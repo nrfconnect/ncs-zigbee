@@ -1,2 +1,2 @@
-# sdk-zigbee
+# ncs-zigbee
 Zigbee nRF Connect add-on
