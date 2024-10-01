@@ -1,0 +1,12 @@
+sample:
+  description: Zigbee application that includes all Zigbee shell commands
+  name: Zigbee application with Zigbee shell
+tests:
+  sample.zigbee.shell:
+    build_only: true
+    sysbuild: true
+    integration_platforms:
+      - nrf52840dk/nrf52840
+      - nrf54l15dk/nrf54l15/cpuapp
+    platform_allow: nrf52840dk/nrf52840 nrf54l15dk/nrf54l15/cpuapp
+    tags: ci_build shell sysbuild ci_samples_zigbee
