@@ -195,7 +195,7 @@ Added
 =====
 
 * Development ZBOSS stack library version based on the ZBOSS build v3.5.0.0.
-  This library version is dedicated for :ref:`NCP development <nrf:ug_zigbee_platform_design_ncp_details>`.
+  This library version is dedicated for :ref:`NCP development <ug_zigbee_platform_design_ncp_details>`.
 * Development libraries for the Cortex-M33 CPU.
 
 Changes

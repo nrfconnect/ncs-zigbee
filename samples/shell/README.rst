@@ -7,7 +7,7 @@ Zigbee: Shell
    :local:
    :depth: 2
 
-This :ref:`Zigbee <ug_zigbee>` Shell sample demonstrates a Zigbee router (with the possibility of being a coordinator) that uses the :ref:`lib_zigbee_shell` library for interaction.
+This :ref:`Zigbee <zigbee_index>` Shell sample demonstrates a Zigbee router (with the possibility of being a coordinator) that uses the :ref:`lib_zigbee_shell` library for interaction.
 
 You can use this sample for several purposes, including:
 
@@ -19,15 +19,16 @@ Requirements
 
 The sample supports the following development kits:
 
-.. table-from-sample-yaml::
+.. include:: /includes/device_table_nrf54l15.txt
 
-You can use one or more of the development kits listed above and mix different development kits.
+..
+  You can use one or more of the development kits listed above and mix different development kits.
 
 To test this sample you also need to program the following samples:
 
 * The :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` sample on one separate device or using a second Zigbee Shell sample.
 
-Additionally, you can use this sample with any other :ref:`Zigbee <ug_zigbee>` sample application for testing the communication or other sample-specific functionalities.
+Additionally, you can use this sample with any other :ref:`Zigbee <zigbee_index>` sample application for testing the communication or other sample-specific functionalities.
 
 Overview
 ********
@@ -56,6 +57,11 @@ These interfaces are completely independent one from another and can be used sim
 For information about setup, see :ref:`testing`.
 
 The Zigbee Shell sample uses UART as the default shell backend.
+To change the shell backend from the default UART to the nRF USB CDC ACM, use the :file:`prj_usb.conf` configuration file and add the ``-DFILE_SUFFIX=usb`` flag when building the sample.
+With such configuration, Zephyr logs are printed only to the backend that the shell is using.
+You can enable the UART backend for the logger, so that Zephyr logs are printed to both the shell backend and the UART.
+To do this, enable the :option:`CONFIG_LOG_BACKEND_UART` Kconfig option.
+If the sample is built for :ref:`zephyr:nrf52840dongle_nrf52840`, the nRF USB CDC ACM is the default backend for shell.
 
 User interface
 **************
@@ -210,14 +216,14 @@ This sample uses the following |NCS| libraries:
 
   * :file:`zb_nrf_platform.h`
 
-* :ref:`dk_buttons_and_leds_readme`
+* `DK Buttons and LEDs`_
 
 It uses the following `sdk-nrfxlib`_ libraries:
 
-* :ref:`nrfxlib:zboss` |zboss_version| (`API documentation`_)
+* :ref:`zigbee_zboss` |zboss_version| (`API documentation`_)
 
 In addition, it uses the following Zephyr libraries:
 
 * :file:`include/zephyr.h`
 * :file:`include/device.h`
-* :ref:`zephyr:logging_api`
+* `Logging`_

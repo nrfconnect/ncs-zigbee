@@ -1,14 +1,14 @@
-.. _zboss:
+.. _zigbee_zboss:
 
 ZBOSS Zigbee stack
 ##################
 
-The |NCS|'s :ref:`nrf:ug_zigbee` stack uses ZBOSS – a portable, high-performance Zigbee software protocol stack that allows for interoperability, customizing, testing, and optimizing of your Zigbee solution.
+The |NCS|'s Zigbee stack uses ZBOSS – a portable, high-performance Zigbee software protocol stack that allows for interoperability, customizing, testing, and optimizing of your Zigbee solution.
 
 The nrfxlib repository contains the following version of the ZBOSS libraries:
 
 * *Production* version that contains the latest stable ZBOSS libraries.
-  This version is enabled with the :kconfig:option:`CONFIG_ZIGBEE_LIBRARY_PRODUCTION` Kconfig option and its files are located in the :file:`zboss/production/` directory.
+  This version is enabled with the :option:`CONFIG_ZIGBEE_LIBRARY_PRODUCTION` Kconfig option and its files are located in the :file:`zboss/production/` directory.
   This version is enabled by default.
 
   The production libraries fully conform to the certification, but they are not necessarily certified.
@@ -21,7 +21,7 @@ For detailed documentation of the ZBOSS API for these versions and instructions 
 
     .. rst-class:: doc-link-image
 
-    .. image:: doc/images/zoi-logo.png
+    .. image:: images/zoi-logo.png
        :target: `ZBOSS API documentation`_
 
     .. rst-class:: doc-link-text
@@ -33,6 +33,6 @@ For detailed documentation of the ZBOSS API for these versions and instructions 
    :maxdepth: 1
    :caption: Subpages:
 
-   doc/zboss_configuration
-   doc/zboss_certification
-   CHANGELOG
+   configuration
+   certification
+   changelog
