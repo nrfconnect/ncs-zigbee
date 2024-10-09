@@ -7,7 +7,7 @@ Zigbee: Network coordinator
    :local:
    :depth: 2
 
-This :ref:`Zigbee <ug_zigbee>` Network coordinator sample establishes the Zigbee network and commissions Zigbee devices that want to join the network.
+This :ref:`Zigbee <zigbee_index>` Network coordinator sample establishes the Zigbee network and commissions Zigbee devices that want to join the network.
 
 You can use this sample together with the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` and the :ref:`Zigbee Light switch <zigbee_light_switch_sample>` to set up a basic Zigbee network.
 
@@ -16,9 +16,10 @@ Requirements
 
 The sample supports the following development kits:
 
-.. table-from-sample-yaml::
+.. include:: /includes/device_table_nrf54l15.txt
 
-You can use one of the development kits listed above.
+..
+  You can use one or more of the development kits listed above and mix different development kits.
 
 Optionally, you can use this sample with one or both of the following samples:
 
@@ -40,10 +41,11 @@ Configuration
 
 |config|
 
-FEM support
-===========
+..
+  FEM support
+  ===========
 
-.. include:: /includes/sample_fem_support.txt
+  .. include:: /includes/sample_fem_support.txt
 
 .. _zigbee_network_coordinator_user_interface:
 
@@ -73,7 +75,7 @@ Button 4:
 
     * If pressed for less than five seconds, it starts or cancels the Identify mode.
     * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
-      The length of the button press can be edited using the :kconfig:option:`CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+      The length of the button press can be edited using the :option:`CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS` Kconfig option from :ref:`lib_zigbee_application_utilities`.
       Releasing the button within this time does not trigger the factory reset procedure.
 
 Building and running
@@ -127,14 +129,14 @@ This sample uses the following |NCS| libraries:
 
   * :file:`zb_nrf_platform.h`
 
-* :ref:`dk_buttons_and_leds_readme`
+* `DK Buttons and LEDs`_
 
 This sample uses the following `sdk-nrfxlib`_ libraries:
 
-* :ref:`nrfxlib:zboss` |zboss_version| (`API documentation`_)
+* :ref:`zigbee_zboss` |zboss_version| (`API documentation`_)
 
 In addition, it uses the following Zephyr libraries:
 
 * :file:`include/zephyr.h`
 * :file:`include/device.h`
-* :ref:`zephyr:logging_api`
+* `Logging`_

@@ -1,0 +1,24 @@
+.. list-table::
+   :widths: auto
+   :header-rows: 1
+
+   * - Hardware platforms
+     - PCA
+     - Board name
+     - Board target
+   * - `nRF52840 DK <Developing with nRF52 Series_>`_
+     - PCA10056
+     - `nrf52840dk`_
+     - ``nrf52840dk/nrf52840``
+   * - `nRF52833 DK <Developing with nRF52 Series_>`_
+     - PCA10100
+     - `nrf52833dk`_
+     - ``nrf52833dk/nrf52833``
+   * - `nRF 5340 DK <Developing with nRF53 Series_>`_
+     - PCA10095
+     - `nrf5340dk`_
+     - ``nrf5340dk/nrf5340/cpuapp``
+   * - `nRF21540 DK <Developing with Front-End Modules_>`_
+     - PCA10112
+     - `nrf21540dk`_
+     - ``nrf21540dk/nrf52840``

@@ -1,0 +1,7 @@
+This sample can be found under |sample path| in the |NCS| folder structure.
+
+To build the sample, follow the instructions in `Building an application`_ in the |NCS| documentation for your preferred building environment.
+See also `Programming an application`_ for programming steps and `Testing and optimization`_ for general information about testing and debugging in the |NCS|.
+
+.. note::
+    |sysbuild_autoenabled_ncs|

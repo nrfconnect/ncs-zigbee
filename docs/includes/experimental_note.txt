@@ -1,0 +1,3 @@
+This is an initial and  `experimental support <Software maturity levels_>`_ release of Zigbee R23 support in Nordic Semiconductor products.
+
+You can expect updates and enhancements in the future, including optimizations related to memory consumption and overall performance.

@@ -7,18 +7,19 @@ Zigbee: Light bulb
    :local:
    :depth: 2
 
-This :ref:`Zigbee <ug_zigbee>` Light bulb sample demonstrates a simple light bulb whose brightness can be adjusted by another device.
+This sample demonstrates a simple light bulb whose brightness can be adjusted by another device.
 
-You can use this sample with the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` and the :ref:`Zigbee Light switch <zigbee_light_switch_sample>` to set up a basic Zigbee network.
+You can use this sample with the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` and :ref:`Zigbee Light switch <zigbee_light_switch_sample>` samples to set up a basic Zigbee network.
 
 Requirements
 ************
 
-The sample supports the following development kits:
+The sample supports the following development kit:
 
-.. table-from-sample-yaml::
+.. include:: /includes/device_table_nrf54l15.txt
 
-You can use one or more of the development kits listed above and mix different development kits.
+..
+  You can use one or more of the development kits listed above and mix different development kits.
 
 To test this sample, you also need to program the following samples:
 
@@ -28,16 +29,25 @@ To test this sample, you also need to program the following samples:
 Overview
 ********
 
-The Zigbee Light bulb sample takes the Zigbee Router role and implements the Dimmable Light device specification, as defined in the Zigbee Home Automation public application profile.
-This profile allows changing the brightness level of a LED of the light bulb.
+The Zigbee light bulb sample takes the :ref:`Zigbee Router <zigbee_roles>` role and implements the Dimmable Light device specification, as defined in the Zigbee Home Automation public application profile.
+This profile allows changing the brightness level of the light bulb's LED.
 
 Configuration
 *************
 
 |config|
 
+..
+  FEM support
+  ===========
+
+  .. include:: /includes/sample_fem_support.txt
+
 User interface
 **************
+
+.. note::
+   Update LED and button numbering.
 
 LED 1:
     Blinks to indicate that the main application thread is running.
@@ -55,7 +65,7 @@ Button 4:
 
     * If pressed for less than five seconds, it starts or cancels the Identify mode.
     * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
-      The length of the button press can be edited using the :kconfig:option:`CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+      The length of the button press can be edited using the :option:`CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS` Kconfig option from :ref:`lib_zigbee_application_utilities`.
       Releasing the button within this time does not trigger the factory reset procedure.
 
 Building and running
@@ -70,6 +80,9 @@ Building and running
 
 Testing
 =======
+
+.. note::
+   Update LED and button numbering.
 
 After programming the sample to your development kits, complete the following steps to test it:
 
@@ -109,15 +122,15 @@ This sample uses the following |NCS| libraries:
 
   * :file:`zb_nrf_platform.h`
 
-* :ref:`dk_buttons_and_leds_readme`
+* `DK Buttons and LEDs`_
 
 It uses the following `sdk-nrfxlib`_ libraries:
 
-* :ref:`nrfxlib:zboss` |zboss_version| (`API documentation`_)
+* :ref:`zigbee_zboss` |zboss_version| (`API documentation`_)
 
 In addition, it uses the following Zephyr libraries:
 
 * :file:`include/zephyr.h`
 * :file:`include/device.h`
-* :ref:`zephyr:logging_api`
-* :ref:`zephyr:pwm_api`
+* `Logging`_
+* `Puls Width Modulation (PWM)`_

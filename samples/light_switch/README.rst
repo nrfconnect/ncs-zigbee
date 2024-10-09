@@ -7,21 +7,26 @@ Zigbee: Light switch
    :local:
    :depth: 2
 
-You can use the :ref:`Zigbee <ug_zigbee>` Light switch sample to change the state of light sources on other devices within the same Zigbee network.
+You can use the :ref:`Zigbee <zigbee_index>` Light switch sample to change the state of light sources on other devices within the same Zigbee network.
 
 You can use it together with the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` and the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` samples to set up a basic Zigbee network.
 
 This sample supports the optional `Sleepy End Device behavior`_ and :ref:`zigbee_light_switch_sample_nus`.
 See :ref:`zigbee_light_switch_activating_variants` for details about how to enable these variants.
 
+..
+  It also supports :ref:`lib_zigbee_fota`.
+  Add sentence between Lines 14 and 15 when restoring.
+
 Requirements
 ************
 
 The sample supports the following development kits:
 
-.. table-from-sample-yaml::
+.. include:: /includes/device_table_nrf54l15.txt
 
-You can use one or more of the development kits listed above and mix different development kits.
+..
+  You can use one or more of the development kits listed above and mix different development kits.
 
 To test this sample, you also need to program the following samples:
 
@@ -71,12 +76,12 @@ When this extension is enabled, you can use:
 
 Both networks are independent from each other.
 
-To support both protocols at the same time, the Zigbee stack uses the :ref:`zephyr:ieee802154_interface` radio during the inactive time of the Bluetooth LE radio (using the Timeslot API of the :ref:`nrfxlib:mpsl`).
+To support both protocols at the same time, the Zigbee stack uses the `IEEE 802.15.4`_ radio during the inactive time of the Bluetooth LE radio (using the Timeslot API of the :ref:`nrfxlib:mpsl`).
 Depending on the Bluetooth LE connection interval, the nRF52 development kits can spend up to 99% of the radio time on the Zigbee protocol.
 
 Transmitting and receiving data when using this example does not break connection from any of the used radio protocols, either Bluetooth LE or Zigbee.
 
-For more information about the multiprotocol feature, see :ref:`ug_multiprotocol_support`.
+For more information about the multiprotocol feature, see `Multiprotocol support`_ in the |NCS| documentation.
 
 .. _zigbee_light_switch_configuration:
 
@@ -104,6 +109,19 @@ You can find the configuration files in the :file:`samples/zigbee/light_switch` 
 Activating optional extensions
 ------------------------------
 
+..
+  To activate the :ref:`lib_zigbee_fota`, use the :file:`prj_fota.conf` configuration file.
+  For example, when building from the command line, use the following command:
+
+  .. code-block:: console
+
+     west build samples/zigbee/light_switch -b nrf52840dk/nrf52840 -- -DFILE_SUFFIX=fota
+
+  Alternatively, you can :ref:`configure Zigbee FOTA manually <ug_zigbee_configuring_components_ota>`.
+
+  .. note::
+     You can use the :file:`prj_fota.conf` file only with a development kit that contains the nRF52840 or nRF5340 SoC.
+
 To activate the Multiprotocol Bluetooth LE extension, set :makevar:`EXTRA_CONF_FILE` to the :file:`overlay-multiprotocol_ble.conf`.
 For example, when building from the command line, use the following command:
 
@@ -117,18 +135,24 @@ For the board name to use instead of the ``nrf52840dk/nrf52840``, see :ref:`prog
 See :ref:`cmake_options` for instructions on how to add flags to your build.
 For more information about configuration files in the |NCS|, see :ref:`app_build_system`.
 
+..
+  FEM support
+  ===========
+
+  .. include:: /includes/sample_fem_support.txt
+
 Configurable transmission power
 ===============================
 
-To achieve a lower power consumption of the light switch, you can configure the transmission power using the :kconfig:option:`CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER` Kconfig option.
-You can select per-channel transmission power (in dBm) with the :kconfig:option:`CONFIG_LIGHT_SWITCH_TX_POWER` Kconfig option.
+To achieve a lower power consumption of the light switch, you can configure the transmission power using the :option:`CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER` Kconfig option.
+You can select per-channel transmission power (in dBm) with the :option:`CONFIG_LIGHT_SWITCH_TX_POWER` Kconfig option.
 This affects to all frames sent by the device, even in the network scan phase.
 
 .. note::
-    The :kconfig:option:`CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER` Kconfig option is enabled by default and this sample's transmission power is set to 0 dBm.
+    The :option:`CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER` Kconfig option is enabled by default and this sample's transmission power is set to 0 dBm.
 
-When the :kconfig:option:`CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI` Kconfig option is set to ``y``, the :kconfig:option:`CONFIG_ZIGBEE_APP_CB_QUEUE_LENGTH` Kconfig option must be increased depending on the channel mask.
-For example, in case 16 channels are active, a proper value for :kconfig:option:`CONFIG_ZIGBEE_APP_CB_QUEUE_LENGTH` would be ``17``.
+When the :option:`CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI` Kconfig option is set to ``y``, the :option:`CONFIG_ZIGBEE_APP_CB_QUEUE_LENGTH` Kconfig option must be increased depending on the channel mask.
+For example, in case 16 channels are active, a proper value for :option:`CONFIG_ZIGBEE_APP_CB_QUEUE_LENGTH` would be ``17``.
 Similar consideration applies to the `ZB_CONFIG_IOBUF_POOL_SIZE` and `ZB_CONFIG_SCHEDULER_Q_SIZE` values configured in the :file:`include/zb_mem_config_custom.h` file.
 
 .. _zigbee_light_switch_user_interface:
@@ -155,11 +179,19 @@ Button 2:
 
 Button 4:
     When pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
-    The length of the button press can be edited using the :kconfig:option:`CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+    The length of the button press can be edited using the :option:`CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS` Kconfig option from :ref:`lib_zigbee_application_utilities`.
     Releasing the button within this time does not trigger the factory reset procedure.
 
 .. note::
     If the brightness level is at the minimum level, you may not notice the effect of turning on the light bulb.
+
+..
+  FOTA behavior assignments
+  =========================
+
+  LED 2:
+      Indicates the OTA activity.
+      Used only if the FOTA support is enabled.
 
 Sleepy End Device behavior assignments
 ======================================
@@ -228,60 +260,57 @@ You can now use buttons on the development kit to control the light bulb, as des
 Testing multiprotocol Bluetooth LE extension
 --------------------------------------------
 
-To test the multiprotocol Bluetooth LE extension, complete the following steps after the standard `Testing`_ procedure:
+To test the multiprotocol Bluetooth LE extension, you need to complete the standard `Testing`_ procedure, set up nRF Toolbox, and then perform the tests using nRF Toolbox.
 
-#. Set up nRF Toolbox by completing the following steps:
+Set up nRF Toolbox by completing the following steps:
 
-   .. tabs::
+1. Start UART.
 
-      .. tab:: a. Start UART
+   Tap :guilabel:`UART` to open the UART application in nRF Toolbox.
 
-         Tap :guilabel:`UART` to open the UART application in nRF Toolbox.
+   .. figure:: /images/nrftoolbox_dynamic_zigbee_uart_1.png
+      :alt: UART application in nRF Toolbox
 
-         .. figure:: /images/nrftoolbox_dynamic_zigbee_uart_1.png
-            :alt: UART application in nRF Toolbox
+      UART application in nRF Toolbox
 
-            UART application in nRF Toolbox
+#. Configure commands.
 
-      .. tab:: b. Configure commands
+   Configure the UART commands by completing the following steps:
 
-         Configure the UART commands by completing the following steps:
+   a. Tap :guilabel:`EDIT` in the top right corner of the application.
+      The button configuration window appears.
+   #. Create the active application buttons by completing the following steps:
 
-         1. Tap :guilabel:`EDIT` in the top right corner of the application.
-            The button configuration window appears.
-         #. Create the active application buttons by completing the following steps:
+      i. Bind the ``n`` command to one of the buttons, with EOL set to LF and an icon of your choice.
+      #. Bind the ``f`` command to one of the buttons, with EOL set to LF and an icon of your choice.
+      #. Bind the ``t`` command to one of the buttons, with EOL set to LF and an icon of your choice.
+      #. Bind the ``d`` command to one of the buttons, with EOL set to LF and an icon of your choice.
+      #. Bind the ``i`` command to one of the buttons, with EOL set to LF and an icon of your choice.
 
-            a. Bind the ``n`` command to one of the buttons, with EOL set to LF and an icon of your choice.
-            #. Bind the ``f`` command to one of the buttons, with EOL set to LF and an icon of your choice.
-            #. Bind the ``t`` command to one of the buttons, with EOL set to LF and an icon of your choice.
-            #. Bind the ``d`` command to one of the buttons, with EOL set to LF and an icon of your choice.
-            #. Bind the ``i`` command to one of the buttons, with EOL set to LF and an icon of your choice.
+      .. figure:: /images/nrftoolbox_dynamic_zigbee_uart_2.png
+         :alt: Configuring buttons in nRF Toolbox - UART application
 
-            .. figure:: /images/nrftoolbox_dynamic_zigbee_uart_2.png
-               :alt: Configuring buttons in nRF Toolbox - UART application
+         Configuring buttons in the UART application of nRF Toolbox
 
-               Configuring buttons in the UART application of nRF Toolbox
+   #. Tap :guilabel:`DONE` in the top right corner of the application.
 
-         #. Tap :guilabel:`DONE` in the top right corner of the application.
+#. Connect to the device.
 
-      .. tab:: c. Connect to device
+   Tap :guilabel:`CONNECT` and select the **Zigbee_Switch** device from the list of devices.
 
-         Tap :guilabel:`CONNECT` and select the **Zigbee_Switch** device from the list of devices.
+   .. figure:: /images/nrftoolbox_dynamic_zigbee_uart_3.png
+      :alt: nRF Toolbox - UART application view after establishing connection
 
-         .. figure:: /images/nrftoolbox_dynamic_zigbee_uart_3.png
-            :alt: nRF Toolbox - UART application view after establishing connection
+      The UART application of nRF Toolbox after establishing the connection
 
-            The UART application of nRF Toolbox after establishing the connection
+   Observe that **LED 1** on the light switch node is solid.
+   This indicates that the Bluetooth LE connection is established.
 
-         .. note::
-            Observe that **LED 1** on the light switch node is solid, which indicates that the Bluetooth LE connection is established.
-   ..
+In nRF Toolbox, tap the buttons you assigned to perform the test:
 
-#. In nRF Toolbox, tap the buttons you assigned:
-
-   a. Tap the :guilabel:`n` and :guilabel:`f` command buttons to turn the LED on the Zigbee Light bulb node on and off, respectively.
-   #. Tap the :guilabel:`t` command button two times to toggle the LED on the Zigbee Light bulb node on and off.
-   #. Tap the :guilabel:`i` and :guilabel:`d` command buttons to make adjustments to the brightness level.
+1. Tap the :guilabel:`n` and :guilabel:`f` command buttons to turn the LED on the Zigbee Light bulb node on and off, respectively.
+#. Tap the :guilabel:`t` command button two times to toggle the LED on the Zigbee Light bulb node on and off.
+#. Tap the :guilabel:`i` and :guilabel:`d` command buttons to make adjustments to the brightness level.
 
 You can now control the devices either with the buttons on the development kits or with the NUS UART command buttons in the nRF Toolbox application.
 
@@ -289,31 +318,31 @@ Sample output
 -------------
 
 You can observe the sample logging output through a serial port after connecting with a terminal emulator (for example, nRF Connect Serial Terminal).
-See :ref:`test_and_optimize` for the required settings and steps.
+See `Testing and optimization`_ in the |NCS| documentation for the required settings and steps.
 
 Dependencies
 ************
 
 This sample uses the following |NCS| libraries:
 
-* :ref:`lib_ram_pwrdn`
+* `RAM power-down`_
 * :ref:`lib_zigbee_error_handler`
 * :ref:`lib_zigbee_application_utilities`
 * Zigbee subsystem:
 
   * :file:`zb_nrf_platform.h`
 
-* :ref:`dk_buttons_and_leds_readme`
+* `DK Buttons and LEDs`_
 
 It uses the following `sdk-nrfxlib`_ libraries:
 
-* :ref:`nrfxlib:zboss` |zboss_version| (`API documentation`_)
+* :ref:`zigbee_zboss` |zboss_version| (`API documentation`_)
 
 In addition, it uses the following Zephyr libraries:
 
 * :file:`include/zephyr.h`
 * :file:`include/device.h`
-* :ref:`zephyr:logging_api`
+* `Logging`_
 
 The following dependencies are added by the multiprotocol Bluetooth LE extension:
 
