@@ -37,3 +37,8 @@ zephyr_library_link_libraries(zboss)
 
 zephyr_compile_definitions(CUSTOM_IEEE802154_L2=ZIGBEE_L2)
 zephyr_compile_definitions(ZIGBEE_L2=ZIGBEE_R23)
+
+if (CONFIG_ZIGBEE_R23)
+    include(${ZEPHYR_NRF_MODULE_DIR}/cmake/extensions.cmake)
+    ncs_add_partition_manager_config(partition_manager/pm.yml.zboss)
+endif()
