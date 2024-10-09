@@ -404,4 +404,12 @@ config APP_LINK_WITH_ZIGBEE
 	help
 	  Link application with Zigbee subsystem
 
+partition=ZBOSS_NVRAM
+partition-size=0x8000
+source "${ZEPHYR_BASE}/../nrf/subsys/partition_manager/Kconfig.template.partition_config"
+
+partition=ZBOSS_PRODUCT_CONFIG
+partition-size=0x1000
+source "${ZEPHYR_BASE}/../nrf/subsys/partition_manager/Kconfig.template.partition_config"
+
 endif #ZIGBEE_R23
