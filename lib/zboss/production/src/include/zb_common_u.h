@@ -55,8 +55,6 @@ zb_uint32_t zb_random_jitter(void);
  */
 #define ZB_RANDOM_JTR(max_value) (zb_random_jitter() / (ZB_RAND_MAX / (zb_uint32_t)(max_value)))
 
-/*! @} */
-
 /*! \internal \addtogroup ZB_BASE */
 /*! @{ */
 

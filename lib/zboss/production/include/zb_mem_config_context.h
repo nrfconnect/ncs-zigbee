@@ -48,7 +48,7 @@
 /*! @{ */
 
 /**
-   @defgroup configurable_mem_internals
+   @defgroup configurable_mem_internals Configurable internal memory
    @{
    @details
    Design of configurable ZBOSS internal memory provides an ability to
@@ -356,7 +356,6 @@ ZB_CONFIG_PRE zb_ncp_pending_calls_t gc_ncp_pending_calls[ZB_CONFIG_N_BUF_IDS] Z
 
 #endif  /* ZB_CONFIGURABLE_MEM */
 
-/*! @} */
 /*! @} */
 
 #endif /* ZB_MEM_CONFIG_CONTEXT_H */

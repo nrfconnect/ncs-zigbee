@@ -108,8 +108,8 @@ typedef ZB_PACKED_PRE struct zb_zcl_ota_upgrade_file_header_optional_s
 /** @cond DOXYGEN_INTERNAL_DOC */
 #define ZB_ZCL_OTA_UPGRADE_FILE_HEADER_FULL_SIZE        \
     (sizeof(zb_zcl_ota_upgrade_file_header_t) + 2*sizeof(zb_uint16_t)+sizeof(zb_ieee_addr_t))
-/*! @}
- *  @endcond */ /* DOXYGEN_INTERNAL_DOC */
+/** @endcond */ /* DOXYGEN_INTERNAL_DOC */
+/*! @} */
 
 /** @brief Default OTA Upgrade File Identifier, see ZCL8 specification, subsection 11.4.2.1 */
 #define ZB_ZCL_OTA_UPGRADE_FILE_HEADER_FILE_ID          0x0BEEF11E
@@ -800,10 +800,8 @@ enum zb_zcl_ota_upgrade_image_status_e
 
 /*! @internal Number of attributes mandatory for reporting in OTA Upgrade cluster */
 #define ZB_ZCL_OTA_UPGRADE_REPORT_ATTR_COUNT 0
-
-/*! @}
-  * @
-    @endcond endcond */ /* OTA Upgrade cluster internals */
+/** @endcond */ /* internals_doc */
+/*! @} */ /* OTA Upgrade cluster internals */
 
 /** @brief Declare attribute list for OTA Upgrade cluster - client side
     @attention All attributes are required by built-in OTA client so passing NULL pointers in parameters is prohibited!
@@ -989,8 +987,8 @@ enum zb_zcl_ota_upgrade_resp_cmd_e
                                               ZB_ZCL_CMD_OTA_UPGRADE_IMAGE_BLOCK_ID,           \
                                               ZB_ZCL_CMD_OTA_UPGRADE_UPGRADE_END_ID,           \
                                               ZB_ZCL_CMD_OTA_UPGRADE_QUERY_SPECIFIC_FILE_ID
-/*! @}
- *  @endcond */ /* internals_doc */
+/** @endcond */ /* internals_doc */
+/*! @} */ /* OTA Upgrade cluster commands */
 
 
 /************************* Query Next Image Request **************************/
@@ -2192,8 +2190,8 @@ zb_uint8_t zb_zcl_ota_upgrade_get8(zb_uint8_t endpoint, zb_uint16_t attr_id);
 zb_uint16_t zb_zcl_ota_upgrade_get16(zb_uint8_t endpoint, zb_uint16_t attr_id);
 
 zb_uint32_t zb_zcl_ota_upgrade_get32(zb_uint8_t endpoint, zb_uint16_t attr_id);
-/*! @}
- *  @endcond */ /* internals_doc */
+/** @endcond */ /* internals_doc */
+/*! @} */
 
 zb_ret_t zb_zcl_check_value_ota_upgrade(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 
@@ -2214,9 +2212,13 @@ void zcl_ota_abort_and_set_tc(zb_uint8_t param);
 zb_uint8_t zb_zcl_get_cmd_list_ota_upgrade(zb_bool_t is_client_generated, zb_uint8_t **cmd_list);
 #endif /* defined ZB_ENABLE_HA */
 
-#endif /* defined ZB_ZCL_SUPPORT_CLUSTER_OTA_UPGRADE || defined DOXYGEN */
 /*! @} */ /* ZCL OTA Upgrade cluster definitions */
 
+/** @endcond */ /* DOXYGEN_ZCL_SECTION */
+
+#endif /* defined ZB_ZCL_SUPPORT_CLUSTER_OTA_UPGRADE || defined DOXYGEN */
+
+/** @cond DOXYGEN_ZCL_SECTION */
 #ifdef ZB_HA_ENABLE_OTA_UPGRADE_CLIENT
 #define ZCL_OTA_MAX_RESEND_RETRIES 3
 
@@ -2229,7 +2231,7 @@ typedef struct zb_zcl_ota_upgrade_cli_ctx_s
   zb_uint16_t ota_period_backup;
   zb_uint32_t ota_dfv;
 } zb_zcl_ota_upgrade_cli_ctx_t;
-#endif
+#endif /* ZB_HA_ENABLE_OTA_UPGRADE_CLIENT */
 
 /** @endcond */ /* DOXYGEN_ZCL_SECTION */
 

@@ -102,8 +102,8 @@ zb_zcl_cluster_handler_t zb_zcl_get_cluster_handler_internal(zb_uint8_t endpoint
 zb_zcl_cluster_check_value_t zb_zcl_internal_get_cluster_check_value(zb_uint8_t endpoint, zb_uint16_t cluster_id, zb_uint8_t cluster_role);
 zb_zcl_cluster_write_attr_hook_t zb_zcl_internal_get_cluster_write_attr_hook(zb_uint8_t endpoint, zb_uint16_t cluster_id, zb_uint8_t cluster_role);
 
-/** @endcond */ /* internals_doc */
-
 /*! @} */ /* zcl_api */
+
+/** @endcond */ /* internals_doc */
 
 #endif /* ZB_ZCL_H */

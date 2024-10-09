@@ -189,8 +189,7 @@ enum zb_zcl_level_control_options_e
 
 /** @cond internals_doc */
 #define ZB_ZCL_LEVEL_CONTROL_RATE_AS_FAST_AS_ABLE 0xff
-/*! @}
- *  @endcond */ /* internals_doc */
+/*! @endcond */ /* internals_doc */
 
 /*!
   @brief Declare attribute list for Level Control cluster
@@ -322,8 +321,7 @@ typedef struct zb_zcl_level_control_move_status_s
 #define ZB_ZCL_LEVEL_CONTROL_REPORT_ATTR_COUNT 1
 
 /*! @} */ /* Level Control cluster internals */
-/*! @}
- *  @endcond */ /* internals_doc */
+/*! @endcond */ /* internals_doc */
 
 /*! @name Level Control cluster commands
     @{
@@ -373,8 +371,8 @@ enum zb_zcl_level_control_cmd_e
                                       ZB_ZCL_CMD_LEVEL_CONTROL_STOP_WITH_ON_OFF
 
 #define ZB_ZCL_CLUSTER_ID_LEVEL_SERVER_ROLE_RECEIVED_CMD_LIST ZB_ZCL_CLUSTER_ID_LEVEL_CLIENT_ROLE_GENERATED_CMD_LIST
-/*! @}
- *  @endcond */ /* internals_doc */
+/*! @endcond */ /* internals_doc */
+/*! }@ */ /* Level Control cluster commands */
 
 /*! Default OptionsMask value */
 #define ZB_ZCL_LEVEL_CONTROL_OPTIONS_MASK_DEFAULT_FIELD_VALUE ((zb_uint8_t)0x00)
@@ -1378,8 +1376,7 @@ typedef struct zb_zcl_level_control_set_value_param_s
 {
   zb_uint8_t new_value;
 } zb_zcl_level_control_set_value_param_t;
-/*! @}
- *  @endcond */ /* internals_doc */
+/*! @endcond */ /* internals_doc */
 
   /* definition to parse request */
 
@@ -1393,7 +1390,7 @@ typedef struct zb_zcl_level_control_set_value_param_s
 
 /*! @} */ /* ZCL Level Control cluster definitions */
 
-/** @endcond */
+/** @endcond */ /* DOXYGEN_ZCL_SECTION */
 
 void zb_zcl_level_control_init_server(void);
 void zb_zcl_level_control_init_client(void);

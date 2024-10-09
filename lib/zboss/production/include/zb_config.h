@@ -158,7 +158,7 @@ constants etc.
 #define ZB_ZGP_TBL_MAX_CLUSTERS 5U
 #endif  /* ZB_ZGP_SINK_SUPPORT_LEGACY_MATCH_INFO */
 
-#endif
+#endif /* (defined ZB_ENABLE_ZGP_COMBO || defined ZB_ENABLE_ZGP_TARGET || defined ZB_ENABLE_ZGP_TARGET_PLUS || defined ZGP_COMMISSIONING_TOOL) */
 
 /** Sink table size */
 #ifndef ZB_ZGP_SINK_TBL_SIZE
@@ -779,7 +779,7 @@ In general, define ZB_COORDINATOR_ROLE to compile ZC-only build, ZB_ROUTER_ROLE 
 /*! Define Zigbee end device functionality */
 #define ZB_ED_FUNC
 #endif
-#endif
+#endif /* !defined ZB_ED_ROLE && !defined ZB_ZGPD_ROLE && !defined ZB_COORDINATOR_ROLE && !defined ZB_ROUTER_ROLE */
 
 #if defined ZB_ED_ROLE || defined ZB_ROUTER_ROLE
 /*! Define joiner client functionality */
@@ -811,7 +811,6 @@ ZB_ED_RX_OFF_WHEN_IDLE
  */
 
 #if defined ZB_COORDINATOR_ROLE || (defined ZB_ROUTER_ROLE && defined ZB_DISTRIBUTED_SECURITY_ON)
-
 /*! Formation is supported by ZC or ZR in Distributed mode */
 #define ZB_FORMATION
 #endif
@@ -1031,7 +1030,7 @@ ZB_ED_RX_OFF_WHEN_IDLE
  * of devices in the network, not neighbor table size */
 #define ZB_N_APS_KEY_PAIR_ARR_MAX_SIZE            ZB_NEIGHBOR_TABLE_SIZE
 #endif
-#endif
+#endif /* ZB_N_APS_KEY_PAIR_ARR_MAX_SIZE */
 
 /**
    If the joining device does not receive any of
@@ -1202,7 +1201,6 @@ ZB_ED_RX_OFF_WHEN_IDLE
 #else
 #define ZB_CHANNEL_PAGES_NUM 1u
 #endif  /* !ZB_SUBGHZ_BAND_ENABLED */
-/** @endcond */
 
 /*! @cond DOXYGEN_INTERNAL_DOC */
 /**

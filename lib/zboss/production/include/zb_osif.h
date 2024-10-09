@@ -379,9 +379,16 @@ void zb_osif_mserial_set_cb_send_data(zb_serial_port_t port_instance, zb_serial_
 
 #endif /* ZB_HAVE_ASYNC_SERIAL */
 
+/*! @} */
+/** @endcond */ /* DOXYGEN_UART_SECTION */
+
 #endif /* ZB_HAVE_SERIAL || DOXYGEN */
 
 #if defined ZB_BINARY_TRACE || defined ZB_HAVE_SERIAL || defined ZB_TRACE_OVER_USART || defined DOXYGEN || defined ZB_NSNG
+
+/** @cond DOXYGEN_UART_SECTION */
+/*! \addtogroup uart */
+/*! @{ */
 
 /**
    TX data over UART
@@ -408,11 +415,11 @@ void zb_osif_mserial_put_bytes(zb_serial_port_t port_instance, const zb_uint8_t 
 #ifdef ZB_TRACE_OVER_JTAG
 void zb_osif_jtag_put_bytes(const zb_uint8_t *buf, zb_short_t len);
 void zb_osif_jtag_flush(void);
-#endif
 
 /*! @} */
 /** @endcond */ /* DOXYGEN_UART_SECTION */
 
+#endif /* ZB_BINARY_TRACE || defined ZB_HAVE_SERIAL || defined ZB_TRACE_OVER_USART */
 
 
 #ifdef ZB_TRACE_OVER_SIF

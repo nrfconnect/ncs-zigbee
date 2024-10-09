@@ -92,7 +92,7 @@ typedef struct zb_zdo_configuration_attributes_e
 } zb_zdo_configuration_attributes_t;
 
 
-/*! @} */
+/*! @} */ /*zbo_ib */
 
 /*! \addtogroup ZB_ZDO */
 /*! @{ */
@@ -234,7 +234,6 @@ typedef struct zdo_cluster_filters_s
 } zdo_cluster_filters_t;
 
 struct zb_zdo_device_annce_s;
-/*! @endcond */
 
 #if defined ZB_JOINING_LIST_SUPPORT && defined ZB_ROUTER_ROLE
 typedef struct zb_joining_list_ctx_s
