@@ -93,6 +93,7 @@
 
 #define zb_buf_t zb_leg_buf_t
 
+/** @cond internals_doc */
 
 /**
    BIG Packet buffer header.
@@ -764,17 +765,14 @@ zb_ret_t zb_get_buf_delayed_2param(
 #else
 #define ZB_GET_OUT_BUF_DELAYED2(callback, user_param) zb_get_buf_delayed_2param(callback, ZB_OUT_BUFFER, ZB_TRUE, user_param)
 #endif
-/** @cond internals_doc */
-
 
 /**
    Do nothing in ZB_SWITCH_BUF
  */
 #define ZB_SWITCH_BUF(buf, to_in)
 
-
-/*! @} */
-
 #endif /* #ifdef ZB_LEGACY_BUFS */
+
+/*! @} */ /* bufleg */
 
 #endif /* ZBOSS_API_BUF_LEGACY_H */

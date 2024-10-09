@@ -409,7 +409,7 @@ typedef enum zb_zcl_security_use_option_e
 #define ZB_ZCL_STATUS_ABORT                 0x95U /*!< Abort */
 #define ZB_ZCL_STATUS_INVALID_IMAGE         0x96U /*!< Invalid OTA upgrade image */
 #define ZB_ZCL_STATUS_WAIT_FOR_DATA         0x97U /*!< Server does not have data block available yet */
-/**< No OTA upgrade image available for a particular client. */
+/** No OTA upgrade image available for a particular client. */
 #define ZB_ZCL_STATUS_NO_IMAGE_AVAILABLE    0x98U
 /** The client still requires more OTA upgrade image files in order to successfully upgrade. */
 #define ZB_ZCL_STATUS_REQUIRE_MORE_IMAGE    0x99U
@@ -1951,7 +1951,7 @@ zb_single_t zb_zcl_attr_getsingle(zb_uint8_t *value);
 #define ZB_ZCL_INVALID_STRING_VALUE 0xFFU
 #define ZB_ZCL_INVALID_ARRAY_VALUE 0xFFFFU
 
-/** @endcond */
+/** @endcond */ /* internals_doc */
 
 /*! @} */ /* ZCL common types and definitions */
 
@@ -2000,7 +2000,7 @@ typedef struct zcl_cb_hash_ent_s
 }
 zcl_cb_hash_ent_t;
 
-/** @endcond */
+/** @endcond */ /*internals_doc */
 
 /** Command send status structure */
 typedef struct zb_zcl_command_send_status_s
@@ -2352,6 +2352,8 @@ void zb_zcl_process_command_finish_new(zb_bufid_t buffer, zb_zcl_parsed_hdr_t *p
 #define ZB_ZCL_PROCESS_COMMAND_FINISH_NEW(buffer, pcmd_info, status)        \
   zb_zcl_process_command_finish_new(buffer, pcmd_info, status)
 
+/** @endcond */ /* DOXYGEN_INTERNAL_DOC */
+
 /** @brief Declare for change attribute for User Application
  *
  * @note Size of values must be twice as large as maximum size of a possible attribute
@@ -2442,7 +2444,7 @@ typedef struct zb_zcl_set_attr_value_param_s
   }                                                                            \
 }
 
-/** @endcond */
+/** @endcond */ /* internals_doc */
 
 /**
  * @brief Set ZCL backward compatibility modes

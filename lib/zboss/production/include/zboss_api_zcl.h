@@ -2066,7 +2066,7 @@ void zb_zcl_remove_default_reporting_info(zb_uint16_t cluster_id, zb_uint8_t clu
 
 void zb_zcl_mark_report_not_sent(zb_zcl_reporting_info_t *rep_info);
 
-#endif
+#endif /* ZB_ZCL_DISABLE_REPORTING */
 
 /**
    Register device context.
@@ -2390,7 +2390,7 @@ void zb_bdb_finding_binding_initiator_cancel(void);
 
 /** @} */
 
-#endif
+#endif /* ZB_BDB_ENABLE_FINDING_BINDING || DOXYGEN */
 
 /**
    @addtogroup zboss_bdb_comm_params
@@ -2573,7 +2573,7 @@ typedef struct zb_zcl_globals_s
     * defined time interval */
   zb_zcl_no_reporting_cb_t no_reporting_cb;
   /** @internal User defined API callback, is used to connection with User Application */
-#endif
+#endif /* ZB_ZCL_DISABLE_REPORTING */
 
   zb_callback_t device_cb;
   zb_callback_t checkin_cb;
@@ -2581,7 +2581,7 @@ typedef struct zb_zcl_globals_s
 #if !(defined ZB_ZCL_DISABLE_REPORTING)
   /** @internal Stores context information for reporting */
   zb_zcl_reporting_ctx_t reporting_ctx;
-#endif
+#endif /* ZB_ZCL_DISABLE_REPORTING */
 
   /** @internal Set default value all attributes */
   zb_zcl_set_default_value_attr_cb_t set_default_attr_cb;

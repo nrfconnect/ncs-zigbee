@@ -91,6 +91,7 @@ void zb_globals_init(void);
                             in 8051 simulator)
  */
 void zb_ib_set_defaults(zb_char_t *rx_pipe);
+/*! @} */
 
 enum zb_dev_specific_e
 {

@@ -740,6 +740,8 @@ typedef zb_uint8_t zb_zdp_status_t;
 
 #endif /* ZB_ENABLE_SE_MIN_CONFIG */
 
+/** @cond DOXYGEN_SE_SECTION */
+
 /** ZC / our MAC suspended our device tx: out of Duty cycle (sub-ghz only)
                                                  * @par Signal parameter - number of minutes to suspend, -1 if unknown
                                                  */
@@ -2151,13 +2153,13 @@ zb_uint8_t zb_zdo_system_server_discovery_req(zb_uint8_t param, zb_callback_t cb
 #ifdef ZB_JOIN_CLIENT
 /**
  * @brief Set the number of network scan attempts
- *  
- * Sets the number of scan attempts to make before the NWK layer decides which Zigbee 
+ *
+ * Sets the number of scan attempts to make before the NWK layer decides which Zigbee
  * coordinator or router to associate with.
  * The default value is 5, see @ref ZB_ZDO_NWK_SCAN_ATTEMPTS.
- * 
+ *
  * @param [IN] attempts - value of scan attempts. Valid values between 1 and 255.
- * 
+ *
  * @return RET_OK - if success,
  *         RET_INVALID_PARAMETER_1 - if the attempts value is incorrect.
  */
@@ -2564,13 +2566,13 @@ zb_zdo_routing_table_record_t;
  * zb_nlme_network_discovery_request_t. The only
  * argument from this callback is the index of a buffer with
  * zb_nlme_network_discovery_confirm_t param, followed by a sequence of
- * zb_nlme_network_descriptor_t params (count is determined by 
+ * zb_nlme_network_descriptor_t params (count is determined by
  * zb_nlme_network_discovery_confirm_t - network_count)
- * 
+ *
  * Sample use of active scan request:
  * @snippet zdo_startup_nwk_scan/zdo_start_ze.c active_scan_complete_cb
  * @snippet zdo_startup_nwk_scan/zdo_start_ze.c zb_zdo_active_scan_request
- * 
+ *
  * @param param - index of buffer with zb_nlme_network_discovery_request_t param
  */
 void zb_zdo_active_scan_request(zb_uint8_t param);
@@ -3560,10 +3562,10 @@ void zb_zdo_setup_network_as_distributed(void);
 
 /**
  *  Enable distributed security linkage
- * 
+ *
  *  Without that call ZR is not able to create a Distributed network.
- * 
- *  @deprecated This function will be removed in January 2024. 
+ *
+ *  @deprecated This function will be removed in January 2024.
  *  Use instead:
  *  - @ref zb_bdb_enable_distributed_network_formation
  */
@@ -3571,9 +3573,9 @@ void zb_enable_distributed(void);
 
 /**
  *  @brief Disable distributed security network formation at runtime
- *  
- * 
- *  @deprecated This function will be removed in January 2024. 
+ *
+ *
+ *  @deprecated This function will be removed in January 2024.
  *  Use instead:
  *  - @ref zb_bdb_enable_distributed_network_formation
  */
@@ -3581,7 +3583,7 @@ void zb_disable_distributed(void);
 
 /**
  *  @brief Enable distributed security network formation at runtime
- * 
+ *
  * After call the function device won't try
  * to join, but will form a distributed security network instead.
  */
@@ -3590,7 +3592,7 @@ void zb_bdb_enable_distributed_network_formation (void);
 
 /**
  *  @brief Disable distributed security network formation at runtime
- * 
+ *
  * After call the function the device will not be able to form a distributed security
  * network, but can join another distributed network.
  */
@@ -3599,13 +3601,13 @@ void zb_bdb_disable_distributed_network_formation (void);
 
 /**
  *  @brief Enable/disable distributed security network formation at runtime
- * 
+ *
  * After call the function with the enable param set to ZB_TRUE, device won't try
  * to join, but will form a distributed security network instead. If enable param
  * is set to ZB_FALSE, the device will not be able to form a distributed security
  * network, but can join another network.
- * 
- *  @param enable - ZB_TRUE to enable distributed formation, ZB_FALSE to disable. 
+ *
+ *  @param enable - ZB_TRUE to enable distributed formation, ZB_FALSE to disable.
  *
  * @deprecated This function will be moved to the private header in April 2025. Use @ref
  * zb_bdb_enable_distributed_network_formation() or @ref zb_bdb_disable_distributed_network_formation() instead.
@@ -3627,7 +3629,7 @@ void zb_disable_joining_to_distributed_network (void);
 
 /**
  * @brief Enable joining to a distributed network
- * 
+ *
  *  @param enable - ZB_TRUE to enable, ZB_FALSE to disable
  *
  * @deprecated This function will be moved to the private header in April 2025. Use @ref

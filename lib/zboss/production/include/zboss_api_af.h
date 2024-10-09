@@ -764,10 +764,10 @@ void zb_af_register_device_ctx(zb_af_device_ctx_t *device_ctx);
  *  @param func_ptr - a callback to set (of type @ref zb_callback_t).
  *  @hideinitializer
  *
- * @b Example:
- * @snippet onoff_server/on_off_output_zc.c zcl_register_device_cb_example_cb
- * @par Register callback:
- * @snippet onoff_server/on_off_output_zc.c zcl_register_device_cb
+ *  @b Example:
+ *  @snippet onoff_server/on_off_output_zc.c zcl_register_device_cb_example_cb
+ *  @par Register callback:
+ *  @snippet onoff_server/on_off_output_zc.c zcl_register_device_cb
 */
 #define ZB_ZCL_REGISTER_DEVICE_CB(func_ptr) ZCL_CTX().device_cb = (func_ptr)
 
