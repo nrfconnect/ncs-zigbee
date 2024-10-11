@@ -7,7 +7,7 @@ Zigbee: Shell
    :local:
    :depth: 2
 
-This :ref:`Zigbee <zigbee_index>` Shell sample demonstrates a Zigbee router (with the possibility of being a coordinator) that uses the :ref:`lib_zigbee_shell` library for interaction.
+This Shell sample demonstrates a Zigbee router (with the possibility of being a coordinator) that uses the :ref:`lib_zigbee_shell` library for interaction.
 
 You can use this sample for several purposes, including:
 
@@ -54,31 +54,25 @@ Available shell interfaces
 
 You can run the Zigbee shell commands after connecting and configuring any of the :ref:`supported backends <lib_zigbee_shell>` for testing.
 These interfaces are completely independent one from another and can be used simultaneously or exclusively.
-For information about setup, see :ref:`testing`.
+For information about setup, see `Testing and optimization`_.
 
 The Zigbee Shell sample uses UART as the default shell backend.
 To change the shell backend from the default UART to the nRF USB CDC ACM, use the :file:`prj_usb.conf` configuration file and add the ``-DFILE_SUFFIX=usb`` flag when building the sample.
 With such configuration, Zephyr logs are printed only to the backend that the shell is using.
 You can enable the UART backend for the logger, so that Zephyr logs are printed to both the shell backend and the UART.
-To do this, enable the :option:`CONFIG_LOG_BACKEND_UART` Kconfig option.
-If the sample is built for :ref:`zephyr:nrf52840dongle_nrf52840`, the nRF USB CDC ACM is the default backend for shell.
+To do this, enable the ``CONFIG_LOG_BACKEND_UART`` Kconfig option.
+If the sample is built for `nRF52840 Dongle <nrf52840dongle_>`_, the nRF USB CDC ACM is the default backend for shell.
 
 User interface
 **************
 
-LED 1 (nRF52 Dongle):
-    Blinks green to indicate that the identification mode is on.
-
-LED 3:
+LED 2:
     Turns on when the device joins the network.
 
-LED 4 (supported DKs):
+LED 3:
     Blinks to indicate that the identification mode is on.
 
-Button 1 (nRF52 Dongle):
-    Starts or cancels the Identify mode.
-
-Button 4 (supported DKs):
+BUTTON 3:
     Starts or cancels the Identify mode.
 
 All other interactions with the application can be handled using serial communication.
@@ -116,7 +110,7 @@ You can enable and disable logs from endpoint logger using the ``log enable`` an
 
 Building and running
 ********************
-.. |sample path| replace:: :file:`samples/zigbee/shell`
+.. |sample path| replace:: :file:`samples/shell`
 
 |enable_zigbee_before_testing|
 
@@ -218,7 +212,7 @@ This sample uses the following |NCS| libraries:
 
 * `DK Buttons and LEDs`_
 
-It uses the following `sdk-nrfxlib`_ libraries:
+It uses the ZBOSS stack:
 
 * :ref:`zigbee_zboss` |zboss_version| (`API documentation`_)
 

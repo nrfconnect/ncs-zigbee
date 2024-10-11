@@ -7,7 +7,10 @@ Tools
    :local:
    :depth: 2
 
-The tools listed on this page can be helpful when developing your Zigbee application with the |NCS|.
+.. note::
+   .. include:: /includes/experimental_note.txt
+
+The tools listed on this page can be helpful when developing your Zigbee application with the |addon| for the |NCS|.
 
 .. _ug_zigbee_tools_sniffer:
 
@@ -19,19 +22,20 @@ It provides a near real-time display of 802.15.4 packets that are sent back and 
 
 See `nRF Sniffer for 802.15.4`_ for documentation.
 
-.. _ug_zigbee_tools_ncp_host:
+..
+  .. _ug_zigbee_tools_ncp_host:
 
-ZBOSS NCP Host
-**************
+  ZBOSS NCP Host
+  **************
 
-The NCP Host is a ZBOSS-based tool for running the host side of the :ref:`ug_zigbee_platform_design_ncp_details` design.
-|zigbee_ncp_package|
+  The NCP Host is a ZBOSS-based tool for running the host side of the :ref:`ug_zigbee_platform_design_ncp_details` design.
+  |zigbee_ncp_package|
 
-The tool is available for download as a standalone :file:`zip` package using the following link:
+  The tool is available for download as a standalone :file:`zip` package using the following link:
 
-* `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
+  * `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
 
-|zigbee_ncp_package_more_info|
+  |zigbee_ncp_package_more_info|
 
 .. _ug_zigbee_tools_logger_endpoint:
 

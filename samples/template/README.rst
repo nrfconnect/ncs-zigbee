@@ -7,18 +7,19 @@ Zigbee: Template
    :local:
    :depth: 2
 
-This :ref:`Zigbee <ug_zigbee>` sample is a minimal implementation of the Zigbee Router role.
+This sample is a minimal implementation of the Zigbee Router role.
 
 You can use this sample as the starting point for developing your own Zigbee device.
 
 Requirements
 ************
 
-The sample supports the following development kits:
+The sample supports the following development kit:
 
-.. table-from-sample-yaml::
+.. include:: /includes/device_table_nrf54l15.txt
 
-You can use one or more of the development kits listed above and mix different development kits.
+..
+  You can use one or more of the development kits listed above and mix different development kits.
 
 To test this sample, you also need to program the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` sample on one separate device.
 
@@ -36,31 +37,32 @@ Configuration
 
 |config|
 
-FEM support
-===========
+..
+  FEM support
+  ===========
 
-.. include:: /includes/sample_fem_support.txt
+  .. include:: /includes/sample_fem_support.txt
 
 User interface
 **************
 
-LED 3:
+LED 2:
     Turns on when the device joins the network.
 
-LED 4:
+LED 3:
     Blinks to indicate that the identification mode is on.
 
-Button 4:
+BUTTON 3:
     Depending on how long the button is pressed:
 
     * If pressed for less than five seconds, it starts or cancels the Identify mode.
     * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
-      The length of the button press can be edited using the :kconfig:option:`CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+      The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
       Releasing the button within this time does not trigger the factory reset procedure.
 
 Building and running
 ********************
-.. |sample path| replace:: :file:`samples/zigbee/template`
+.. |sample path| replace:: :file:`samples/template`
 
 |enable_zigbee_before_testing|
 
@@ -75,14 +77,14 @@ After programming the sample to your development kit, complete the following ste
 
 1. Turn on the development kit that runs the Network coordinator sample.
 
-   When **LED 3** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
+   When **LED2** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
 
 #. Turn on the development kit that runs the Template sample.
 
-   When **LED 3** turns on, the light bulb has become a Router inside the network.
+   When **LED2** turns on, the light bulb has become a Router inside the network.
 
    .. note::
-        If **LED 3** does not turn on, press **Button 1** on the Coordinator to reopen the network.
+        If **LED2** does not turn on, press **BUTTON 0** on the Coordinator to reopen the network.
 
 The device running the Template sample is now part of the Zigbee network as a Router.
 As a result, the network range is extended by the template application radio range.
@@ -98,14 +100,14 @@ This sample uses the following |NCS| libraries:
 
   * :file:`zb_nrf_platform.h`
 
-* :ref:`dk_buttons_and_leds_readme`
+* `DK Buttons and LEDs`_
 
 It uses the following `sdk-nrfxlib`_ libraries:
 
-* :ref:`nrfxlib:zboss` |zboss_version| (`API documentation`_)
+* :ref:`zigbee_zboss` |zboss_version| (`API documentation`_)
 
 In addition, it uses the following Zephyr libraries:
 
 * :file:`include/zephyr.h`
 * :file:`include/device.h`
-* :ref:`zephyr:logging_api`
+* `Logging`_

@@ -1,13 +1,39 @@
 .. _zboss_changelog:
 
-Changelog
-#########
+ZBOSS stack changelog
+#####################
 
 .. contents::
    :local:
    :depth: 2
 
-All notable changes to this project in the |NCS| are documented in this file.
+All notable changes to the ZBOSS stack are documented in this file.
+
+.. note::
+   .. include:: /includes/experimental_note.txt
+
+Zigbee R23 add-on v0.1.0 - 11/XX/2024
+*************************************
+
+Updated
+=======
+
+* The ZBOSS stack to version ``4.1.4.2+``.
+  For detailed information, see `ZBOSS stack release notes`_ for the |addon| v0.1.0 release.
+
+nRF Connect SDK v2.8.0
+**********************
+
+Updated
+=======
+
+* The ZBOSS stack to version ``3.11.5.0+5.1.6``.
+  For detailed information, see `ZBOSS stack release notes`_ for the |NCS| v2.8.0 release.
+
+Bug fixes
+=========
+
+* Fixed the traces mask used to build the traces version of the libraries, so that more subsystems are enabled when the ``CONFIG_ZIGBEE_ENABLE_TRACES`` Kconfig option is enabled.
 
 nRF Connect SDK v2.7.0
 **********************

@@ -6,9 +6,7 @@ Adding ZCL clusters to application
 ##################################
 
 .. note::
-   The contents of this user guide are inaccurate and will be updated in one of the upcoming releases.
-   The information about the update will be posted in the release notes.
-   For the time being, do not use this guide.
+   .. include:: /includes/experimental_note.txt
 
 .. contents::
    :local:
@@ -372,19 +370,20 @@ Complete the following steps to read the cluster list of a Zigbee node:
 Further expanding the custom application
 ****************************************
 
-You can further expand the application with more features, such as OTA support.
+You can further expand the application with more features.
 
-.. _ug_zigee_adding_clusters_ota:
+..
+  .. _ug_zigee_adding_clusters_ota:
 
-Adding OTA
-==========
+  Adding OTA
+  ==========
 
-To extend the sample with OTA support, we would have to complete steps similar to :ref:`adding On/Off Switch and Temperature Sensor functionalities <ug_zigee_adding_clusters_adding_clusters>`.
-Then, we would have to implement the ZCL device callback to control the process of collecting chunks of new firmware.
-This is described more broadly in the following sections.
+  To extend the sample with OTA support, we would have to complete steps similar to :ref:`adding On/Off Switch and Temperature Sensor functionalities <ug_zigee_adding_clusters_adding_clusters>`.
+  Then, we would have to implement the ZCL device callback to control the process of collecting chunks of new firmware.
+  This is described more broadly in the following sections.
 
-Fortunately, we can use the :ref:`lib_zigbee_fota` library to handle the majority of these implementation steps.
-To add OTA support to the extended application, follow the steps in :ref:`ug_zigbee_configuring_components_ota`.
+  Fortunately, we can use the :ref:`lib_zigbee_fota` library to handle the majority of these implementation steps.
+  To add OTA support to the extended application, follow the steps in :ref:`ug_zigbee_configuring_components_ota`.
 
 
 .. _ug_zigee_adding_clusters_passing_events:

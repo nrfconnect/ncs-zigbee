@@ -29,23 +29,23 @@ The following entities participate in the Zigbee OTA Upgrade process:
 
 * OTA Upgrade Client – Runs on the target, that is the device that is being upgraded, and is responsible for downloading and installing the new firmware.
 * OTA Upgrade Server – Provides the firmware image.
-  The OTA Upgrade Server can be either a standalone third-party device or it can be instantiated on an nRF52840 DK using nRF Util's `DFU over Zigbee`_ procedure.
+  The OTA Upgrade Server can be either a standalone third-party device or it can be instantiated on an `nRF52840 DK <Developing with nRF52 Series_>`_ using nRF Util's `DFU over Zigbee`_ procedure.
 
 OTA upgrade process
 *******************
 
-The OTA Upgrade Client queries for OTA Upgrade Servers with the intervals defined by the :option:`CONFIG_ZIGBEE_FOTA_SERVER_DISOVERY_INTERVAL_HRS` Kconfig option until at least one server is found.
+The OTA Upgrade Client queries for OTA Upgrade Servers with the intervals defined by the ``CONFIG_ZIGBEE_FOTA_SERVER_DISOVERY_INTERVAL_HRS`` Kconfig option until at least one server is found.
 Once found, the client starts to query the server for images.
-The interval between queries for the available Zigbee FOTA images is defined by the :option:`CONFIG_ZIGBEE_FOTA_IMAGE_QUERY_INTERVAL_MIN` Kconfig option.
+The interval between queries for the available Zigbee FOTA images is defined by the ``CONFIG_ZIGBEE_FOTA_IMAGE_QUERY_INTERVAL_MIN`` Kconfig option.
 After querying the OTA Upgrade Server for available images and receiving information about the image, the library begins the OTA upgrade process.
 The library uses :ref:`zigbee_zboss`'s ZCL API to download the image.
 
 After the OTA Upgrade Client downloads the Zigbee OTA image header, the stack verifies the following mandatory fields:
 
-* Manufacturer ID - Defined by the :option:`CONFIG_ZIGBEE_FOTA_MANUFACTURER_ID` Kconfig option.
-* Image type - Defined by the :option:`CONFIG_ZIGBEE_FOTA_IMAGE_TYPE` Kconfig option; it may be different than the MCUboot image type value.
-* Hardware version - Defined by the :option:`CONFIG_ZIGBEE_FOTA_HW_VERSION` Kconfig option.
-* Firmware version - Defined by the :option:`CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION` Kconfig option; see :ref:`ug_zigbee_configuring_components_ota` for details.
+* Manufacturer ID - Defined by the ``CONFIG_ZIGBEE_FOTA_MANUFACTURER_ID`` Kconfig option.
+* Image type - Defined by the ``CONFIG_ZIGBEE_FOTA_IMAGE_TYPE`` Kconfig option; it may be different than the MCUboot image type value.
+* Hardware version - Defined by the ``CONFIG_ZIGBEE_FOTA_HW_VERSION`` Kconfig option.
+* Firmware version - Defined by the ``CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION`` Kconfig option; see :ref:`ug_zigbee_configuring_components_ota` for details.
 
 If all values are accepted, the OTA Upgrade Client downloads the first fragment of the firmware image.
 
@@ -63,23 +63,23 @@ When the consumer of the library receives this event, it should issue a reboot c
 Configuration
 *************
 
-To enable the Zigbee FOTA library, set the :option:`CONFIG_ZIGBEE_FOTA` Kconfig option.
+To enable the Zigbee FOTA library, set the ``CONFIG_ZIGBEE_FOTA`` Kconfig option.
 
-To configure the Zigbee FOTA library, use the following options:
+To configure the Zigbee FOTA library, use the following Kconfig options:
 
-* :option:`CONFIG_ZIGBEE_FOTA_HW_VERSION`
-* :option:`CONFIG_ZIGBEE_FOTA_DATA_BLOCK_SIZE`
-* :option:`CONFIG_ZIGBEE_FOTA_ENDPOINT`
-* :option:`CONFIG_ZIGBEE_FOTA_PROGRESS_EVT`
-* :option:`CONFIG_ZIGBEE_FOTA_MANUFACTURER_ID`
-* :option:`CONFIG_ZIGBEE_FOTA_IMAGE_TYPE`
-* :option:`CONFIG_ZIGBEE_FOTA_COMMENT`
-* :option:`CONFIG_ENABLE_ZIGBEE_FOTA_MIN_HW_VERSION`
-* :option:`CONFIG_ZIGBEE_FOTA_MIN_HW_VERSION`
-* :option:`CONFIG_ENABLE_ZIGBEE_FOTA_MAX_HW_VERSION`
-* :option:`CONFIG_ZIGBEE_FOTA_MAX_HW_VERSION`
-* :option:`CONFIG_ZIGBEE_FOTA_SERVER_DISOVERY_INTERVAL_HRS`
-* :option:`CONFIG_ZIGBEE_FOTA_IMAGE_QUERY_INTERVAL_MIN`
+* ``CONFIG_ZIGBEE_FOTA_HW_VERSION``
+* ``CONFIG_ZIGBEE_FOTA_DATA_BLOCK_SIZE``
+* ``CONFIG_ZIGBEE_FOTA_ENDPOINT``
+* ``CONFIG_ZIGBEE_FOTA_PROGRESS_EVT``
+* ``CONFIG_ZIGBEE_FOTA_MANUFACTURER_ID``
+* ``CONFIG_ZIGBEE_FOTA_IMAGE_TYPE``
+* ``CONFIG_ZIGBEE_FOTA_COMMENT``
+* ``CONFIG_ENABLE_ZIGBEE_FOTA_MIN_HW_VERSION``
+* ``CONFIG_ZIGBEE_FOTA_MIN_HW_VERSION``
+* ``CONFIG_ENABLE_ZIGBEE_FOTA_MAX_HW_VERSION``
+* ``CONFIG_ZIGBEE_FOTA_MAX_HW_VERSION``
+* ``CONFIG_ZIGBEE_FOTA_SERVER_DISOVERY_INTERVAL_HRS``
+* ``CONFIG_ZIGBEE_FOTA_IMAGE_QUERY_INTERVAL_MIN``
 
 For detailed steps about configuring the library in a Zigbee sample or application, see :ref:`ug_zigbee_configuring_components_ota`.
 
@@ -90,7 +90,7 @@ Limitations
 
 The Zigbee FOTA library has the following limitations:
 
-* The endpoint definition in the library includes the endpoint ID, defined with :option:`CONFIG_ZIGBEE_FOTA_ENDPOINT`.
+* The endpoint definition in the library includes the endpoint ID, defined with the ``CONFIG_ZIGBEE_FOTA_ENDPOINT`` Kconfig option.
   When using the Zigbee FOTA library, this endpoint ID cannot be used for other endpoints.
 * The Zigbee FOTA upgrades are currently only supported on the nRF52840 DK (PCA10056) and nRF5340 DK (PCA10095).
 * The Zigbee FOTA library does not currently support bootloader upgrades.
@@ -99,13 +99,13 @@ Additionally, the following limitations apply on the nRF5340 SoCs:
 
 * It is required to use external flash to enable the Zigbee FOTA library.
 * By default, only the full upgrades (to both application and network core) are allowed.
-  Disable the :option:`CONFIG_NRF53_ENFORCE_IMAGE_VERSION_EQUALITY` Kconfig option to build update images without inter-dependencies so that they can be applied independently.
-* It is impossible to enable ``SB_CONFIG_MCUBOOT_MODE_SWAP_WITHOUT_SCRATCH`` Kconfig option.
+  Disable the ``CONFIG_NRF53_ENFORCE_IMAGE_VERSION_EQUALITY`` Kconfig option to build update images without inter-dependencies so that they can be applied independently.
+* It is impossible to enable ``SB_CONFIG_MCUBOOT_MODE_SWAP_WITHOUT_SCRATCH``` Kconfig option.
   As a result, the fallback recovery is not available and any valid upgrade will overwrite the previous image.
   The call to the :c:func:`boot_write_img_confirmed()` will have no effect.
-* The current DFU limitations and dependencies are enforced by the :option:`CONFIG_NRF53_MULTI_IMAGE_UPDATE` Kconfig option.
+* The current DFU limitations and dependencies are enforced by the ``CONFIG_NRF53_MULTI_IMAGE_UPDATE`` Kconfig option.
 * The version of the network core image is always set to the same value as the application core image.
-  Its value can be configured using the :option:`CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION` Kconfig option.
+  Its value can be configured using the ``CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION`` Kconfig option.
 * The MCUboot header is not stored inside the network core flash memory.
   As a result, it is impossible to read the version of the currently running network core image.
 

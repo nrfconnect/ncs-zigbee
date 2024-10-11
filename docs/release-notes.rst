@@ -7,28 +7,37 @@ Release notes
    :local:
    :depth: 2
 
-All the notable changes to this application are listed here.
+All the notable changes to the |addon| for the |NCS| are listed here.
+See also the `Release notes for the nRF Connect SDK`_ and the :ref:`zboss_changelog`
 
-To follow the nRF Connect SDK style for release notes, group entries for Added, Changed, and Removed under a single bullet.
+.. note::
+   .. include:: /includes/experimental_note.txt
 
-.. _example_release_xx:
+The |addon| v\ |addon_version| is compatible with |NCS| v\ |ncs_version| and uses the ZBOSS R23 stack version |zboss_version|.
+For a full list of |addon|, |NCS| and ZBOSS R23 stack versions, view the following table:
 
-Example Application - vX.X
-**************************
+.. toggle::
 
-* Changed:
+   +-------------------+------------------+---------------------------+
+   | |addon| version   | |NCS| version    | ZBOSS R23 stack version   |
+   +===================+==================+===========================+
+   | v0.1.0            | v2.8.0           | 4.1.4.2                   |
+   +-------------------+------------------+---------------------------+
 
-  * Feature two to handle both something and another function.
-  * Feature one to do a completely different thing.
+.. _zigbee_release:
 
-.. _example_release_xy:
+[v0.1.0] - 11/XX/2024
+*********************
 
-Example Application - vX.Y
-**************************
+Initial release.
 
 * Added:
 
-  * Feature one, which is used to do something.
-  * Feature two, which is used for another function.
+  * Experimental support for the ZBOSS R23 stack for the nRF54L15 DK.
+    This release has not been certified.
+  * Basic samples:
 
-* Removed feature three.
+    * :ref:`Light bulb <zigbee_light_bulb_sample>`
+    * :ref:`Light switch <zigbee_light_switch_sample>`
+    * :ref:`Network coordinator <zigbee_network_coordinator_sample>`
+    * :ref:`Shell <zigbee_shell_sample>`

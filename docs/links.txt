@@ -4,11 +4,15 @@
 .. _`Installing the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/installation/install_ncs.html
 
 .. _`Application types`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#application_types
+.. _`Creating an application`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html
 .. _`Repository application`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#repository_application
 .. _`Freestanding application`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#create-application-types-freestanding
 .. _`Configuring and building`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/index.html
+.. _`Build and configuration system`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/config_and_build_system.html
+.. _`Providing CMake options`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/cmake/index.html#providing_cmake_options
 .. _`Sysbuild enabled by default`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/config_and_build_system.html#sysbuild_enabled_by_default
 .. _`Configuring sysbuild usage in west`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/sysbuild/sysbuild_configuring_west.html
+.. _`Image-specific variables`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/multi_image.html
 .. _`Building an application`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/building.html
 .. _`Programming an application`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/programming.html
 .. _`Secure bootloader chain`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/bootloaders_dfu/mcuboot_nsib/bootloader.html
@@ -25,6 +29,7 @@
 
 .. _`Multiprotocol support`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/protocols/multiprotocol/index.html
 
+.. _`Nordic UART Service (NUS)`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/bluetooth_services/services/nus.html
 .. _`DFU multi-image`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/dfu/dfu_multi_image.html
 .. _`DFU target`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/dfu/dfu_target.html
 .. _`FOTA download`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/networking/fota_download.html
@@ -51,13 +56,16 @@
 .. _`nRF Connect for Visual Studio Code`: https://docs.nordicsemi.com/bundle/nrf-connect-vscode/page/index.html
 .. _`How to work with build configurations`: https://docs.nordicsemi.com/bundle/nrf-connect-vscode/page/guides/build_config.html
 
-.. ### nrfxlib documentation
+.. ### NCS nrfxlib documentation set
 
-.. _`ZBOSS Zigbee stack`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrfxlib/zboss/README.html
+.. _`Multiprotocol Service Layer`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrfxlib/mpsl/README.html
+.. _`SoftDevice Controller`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrfxlib/softdevice_controller/README.html
 
 .. ### NCS Zephyr documentation set
 
+.. _`Bluetooth API`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/connectivity/bluetooth/api/index.html
 .. _`CDC ACM`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/connectivity/usb/device/usb_device.html#cdc_acm
+.. _`USB device support APIs`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/connectivity/usb/device/api/index.html
 .. _`IEEE 802.15.4`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/connectivity/networking/api/ieee802154.html
 
 .. _`Thread analyzer`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/debugging/thread-analyzer.html
@@ -65,7 +73,7 @@
 .. _`Settings`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/settings/index.html
 .. _`Shell`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/shell/index.html
 .. _`Non-Volatile Storage (NVS)`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/storage/nvs/nvs.html
-.. _`Puls Width Modulation (PWM)`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/hardware/peripherals/pwm.html
+.. _`Pulse Width Modulation (PWM)`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/hardware/peripherals/pwm.html
 .. _`UART API`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/hardware/peripherals/uart.html
 .. _`Shields`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/hardware/porting/shields.html
 
@@ -84,7 +92,11 @@
 .. _`Zigbee CIDs for nRF52840`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf52840/page/COMP/nrf52840/nrf52840_zigbee_cids.html
 .. _`Zigbee CIDs for nRF52833`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf52833/page/COMP/nrf52833/nrf52833_zigbee_cids.html
 
+.. _`Using MCUboot in nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-latest/page/mcuboot/readme-ncs.html
+
 .. _`Programming the nRF52840 Dongle`: https://docs.nordicsemi.com/bundle/nrf-connect-programmer/page/programming_dk.html#programming-the-nrf52840-dongle
+
+.. _`Kconfig search`: https://docs.nordicsemi.com/bundle/ncs-latest/page/kconfig/index.html
 
 .. _`nRF Util`: https://docs.nordicsemi.com/bundle/nrfutil/page/README.html
 .. _`Installing nRF Util for nRF5 SDK`: https://docs.nordicsemi.com/bundle/nrfutil/page/guides-nrf5sdk/installing.html
@@ -119,6 +131,7 @@
 .. _`Zigbee Alliance`:
 .. _`Connectivity Standards Alliance`: https://csa-iot.org
 .. _`CSA Specifications Download Request`: https://csa-iot.org/developer-resource/specifications-download-request/
+.. _`Zigbee Alliance Certification Policy`:
 .. _`Zigbee certification policy`: https://zigbeealliance.org/wp-content/uploads/2021/04/07-4842-13-Zigbee-certification-policy.pdf
 .. _`Zigbee Cluster Library specification`: https://zigbeealliance.org/wp-content/uploads/2019/12/07-5123-06-zigbee-cluster-library-specification.pdf
 

@@ -6,17 +6,16 @@ About Zigbee protocol
 .. note::
    .. include:: /includes/experimental_note.txt
 
-The |NCS|'s Zigbee protocol uses the ZBOSS library, a third-party precompiled Zigbee stack.
+The |addon| for the |NCS| uses the ZBOSS library, a third-party precompiled Zigbee stack.
 It includes all mandatory features of the |zigbee_version| specification and provides an Application Programming Interface (API) to access different services.
 The stack comes with the following features:
 
-* Complete implementation of the Zigbee core specification and Zigbee Pro feature set.
+* Complete implementation of the Zigbee core specification and Zigbee Pro feature set, revision 21, 22, and 23.
 * Support for all device roles: Coordinator, Router, and End Device.
-* Zigbee Cluster Library, including :ref:`lib_zigbee_fota`.
-* Base Device Behavior.
-* Device definitions for devices that were implemented for Zigbee Home Automation and Light Link profiles.
+* Zigbee Cluster Library.
+* Base Device Behavior version 3.0.1.
+* Zigbee Cluster Library, revision 8.
 * Zigbee Green Power Proxy Basic.
-* Experimental support for ``ZB_ZCL_WWAH``.
 
 See `Software maturity levels`_ in the |NCS| documentation for what experimental support means.
 Experimental support also means that the feature is either not certified or no sample is provided for the given feature (or both).
@@ -57,7 +56,7 @@ In each topology, the nodes have the following responsibilities:
 * *Zigbee Router* - Extends the range of the network.
   For this reason, the router has the radio enabled at all times.
   However, in the star topology it is not moving packets through the network.
-* *Zigbee End Device* - Receives messages from the parent device, in this case the coordinator.
+* *Zigbee End Device* - Receives messages from the parent device.
 
 In every Zigbee topology, each router and end device that joins the Zigbee network after its creation by the coordinator needs a parent device.
 When a device wants to join the network, it sends a beacon request to scan for available devices.
@@ -67,7 +66,7 @@ Based on different factors of responses, such as signal strength, the new device
 For end devices, the parent device (a coordinator or a router) can store information meant for them.
 This is required because the end devices do not receive packets directly from other devices.
 Each packet meant for an end device needs to go through its parent, and the end devices need to regularly request and respond to packets from the parents.
-For example, in the |NCS|, the Zigbee light switch device requests packets from the parent every three seconds.
+For example, in the |addon| for the |NCS|, the Zigbee light switch device requests packets from the parent every three seconds.
 The end device does not route packets.
 It can also disable its radio to reduce the power consumption between the regular packet requests if the Sleepy End Device behavior is enabled.
 
@@ -76,7 +75,7 @@ Additional information
 
 If you want to learn more about the Zigbee topics and terminology mentioned in this guide, read the following pages:
 
-* :ref:`ug_zigbee_architectures` page to learn more about the Zigbee architecture available in the |NCS|.
+* :ref:`ug_zigbee_architectures` page to learn more about the Zigbee architecture.
 * `Common ZCL terms and definitions`_ section in the ZBOSS user guide.
 * Zigbee topologies in section 1.1.4 of the `Zigbee Specification <CSA Specifications Download Request_>`_.
 * :ref:`zigbee_ug_sed` section on the :ref:`ug_zigbee_configuring` page.

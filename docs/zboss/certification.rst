@@ -7,6 +7,11 @@ ZBOSS library certification
    :local:
    :depth: 2
 
+.. note::
+   .. include:: /includes/experimental_note.txt
+
+   The |addon| for the |NCS| has not been certified.
+
 Zigbee ZBOSS libraries in the |NCS| are always tested in-house by Nordic Semiconductor to conform to Zigbee Pro R22 test specification.
 However, these libraries are only periodically verified by external test service provider and granted Zigbee Compliant Platform certification by Connectivity Standards Alliance.
 
@@ -18,7 +23,7 @@ However, these libraries are only periodically verified by external test service
 Certification levels
 ********************
 
-The certification is based on CSA's `Zigbee certification policy`_, which distinguishes the following levels of certification:
+The certification is based on CSA's `Zigbee Alliance Certification Policy`_, which distinguishes the following levels of certification:
 
 * Compliant Platform
 * Certified Product
@@ -33,6 +38,6 @@ Certification IDs
 
 Check the compatibility matrices for your device for information about the latest certification ID entries (CIDs) for the combination of the ZBOSS stack v3.3 (or newer), the |NCS| version, and Nordic Semiconductor's SoCs:
 
-* `Zigbee CIDs for nRF5340`_
-* `Zigbee CIDs for nRF52840`_
-* `Zigbee CIDs for nRF52833`_
+  * `Zigbee CIDs for nRF5340`_
+  * `Zigbee CIDs for nRF52840`_
+  * `Zigbee CIDs for nRF52833`_
