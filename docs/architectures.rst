@@ -7,17 +7,22 @@ Architectures
    :local:
    :depth: 2
 
-This page describes the platform designs that are possible with the Zigbee stack on Nordic Semiconductor devices.
+.. note::
+   .. include:: /includes/experimental_note.txt
+
+This page describes the platform designs that are possible with the Zigbee stack on the nRF54L15 development kit.
 
 The designs are described from the least to the most complex, that is from simple applications that consist of a single chip running single or multiple protocols to scenarios in which the nRF SoC acts as a network co-processor when the application is running on a much more powerful host processor.
+
+.. include:: /includes/coprocessor_note.txt
 
 .. _ug_zigbee_platform_design_soc:
 
 System-on-Chip designs
 **********************
 
-This single-chip solution has the combined RFIC (the IEEE 802.15.4 in case of Zigbee) and processor.
-The Zigbee stack and the application layer run on the local processor.
+The single-chip solution has a combined RFIC (the IEEE 802.15.4 in case of Zigbee) and processor.
+Both the Zigbee stack and the application layer run on the local processor.
 
 This design has the following advantages:
 
@@ -27,7 +32,7 @@ This design has the following advantages:
 
 It also has the following disadvantages:
 
-* For some uses, the nRF SoC's MCU can be to slow to handle both the application and the network stack load.
+* For some uses, the nRF SoC's MCU can be too slow to handle both the application and the network stack load.
 * The application and the network stack share flash and RAM space.
   This leaves less resources for the application.
 * Dual-bank DFU or an external flash is needed to update the firmware.
@@ -71,7 +76,7 @@ It also has the following disadvantages:
 .. figure:: images/zigbee_platform_design_multi.svg
    :alt: Multiprotocol Zigbee and Bluetooth LE architecture (nRF54L Series devices)
 
-   Multiprotocol Zigbee and Bluetooth LE architecture on nRF52 Series devices
+   Multiprotocol Zigbee and Bluetooth LE architecture on nRF54L Series devices
 
 ..
   .. figure:: images/zigbee_platform_design_nRF5340_multi.svg
@@ -89,6 +94,8 @@ This platform design is suitable for the following development kit:
 
 Co-processor designs
 ********************
+
+.. include:: /includes/coprocessor_note.txt
 
 In co-processor designs, the application runs on one processor (the host processor) and communicates with another processor that provides the radio interface.
 In these designs, the more powerful processor (host) interacts with the Zigbee network through a connectivity device, for example a Nordic Semiconductor's device with the Zigbee interface.
@@ -123,15 +130,17 @@ It also has the following disadvantages:
 
    Split Zigbee architecture
 
-The |NCS| includes the :ref:`ug_zigbee_tools_ncp_host` tool.
-|zigbee_ncp_package|
+..
+  The |addon| for the |NCS| includes the :ref:`ug_zigbee_tools_ncp_host` tool.
+  |zigbee_ncp_package|
 
-The tool is available for download as a standalone :file:`zip` package using the following link:
 
-* `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
+  The tool is available for download as a standalone :file:`zip` package using the following link:
 
-|zigbee_ncp_package_more_info|
+    * `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
 
-This platform design is suitable for the following development kits:
+    |zigbee_ncp_package_more_info|
 
-.. include:: /includes/device_table_ncp.txt
+  This platform design is suitable for the following development kits:
+
+  .. include:: /includes/device_table_ncp.txt

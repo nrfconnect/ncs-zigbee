@@ -7,7 +7,7 @@ Zigbee: Light switch
    :local:
    :depth: 2
 
-You can use the :ref:`Zigbee <zigbee_index>` Light switch sample to change the state of light sources on other devices within the same Zigbee network.
+You can use the this Light switch sample to change the state of light sources on other devices within the same Zigbee network.
 
 You can use it together with the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` and the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` samples to set up a basic Zigbee network.
 
@@ -57,7 +57,7 @@ Sleepy End Device behavior
 
 The light switch supports the :ref:`zigbee_ug_sed` that enables the sleepy behavior for the end device, for a significant conservation of energy.
 
-To enable the sleepy behavior, press **Button 3** while the light switch sample is booting.
+To enable the sleepy behavior, press **BUTTON 2** while the light switch sample is booting.
 This is required only when device is joining the network for the first time.
 After restarting the device, it will boot with the sleepy behavior enabled.
 
@@ -67,7 +67,7 @@ Multiprotocol Bluetooth LE extension
 ====================================
 
 This optional extension demonstrates dynamic concurrent switching between two protocols, Bluetooth® LE and Zigbee.
-It uses the :ref:`nus_service_readme` library.
+It uses the `Nordic UART Service (NUS)`_ library.
 
 When this extension is enabled, you can use:
 
@@ -76,7 +76,7 @@ When this extension is enabled, you can use:
 
 Both networks are independent from each other.
 
-To support both protocols at the same time, the Zigbee stack uses the `IEEE 802.15.4`_ radio during the inactive time of the Bluetooth LE radio (using the Timeslot API of the :ref:`nrfxlib:mpsl`).
+To support both protocols at the same time, the Zigbee stack uses the `IEEE 802.15.4`_ radio during the inactive time of the Bluetooth LE radio (using the Timeslot API of the `Multiprotocol Service Layer`_).
 Depending on the Bluetooth LE connection interval, the nRF52 development kits can spend up to 99% of the radio time on the Zigbee protocol.
 
 Transmitting and receiving data when using this example does not break connection from any of the used radio protocols, either Bluetooth LE or Zigbee.
@@ -127,13 +127,13 @@ For example, when building from the command line, use the following command:
 
 .. code-block:: console
 
-   west build samples/zigbee/light_switch -b nrf52840dk/nrf52840 -- -DEXTRA_CONF_FILE='overlay-multiprotocol_ble.conf'
+   west build samples/zigbee/light_switch -b nrf54l15dk/nrfnrf54l15/cpuapp -- -DEXTRA_CONF_FILE='overlay-multiprotocol_ble.conf'
 
+..
+  For the board name to use instead of the ``nrf52840dk/nrf52840``, see :ref:`programming_board_names`.
 
-For the board name to use instead of the ``nrf52840dk/nrf52840``, see :ref:`programming_board_names`.
-
-See :ref:`cmake_options` for instructions on how to add flags to your build.
-For more information about configuration files in the |NCS|, see :ref:`app_build_system`.
+See `Providing CMake options`_ in the |NCS| documentation for instructions on how to add flags to your build.
+For more information about configuration files in the |NCS|, see `Build and configuration system`_ in the |NCS| documentation.
 
 ..
   FEM support
@@ -144,42 +144,43 @@ For more information about configuration files in the |NCS|, see :ref:`app_build
 Configurable transmission power
 ===============================
 
-To achieve a lower power consumption of the light switch, you can configure the transmission power using the :option:`CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER` Kconfig option.
-You can select per-channel transmission power (in dBm) with the :option:`CONFIG_LIGHT_SWITCH_TX_POWER` Kconfig option.
+To achieve a lower power consumption of the light switch, you can configure the transmission power using the ``CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER`` Kconfig option.
+You can select per-channel transmission power (in dBm) with the ``CONFIG_LIGHT_SWITCH_TX_POWER`` Kconfig option.
 This affects to all frames sent by the device, even in the network scan phase.
 
 .. note::
-    The :option:`CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER` Kconfig option is enabled by default and this sample's transmission power is set to 0 dBm.
+    The ``CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER`` Kconfig option is enabled by default and this sample's transmission power is set to 0 dBm.
 
-When the :option:`CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI` Kconfig option is set to ``y``, the :option:`CONFIG_ZIGBEE_APP_CB_QUEUE_LENGTH` Kconfig option must be increased depending on the channel mask.
-For example, in case 16 channels are active, a proper value for :option:`CONFIG_ZIGBEE_APP_CB_QUEUE_LENGTH` would be ``17``.
-Similar consideration applies to the `ZB_CONFIG_IOBUF_POOL_SIZE` and `ZB_CONFIG_SCHEDULER_Q_SIZE` values configured in the :file:`include/zb_mem_config_custom.h` file.
+When the ``CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI`` Kconfig option is set to ``y``, the ``CONFIG_ZIGBEE_APP_CB_QUEUE_LENGTH`` Kconfig option must be increased depending on the channel mask.
+For example, in case 16 channels are active, a proper value for ``CONFIG_ZIGBEE_APP_CB_QUEUE_LENGTH`` would be ``17``.
+Similar consideration applies to the ``ZB_CONFIG_IOBUF_POOL_SIZE`` and ``ZB_CONFIG_SCHEDULER_Q_SIZE`` values configured in the :file:`include/zb_mem_config_custom.h` file.
 
 .. _zigbee_light_switch_user_interface:
 
 User interface
 **************
 
-LED 3:
+LED 2:
     Lit and solid when the device is connected to a Zigbee network.
 
-LED 4:
+LED 3:
     Lit and solid when the light switch has found a light bulb to control.
 
-Button 1:
-    When the light bulb is turned off, turn it back on.
+BUTTON 0:
+    Turn on the light bulb connected to the network (light bulb's **LED1**).
+    This option is available after the successful commissioning (light switch's **LED2** turned on).
 
-    Pressing this button for a longer period of time increases the brightness of the light bulb.
+    Pressing this button for a longer period of time increases the brightness of the **LED1** of the connected light bulb.
 
-Button 2:
-    Turn off the light bulb connected to the network (light bulb's **LED 4**).
-    This option is available after the successful commissioning (light switch's **LED 3** turned on).
+BUTTON 1:
+    Turn off the light bulb connected to the network (light bulb's **LED1**).
+    This option is available after the successful commissioning (light switch's **LED2** turned on).
 
-    Pressing this button for a longer period of time decreases the brightness of the **LED 4** of the connected light bulb.
+    Pressing this button for a longer period of time decreases the brightness of the **LED1** of the connected light bulb.
 
-Button 4:
+BUTTON 3:
     When pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
-    The length of the button press can be edited using the :option:`CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+    The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
     Releasing the button within this time does not trigger the factory reset procedure.
 
 .. note::
@@ -189,22 +190,22 @@ Button 4:
   FOTA behavior assignments
   =========================
 
-  LED 2:
+  LED 1:
       Indicates the OTA activity.
       Used only if the FOTA support is enabled.
 
 Sleepy End Device behavior assignments
 ======================================
 
-Button 3:
+BUTTON 2:
     When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
 
 Multiprotocol Bluetooth LE extension assignments
 ================================================
 
-LED 1:
+LED 0:
     Lit and solid when a Bluetooth LE Central is connected to the NUS service.
-    Available when using :ref:`nus_service_readme` in the multiprotocol configuration.
+    Available when using `Nordic UART Service (NUS)`_ in the multiprotocol configuration.
 
 UART command assignments:
     The following command assignments are configured and used in nRF Toolbox when :ref:`zigbee_light_switch_testing_ble`:
@@ -221,7 +222,7 @@ UART command assignments:
 Building and running
 ********************
 
-.. |sample path| replace:: :file:`samples/zigbee/light_switch`
+.. |sample path| replace:: :file:`samples/light_switch`
 
 |enable_zigbee_before_testing|
 
@@ -236,20 +237,20 @@ After programming the sample to your development kits, complete the following st
 
 1. Turn on the development kit that runs the Network coordinator sample.
 
-   When **LED 3** turns on, this development kit has become the Coordinator of the Zigbee network.
+   When **LED2** turns on, this development kit has become the Coordinator of the Zigbee network.
 
 #. Turn on the development kit that runs the Light bulb sample.
 
-   When **LED 3** turns on, the light bulb has become a Router inside the network.
+   When **LED2** turns on, the light bulb has become a Router inside the network.
 
    .. note::
-        If **LED 3** does not turn on, press **Button 1** on the Coordinator to reopen the network.
+        If **LED2** does not turn on, press **BUTTON 0** on the Coordinator to reopen the network.
 
 #. Turn on the development kit that runs the Light switch sample.
 
-   When **LED 3** turns on, the light switch has become an End Device, connected directly to the Coordinator.
+   When **LED2** turns on, the light switch has become an End Device, connected directly to the Coordinator.
 
-#. Wait until **LED 4** on the light switch node turns on.
+#. Wait until **LED3** on the light switch node turns on.
 
    This LED indicates that the light switch found a light bulb to control.
 
@@ -303,7 +304,7 @@ Set up nRF Toolbox by completing the following steps:
 
       The UART application of nRF Toolbox after establishing the connection
 
-   Observe that **LED 1** on the light switch node is solid.
+   Observe that **LED0** on the light switch node is solid.
    This indicates that the Bluetooth LE connection is established.
 
 In nRF Toolbox, tap the buttons you assigned to perform the test:
@@ -334,7 +335,7 @@ This sample uses the following |NCS| libraries:
 
 * `DK Buttons and LEDs`_
 
-It uses the following `sdk-nrfxlib`_ libraries:
+It uses the ZBOSS stack:
 
 * :ref:`zigbee_zboss` |zboss_version| (`API documentation`_)
 
@@ -346,9 +347,9 @@ In addition, it uses the following Zephyr libraries:
 
 The following dependencies are added by the multiprotocol Bluetooth LE extension:
 
-* :ref:`nrfxlib:softdevice_controller`
-* :ref:`nus_service_readme`
-* Zephyr's :ref:`zephyr:bluetooth_api`:
+* `SoftDevice Controller`_
+* `Nordic UART Service (NUS)`_
+* Zephyr's `Bluetooth API`_:
 
   * ``include/bluetooth/bluetooth.h``
   * ``include/bluetooth/gatt.h``

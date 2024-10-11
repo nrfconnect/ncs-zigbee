@@ -1,14 +1,16 @@
 ﻿.. _ug_zigbee_configuring_libraries:
 
-Configuring Zigbee libraries in |NCS|
-#####################################
+Configuring Zigbee libraries
+############################
 
 .. contents::
    :local:
    :depth: 2
 
-The Zigbee protocol in |NCS| can be customized by enabling and configuring several :ref:`Zigbee libraries <lib_zigbee>`.
+The Zigbee protocol in the |addon| for the |NCS| can be customized by enabling and configuring several :ref:`Zigbee libraries <lib_zigbee>`.
 This page lists options and steps required for configuring each of them.
+
+|kconfig_search|
 
 .. _ug_zigbee_configuring_components_osif:
 
@@ -16,7 +18,7 @@ Configuring ZBOSS OSIF
 **********************
 
 The Zigbee ZBOSS OSIF layer subsystem acts as the linking layer between the :ref:`zigbee_zboss` and the |NCS|.
-The layer is automatically enabled when you enable the ZBOSS library with the :option:`CONFIG_ZIGBEE` Kconfig option.
+The layer is automatically enabled when you enable the ZBOSS library with the ``CONFIG_ZIGBEE_R23`` Kconfig option.
 
 For more information about the library, see :ref:`lib_zigbee_osif`.
 
@@ -26,9 +28,9 @@ Configuring Zigbee application utilities
 ****************************************
 The :ref:`lib_zigbee_application_utilities` library provides a set of components that are ready for use in Zigbee applications.
 
-To enable and use this library, set the :option:`CONFIG_ZIGBEE_APP_UTILS` Kconfig option.
+To enable and use this library, set the ``CONFIG_ZIGBEE_APP_UTILS`` Kconfig option.
 
-For additional logs for this library, configure the :option:`CONFIG_ZIGBEE_APP_UTILS_LOG_LEVEL_CHOICE` Kconfig option.
+For additional logs for this library, configure the ``CONFIG_ZIGBEE_APP_UTILS_LOG_LEVEL_CHOICE`` Kconfig option.
 See :ref:`zigbee_ug_logging_logger_options` for more information.
 
 Default signal handler
@@ -57,15 +59,15 @@ For more information about the library, see :ref:`lib_zigbee_error_handler`.
 
   The Zigbee Over The Air Device Firmware Upgrade (:ref:`lib_zigbee_fota`) library provides a mechanism to upgrade the firmware of the device through the Zigbee network.
 
-  To enable and configure the library, you must set the :option:`CONFIG_ZIGBEE_FOTA` Kconfig option.
+  To enable and configure the library, you must set the ``CONFIG_ZIGBEE_FOTA`` Kconfig option.
   Other :ref:`Zigbee FOTA Kconfig options <lib_zigbee_fota_options>` can be used with default values.
 
-  Because the Zigbee OTA DFU performs the upgrade using the `DFU target`_ library, the are several non-Zigbee options that must be set to configure the update process:
+  Because the Zigbee OTA DFU performs the upgrade using the `DFU target`_ library, the are several non-Zigbee Kconfig options that must be set to configure the update process:
 
-  * :option:`CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION` - This option specifies the current image version.
-  * :option:`CONFIG_DFU_TARGET_MCUBOOT` - This option enables updates that are performed by MCUboot.
-  * :option:`CONFIG_IMG_MANAGER` - This option enables the support for managing the DFU image downloaded using MCUboot.
-  * :option:`CONFIG_IMG_ERASE_PROGRESSIVELY` - This option instructs MCUboot to erase the flash memory progressively.
+  * ``CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION`` - This option specifies the current image version.
+  * ``CONFIG_DFU_TARGET_MCUBOOT`` - This option enables updates that are performed by MCUboot.
+  * ``CONFIG_IMG_MANAGER`` - This option enables the support for managing the DFU image downloaded using MCUboot.
+  * ``CONFIG_IMG_ERASE_PROGRESSIVELY`` - This option instructs MCUboot to erase the flash memory progressively.
     This allows to avoid long wait times at the beginning of the DFU process.
 
   Configuring these options and updating the default values (at least updating the ``image_version`` to the application version) allows you to use Zigbee FOTA in the :ref:`zigbee_light_switch_sample` sample.
@@ -137,10 +139,10 @@ For more information about the library, see :ref:`lib_zigbee_error_handler`.
   By enabling the Zigbee OTA DFU, the west tool will automatically generate the upgrade image.
   To specify the target device of the generated image, use the following Kconfig options:
 
-  * :option:`CONFIG_ZIGBEE_FOTA_COMMENT` - This option allows to specify a human-readable image name.
-  * :option:`CONFIG_ENABLE_ZIGBEE_FOTA_MIN_HW_VERSION` and :option:`CONFIG_ZIGBEE_FOTA_MIN_HW_VERSION` - These options allow to specify the minimum hardware version of the device that will accept the generated image.
+  * ``CONFIG_ZIGBEE_FOTA_COMMENT`` - This option allows to specify a human-readable image name.
+  * ``CONFIG_ENABLE_ZIGBEE_FOTA_MIN_HW_VERSION`` and ``CONFIG_ZIGBEE_FOTA_MIN_HW_VERSION`` - These options allow to specify the minimum hardware version of the device that will accept the generated image.
     No value makes these options unused.
-  * :option:`CONFIG_ENABLE_ZIGBEE_FOTA_MAX_HW_VERSION` and :option:`CONFIG_ZIGBEE_FOTA_MAX_HW_VERSION` - These options allow to specify the maximum hardware version of the device that will accept the generated image.
+  * ``CONFIG_ENABLE_ZIGBEE_FOTA_MAX_HW_VERSION`` and ``CONFIG_ZIGBEE_FOTA_MAX_HW_VERSION`` - These options allow to specify the maximum hardware version of the device that will accept the generated image.
     No value makes these options unused.
 
   The manufacturer ID, image type and version of the generated image are obtained from the application settings.
@@ -156,8 +158,8 @@ The Zigbee endpoint logger library provides an endpoint handler for parsing and 
 
 To enable the endpoint logger library in your application, complete the following steps:
 
-1. Enable the library by setting the :option:`CONFIG_ZIGBEE_LOGGER_EP` Kconfig option.
-2. Define the logging level for the library by setting the :option:`CONFIG_ZIGBEE_LOGGER_EP_LOG_LEVEL_CHOICE` Kconfig option.
+1. Enable the library by setting the ``CONFIG_ZIGBEE_LOGGER_EP`` Kconfig option.
+2. Define the logging level for the library by setting the ``CONFIG_ZIGBEE_LOGGER_EP_LOG_LEVEL_CHOICE`` Kconfig option.
    See :ref:`zigbee_ug_logging_logger_options` for more information.
 3. Include the required header file :file:`include/zigbee/zigbee_logger_eprxzcl.h` into your project.
 4. Register :c:func:`zigbee_logger_eprxzcl_ep_handler` as handler for the given *your_ep_number* endpoint using :c:macro:`ZB_AF_SET_ENDPOINT_HANDLER`, after the device context is registered with :c:macro:`ZB_AF_REGISTER_DEVICE_CTX`, but before starting the Zigbee stack:
@@ -171,7 +173,7 @@ To enable the endpoint logger library in your application, complete the followin
    For applications that implement multiple handlers, :c:func:`zigbee_logger_eprxzcl_ep_handler` can be registered as handler for each endpoint.
 
    .. note::
-      If :ref:`lib_zigbee_shell` is already enabled and configured for the given endpoint, set the :option:`CONFIG_ZIGBEE_SHELL_DEBUG_CMD` Kconfig option to enable the endpoint logger instead of registering a handler.
+      If :ref:`lib_zigbee_shell` is already enabled and configured for the given endpoint, set the ``CONFIG_ZIGBEE_SHELL_DEBUG_CMD`` Kconfig option to enable the endpoint logger instead of registering a handler.
       This is because the Zigbee shell library registers its own handler for the endpoint.
 
 For more information about the library, see :ref:`lib_zigbee_logger_endpoint`.
@@ -183,7 +185,7 @@ Configuring Zigbee ZCL scene helper
 
 The Zigbee ZCL scene helper library provides a set of functions that implement the callbacks required by the ZCL scene cluster in the application.
 
-To enable the Zigbee ZCL scene helper library, set the :option:`CONFIG_ZIGBEE_SCENES` Kconfig option.
+To enable the Zigbee ZCL scene helper library, set the ``CONFIG_ZIGBEE_SCENES`` Kconfig option.
 
 Because the library uses Zephyr's `Settings`_ subsystem, the application must call the following functions for the library to work correctly:
 
@@ -205,15 +207,15 @@ The Zigbee shell library implements a set of :ref:`Zigbee shell commands <zigbee
 
 To extend a sample with the Zigbee shell command support, set the following Kconfig options:
 
-* :option:`CONFIG_ZIGBEE_SHELL` - This option enables Zigbee shell and Zephyr's `Shell`_ interface.
-* :option:`CONFIG_ZIGBEE_SHELL_ENDPOINT` - This option specifies the endpoint number to be used by the Zigbee shell instance.
+* ``CONFIG_ZIGBEE_SHELL`` - This option enables Zigbee shell and Zephyr's `Shell`_ interface.
+* ``CONFIG_ZIGBEE_SHELL_ENDPOINT`` - This option specifies the endpoint number to be used by the Zigbee shell instance.
   The endpoint must be present at the device and you must not register an endpoint handler for this endpoint.
-* :option:`CONFIG_ZIGBEE_SHELL_DEBUG_CMD` - This option enables commands useful for testing and debugging.
+* ``CONFIG_ZIGBEE_SHELL_DEBUG_CMD`` - This option enables commands useful for testing and debugging.
   This option also enables logging of the incoming ZCL frames.
-  Logging of the incoming ZCL frames uses the logging level set in :option:`CONFIG_ZIGBEE_LOGGER_EP_LOG_LEVEL_CHOICE`.
+  Logging of the incoming ZCL frames uses the logging level set with the ``CONFIG_ZIGBEE_LOGGER_EP_LOG_LEVEL_CHOICE`` Kconfig option.
 
   .. note::
      Using debug commands can make the device unstable.
 
-* :option:`CONFIG_ZIGBEE_SHELL_LOG_LEVEL` - This option sets the logging level for Zigbee shell logs.
+* ``CONFIG_ZIGBEE_SHELL_LOG_LEVEL`` - This option sets the logging level for Zigbee shell logs.
   See :ref:`zigbee_ug_logging_logger_options` for more information.

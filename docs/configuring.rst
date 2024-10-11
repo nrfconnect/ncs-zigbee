@@ -1,23 +1,27 @@
 .. _ug_zigbee_configuring:
 
-Configuring Zigbee in |NCS|
-###########################
+Configuring |addon|
+###################
 
 .. contents::
    :local:
    :depth: 2
 
-This page describes what is needed to start working with Zigbee in the |NCS|.
+.. note::
+   .. include:: /includes/experimental_note.txt
+
+This page describes what is needed to start working with Zigbee using the |addon| for the |NCS|.
+|kconfig_search|
 
 .. _zigbee_ug_libs:
 
 Required libraries and drivers
 ******************************
 
-Zigbee requires the following modules to properly operate in the |NCS|:
+Zigbee requires the following modules:
 
 * :ref:`zigbee_zboss`, with the :ref:`lib_zigbee_osif` subsystem acting as the linking layer between the ZBOSS stack and the |NCS|.
-  The ZBOSS library is enabled by the :option:`CONFIG_ZIGBEE` Kconfig option.
+  The ZBOSS library is enabled by the ``CONFIG_ZIGBEE_R23`` Kconfig option.
   For more information about the ZBOSS stack, see also the `external ZBOSS development guide and API documentation`_.
 * `IEEE 802.15.4`_ radio driver - This library is automatically enabled when working with Zigbee on Nordic Semiconductor's development kits.
 
@@ -26,14 +30,14 @@ Zigbee requires the following modules to properly operate in the |NCS|:
 Mandatory configuration
 ***********************
 
-To use the Zigbee protocol, set the :option:`CONFIG_ZIGBEE` Kconfig option.
+To use the Zigbee protocol, set the ``CONFIG_ZIGBEE_R23`` Kconfig option.
 Setting this option enables all the peripherals required for the correct operation of the Zigbee protocol and allows you to use them.
 
 After that, you have to define the Zigbee device role for the Zigbee application or sample by setting one of the following Kconfig options:
 
-* Router role: :option:`CONFIG_ZIGBEE_ROLE_ROUTER`
-* End Device role: :option:`CONFIG_ZIGBEE_ROLE_END_DEVICE`
-* Coordinator role: :option:`CONFIG_ZIGBEE_ROLE_COORDINATOR`
+* Router role: ``CONFIG_ZIGBEE_ROLE_ROUTER``
+* End Device role: ``CONFIG_ZIGBEE_ROLE_END_DEVICE``
+* Coordinator role: ``CONFIG_ZIGBEE_ROLE_COORDINATOR``
 
 Setting any of these options enables the respective ZBOSS role library.
 This is needed because End Devices use different libraries than Routers and Coordinators.
@@ -55,7 +59,8 @@ This allows the stack to enter the sleep state during these periods, which also 
 When the Zigbee stack thread goes to sleep, the Zigbee thread can enter the suspend state for the same amount of time as the stack's sleep.
 The thread will be automatically resumed after the sleep period is over or on an event.
 
-For this feature to work, make sure to call the :c:func:`zb_set_rx_on_when_idle` ZBOSS API, as described in `Configuring sleepy behavior for end devices`_ in the ZBOSS documentation.
+For this feature to work, make sure to call the :c:func:`zb_set_rx_on_when_idle` ZBOSS API with the ``ZB_FALSE`` parameter before starting the ZBOSS stack.
+This function specifies whether the device should have the radio disabled between the polls to parent.
 This feature does not require enabling any additional options in Kconfig.
 
 In the :ref:`Zigbee light switch sample <zigbee_light_switch_sample>` in the |NCS|, after you enable the SED behavior extension, the sleepy behavior can be triggered by pressing a predefined button when the device is booting.
@@ -65,11 +70,10 @@ Power saving during sleep
 -------------------------
 
 With the sleepy behavior enabled, the unused part of RAM memory is powered off, which allows to lower the power consumption even more.
-The sleep current of MCU can be lowered to about 1.8 uA by completing the following steps:
+The sleep current of MCU can be lowered by completing the following steps:
 
-1. Turn off UART by setting :option:`CONFIG_SERIAL` to ``n``.
-#. For current measurements for the `nRF52840 DK <Developing with nRF52 Series_>`_ (PCA10056), the :`nRF52833 DK <Developing with nRF52 Series_>`_ (PCA10100), or the `nRF5340 <Developing with nRF53 Series_>`_ (PCA10095), set **SW6** to ``nRF ONLY`` position to get the desired results.
-#. Enable the :option:`CONFIG_RAM_POWER_DOWN_LIBRARY` Kconfig option.
+1. Turn off UART by setting the ``CONFIG_SERIAL`` Kconfig option to ``n``.
+#. Enable the ``CONFIG_RAM_POWER_DOWN_LIBRARY`` Kconfig option.
 
 Optional configuration
 **********************
@@ -81,11 +85,11 @@ Device operational channel
 
 You can enable one of the following alternative options to select the channel on which the Zigbee device can operate:
 
-  * :option:`CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_SINGLE` - Single mode is enabled by default.
+  * ``CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_SINGLE`` - Single mode is enabled by default.
     The default channel is set to 16.
-    To set a different channel, edit the :option:`CONFIG_ZIGBEE_CHANNEL` option to the desired value.
-  * :option:`CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI` - In this mode, you get all the channels enabled by default.
-    To configure a custom set of channels in the range from 11 to 26, edit the :option:`CONFIG_ZIGBEE_CHANNEL_MASK` option.
+    To set a different channel, edit the ``CONFIG_ZIGBEE_CHANNEL`` Kconfig option to the desired value.
+  * ``CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI`` - In this mode, you get all the channels enabled by default.
+    To configure a custom set of channels in the range from 11 to 26, edit the ``CONFIG_ZIGBEE_CHANNEL_MASK`` Kconfig option.
     For example, you can set channels 13, 16, and 21.
     You must have at least one channel enabled with this option.
 
@@ -99,7 +103,7 @@ By default, it uses an address from Nordic Semiconductor's pool.
 
 If your devices should use a different address, you can change the address according to your company's addressing scheme.
 
-.. include:: includes/ieee802154_eui64_conf.txt
+.. include:: includes/ieee802154_eui64_conf_nrf54l.txt
 
 At the end of the configuration process, you can check the EUI-64 value using :ref:`lib_zigbee_shell`:
 
@@ -122,17 +126,17 @@ The ZBOSS stack can be started using one of the following options:
 * Started and executed from the main thread, as `described in the ZBOSS development guide <Stack commissioning start sequence_>`_.
 * Started from a dedicated Zephyr thread, which in turn can be created and started by calling :c:func:`zigbee_enable`.
 
-The dedicated thread can be configured using the following options:
+The dedicated thread can be configured using the following Kconfig options:
 
-* :option:`CONFIG_ZBOSS_DEFAULT_THREAD_PRIORITY` - Defines thread priority; set to 3 by default.
-* :option:`CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE` - Defines the size of the thread stack; set to 2048 by default.
+* ``CONFIG_ZBOSS_DEFAULT_THREAD_PRIORITY`` - Defines thread priority; set to ``3`` by default.
+* ``CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE`` - Defines the size of the thread stack; set to ``2048`` by default.
 
 .. _zigbee_ug_logging:
 
 Custom logging per module
 =========================
 
-Logging is handled with the :option:`CONFIG_LOG` option.
+Logging is handled with the ``CONFIG_LOG`` Kconfig option.
 This option enables logging for both the stack and Zephyr's `Logging`_ API.
 
 .. _zigbee_ug_logging_application_logs:
@@ -149,21 +153,22 @@ Stack logs
 ----------
 
 The stack logs are independent from Zephyr's `Logging`_ API.
-To customize them, use the following options:
+To customize them, use the following Kconfig options:
 
-* :option:`CONFIG_ZBOSS_ERROR_PRINT_TO_LOG` - Allows the application to log ZBOSS error names; enabled by default.
-* :option:`CONFIG_ZBOSS_TRACE_MASK` - Sets the modules from which ZBOSS will log the debug messages with :option:`CONFIG_ZBOSS_TRACE_LOG_LEVEL`; no module is set by default.
-* :option:`CONFIG_ZBOSS_TRAF_DUMP` - Enables logging of the received 802.15.4 frames over ZBOSS trace log if :option:`CONFIG_ZBOSS_TRACE_LOG_LEVEL` is set; disabled by default.
+* ``CONFIG_ZBOSS_ERROR_PRINT_TO_LOG`` - Allows the application to log ZBOSS error names; enabled by default.
+* ``CONFIG_ZBOSS_TRACE_MASK`` - Sets the modules from which ZBOSS will log the debug messages with ``CONFIG_ZBOSS_TRACE_LOG_LEVEL``; no module is set by default.
+* ``CONFIG_ZBOSS_TRAF_DUMP`` - Enables logging of the received 802.15.4 frames over ZBOSS trace log if ``CONFIG_ZBOSS_TRACE_LOG_LEVEL`` is set; disabled by default.
 
-The stack logs are provided in a binary format and you can configure how they are printed:
+The stack logs are provided in a binary format.
+You can configure how they are printed with the following Kconfig options:
 
-* :option:`CONFIG_ZBOSS_TRACE_HEXDUMP_LOGGING` - Stack logs are printed as hexdump using Zephyr's `Logging`_ API.
+* ``CONFIG_ZBOSS_TRACE_HEXDUMP_LOGGING`` - Stack logs are printed as hexdump using Zephyr's `Logging`_ API.
   This option is enabled by default.
-* :option:`CONFIG_ZBOSS_TRACE_BINARY_LOGGING` - Stack logs are printed in the binary format using one of the following independent serial backends of your choice:
+* ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` - Stack logs are printed in the binary format using one of the following independent serial backends of your choice:
 
-  * :option:`CONFIG_ZBOSS_TRACE_UART_LOGGING` - UART serial.
+  * ``CONFIG_ZBOSS_TRACE_UART_LOGGING`` - UART serial.
     This backend is enabled by default.
-  * :option:`CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING` - USB CDC serial.
+  * ``CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING`` - USB CDC serial.
 
   To specify the serial device, you need to set the ``ncs,zboss-trace-uart`` choice in devicetree like this:
 
@@ -174,18 +179,19 @@ The stack logs are provided in a binary format and you can configure how they ar
      };
 
   .. note::
-     When you select :option:`CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING`, the USB peripheral is enabled and the USB CDC serial is configured as a part of the :c:func:`zb_osif_serial_logger_init` function.
+     When you select the ``CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING`` Kconfig option, the USB peripheral is enabled and the USB CDC serial is configured as a part of the :c:func:`zb_osif_serial_logger_init` function.
      The application does not wait for the connection to be established and unreceived data is lost.
      For this reason, start collecting the data as soon as you need to.
 
      See `CDC ACM`_ in the Zephyr documentation for more information about how to configure USB CDC ACM instance for logging ZBOSS trace messages.
 
-* :option:`CONFIG_ZBOSS_TRACE_BINARY_NCP_TRANSPORT_LOGGING` - Stack logs are printed in the binary format using the NCP transport channel.
+* ``CONFIG_ZBOSS_TRACE_BINARY_NCP_TRANSPORT_LOGGING`` - Stack logs are printed in the binary format using the NCP transport channel.
 
 Stack logs are stored in the internal buffer if they are printed using Zephyr's `Logging`_ API or the independent serial backend.
-You can customize the buffer size with the :option:`CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`.
+You can customize the buffer size with the ``CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`` Kconfig option.
 The buffer size must be larger than ``256`` and smaller than ``2147483648``.
-If NCP transport channel is used, stack logs are stored in the buffer used for NCP transport, which size can be configured with :option:`CONFIG_ZIGBEE_UART_TX_BUF_LEN`.
+If NCP transport channel is used, stack logs are stored in the buffer used for NCP transport.
+This buffer's size can be configured with the ``CONFIG_ZIGBEE_UART_TX_BUF_LEN`` Kconfig option.
 
 .. _zigbee_ug_logging_logger_options:
 
@@ -195,12 +201,12 @@ Zephyr's logger options
 You can configure custom logger options for each Zigbee and ZBOSS module.
 To do this, configure the related Kconfig option for one or more modules:
 
-* :option:`CONFIG_ZBOSS_TRACE_LOG_LEVEL`
-* :option:`CONFIG_ZBOSS_OSIF_LOG_LEVEL`
-* :option:`CONFIG_ZIGBEE_SHELL_LOG_LEVEL`
-* :option:`CONFIG_ZIGBEE_APP_UTILS_LOG_LEVEL_CHOICE`
-* :option:`CONFIG_ZIGBEE_LOGGER_EP_LOG_LEVEL_CHOICE`
-* :option:`CONFIG_ZIGBEE_SCENES_LOG_LEVEL`
+* ``CONFIG_ZBOSS_TRACE_LOG_LEVEL``
+* ``CONFIG_ZBOSS_OSIF_LOG_LEVEL``
+* ``CONFIG_ZIGBEE_SHELL_LOG_LEVEL``
+* ``CONFIG_ZIGBEE_APP_UTILS_LOG_LEVEL_CHOICE``
+* ``CONFIG_ZIGBEE_LOGGER_EP_LOG_LEVEL_CHOICE``
+* ``CONFIG_ZIGBEE_SCENES_LOG_LEVEL``
 
 For each of the modules, you can set the following logging options:
 
@@ -210,7 +216,7 @@ For each of the modules, you can set the following logging options:
 * ``LOG_LEVEL_INF`` - Enables logging for informational messages, errors, and warnings.
 * ``LOG_LEVEL_DBG`` - Enables logging for debug messages, informational messages, errors, and warnings.
 
-For example, setting :option:`CONFIG_ZBOSS_TRACE_LOG_LEVEL_INF` will enable logging of informational messages, errors, and warnings for the ZBOSS Trace module.
+For example, setting ``CONFIG_ZBOSS_TRACE_LOG_LEVEL_INF`` will enable logging of informational messages, errors, and warnings for the ZBOSS Trace module.
 
 Reduced power consumption
 =========================
@@ -218,12 +224,13 @@ Reduced power consumption
 You can reduce the amount of power used by your device by enabling the `RAM power-down`_ library.
 This library is also used for `Power saving during sleep`_.
 
-.. _zigbee_ug_static_partition:
+..
+  .. _zigbee_ug_static_partition:
 
-Upgrading Zigbee application
-****************************
+  Upgrading Zigbee application
+  ****************************
 
-When upgrading the Zigbee application, use the `Static and dynamic configuration`_ of the Partition Manager to ensure that ZBOSS' NVRAM is placed in the same area of flash.
-This is because enabling additional features (for example, Zephyr's `Non-Volatile Storage (NVS)`_) can change the placement of the partition in the flash and the ZBOSS settings can be lost, as the application is not able to find the partition.
+  When upgrading the Zigbee application, use the `Static and dynamic configuration`_ of the Partition Manager to ensure that ZBOSS' NVRAM is placed in the same area of flash.
+  This is because enabling additional features (for example, Zephyr's `Non-Volatile Storage (NVS)`_) can change the placement of the partition in the flash and the ZBOSS settings can be lost, as the application is not able to find the partition.
 
-The static configuration is required regardless of the application version and the upgrading method (:ref:`lib_zigbee_fota` or `Secure bootloader chain`).
+  The static configuration is required regardless of the application version and the upgrading method (:ref:`lib_zigbee_fota` or `Secure bootloader chain`).

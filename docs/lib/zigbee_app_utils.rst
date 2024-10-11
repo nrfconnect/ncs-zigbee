@@ -461,23 +461,23 @@ Use the following code as reference, with a call to :c:func:`zigbee_default_sign
 Configuration
 *************
 
-To enable the Zigbee application utilities library, set the :option:`CONFIG_ZIGBEE_APP_UTILS` Kconfig option.
+To enable the Zigbee application utilities library, set the ``CONFIG_ZIGBEE_APP_UTILS`` Kconfig option.
 
 Logging
-    To configure the logging level of the library, use the :option:`CONFIG_ZIGBEE_APP_UTILS_LOG_LEVEL` Kconfig option.
+    To configure the logging level of the library, use the ``CONFIG_ZIGBEE_APP_UTILS_LOG_LEVEL`` Kconfig option.
 
 Automatic PAN ID conflict resolution
-    To enable automatic PAN ID conflict resolution, use the :option:`CONFIG_ZIGBEE_PANID_CONFLICT_RESOLUTION` Kconfig option.
+    To enable automatic PAN ID conflict resolution, use the ``CONFIG_ZIGBEE_PANID_CONFLICT_RESOLUTION`` Kconfig option.
     This option is enabled by default.
 
 Factory reset button
-    To configure the time of the button press that initiates the device factory reset, use the :option:`CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS` Kconfig option.
+    To configure the time of the button press that initiates the device factory reset, use the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option.
     This option is set to 5 seconds by default.
 
     For more information about the factory reset, see the `Resetting to factory defaults`_ section in the ZBOSS stack documentation.
 
 Trust Center Rejoin
-    To enable the Trust Center Rejoin feature, use the :option:`CONFIG_ZIGBEE_TC_REJOIN_ENABLED` Kconfig option.
+    To enable the Trust Center Rejoin feature, use the ``CONFIG_ZIGBEE_TC_REJOIN_ENABLED`` Kconfig option.
     This option is enabled by default.
 
 For detailed steps about configuring the library in a Zigbee sample or application, see :ref:`ug_zigbee_configuring_components_application_utilities`.

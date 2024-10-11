@@ -17,8 +17,7 @@ Replace the company ID
 
 Replace the full EUI-64
   You can provide the full EUI-64 value by programming certain user information configuration registers (UICR).
-  For nRF52 Series devices, the CUSTOMER registers block is used.
-  For nRF53 Series devices, the OTP registers block is used.
+  For nRF54L15 DK, this is the TODO block.
 
   To use the EUI-64 value from the UICR, enable the ``CONFIG_IEEE802154_NRF5_UICR_EUI64_ENABLE`` Kconfig option and set the ``CONFIG_IEEE802154_NRF5_UICR_EUI64_REG`` Kconfig option to the base of the two consecutive registers that contain your EUI-64 value.
 

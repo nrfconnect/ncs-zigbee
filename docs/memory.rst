@@ -11,6 +11,9 @@ This page provides information about the amount of flash memory and RAM that is 
 Use it to check if your application has enough space for a given configuration.
 Values are provided for :ref:`ZBOSS libraries <zigbee_zboss>`.
 
+.. note::
+   .. include:: /includes/experimental_note.txt
+
 Samples were built using the available :ref:`zigbee_zboss`.
 Unless stated otherwise, the default :file:`prj.conf` was used.
 
@@ -22,12 +25,14 @@ Unless stated otherwise, the default :file:`prj.conf` was used.
 RAM and flash memory requirements
 *********************************
 
-RAM and flash memory requirement values differ depending on the DK, and the programmed sample.
+RAM and flash memory requirement values differ depending on the programmed sample.
 
 The following tables list memory requirement values for Zigbee samples.
 
 Values are provided in kilobytes (KB).
 ``n/a`` indicates that the sample with the given variant is not supported on the DK.
+
+The following table lists memory requirements for samples running on the `nRF54L15 DK <Developing with nRF54L Series_>`_ (`nrf54l15dk`_).
 
 .. note::
    Values of the nRF54L15 DK are needed.
@@ -192,10 +197,12 @@ Stack memory requirements
 The following table lists stack memory requirement values for ``main`` and ``zboss`` threads.
 These measurements were carried out with Zephyr's `Thread analyzer`_, using the following Kconfig options for configuration:
 
-* For the stack memory size of the ``main`` thread - :option:`CONFIG_MAIN_STACK_SIZE`
-* For the stack memory size of the ``zboss`` thread - :option:`CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE`
+* For the stack memory size of the ``main`` thread - ``CONFIG_MAIN_STACK_SIZE``
+* For the stack memory size of the ``zboss`` thread - ``CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE``
 
 Values are provided in bytes (B).
+
+The following table lists memory requirements for samples running on the `nRF54L15 DK <Developing with nRF54L Series_>`_ (`nrf54l15dk`_).
 
 .. note::
    Values of the nRF54L15 DK are needed.

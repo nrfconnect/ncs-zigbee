@@ -38,16 +38,13 @@ bool zigbee_is_stack_started(void);
 void zigbee_enable(void);
 
 #ifdef CONFIG_ZIGBEE_DEBUG_FUNCTIONS
-/**@brief Function for checking if the ZBOSS thread has been created.
- */
+/**@brief Function for checking if the ZBOSS thread has been created. */
 bool zigbee_debug_zboss_thread_is_created(void);
 
-/**@brief Function for suspending the ZBOSS thread.
- */
+/**@brief Function for suspending the ZBOSS thread. */
 void zigbee_debug_suspend_zboss_thread(void);
 
-/**@brief Function for resuming the ZBOSS thread.
- */
+/**@brief Function for resuming the ZBOSS thread. */
 void zigbee_debug_resume_zboss_thread(void);
 
 /**@brief Function for getting the state of the Zigbee stack thread

@@ -3,9 +3,12 @@
 Samples
 #######
 
-The nRF Connect SDK provides the following samples showcasing the Zigbee protocol.
+The |addon| for the |NCS| provides the following samples showcasing the Zigbee R23 protocol.
 All samples are placed in the :file:`samples` directory in the Zigbee repository.
 You can build the samples for various boards and configure them for different usage scenarios.
+
+.. note::
+   .. include:: /includes/experimental_note.txt
 
 In addition to their basic functionalities, you can expand the samples with variants and extensions.
 The following table lists variants and extensions available for each Zigbee sample:
@@ -74,28 +77,28 @@ The following table lists variants and extensions available for each Zigbee samp
       - Light switch
       - Network coordinator
       - Shell
+      - Template
     * - Sleepy End Device behavior
       - :ref:`*** <zigbee_ug_sed>`
       - ✔
       -
+      - :ref:`** <zigbee_ug_sed>`
       - :ref:`** <zigbee_ug_sed>`
     * - Multiprotocol Bluetooth LE
       - `*** <Multiprotocol support_>`_
       - ✔
       - `*** <Multiprotocol support_>`_
       - `*** <Multiprotocol support_>`_
-    * - Zigbee FOTA
-      - :ref:`** <ug_zigbee_configuring_components_ota>`
-      - ✔
-      - :ref:`** <ug_zigbee_configuring_components_ota>`
-      - :ref:`** <ug_zigbee_configuring_components_ota>`
+      - `*** <Multiprotocol support_>`_
     * - Endpoint logger
       - :ref:`** <ug_zigbee_configuring_components_logger_ep>`
       - :ref:`** <ug_zigbee_configuring_components_logger_ep>`
       - :ref:`** <ug_zigbee_configuring_components_logger_ep>`
       - ✔
+      - :ref:`** <ug_zigbee_configuring_components_logger_ep>`
     * - ZCL scene helper
       - ✔
+      - :ref:`*** <ug_zigbee_configuring_components_scene_helper>`
       - :ref:`*** <ug_zigbee_configuring_components_scene_helper>`
       - :ref:`*** <ug_zigbee_configuring_components_scene_helper>`
       - :ref:`*** <ug_zigbee_configuring_components_scene_helper>`

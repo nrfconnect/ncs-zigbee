@@ -1,4 +1,12 @@
+.. ### Versions
+
+.. |addon_version| replace:: 0.1.0
+.. |ncs_version| replace:: 2.8.0
+.. |zigbee_version| replace:: Zigbee 3.0
+.. |zboss_version| replace:: 4.1.4.2
+
 .. |NCS| replace:: nRF Connect SDK
+.. |addon| replace:: Zigbee R23 add-on
 
 .. |VSC| replace:: Visual Studio Code
 .. |nRFVSC| replace:: nRF Connect for VS Code extension
@@ -15,21 +23,21 @@
 
 .. ### Other shortcuts
 
-.. |sysbuild_autoenabled_ncs| replace:: When building `repository applications <Repository application_>`_ in the `SDK repositories <Repository types_>`_, building with sysbuild is `enabled by default <Sysbuild enabled by default_>`_.
+.. |sysbuild_autoenabled_ncs| replace:: When building `repository applications <Repository application_>`_ in the |addon| which is an `SDK repository <Repository types_>`_, building with sysbuild is `enabled by default <Sysbuild enabled by default_>`_.
    If you work with out-of-tree `freestanding applications <Freestanding application_>`_, you need to manually pass the ``--sysbuild`` parameter to every build command or `configure west to always use it <Configuring sysbuild usage in west_>`_.
 
+.. |kconfig_search| replace::
+   For details about the Kconfig options mentioned here, see the `Kconfig search`_ in the |NCS| documentation.
 
 .. ### Zigbee & ZBOSS shortcuts
 
-.. |zigbee_version| replace:: Zigbee 3.0
-.. |zboss_version| replace:: 3.11.4.0
 .. |zigbee_ncp_package_version| replace:: 2.2.3
 .. |zigbee_description| replace:: Zigbee is a portable, low-power software networking protocol that provides connectivity over an 802.15.4-based mesh network.
 .. |enable_zigbee_before_testing| replace:: Make sure to configure the Zigbee stack before building and testing this sample.
    See :ref:`ug_zigbee_configuring` for more information.
 .. |zigbee_library| replace:: This is a Zigbee library.
    See :ref:`ug_zigbee_configuring_libraries` for information about how to configure it for you Zigbee application.
-.. |zigbee_ncp_package| replace:: It contains the full development-ready source code for host and evaluation-ready firmware for the nRF52840 DK, the nRF52833 DK, and the nRF52840 Dongle.
+.. |zigbee_ncp_package| replace:: It contains the full development-ready source code for host and evaluation-ready firmware for the nRF54L15 DK.
    The package comes with prebuilt libraries compatible with 64-bit Ubuntu 18.04 Linux.
 .. |zigbee_ncp_package_more_info| replace:: For information about how to recompile the package libraries for a different host architecture or operating system, see the `NCP Host documentation`_.
    For information about how to use NCP Host for Zigbee in the |NCS| or build the firmware using the NCP sample, see the :ref:`NCP sample <zigbee_ncp_sample>`.

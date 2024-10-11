@@ -9,7 +9,7 @@ import sys
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'nRF Connect SDK - Zigbee R23 add-on'
+project = 'Zigbee R23 add-on for nRF Connect SDK'
 copyright = '2024, Nordic Semiconductor'
 author = 'Nordic Semiconductor'
 release = '1.0.0'

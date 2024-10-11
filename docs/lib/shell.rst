@@ -21,15 +21,15 @@ To change this and other Zephyr's shell settings (for example, the prompt or the
 
 |zigbee_shell_config|
 
-To configure the Zigbee shell library, use the following options:
+To configure the Zigbee shell library, use the following Kconfig options:
 
-* :option:`CONFIG_ZIGBEE_SHELL`
-* :option:`CONFIG_ZIGBEE_SHELL_ENDPOINT`
-* :option:`CONFIG_ZIGBEE_SHELL_DEBUG_CMD`
-* :option:`CONFIG_ZIGBEE_SHELL_LOG_LEVEL`
-* :option:`CONFIG_ZIGBEE_SHELL_CTX_MGR_ENTRIES_NBR`
-* :option:`CONFIG_ZIGBEE_SHELL_MONITOR_CACHE_SIZE`
-* :option:`CONFIG_ZIGBEE_SHELL_ZCL_CMD_TIMEOUT`
+* ``CONFIG_ZIGBEE_SHELL``
+* ``CONFIG_ZIGBEE_SHELL_ENDPOINT``
+* ``CONFIG_ZIGBEE_SHELL_DEBUG_CMD``
+* ``CONFIG_ZIGBEE_SHELL_LOG_LEVEL``
+* ``CONFIG_ZIGBEE_SHELL_CTX_MGR_ENTRIES_NBR``
+* ``CONFIG_ZIGBEE_SHELL_MONITOR_CACHE_SIZE``
+* ``CONFIG_ZIGBEE_SHELL_ZCL_CMD_TIMEOUT``
 
 For detailed steps about configuring the library in a Zigbee sample or application, see :ref:`ug_zigbee_configuring_components_logger_ep`.
 

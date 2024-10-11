@@ -7,11 +7,14 @@ Commissioning
    :local:
    :depth: 2
 
+.. note::
+   .. include:: /includes/experimental_note.txt
+
 Commissioning is a process that allows a new Zigbee device to join a Zigbee network.
 The device is configured into the network, so that it can start communicating with other network nodes.
 If there is no network to join, the commissioning procedure ensures that a new network is created.
 
-You can configure Zigbee commissioning in the |NCS| by setting parameters before the start of the :ref:`zigbee_zboss`.
+You can configure Zigbee commissioning by setting parameters before the start of the :ref:`zigbee_zboss`.
 For more information, see the `Support for Zigbee commissioning`_ section in the ZBOSS stack documentation.
 
 .. _zigbee_commissioning_start:
@@ -32,7 +35,7 @@ In the ZBOSS stack, the commissioning can be started using one of the following 
 
 For more information, see the `Stack commissioning start sequence`_ section in the ZBOSS stack documentation.
 
-In the |NCS|, the application can use :ref:`lib_zigbee_signal_handler` to handle the ZBOSS signals and start the commissioning.
+With the |addon|, the application can use :ref:`lib_zigbee_signal_handler` to handle the ZBOSS signals and start the commissioning.
 
 .. _zigbee_commissioning_modes:
 
@@ -41,7 +44,7 @@ Commissioning modes
 
 Zigbee commissioning is organized into four different modes:
 
-* Touchlink commissioning (optional; not supported in the |NCS|)
+* Touchlink commissioning (optional; not supported in the |addon| for the |NCS|)
 * Network Steering
 * Network Formation
 * Finding and Binding (optional)
@@ -69,7 +72,7 @@ Touchlink
 =========
 
 .. note::
-      The Touchlink mode is optional in Zigbee and is not supported in the |NCS|.
+   The Touchlink mode is optional in Zigbee and is not supported in the |addon| for the |NCS|.
 
 The Touchlink mode allows commissioning of devices in close proximity to each other, which means that the key criterium for this mode is the signal strength.
 It involves an initiator device and a target device, where the initiator is a member of an existing Zigbee network or it can form a new network.
@@ -108,10 +111,10 @@ The new device must be authenticated and authorized to become part of the networ
 For this purpose, it needs credentials, which usually take form of a network key.
 For `Centralized security network`_, the authentication and authorization also involves establishing a unique Trust Center Link Key (TCLK).
 
-Network Steering in the |NCS|
+Network Steering in the |addon| for the |NCS|
    In the ZBOSS stack, Network Steering is started using the `ZB_BDB_NETWORK_STEERING`_ bit mask.
 
-   In the |NCS|, Network Steering for a node on a network can be started using the following additional options:
+   In the |addon|, Network Steering for a node on a network can be started using the following additional options:
 
    * When running the :ref:`Zigbee Coordinator sample <zigbee_network_coordinator_sample>`, you can press the associated button.
    * If you are using the :ref:`lib_zigbee_shell` library in your application, you can use the ``bdb start`` command.
@@ -139,10 +142,10 @@ Depending on the node role:
 If Network Formation is successful, you can add nodes to the new network using `Network Steering`_.
 If unsuccessful, the commissioning procedure stops here.
 
-Network Formation in the |NCS|
+Network Formation in the |addon| for the |NCS|
    In the ZBOSS stack, Network Formation is started using the `ZB_BDB_NETWORK_FORMATION`_ bit mask.
 
-   In the |NCS|, when using the :ref:`lib_zigbee_signal_handler` and the application implements the Zigbee Coordinator role, the Network Formation procedure is started right after the stack initialization.
+   In the |addon|, when using the :ref:`lib_zigbee_signal_handler` and the application implements the Zigbee Coordinator role, the Network Formation procedure is started right after the stack initialization.
 
 Centralized security network
 ----------------------------
@@ -196,7 +199,7 @@ Depending on the device type:
 
 Finding and Binding can be terminated if there are no corresponding clusters on the target node.
 
-Finding and Binding in the |NCS|
+Finding and Binding in the |addon| for the |NCS|
    In the ZBOSS stack, Finding and Binding is started using the `ZB_BDB_FINDING_N_BINDING`_ bit mask.
 
    Apart from the BDB top-level procedure API, you can use the `zb_bdb_finding_binding_initiator()`_ function to manually control which binding table entries are to be created.
