@@ -5,7 +5,8 @@
 #
 
 menuconfig ZIGBEE_R23
-	bool "Enable Zigbee stack"
+	bool "Enable Zigbee stack [EXPERIMENTAL]"
+	select EXPERIMENTAL
 	imply FPU
 	select APP_LINK_WITH_ZBOSS
 	select PM_SINGLE_IMAGE
