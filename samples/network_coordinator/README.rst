@@ -114,7 +114,7 @@ After programming the sample to your development kit, complete the following ste
 
    #. Use buttons on the development kit that runs the Light switch sample to control the light bulb, as described in the Light switch sample's user interface section.
 
-      The result of using the buttons is reflected on the light bulb's **LED3**.
+      The result of using the buttons is reflected on the light bulb's **LED1**.
 
 You can now use buttons on the light switch to control the light bulb, as described in the :ref:`zigbee_light_switch_user_interface` section of the Light switch sample page.
 
