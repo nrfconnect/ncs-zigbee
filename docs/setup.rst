@@ -51,18 +51,5 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
          west init -m "http://github.com/nrfconnect/ncs-zigbee" --mr main
 
-To create an application, follow the `Creating an application`_ instructions, with the following differences:
 
-.. tabs::
-
-   .. group-tab:: |nRFVSC|
-
-      In Step 4, select :guilabel:`Browse nRF Connect SDK Add-on Index`, then select :guilabel:`Zigbee R23 extension`, and select |addon_version| of the |addon|.
-
-   .. group-tab:: command line
-
-      TODO: This might require discrete steps.
-      Maybe adapted from either:
-
-      * https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/dev_model_and_contributions/adding_code.html#workflow_3_application_in_a_fork_of_sdk-nrf
-      * https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#creating_application_for_use_with_command_line
+To create an application, use :ref:`zigbee_template_sample` sample as a starting point.
