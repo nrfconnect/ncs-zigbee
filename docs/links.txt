@@ -183,6 +183,11 @@
 .. _`ZB_BDB_FINDING_N_BINDING`: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/zboss/3.11.4.0/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ad9bcb56a6668b6ba6f37edc73a796b58
 .. _`zb_bdb_finding_binding_initiator()`: https://developer.nordicsemi.com/nRF_Connect_SDK/doc/zboss/3.11.4.0/group__zboss__bdb__comm__fb.html#gae6fd60a050559ef0aa3c3e5ec32bc515
 
+.. _`ZBOSS 4.1.4.2 Documentation`: https://nrfconnect.github.io/ncs-zigbee/docs/zboss/4.1.4.2/index.html
+.. _`ZBOSS 4.1.4.2 changelog`: https://nrfconnect.github.io/ncs-zigbee/docs/zboss/4.1.4.2/zboss_release_notes.html#zboss_ncs_release_4.1.4.2
+.. _`NCP Host 3.0.0 Documentation`: https://nrfconnect.github.io/ncs-zigbee/docs/zboss/4.1.4.2/zboss_ncp_host_intro.html
+.. _`NCP Host 3.0.0 changelog`: https://nrfconnect.github.io/ncs-zigbee/docs/zboss/4.1.4.2/zboss_ncp_host_release_notes.html
+
 .. ### Other sources
 
 .. _`dfu-util tool`: http://dfu-util.sourceforge.net/
