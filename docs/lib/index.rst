@@ -84,8 +84,12 @@ The following table lists libraries enabled by default for each available Zigbee
       - :ref:`Light bulb <zigbee_light_bulb_sample>`
       - :ref:`Light switch <zigbee_light_switch_sample>`
       - :ref:`Network coordinator <zigbee_network_coordinator_sample>`
+      - :ref:`NCP <zigbee_ncp_sample>`
       - :ref:`Shell (sample) <zigbee_shell_sample>`
+      - :ref:`Template <zigbee_template_sample>`
     * - ZBOSS OSIF
+      - ✔
+      - ✔
       - ✔
       - ✔
       - ✔
@@ -94,24 +98,34 @@ The following table lists libraries enabled by default for each available Zigbee
       -
       -
       -
+      -
       - ✔
+      -
     * - Application utilities (default signal handler)
       - ✔
       - ✔
+      - ✔
+      -
       - ✔
       - ✔
     * - Error handler
       - ✔
       - ✔
       - ✔
+      -
+      - ✔
       - ✔
     * - Endpoint logger
       -
       -
       -
+      -
       - ✔
+      -
     * - Scene helper
       - ✔
+      -
+      -
       -
       -
       -
