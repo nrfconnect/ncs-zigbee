@@ -93,7 +93,7 @@ Zigbee async serial
 ===================
 
 The Zigbee async serial is the only backend that the ZBOSS OSIF serial supports for handling the NCP communication.
-This set of functions uses `UART API`_ and can be configured to use UART peripheral or USB CDC ACM device.
+This set of functions uses `UART API`_ and can be configured to use UART peripheral.
 The data received is internally buffered.
 
 You can also use the Zigbee async serial for logging ZBOSS traces.
@@ -121,7 +121,7 @@ The Zigbee ZBOSS OSIF layer serial device needs to be provided in devicetree as 
 Zigbee serial logger
 ====================
 
-This set of functions uses Zephyr's `UART API`_ and can be configured to use either the UART peripheral or the USB CDC ACM device.
+This set of functions uses Zephyr's `UART API`_ and can be configured to use either the UART peripheral.
 Data is buffered internally in ring buffer and printed in the binary format.
 This ring buffer has a size of 4096 bytes by default.
 
@@ -132,11 +132,6 @@ Use the following Kconfig options to configure the Zigbee serial logger:
 
 * ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` - This option enables logging ZBOSS traces with Zigbee serial logger.
 * ``CONFIG_ZBOSS_TRACE_UART_LOGGING`` - This option selects the UART serial backend.
-* ``CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING`` - This option selects the USB CDC ACM serial backend.
-
-   .. note::
-      See `CDC ACM`_ in the Zephyr documentation for more information about how to configure USB CDC ACM instance for logging ZBOSS trace messages.
-
 * ``CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`` - This option specifies the size of the internal ring buffer.
 
 The ZBOSS tracing serial device needs to be provided in Devicetree like this:

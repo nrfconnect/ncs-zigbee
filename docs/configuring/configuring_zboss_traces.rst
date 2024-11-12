@@ -34,12 +34,6 @@ To collect and view the log files, you will need the following:
 
    * For traces using the UART, the J-Link COM port is used. The development kit is assigned to a COM port (Windows) or a ttyACM device (Linux), which is visible in the system's Device Manager.
 
-   * For traces using USB, a virtual COM port (a serial port emulated over USB) is used.
-     You can set the ``CONFIG_USB_DEVICE_PRODUCT`` Kconfig option to help identify the COM port in the system's Device Manager.
-
-* An additional USB cable if trace logs through USB are enabled (see :ref:`ug_zigbee_configuring_zboss_traces_using_usb`).
-
-
 .. rst-class:: numbered-step
 
 Switch to ZBOSS libraries with compiled-in trace logs
@@ -199,49 +193,4 @@ Optional: Increasing the UART throughput
          pinctrl-0 = <&uart1_default_alt>;
          pinctrl-1 = <&uart1_sleep_alt>;
          pinctrl-names = "default", "sleep";
-      };
-
-.. _ug_zigbee_configuring_zboss_traces_using_usb:
-
-Trace logs using native USB
-===========================
-
-Trace logs can also be configured to use a native USB.
-This is useful because trace logs will be printed through a separate virtual COM port so that the console logs can still be read through the J-Link COM port.
-For applications that relay on the UART connection through the J-Link COM port, for example the Network co-processor (NCP) sample, trace logs can only be configured through USB (COM port emulated over USB).
-See the :ref:`Zigbee NCP <zigbee_ncp_sample>` sample page for how to configure trace logs for USB in this case.
-
-.. note::
-   Before proceeding with the following steps, first check if your Zigbee application already has USB enabled or is currently using a USB.
-   If your application is already using a virtual COM port via native USB, use a device name that is different than the default ``CDC_ACM_0`` to create new virtual COM port for printing trace logs.
-   For example, if ``CDC_ACM_0`` is already present, then create a virtual COM port named ``CDC_ACM_1``, and so on.
-   Additionally, the Kconfig option ``CONFIG_USB_COMPOSITE_DEVICE`` must be set if there are multiple virtual COM ports configured.
-
-   See the :ref:`Zigbee NCP <zigbee_ncp_sample>` sample page as an example where one virtual COM port instance is already configured, and another must be created.
-
-To configure trace logs using native USB, complete the following steps:
-
-1. Set the Kconfig option ``CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING``.
-   This also enables the necessary USB Kconfig options.
-
-#. Create a virtual COM port that will be used for printing ZBOSS trace logs by extending the DTS overlay file for the selected board with the following:
-
-   .. code-block:: devicetree
-
-      &zephyr_udc0 {
-         cdc_acm_uart0: cdc_acm_uart0 {
-            compatible = "zephyr,cdc-acm-uart";
-            label = "CDC_ACM_0";
-         };
-      };
-
-   .. note::
-      For the ZBOSS trace logs to be printed correctly through the USB, it is recommended to avoid using the USB autosuspend.
-
-#. Provide the ZBOSS tracing serial device in Devicetree like this:
-
-   .. code-block:: devicetree
-
-      chosen {
-          ncs,zboss-trace-uart = &cdc_acm_uart0;
       };

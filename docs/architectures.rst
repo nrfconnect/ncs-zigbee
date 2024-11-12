@@ -110,7 +110,7 @@ Network Co-Processor (NCP)
 
 In this design, the host processor runs the Zigbee application layer (ZCL) and the Zigbee commissioning logic.
 The connectivity device (nRF SoC) runs the :ref:`NCP application <zigbee_ncp_sample>` that contains lower parts of the Zigbee stack (802.15.4 PHY/MAC and the Zigbee PRO network layer), as well as provides commands to execute BDB commissioning primitives.
-The host processor communicates with the NCP through a serial interface (USB or UART).
+The host processor communicates with the NCP through a serial interface (UART).
 
 The NCP design has the following advantages:
 

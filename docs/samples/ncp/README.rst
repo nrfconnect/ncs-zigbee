@@ -94,85 +94,6 @@ As the result, Zephyr's logger ``uart0`` is available only through GPIO pins (**
 
 The ``uart0`` pins are configured by devicetree overlay files for each supported development kit in the :file:`boards` directory.
 
-Communication through USB
--------------------------
-
-To change the communication channel from the default UART to nRF USB CDC ACM ``cdc_acm_uart0``, use the :file:`prj_usb.conf` configuration file and add the ``-DFILE_SUFFIX=usb`` flag to the build command.
-When using the nRF52840 Dongle, please add the ``-DFILE_SUFFIX=dongle`` flag to the build command instead.
-See `Providing CMake options`_ in the |NCS| documentation for instructions on how to add these flags to your build.
-For example, when building from the command line, use the following commands:
-
-.. code-block:: console
-
-   west build samples/zigbee/ncp -b nrf52840dk/nrf52840 -- -DFILE_SUFFIX=usb
-
-.. code-block:: console
-
-   west build samples/zigbee/ncp -b nrf52840dongle/nrf52840 -- -DFILE_SUFFIX=dongle
-
-The USB device VID and PID are configured by the sample's Kconfig file.
-
-.. note::
-   USB is used as the default NCP communication channel when using the nRF52840 Dongle.
-
-When you change the communication channel to nRF USB using either :file:`prj_usb.conf` or :file:`prj_dongle.conf` and select any of the :file:`<board>_usb.overlay` or :file:`<board>_dongle.overlay` files, respectively, :ref:`Zigbee stack logs <zigbee_ug_logging_stack_logs>` are printed by default using ``uart1``.
-This is configured in the project file with the following Kconfig options:
-
-* ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` - To enable binary format.
-* ``CONFIG_ZBOSS_TRACE_UART_LOGGING`` - To select the UART serial over the nRF USB serial.
-  This option is set by default when the binary format is enabled.
-
-And, in the overlay file like this:
-
-.. code-block:: devicetree
-
-   chosen {
-       ncs,zboss-trace-uart = &uart1;
-   };
-
-Alternatively, you can configure :ref:`Zigbee stack logs <zigbee_ug_logging_stack_logs>` to be printed in binary format using an independent CDC ACM device of the same nRF USB.
-Complete the following steps:
-
-1. Set the following Kconfig options:
-
-   * ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` - This option enables the binary format.
-   * ``CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING`` - This option selects nRF USB serial over UART serial.
-
-#. Create two instances of USB CDC ACM for the application:
-
-   a. Create two entries in the DTS overlay file :file:`<board>_usb.overlay` or :file:`<board>_dongle.overlay` for the selected board, one for each USB CDC ACM instance.
-      See `CDC ACM`_ in the Zephyr documentation for more information.
-   #. Extend the ``zephyr_udc0`` node in the DTS overlay file to also configure the second USB CDC ACM instance ``"cdc_acm_uart1"``:
-
-      .. code-block:: devicetree
-
-         &zephyr_udc0 {
-            cdc_acm_uart0: cdc_acm_uart0 {
-               compatible = "zephyr,cdc-acm-uart";
-            };
-
-            cdc_acm_uart1: cdc_acm_uart1 {
-               compatible = "zephyr,cdc-acm-uart";
-            };
-         };
-
-#. Configure the chosen tracing UART device like this:
-
-   .. code-block:: devicetree
-
-      chosen {
-          ncs,zboss-trace-uart = &cdc_acm_uart1;
-      };
-
-#. Enable the composite USB device driver using the ``CONFIG_USB_COMPOSITE_DEVICE`` Kconfig option.
-
-With this configuration, you have two serial ports created by the NCP sample.
-Use the first one for NCP communication.
-Use the second serial port for collecting Zigbee stack logs.
-
-You can also check the :file:`prj_usb.conf` file that contains the complete Kconfig configuration of Zigbee stack logs over nRF USB serial commented out.
-For more configuration options, see :ref:`Zigbee stack logs <zigbee_ug_logging_stack_logs>`.
-
 .. _zigbee_ncp_bootloader:
 
 Bootloader support
@@ -181,20 +102,12 @@ Bootloader support
 The bootloader support in the NCP sample for the ``nrf54l15dk/nrf54l15/cpuapp`` board target depends on the `Serial communication setup`_:
 
 * If you use the default UART serial communication channel, bootloader support is not enabled, but you can enable `MCUboot`_.
-* If you select `Communication through USB`_, `MCUboot`_ is enabled by default.
 
 MCUboot
 -------
 
-When you select `Communication through USB`_, MCUboot is built with support for a single application slot, and it uses the USB DFU class driver to allow uploading of the image over USB.
-
 If you want to use the default UART serial communication channel, set the ``CONFIG_BOOTLOADER_MCUBOOT`` Kconfig option to enable MCUboot.
-To use the same MCUboot configuration as in `Communication through USB`_, you need to provide MCUboot with the Kconfig options included in the :file:`sysbuild/mcuboot_usb.conf` file.
 See `Image-specific variables`_ in the |NCS| documentations to learn how to set the required options.
-
-MCUboot with the USB DFU requires a larger partition.
-To increase the partition, define the :makevar:`PM_STATIC_YML_FILE` variable that provides the path to the :file:`pm_static_<board>_<suffix>.yml` static configuration file for the board target of your choice.
-This is done automatically when building the sample with the ``-DFILE_SUFFIX=<suffix>`` flag.
 
 For instructions on how to set these additional options and configuration at build time, see `Providing CMake options`_ and `Configuring and building`_ in the |NCS| documentation.
 
@@ -202,7 +115,6 @@ See `Using MCUboot in nRF Connect SDK`_ for information about build system autom
 
 After every reset, the sample first boots to MCUboot and then, after a couple of seconds, the NCP sample is booted.
 When booted to MCUboot, you can upload the new image with the `dfu-util tool`_.
-See the Testing section of the `USB DFU (Device Firmware Upgrade)`_ Zephyr sample for the list of required dfu-util commands.
 
 To learn more about configuring bootloader for an application in |NCS|, see the `Secure bootloader chain` page in the |NCS| documentation.
 
@@ -282,7 +194,7 @@ Once you complete these steps and configure the vendor-specific commands on the 
 User interface
 **************
 
-All the NCP sample's interactions with the application are automatically handled using serial or USB communication.
+All the NCP sample's interactions with the application are automatically handled using serial.
 
 Building and running
 ********************
@@ -306,11 +218,7 @@ After building the sample and programming it to your development kit, complete t
       If you are using a Linux distribution different than the 64-bit Ubuntu 18.04, make sure to rebuild the package libraries and applications.
       Follow the instructions in the `Rebuilding the ZBOSS libraries for host`_ section in the `NCP Host documentation`_.
 
-#. If you are using `Communication through USB`_, connect the nRF USB port of the NCP sample's development kit to the PC USB port with a USB cable.
 #. Get the kit’s serial port name (for example, ``/dev/ttyACM0``).
-
-   If you are communicating through the nRF USB, get the nRF USB serial port name.
-
 #. Turn on the development kit that runs the Light bulb sample.
 #. To start the simple gateway application, run the following command with *serial_port_name* replaced with the serial port name used for communication with the NCP sample:
 
@@ -341,6 +249,5 @@ It uses the ZBOSS stack:
 In addition, it uses the following Zephyr libraries:
 
 * :file:`include/device.h`
-* `USB device support APIs`_
 * `Logging`_
 * `UART API`_

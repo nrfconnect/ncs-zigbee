@@ -168,7 +168,6 @@ You can configure how they are printed with the following Kconfig options:
 
   * ``CONFIG_ZBOSS_TRACE_UART_LOGGING`` - UART serial.
     This backend is enabled by default.
-  * ``CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING`` - USB CDC serial.
 
   To specify the serial device, you need to set the ``ncs,zboss-trace-uart`` choice in devicetree like this:
 
@@ -177,13 +176,6 @@ You can configure how they are printed with the following Kconfig options:
      chosen {
          ncs,zboss-trace-uart = &uart1;
      };
-
-  .. note::
-     When you select the ``CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING`` Kconfig option, the USB peripheral is enabled and the USB CDC serial is configured as a part of the :c:func:`zb_osif_serial_logger_init` function.
-     The application does not wait for the connection to be established and unreceived data is lost.
-     For this reason, start collecting the data as soon as you need to.
-
-     See `CDC ACM`_ in the Zephyr documentation for more information about how to configure USB CDC ACM instance for logging ZBOSS trace messages.
 
 * ``CONFIG_ZBOSS_TRACE_BINARY_NCP_TRANSPORT_LOGGING`` - Stack logs are printed in the binary format using the NCP transport channel.
 
