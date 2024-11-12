@@ -18,16 +18,16 @@ For a full list of |addon|, |NCS| and ZBOSS R23 stack versions, view the followi
 
 .. toggle::
 
-   +-------------------+------------------+---------------------------+
-   | |addon| version   | |NCS| version    | ZBOSS R23 stack version   |
-   +===================+==================+===========================+
-   | v0.1.0            | v2.8.0           | 4.1.4.2                   |
-   +-------------------+------------------+---------------------------+
+   +-------------------+------------------+-------------------------+---------------------+
+   | |addon| version   | |NCS| version    | ZBOSS R23 stack version | NCP host version    |
+   +===================+==================+=========================+=====================+
+   | v0.1.0            | v2.8.0           | 4.1.4.2                 | v3.0.0              | 
+   +-------------------+------------------+-------------------------+---------------------+
 
 .. _zigbee_release:
 
-[v0.1.0] - 11/XX/2024
-*********************
+Zigbee R23 add-on v0.1.0 - 14/11/2024
+*************************************
 
 Initial release.
 
@@ -39,5 +39,7 @@ Initial release.
 
     * :ref:`Light bulb <zigbee_light_bulb_sample>`
     * :ref:`Light switch <zigbee_light_switch_sample>`
-    * :ref:`Network coordinator <zigbee_network_coordinator_sample>`
+    * :ref:` Network coordinator <zigbee_network_coordinator_sample>`
+    * :ref:`NCP <zigbee_ncp_sample>`
     * :ref:`Shell <zigbee_shell_sample>`
+    * :ref:`Template <zigbee_template_sample>`
