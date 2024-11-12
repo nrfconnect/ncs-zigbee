@@ -24,7 +24,7 @@ NCP Host 3.0.0
 Limitations
 ***********
 
-This sections lists limitations that apply to all versions of the |NCS|.
+This sections lists limitations that apply to all released versions of the add-on.
 
 * On average, ZBOSS alarms last longer by 6.4 percent than Zephyr alarms.
 * The maximum size of a reportable attribute is 8 bytes.
