@@ -57,7 +57,7 @@ LED 1:
 LED 2:
     Turns on when the light bulb joins the network.
 
-BUTTON 3:
+Button 3:
     Depending on how long the button is pressed:
 
     * If pressed for less than five seconds, it starts or cancels the Identify mode.
@@ -82,26 +82,26 @@ After programming the sample to your development kits, complete the following st
 
 1. Turn on the development kit that runs the Network coordinator sample.
 
-   When **LED2** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
+   When **LED 2** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
 
 #. Turn on the development kit that runs the Light bulb sample.
 
-   When **LED2** turns on, the light bulb has become a Router inside the network.
+   When **LED 2** turns on, the light bulb has become a Router inside the network.
 
    .. note::
-      If **LED2** does not turn on, press **BUTTON 0** on the Coordinator to reopen the network.
+      If **LED 2** does not turn on, press **Button 0** on the Coordinator to reopen the network.
 
 #. Turn on the development kit that runs the Light switch sample.
 
-   When **LED2** turns on, the light switch has become an End Device, connected directly to the Coordinator.
+   When **LED 2** turns on, the light switch has become an End Device, connected directly to the Coordinator.
 
-#. Wait until **LED3** on the development kit that runs the Light switch sample turns on.
+#. Wait until **LED 3** on the development kit that runs the Light switch sample turns on.
 
    This LED indicates that the switch found a light bulb to control.
 
 #. Use the buttons on the development kit that runs the :ref:`zigbee_light_switch_sample` sample to control the light bulb.
 
-   The result of using the buttons is reflected on the light bulb's **LED1**.
+   The result of using the buttons is reflected on the light bulb's **LED 1**.
 
 You can now use buttons on the light switch to control the light bulb, as described in the :ref:`zigbee_light_switch_user_interface` section of the Light switch sample page.
 

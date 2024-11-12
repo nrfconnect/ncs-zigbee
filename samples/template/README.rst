@@ -52,7 +52,7 @@ LED 2:
 LED 3:
     Blinks to indicate that the identification mode is on.
 
-BUTTON 3:
+Button 3:
     Depending on how long the button is pressed:
 
     * If pressed for less than five seconds, it starts or cancels the Identify mode.
@@ -77,14 +77,14 @@ After programming the sample to your development kit, complete the following ste
 
 1. Turn on the development kit that runs the Network coordinator sample.
 
-   When **LED2** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
+   When **LED 2** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
 
 #. Turn on the development kit that runs the Template sample.
 
-   When **LED2** turns on, the light bulb has become a Router inside the network.
+   When **LED 2** turns on, the light bulb has become a Router inside the network.
 
    .. note::
-        If **LED2** does not turn on, press **BUTTON 0** on the Coordinator to reopen the network.
+        If **LED 2** does not turn on, press **Button 0** on the Coordinator to reopen the network.
 
 The device running the Template sample is now part of the Zigbee network as a Router.
 As a result, the network range is extended by the template application radio range.

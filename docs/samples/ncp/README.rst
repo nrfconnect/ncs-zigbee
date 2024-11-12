@@ -254,7 +254,7 @@ To implement custom vendor-specific commands, you need to modify the NCP sample 
 
    The function must follow the :c:func:`zb_ncp_custom_request_cb_t` declaration.
    For an example, see :c:func:`ncp_vendor_specific_req_handler` in the sample.
-   This function parses the command payload, validates it, performs required action on **LED1**, and sends a response.
+   This function parses the command payload, validates it, performs required action on **LED 1**, and sends a response.
 
 #. Register the handler function using :c:func:`zb_ncp_custom_register_request_cb`, as implemented in the sample.
 
@@ -320,10 +320,10 @@ After building the sample and programming it to your development kit, complete t
       NCP_SLAVE_PTY=*serial_port_name* ./application/simple_gw/simple_gw
 
 The simple gateway device forms the Zigbee network and opens the network for 180 seconds for new devices to join.
-When the light bulb joins the network, the **LED2** on the light bulb device turns on to indicate that it is connected to the simple gateway.
+When the light bulb joins the network, the **LED 2** on the light bulb device turns on to indicate that it is connected to the simple gateway.
 The gateway then starts discovering the On/Off cluster.
 When it is found, the simple gateway configures bindings and reporting for the device.
-It then starts sending On/Off toggle commands with a 15-second interval that toggle the **LED1** on the light bulb on and off.
+It then starts sending On/Off toggle commands with a 15-second interval that toggle the **LED 1** on the light bulb on and off.
 
 Dependencies
 ************

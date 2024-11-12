@@ -57,7 +57,7 @@ Sleepy End Device behavior
 
 The light switch supports the :ref:`zigbee_ug_sed` that enables the sleepy behavior for the end device, for a significant conservation of energy.
 
-To enable the sleepy behavior, press **BUTTON 2** while the light switch sample is booting.
+To enable the sleepy behavior, press **Button 2** while the light switch sample is booting.
 This is required only when device is joining the network for the first time.
 After restarting the device, it will boot with the sleepy behavior enabled.
 
@@ -166,19 +166,19 @@ LED 2:
 LED 3:
     Lit and solid when the light switch has found a light bulb to control.
 
-BUTTON 0:
-    Turn on the light bulb connected to the network (light bulb's **LED1**).
-    This option is available after the successful commissioning (light switch's **LED2** turned on).
+Button 0:
+    Turn on the light bulb connected to the network (light bulb's **LED 1**).
+    This option is available after the successful commissioning (light switch's **LED 2** turned on).
 
-    Pressing this button for a longer period of time increases the brightness of the **LED1** of the connected light bulb.
+    Pressing this button for a longer period of time increases the brightness of the **LED 1** of the connected light bulb.
 
-BUTTON 1:
-    Turn off the light bulb connected to the network (light bulb's **LED1**).
-    This option is available after the successful commissioning (light switch's **LED2** turned on).
+Button 1:
+    Turn off the light bulb connected to the network (light bulb's **LED 1**).
+    This option is available after the successful commissioning (light switch's **LED 2** turned on).
 
-    Pressing this button for a longer period of time decreases the brightness of the **LED1** of the connected light bulb.
+    Pressing this button for a longer period of time decreases the brightness of the **LED 1** of the connected light bulb.
 
-BUTTON 3:
+Button 3:
     When pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
     The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
     Releasing the button within this time does not trigger the factory reset procedure.
@@ -197,7 +197,7 @@ BUTTON 3:
 Sleepy End Device behavior assignments
 ======================================
 
-BUTTON 2:
+Button 2:
     When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
 
 Multiprotocol Bluetooth LE extension assignments
@@ -237,20 +237,20 @@ After programming the sample to your development kits, complete the following st
 
 1. Turn on the development kit that runs the Network coordinator sample.
 
-   When **LED2** turns on, this development kit has become the Coordinator of the Zigbee network.
+   When **LED 2** turns on, this development kit has become the Coordinator of the Zigbee network.
 
 #. Turn on the development kit that runs the Light bulb sample.
 
-   When **LED2** turns on, the light bulb has become a Router inside the network.
+   When **LED 2** turns on, the light bulb has become a Router inside the network.
 
    .. note::
-        If **LED2** does not turn on, press **BUTTON 0** on the Coordinator to reopen the network.
+        If **LED 2** does not turn on, press **Button 0** on the Coordinator to reopen the network.
 
 #. Turn on the development kit that runs the Light switch sample.
 
-   When **LED2** turns on, the light switch has become an End Device, connected directly to the Coordinator.
+   When **LED 2** turns on, the light switch has become an End Device, connected directly to the Coordinator.
 
-#. Wait until **LED3** on the light switch node turns on.
+#. Wait until **LED 3** on the light switch node turns on.
 
    This LED indicates that the light switch found a light bulb to control.
 
@@ -304,7 +304,7 @@ Set up nRF Toolbox by completing the following steps:
 
       The UART application of nRF Toolbox after establishing the connection
 
-   Observe that **LED0** on the light switch node is solid.
+   Observe that **LED 0** on the light switch node is solid.
    This indicates that the Bluetooth LE connection is established.
 
 In nRF Toolbox, tap the buttons you assigned to perform the test:
