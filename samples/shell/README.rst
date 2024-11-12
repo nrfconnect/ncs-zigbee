@@ -72,7 +72,7 @@ LED 2:
 LED 3:
     Blinks to indicate that the identification mode is on.
 
-BUTTON 3:
+Button 3:
     Starts or cancels the Identify mode.
 
 All other interactions with the application can be handled using serial communication.

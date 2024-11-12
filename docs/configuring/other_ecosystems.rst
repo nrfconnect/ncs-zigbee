@@ -57,7 +57,7 @@ The following instructions can help you troubleshoot the connection problem:
 
 1. Make sure that the Coordinator node is up and running.
 #. Make sure that the network is accepting new devices.
-   The most immediate way to verify this is to check if the **LED1** on the Zigbee Coordinator node.
+   The most immediate way to verify this is to check if the **LED 1** on the Zigbee Coordinator node.
    If the LED is on, the network is configured correctly and it is open to new nodes.
 
    .. note::

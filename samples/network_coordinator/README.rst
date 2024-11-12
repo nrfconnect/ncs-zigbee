@@ -64,13 +64,13 @@ LED 2:
 LED 3:
     Blinks when the Network coordinator is in Identify mode.
 
-BUTTON 0:
+Button 0:
     Reopens the network for 180 seconds.
 
     .. note::
          The network is also opened after startup.
 
-BUTTON 3:
+Button 3:
     Depending on how long the button is pressed:
 
     * If pressed for less than five seconds, it starts or cancels the Identify mode.
@@ -95,26 +95,26 @@ After programming the sample to your development kit, complete the following ste
 
 1. Turn on the development kit that runs the coordinator sample.
 
-   * When **LED0** starts blinking, the main application thread has started.
-   * When **LED2** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
+   * When **LED 0** starts blinking, the main application thread has started.
+   * When **LED 2** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
 
 #. Turn on the other development kits that you programmed.
 
-   * When **LED2** turns on the development kit that runs the Light bulb sample, it has become a Router inside the network.
-   * When **LED2** turns on the development kit that runs the Light switch sample, it has become an End Device, connected directly to the Coordinator.
+   * When **LED 2** turns on the development kit that runs the Light bulb sample, it has become a Router inside the network.
+   * When **LED 2** turns on the development kit that runs the Light switch sample, it has become an End Device, connected directly to the Coordinator.
 
    .. note::
-       If **LED2** on the development kits does not turn on, press **BUTTON 0** on the Coordinator to reopen the network.
+       If **LED 2** on the development kits does not turn on, press **Button 0** on the Coordinator to reopen the network.
 
 #. Optionally, if you are testing with both the Light bulb and the Light switch samples, complete the following additional steps:
 
-   a. Wait until **LED3** on the development kit that runs the Light switch sample turns on.
+   a. Wait until **LED 3** on the development kit that runs the Light switch sample turns on.
 
       This LED indicates that the switch found a light bulb to control.
 
    #. Use buttons on the development kit that runs the Light switch sample to control the light bulb, as described in the Light switch sample's user interface section.
 
-      The result of using the buttons is reflected on the light bulb's **LED1**.
+      The result of using the buttons is reflected on the light bulb's **LED 1**.
 
 You can now use buttons on the light switch to control the light bulb, as described in the :ref:`zigbee_light_switch_user_interface` section of the Light switch sample page.
 
