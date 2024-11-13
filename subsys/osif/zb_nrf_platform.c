@@ -25,6 +25,7 @@
 #include "zb_nrf_crypto.h"
 
 #ifdef CONFIG_ZIGBEE_LIBRARY_NCP_DEV
+#include <zb_ncp_nrf_platform.h>
 #define SYS_REBOOT_NCP 0x10
 #endif /* CONFIG_ZIGBEE_LIBRARY_NCP_DEV */
 
@@ -342,8 +343,19 @@ int zigbee_init(void)
 	return 0;
 }
 
+#if IS_ENABLED(CONFIG_ZIGBEE_LIBRARY_NCP_DEV)
+void zb_ncp_app_fw_custom_post_start(void)
+{
+	stack_is_started = true;
+#ifdef CONFIG_ZIGBEE_SHELL
+	zb_shell_configure_endpoint();
+#endif /* defined(CONFIG_ZIGBEE_SHELL) */
+}
+#endif
+
 static void zboss_thread(void *arg1, void *arg2, void *arg3)
 {
+#if !IS_ENABLED(CONFIG_ZIGBEE_LIBRARY_NCP_DEV)
 	zb_ret_t zb_err_code;
 
 	zb_err_code = zboss_start_no_autostart();
@@ -357,6 +369,13 @@ static void zboss_thread(void *arg1, void *arg2, void *arg3)
 	while (1) {
 		zboss_main_loop_iteration();
 	}
+
+#else /* CONFIG_ZIGBEE_LIBRARY_NCP_DEV */
+	/* For NCP mode, the thread implementation (i.e. some initialization part
+	 * and main loop) is in the ZBOSS library.
+	 */
+	zboss_app_main();
+#endif
 }
 
 zb_bool_t zb_osif_is_inside_isr(void)
