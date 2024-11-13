@@ -31,8 +31,8 @@ To collect and view the log files, you will need the following:
 * A terminal emulator, such as `nRF Connect Serial Terminal`_ (from the `nRF Connect for Desktop`_ application) or the nRF Terminal (part of the `nRF Connect for Visual Studio Code`_ extension).
 
 * Correct COM port.
-
-   * For traces using the UART, the J-Link COM port is used. The development kit is assigned to a COM port (Windows) or a ttyACM device (Linux), which is visible in the system's Device Manager.
+  For traces using the UART, the J-Link COM port is used.
+  The development kit is assigned to a COM port (Windows) or a ttyACM device (Linux), which is visible in the system's Device Manager.
 
 .. rst-class:: numbered-step
 
@@ -85,10 +85,10 @@ Optional: Increasing the size of the ring buffer
    This can prevent losing some of the logs in demanding scenarios such as high network traffic, multiple devices being configured or joined, and so on.
    See :ref:`Zigbee serial logger <zigbee_osif_zigbee_async_serial>` for more information.
 
-Trace logs using UART (default)
-===============================
+Trace logs using UART
+=====================
 
-When the ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` Kconfig option is selected, trace logs are printed using the UART by default.
+When the ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` Kconfig option is selected, trace logs are printed using the UART.
 To configure trace logs using the UART, complete the following steps:
 
 1. Set the ``CONFIG_ZBOSS_TRACE_UART_LOGGING`` Kconfig option.

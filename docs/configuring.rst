@@ -164,7 +164,7 @@ You can configure how they are printed with the following Kconfig options:
 
 * ``CONFIG_ZBOSS_TRACE_HEXDUMP_LOGGING`` - Stack logs are printed as hexdump using Zephyr's `Logging`_ API.
   This option is enabled by default.
-* ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` - Stack logs are printed in the binary format using one of the following independent serial backends of your choice:
+* ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` - Stack logs are printed in the binary format using the following independent serial backend:
 
   * ``CONFIG_ZBOSS_TRACE_UART_LOGGING`` - UART serial.
     This backend is enabled by default.

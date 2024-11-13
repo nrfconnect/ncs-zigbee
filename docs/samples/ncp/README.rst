@@ -99,15 +99,18 @@ The ``uart0`` pins are configured by devicetree overlay files for each supported
 Bootloader support
 ==================
 
-The bootloader support in the NCP sample for the ``nrf54l15dk/nrf54l15/cpuapp`` board target depends on the `Serial communication setup`_:
-
-* If you use the default UART serial communication channel, bootloader support is not enabled, but you can enable `MCUboot`_.
+Bootloader support in the NCP sample for the ``nrf54l15dk/nrf54l15/cpuapp`` board target is not enabled by default, but you can enable `MCUboot`_.
 
 MCUboot
 -------
 
-If you want to use the default UART serial communication channel, set the ``CONFIG_BOOTLOADER_MCUBOOT`` Kconfig option to enable MCUboot.
+To enable MCUboot, set the ``CONFIG_BOOTLOADER_MCUBOOT`` Kconfig option.
 See `Image-specific variables`_ in the |NCS| documentations to learn how to set the required options.
+
+..
+  MCUboot with the USB DFU requires a larger partition.
+  To increase the partition, define the :makevar:`PM_STATIC_YML_FILE` variable that provides the path to the :file:`pm_static_<board>_<suffix>.yml` static configuration file for the board target of your choice.
+  This is done automatically when building the sample with the ``-DFILE_SUFFIX=<suffix>`` flag.
 
 For instructions on how to set these additional options and configuration at build time, see `Providing CMake options`_ and `Configuring and building`_ in the |NCS| documentation.
 
@@ -116,7 +119,7 @@ See `Using MCUboot in nRF Connect SDK`_ for information about build system autom
 After every reset, the sample first boots to MCUboot and then, after a couple of seconds, the NCP sample is booted.
 When booted to MCUboot, you can upload the new image with the `dfu-util tool`_.
 
-To learn more about configuring bootloader for an application in |NCS|, see the `Secure bootloader chain` page in the |NCS| documentation.
+To learn more about configuring bootloader for an application in the |NCS|, see the `Secure bootloader chain`_ page in the |NCS| documentation.
 
 ..
   FEM support
@@ -194,7 +197,7 @@ Once you complete these steps and configure the vendor-specific commands on the 
 User interface
 **************
 
-All the NCP sample's interactions with the application are automatically handled using serial.
+All the NCP sample's interactions with the application are automatically handled using serial communication.
 
 Building and running
 ********************
