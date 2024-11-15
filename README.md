@@ -5,7 +5,7 @@
 The Zigbee add-on for the nRF Connect SDK provides support for developing Zigbee applications based on the third-party precompiled ZBOSS stack. This stack is included as the ZBOSS Zigbee R23 stack library. In combination with the nRF Connect SDK, the Zigbee add-on allows for development of low-power connected solutions.
 
 ## Getting started
-To get started with Zigbee add-on for nRF Connect SDK, follow [documentation](https://github.com/nrfconnect/ncs-zigbee).
+To get started with Zigbee add-on for nRF Connect SDK, follow [documentation](https://nrfconnect.github.io/ncs-zigbee/).
 
 ## Documentation
 Pre-build documentation is available [here](https://nrfconnect.github.io/ncs-zigbee).
