@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>ZBOSS Zigbee stack &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="../_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ZBOSS library configuration" href="configuration.html" />
+    <link rel="prev" title="Configuring Zigbee samples for other ecosystems" href="../configuring/other_ecosystems.html" />
+  <link rel="shortcut icon" href="../_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring/index.html">Additional configurations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ZBOSS Zigbee stack</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html">ZBOSS library configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="certification.html">ZBOSS library certification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html">ZBOSS stack changelog</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../samples/index.html">Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lib/index.html">Libraries for Zigbee</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Zigbee add-on for nRF Connect SDK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>ZBOSS Zigbee stack</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/zboss/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zboss-zigbee-stack">
+<span id="zigbee-zboss"></span><h1>ZBOSS Zigbee stack<a class="headerlink" href="#zboss-zigbee-stack" title="Permalink to this headline">¶</a></h1>
+<p>The Zigbee add-on for the nRF Connect SDK uses ZBOSS – a portable, high-performance Zigbee software protocol stack that allows for interoperability, customizing, testing, and optimizing of your Zigbee solution.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee support for the nRF54L Series.</p>
+</div>
+<p>The Zigbee add-on repository contains a version of the latest stable ZBOSS libraries.
+The library is enabled with the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_LIBRARY_PRODUCTION</span></code> Kconfig option and its files are located in the <code class="file docutils literal notranslate"><span class="pre">lib/zboss/production/</span></code> directory.
+The libraries conform to the certification, but they are not necessarily certified.</p>
+<p>For information about additional configuration of these libraries and their certification status, see <a class="reference internal" href="configuration.html#zboss-configuration"><span class="std std-ref">ZBOSS library configuration</span></a>.
+For detailed documentation of the ZBOSS API for these versions and instructions on how to use it, check the ZBOSS API documentation using the following banner.</p>
+<blockquote class="doc-link zboss-box">
+<div><a class="doc-link-image reference external image-reference" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zigbee_devguide.html"><img alt="../_images/zoi-logo.png" src="../_images/zoi-logo.png" /></a>
+<p class="doc-link-text"><a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zigbee_devguide.html">ZBOSS API docs</a></p>
+</div></blockquote>
+<p>See also the <a class="reference internal" href="../lib/osif.html#lib-zigbee-osif"><span class="std std-ref">Zigbee ZBOSS OSIF</span></a> library in the <a class="reference internal" href="../lib/index.html#lib-zigbee"><span class="std std-ref">Libraries for Zigbee</span></a> section.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Subpages:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">ZBOSS library configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="certification.html">ZBOSS library certification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">ZBOSS stack changelog</a></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="configuration.html" class="btn btn-neutral float-right" title="ZBOSS library configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../configuring/other_ecosystems.html" class="btn btn-neutral" title="Configuring Zigbee samples for other ecosystems" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2024, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="../_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

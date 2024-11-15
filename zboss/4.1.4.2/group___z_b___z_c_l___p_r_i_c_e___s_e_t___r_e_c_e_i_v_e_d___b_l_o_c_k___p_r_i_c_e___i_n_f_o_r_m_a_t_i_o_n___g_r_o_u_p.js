@@ -1,0 +1,6 @@
+var group___z_b___z_c_l___p_r_i_c_e___s_e_t___r_e_c_e_i_v_e_d___b_l_o_c_k___p_r_i_c_e___i_n_f_o_r_m_a_t_i_o_n___g_r_o_u_p =
+[
+    [ "zb_zcl_price_set_received_block_price_information_e", "group___z_b___z_c_l___p_r_i_c_e___s_e_t___r_e_c_e_i_v_e_d___b_l_o_c_k___p_r_i_c_e___i_n_f_o_r_m_a_t_i_o_n___g_r_o_u_p.html#gaa2b4571a23ace8ee298b0ff1efe99b70", [
+      [ "ZB_ZCL_ATTR_PRICE_SRV_RX_NO_TIER_BLOCK1_PRICE", "group___z_b___z_c_l___p_r_i_c_e___s_e_t___r_e_c_e_i_v_e_d___b_l_o_c_k___p_r_i_c_e___i_n_f_o_r_m_a_t_i_o_n___g_r_o_u_p.html#ggaa2b4571a23ace8ee298b0ff1efe99b70a5a81b8e7f4f389bc01aec8b486ed0bca", null ]
+    ] ]
+];

@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Tools &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Release notes" href="release-notes.html" />
+    <link rel="prev" title="Zigbee ZCL scene helper" href="lib/zigbee_zcl_scenes.html" />
+  <link rel="shortcut icon" href="_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick-start.html">Quick start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring/index.html">Additional configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zboss/index.html">ZBOSS Zigbee stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="samples/index.html">Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lib/index.html">Libraries for Zigbee</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#nrf-sniffer-for-802-15-4">nRF Sniffer for 802.15.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zigbee-endpoint-logger">Zigbee endpoint logger</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Zigbee add-on for nRF Connect SDK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Tools</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/tools.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tools">
+<span id="ug-zigbee-tools"></span><h1>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#nrf-sniffer-for-802-15-4" id="id3">nRF Sniffer for 802.15.4</a></p></li>
+<li><p><a class="reference internal" href="#zigbee-endpoint-logger" id="id4">Zigbee endpoint logger</a></p></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee support for the nRF54L Series.</p>
+</div>
+<p>The tools listed on this page can be helpful when developing your Zigbee application with the Zigbee add-on for the nRF Connect SDK.</p>
+<div class="section" id="nrf-sniffer-for-802-15-4">
+<span id="ug-zigbee-tools-sniffer"></span><h2><a class="toc-backref" href="#id3">nRF Sniffer for 802.15.4</a><a class="headerlink" href="#nrf-sniffer-for-802-15-4" title="Permalink to this headline">¶</a></h2>
+<p>The nRF Sniffer for 802.15.4 is a tool for learning about and debugging applications that are using protocols based on IEEE 802.15.4, like Thread or Zigbee.
+It provides a near real-time display of 802.15.4 packets that are sent back and forth between devices, even when the link is encrypted.</p>
+<p>See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ug_sniffer_802154/page/UG/sniffer_802154/intro_802154.html">nRF Sniffer for 802.15.4</a> for documentation.</p>
+</div>
+<div class="section" id="zigbee-endpoint-logger">
+<span id="ug-zigbee-tools-logger-endpoint"></span><h2><a class="toc-backref" href="#id4">Zigbee endpoint logger</a><a class="headerlink" href="#zigbee-endpoint-logger" title="Permalink to this headline">¶</a></h2>
+<p>The Zigbee endpoint logger library provides the <code class="xref c c-func docutils literal notranslate"><span class="pre">zigbee_logger_eprxzcl_ep_handler()</span></code> function.
+You can use this endpoint handler function for parsing incoming ZCL frames and logging their fields and command payload.</p>
+<p>The library can work as a partial replacement of <a class="reference external" href="https://docs.nordicsemi.com/bundle/ug_sniffer_802154/page/UG/sniffer_802154/intro_802154.html">nRF Sniffer for 802.15.4</a> for debugging and testing purposes.
+Unlike the sniffer, it provides logging information only for incoming ZCL frames on a specific device.</p>
+<p>See <a class="reference internal" href="lib/zigbee_logger_eprxzcl.html#lib-zigbee-logger-endpoint"><span class="std std-ref">Zigbee endpoint logger</span></a> for documentation.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="release-notes.html" class="btn btn-neutral float-right" title="Release notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="lib/zigbee_zcl_scenes.html" class="btn btn-neutral" title="Zigbee ZCL scene helper" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2024, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

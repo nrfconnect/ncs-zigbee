@@ -1,0 +1,405 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Zigbee: Light bulb &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="../../_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Zigbee: Light switch" href="../light_switch/README.html" />
+    <link rel="prev" title="Samples" href="../index.html" />
+  <link rel="shortcut icon" href="../../_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick-start.html">Quick start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuring/index.html">Additional configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../zboss/index.html">ZBOSS Zigbee stack</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Samples</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Zigbee: Light bulb</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#user-interface">User interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-and-running">Building and running</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#testing">Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../light_switch/README.html">Zigbee: Light switch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../network_coordinator/README.html">Zigbee: Network coordinator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../shell/README.html">Zigbee: Shell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../template/README.html">Zigbee: Template</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../lib/index.html">Libraries for Zigbee</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Zigbee add-on for nRF Connect SDK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Samples</a> &raquo;</li>
+        
+      <li>Zigbee: Light bulb</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/samples/light_bulb/README.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zigbee-light-bulb">
+<span id="zigbee-light-bulb-sample"></span><h1>Zigbee: Light bulb<a class="headerlink" href="#zigbee-light-bulb" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#requirements" id="id2">Requirements</a></p></li>
+<li><p><a class="reference internal" href="#overview" id="id3">Overview</a></p></li>
+<li><p><a class="reference internal" href="#configuration" id="id4">Configuration</a></p></li>
+<li><p><a class="reference internal" href="#user-interface" id="id5">User interface</a></p></li>
+<li><p><a class="reference internal" href="#building-and-running" id="id6">Building and running</a></p>
+<ul>
+<li><p><a class="reference internal" href="#testing" id="id7">Testing</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#dependencies" id="id8">Dependencies</a></p></li>
+</ul>
+</div>
+<p>This sample demonstrates a simple light bulb whose brightness can be adjusted by another device.</p>
+<p>You can use this sample with the <a class="reference internal" href="../network_coordinator/README.html#zigbee-network-coordinator-sample"><span class="std std-ref">Zigbee Network coordinator</span></a> and <a class="reference internal" href="../light_switch/README.html#zigbee-light-switch-sample"><span class="std std-ref">Zigbee Light switch</span></a> samples to set up a basic Zigbee network.</p>
+<div class="section" id="requirements">
+<h2><a class="toc-backref" href="#id2">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>The sample supports the following development kit:</p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Hardware platforms</p></th>
+<th class="head"><p>PCA</p></th>
+<th class="head"><p>Board name</p></th>
+<th class="head"><p>Board target</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf54l/index.html">nRF54L15 DK</a></p></td>
+<td><p>PCA10156</p></td>
+<td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html">nrf54l15dk</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nrf54l15dk/nrf54l15/cpuapp</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>To test this sample, you also need to program the following samples:</p>
+<ul class="simple">
+<li><p>The <a class="reference internal" href="../network_coordinator/README.html#zigbee-network-coordinator-sample"><span class="std std-ref">Zigbee Network coordinator</span></a> sample on one separate device.</p></li>
+<li><p>The <a class="reference internal" href="../light_switch/README.html#zigbee-light-switch-sample"><span class="std std-ref">Zigbee Light switch</span></a> sample on one or more separate devices.</p></li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id3">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The Zigbee light bulb sample takes the <a class="reference internal" href="../../about.html#zigbee-roles"><span class="std std-ref">Zigbee Router</span></a> role and implements the Dimmable Light device specification, as defined in the Zigbee Home Automation public application profile.
+This profile allows changing the brightness level of the light bulb’s LED.</p>
+</div>
+<div class="section" id="configuration">
+<h2><a class="toc-backref" href="#id4">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/index.html">Configuring and building</a> in the nRF Connect SDK documentation for information about how to permanently or temporarily change the configuration.</p>
+</div>
+<div class="section" id="user-interface">
+<h2><a class="toc-backref" href="#id5">User interface</a><a class="headerlink" href="#user-interface" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>LED 0:</dt><dd><p>Blinks to indicate that the main application thread is running.</p>
+</dd>
+<dt>LED 1:</dt><dd><p>Indicates the dimmable light option, that is changes to the light bulb brightness.
+It can be controlled by another Zigbee device in the network, for example a light switch.
+Blinks when the light bulb is in Identify mode.</p>
+</dd>
+<dt>LED 2:</dt><dd><p>Turns on when the light bulb joins the network.</p>
+</dd>
+<dt>Button 3:</dt><dd><p>Depending on how long the button is pressed:</p>
+<ul class="simple">
+<li><p>If pressed for less than five seconds, it starts or cancels the Identify mode.</p></li>
+<li><p>If pressed for five seconds, it initiates the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/using_zigbee__z_c_l.html#reset_factory_defaults">factory reset of the device</a>.
+The length of the button press can be edited using the <code class="docutils literal notranslate"><span class="pre">CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS</span></code> Kconfig option from <a class="reference internal" href="../../lib/zigbee_app_utils.html#lib-zigbee-application-utilities"><span class="std std-ref">Zigbee application utilities</span></a>.
+Releasing the button within this time does not trigger the factory reset procedure.</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="building-and-running">
+<h2><a class="toc-backref" href="#id6">Building and running</a><a class="headerlink" href="#building-and-running" title="Permalink to this headline">¶</a></h2>
+<p>Make sure to configure the Zigbee stack before building and testing this sample.
+See <a class="reference internal" href="../../configuring.html#ug-zigbee-configuring"><span class="std std-ref">Configuring Zigbee add-on</span></a> for more information.</p>
+<p>This sample can be found under <code class="file docutils literal notranslate"><span class="pre">samples/light_bulb</span></code> in the Zigbee add-on folder structure.</p>
+<p>To build the sample, follow the instructions in <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/building.html">Building an application</a> in the nRF Connect SDK documentation for your preferred building environment.
+See also <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/programming.html">Programming an application</a> for programming steps and <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/test_and_optimize.html">Testing and optimization</a> for general information about testing and debugging in the nRF Connect SDK.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When building <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#repository_application">repository applications</a> in the Zigbee add-on which is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/dev_model_and_contributions/code_base.html#repository_types">SDK repository</a>, building with sysbuild is <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/config_and_build_system.html#sysbuild_enabled_by_default">enabled by default</a>.
+If you work with out-of-tree <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#create-application-types-freestanding">freestanding applications</a>, you need to manually pass the <code class="docutils literal notranslate"><span class="pre">--sysbuild</span></code> parameter to every build command or <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/sysbuild/sysbuild_configuring_west.html">configure west to always use it</a>.</p>
+</div>
+<div class="section" id="testing">
+<span id="zigbee-light-bulb-sample-testing"></span><h3><a class="toc-backref" href="#id7">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
+<p>After programming the sample to your development kits, complete the following steps to test it:</p>
+<ol class="arabic">
+<li><p>Turn on the development kit that runs the Network coordinator sample.</p>
+<p>When <strong>LED 2</strong> turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.</p>
+</li>
+<li><p>Turn on the development kit that runs the Light bulb sample.</p>
+<p>When <strong>LED 2</strong> turns on, the light bulb has become a Router inside the network.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <strong>LED 2</strong> does not turn on, press <strong>Button 0</strong> on the Coordinator to reopen the network.</p>
+</div>
+</li>
+<li><p>Turn on the development kit that runs the Light switch sample.</p>
+<p>When <strong>LED 2</strong> turns on, the light switch has become an End Device, connected directly to the Coordinator.</p>
+</li>
+<li><p>Wait until <strong>LED 3</strong> on the development kit that runs the Light switch sample turns on.</p>
+<p>This LED indicates that the switch found a light bulb to control.</p>
+</li>
+<li><p>Use the buttons on the development kit that runs the <a class="reference internal" href="../light_switch/README.html#zigbee-light-switch-sample"><span class="std std-ref">Zigbee: Light switch</span></a> sample to control the light bulb.</p>
+<p>The result of using the buttons is reflected on the light bulb’s <strong>LED 1</strong>.</p>
+</li>
+</ol>
+<p>You can now use buttons on the light switch to control the light bulb, as described in the <a class="reference internal" href="../light_switch/README.html#zigbee-light-switch-user-interface"><span class="std std-ref">User interface</span></a> section of the Light switch sample page.</p>
+</div>
+</div>
+<div class="section" id="dependencies">
+<h2><a class="toc-backref" href="#id8">Dependencies</a><a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>This sample uses the following nRF Connect SDK libraries:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../lib/zigbee_error_handler.html#lib-zigbee-error-handler"><span class="std std-ref">Zigbee error handler</span></a></p></li>
+<li><p><a class="reference internal" href="../../lib/zigbee_app_utils.html#lib-zigbee-application-utilities"><span class="std std-ref">Zigbee application utilities</span></a></p></li>
+<li><p>Zigbee subsystem:</p>
+<ul>
+<li><p><code class="file docutils literal notranslate"><span class="pre">zb_nrf_platform.h</span></code></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/others/dk_buttons_and_leds.html">DK Buttons and LEDs</a></p></li>
+</ul>
+<p>It uses the ZBOSS stack:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../zboss/index.html#zigbee-zboss"><span class="std std-ref">ZBOSS Zigbee stack</span></a> 4.1.4.2 (<a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zigbee_devguide.html">API documentation</a>)</p></li>
+</ul>
+<p>In addition, it uses the following Zephyr libraries:</p>
+<ul class="simple">
+<li><p><code class="file docutils literal notranslate"><span class="pre">include/zephyr.h</span></code></p></li>
+<li><p><code class="file docutils literal notranslate"><span class="pre">include/device.h</span></code></p></li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/logging/index.html">Logging</a></p></li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/hardware/peripherals/pwm.html">Pulse Width Modulation (PWM)</a></p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../light_switch/README.html" class="btn btn-neutral float-right" title="Zigbee: Light switch" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral" title="Samples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2024, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="../../_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

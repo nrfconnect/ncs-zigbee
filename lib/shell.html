@@ -1,0 +1,1309 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Zigbee shell &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="../_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Zigbee application utilities" href="zigbee_app_utils.html" />
+    <link rel="prev" title="Zigbee ZBOSS OSIF" href="osif.html" />
+  <link rel="shortcut icon" href="../_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring/index.html">Additional configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zboss/index.html">ZBOSS Zigbee stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../samples/index.html">Samples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Libraries for Zigbee</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="osif.html">Zigbee ZBOSS OSIF</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Zigbee shell</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#supported-backends">Supported backends</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#zigbee-shell-command-list">Zigbee shell command list</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#description-convention">Description convention</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#help">help</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-role">bdb role</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-extpanid">bdb extpanid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-panid">bdb panid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-start">bdb start</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-channel">bdb channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-ic-add">bdb ic add</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-ic-list">bdb ic list</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-ic-policy">bdb ic policy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-ic-set">bdb ic set</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-legacy">bdb legacy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-nwkkey">bdb nwkkey</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-factory-reset">bdb factory_reset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bdb-child-max">bdb child_max</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zcl-cmd">zcl cmd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zcl-attr-read">zcl attr read</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zcl-attr-write">zcl attr write</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zcl-subscribe-on">zcl subscribe on</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zcl-subscribe-off">zcl subscribe off</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zcl-ping">zcl ping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zcl-groups-add">zcl groups add</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zcl-groups-add-if-identify">zcl groups add_if_identify</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zcl-groups-get-member">zcl groups get_member</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zcl-groups-remove">zcl groups remove</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zcl-groups-remove-all">zcl groups remove_all</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-simple-desc-req">zdo simple_desc_req</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-active-ep">zdo active_ep</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-match-desc">zdo match_desc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-bind-on">zdo bind on</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-bind-off">zdo bind off</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-mgmt-bind">zdo mgmt_bind</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-mgmt-lqi">zdo mgmt_lqi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-nwk-addr">zdo nwk_addr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-ieee-addr">zdo ieee_addr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-eui64">zdo eui64</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-short">zdo short</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zdo-mgmt-leave">zdo mgmt_leave</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#version">version</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#debug">debug</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zscheduler-suspend">zscheduler suspend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zscheduler-resume">zscheduler resume</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nbr-monitor-on">nbr monitor on</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nbr-monitor-off">nbr monitor off</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nbr-monitor-trigger">nbr monitor trigger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nvram-enable">nvram enable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nvram-disable">nvram disable</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="zigbee_app_utils.html">Zigbee application utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zigbee_error_handler.html">Zigbee error handler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zigbee_logger_eprxzcl.html">Zigbee endpoint logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zigbee_zcl_scenes.html">Zigbee ZCL scene helper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Zigbee add-on for nRF Connect SDK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Libraries for Zigbee</a> &raquo;</li>
+        
+      <li>Zigbee shell</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/lib/shell.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zigbee-shell">
+<span id="lib-zigbee-shell"></span><h1>Zigbee shell<a class="headerlink" href="#zigbee-shell" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#configuration" id="id44">Configuration</a></p></li>
+<li><p><a class="reference internal" href="#supported-backends" id="id45">Supported backends</a></p></li>
+<li><p><a class="reference internal" href="#zigbee-shell-command-list" id="id46">Zigbee shell command list</a></p>
+<ul>
+<li><p><a class="reference internal" href="#description-convention" id="id47">Description convention</a></p></li>
+<li><p><a class="reference internal" href="#help" id="id48">help</a></p></li>
+<li><p><a class="reference internal" href="#bdb-role" id="id49">bdb role</a></p></li>
+<li><p><a class="reference internal" href="#bdb-extpanid" id="id50">bdb extpanid</a></p></li>
+<li><p><a class="reference internal" href="#bdb-panid" id="id51">bdb panid</a></p></li>
+<li><p><a class="reference internal" href="#bdb-start" id="id52">bdb start</a></p></li>
+<li><p><a class="reference internal" href="#bdb-channel" id="id53">bdb channel</a></p></li>
+<li><p><a class="reference internal" href="#bdb-ic-add" id="id54">bdb ic add</a></p></li>
+<li><p><a class="reference internal" href="#bdb-ic-list" id="id55">bdb ic list</a></p></li>
+<li><p><a class="reference internal" href="#bdb-ic-policy" id="id56">bdb ic policy</a></p></li>
+<li><p><a class="reference internal" href="#bdb-ic-set" id="id57">bdb ic set</a></p></li>
+<li><p><a class="reference internal" href="#bdb-legacy" id="id58">bdb legacy</a></p></li>
+<li><p><a class="reference internal" href="#bdb-nwkkey" id="id59">bdb nwkkey</a></p></li>
+<li><p><a class="reference internal" href="#bdb-factory-reset" id="id60">bdb factory_reset</a></p></li>
+<li><p><a class="reference internal" href="#bdb-child-max" id="id61">bdb child_max</a></p></li>
+<li><p><a class="reference internal" href="#zcl-cmd" id="id62">zcl cmd</a></p></li>
+<li><p><a class="reference internal" href="#zcl-attr-read" id="id63">zcl attr read</a></p></li>
+<li><p><a class="reference internal" href="#zcl-attr-write" id="id64">zcl attr write</a></p></li>
+<li><p><a class="reference internal" href="#zcl-subscribe-on" id="id65">zcl subscribe on</a></p></li>
+<li><p><a class="reference internal" href="#zcl-subscribe-off" id="id66">zcl subscribe off</a></p></li>
+<li><p><a class="reference internal" href="#zcl-ping" id="id67">zcl ping</a></p></li>
+<li><p><a class="reference internal" href="#zcl-groups-add" id="id68">zcl groups add</a></p></li>
+<li><p><a class="reference internal" href="#zcl-groups-add-if-identify" id="id69">zcl groups add_if_identify</a></p></li>
+<li><p><a class="reference internal" href="#zcl-groups-get-member" id="id70">zcl groups get_member</a></p></li>
+<li><p><a class="reference internal" href="#zcl-groups-remove" id="id71">zcl groups remove</a></p></li>
+<li><p><a class="reference internal" href="#zcl-groups-remove-all" id="id72">zcl groups remove_all</a></p></li>
+<li><p><a class="reference internal" href="#zdo-simple-desc-req" id="id73">zdo simple_desc_req</a></p></li>
+<li><p><a class="reference internal" href="#zdo-active-ep" id="id74">zdo active_ep</a></p></li>
+<li><p><a class="reference internal" href="#zdo-match-desc" id="id75">zdo match_desc</a></p></li>
+<li><p><a class="reference internal" href="#zdo-bind-on" id="id76">zdo bind on</a></p></li>
+<li><p><a class="reference internal" href="#zdo-bind-off" id="id77">zdo bind off</a></p></li>
+<li><p><a class="reference internal" href="#zdo-mgmt-bind" id="id78">zdo mgmt_bind</a></p></li>
+<li><p><a class="reference internal" href="#zdo-mgmt-lqi" id="id79">zdo mgmt_lqi</a></p></li>
+<li><p><a class="reference internal" href="#zdo-nwk-addr" id="id80">zdo nwk_addr</a></p></li>
+<li><p><a class="reference internal" href="#zdo-ieee-addr" id="id81">zdo ieee_addr</a></p></li>
+<li><p><a class="reference internal" href="#zdo-eui64" id="id82">zdo eui64</a></p></li>
+<li><p><a class="reference internal" href="#zdo-short" id="id83">zdo short</a></p></li>
+<li><p><a class="reference internal" href="#zdo-mgmt-leave" id="id84">zdo mgmt_leave</a></p></li>
+<li><p><a class="reference internal" href="#version" id="id85">version</a></p></li>
+<li><p><a class="reference internal" href="#debug" id="id86">debug</a></p></li>
+<li><p><a class="reference internal" href="#zscheduler-suspend" id="id87">zscheduler suspend</a></p></li>
+<li><p><a class="reference internal" href="#zscheduler-resume" id="id88">zscheduler resume</a></p></li>
+<li><p><a class="reference internal" href="#nbr-monitor-on" id="id89">nbr monitor on</a></p></li>
+<li><p><a class="reference internal" href="#nbr-monitor-off" id="id90">nbr monitor off</a></p></li>
+<li><p><a class="reference internal" href="#nbr-monitor-trigger" id="id91">nbr monitor trigger</a></p></li>
+<li><p><a class="reference internal" href="#nvram-enable" id="id92">nvram enable</a></p></li>
+<li><p><a class="reference internal" href="#nvram-disable" id="id93">nvram disable</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>The Zigbee shell library implements a set of Zigbee shell commands that allow you to control the device behavior and perform operations in the Zigbee network, such as steering the network, discovering devices, and reading the network properties.
+Enabling a device to work with these commands simplifies testing and debugging of an existing network and reduces the amount of reprogramming operations.</p>
+<div class="section" id="configuration">
+<span id="zigbee-shell-extending-samples"></span><h2><a class="toc-backref" href="#id44">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>The Zigbee shell commands are implemented using Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/shell/index.html">Shell</a> interface.
+By default, Zephyr shell uses the UART backend.
+To change this and other Zephyr’s shell settings (for example, the prompt or the maximum amount of accepted command arguments), read the documentation page in Zephyr.</p>
+<p>You can add support for Zigbee shell commands to any of the available <a class="reference internal" href="../samples/index.html#zigbee-samples"><span class="std std-ref">Zigbee samples</span></a>.
+Some of the commands use an endpoint for sending packets, so no endpoint handler is allowed to be registered for this endpoint.</p>
+<p>To configure the Zigbee shell library, use the following Kconfig options:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL_ENDPOINT</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL_DEBUG_CMD</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL_LOG_LEVEL</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL_CTX_MGR_ENTRIES_NBR</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL_MONITOR_CACHE_SIZE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL_ZCL_CMD_TIMEOUT</span></code></p></li>
+</ul>
+<p>For detailed steps about configuring the library in a Zigbee sample or application, see <a class="reference internal" href="../configuring/configuring_libraries.html#ug-zigbee-configuring-components-logger-ep"><span class="std std-ref">Configuring Zigbee endpoint logger</span></a>.</p>
+</div>
+<div class="section" id="supported-backends">
+<h2><a class="toc-backref" href="#id45">Supported backends</a><a class="headerlink" href="#supported-backends" title="Permalink to this headline">¶</a></h2>
+<p>Zigbee shell commands are available for the following backends when testing samples:</p>
+<ul class="simple">
+<li><p>UART</p></li>
+<li><p>Segger RTT</p></li>
+</ul>
+<p>You can run the Zigbee shell commands after connecting and configuring the backend for testing.
+For more information, see <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/test_and_optimize.html">Testing and optimization</a> in the nRF Connect SDK documentation.</p>
+</div>
+<div class="section" id="zigbee-shell-command-list">
+<span id="zigbee-shell-reference"></span><h2><a class="toc-backref" href="#id46">Zigbee shell command list</a><a class="headerlink" href="#zigbee-shell-command-list" title="Permalink to this headline">¶</a></h2>
+<p>This section lists commands that are supported by <a class="reference internal" href="../samples/index.html#zigbee-samples"><span class="std std-ref">Zigbee samples</span></a>.</p>
+<div class="section" id="description-convention">
+<h3><a class="toc-backref" href="#id47">Description convention</a><a class="headerlink" href="#description-convention" title="Permalink to this headline">¶</a></h3>
+<p>Every command prints <code class="docutils literal notranslate"><span class="pre">Done</span></code> when it is finished, or an error with the reason why it occurs.</p>
+<p>The command argument description uses the following convention:</p>
+<ul>
+<li><p>Square brackets mean that an argument is optional:</p>
+<pre class="highlight literal-block">command [<em>arg</em>]</pre>
+</li>
+<li><p>A single letter before an argument name defines the format of the argument:</p>
+<pre class="highlight literal-block">command <em>d:arg1</em> <em>h:arg2</em></pre>
+<ul class="simple">
+<li><p><em>h</em> stands for hexadecimal strings.</p></li>
+<li><p><em>d</em> stands for decimal values.</p></li>
+</ul>
+</li>
+<li><p>The ellipsis after an argument means that the preceding argument can be repeated several times:</p>
+<pre class="highlight literal-block">command <em>arg</em> ...</pre>
+</li>
+</ul>
+<hr class="docutils" />
+</div>
+<div class="section" id="help">
+<span id="shell-help"></span><h3><a class="toc-backref" href="#id48">help</a><a class="headerlink" href="#help" title="Permalink to this headline">¶</a></h3>
+<p>Display help for all available shell commands.</p>
+<pre class="highlight literal-block">[<em>group</em>] help</pre>
+<p>If the optional argument is not provided, displays help for all command groups.</p>
+<p>If the optional argument is provided, displays help for subcommands of the specified command group.
+For example, <code class="docutils literal notranslate"><span class="pre">zdo</span> <span class="pre">help</span></code> displays help for all <code class="docutils literal notranslate"><span class="pre">zdo</span></code> commands.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">help</span>
+<span class="n">Please</span> <span class="n">press</span> <span class="n">the</span> <span class="o">&lt;</span><span class="n">Tab</span><span class="o">&gt;</span> <span class="n">button</span> <span class="n">to</span> <span class="n">see</span> <span class="nb">all</span> <span class="n">available</span> <span class="n">commands</span><span class="o">.</span>
+<span class="n">You</span> <span class="n">can</span> <span class="n">also</span> <span class="n">use</span> <span class="n">the</span> <span class="o">&lt;</span><span class="n">Tab</span><span class="o">&gt;</span> <span class="n">button</span> <span class="n">to</span> <span class="n">prompt</span> <span class="ow">or</span> <span class="n">auto</span><span class="o">-</span><span class="n">complete</span> <span class="nb">all</span> <span class="n">commands</span> <span class="ow">or</span> <span class="n">its</span> <span class="n">subcommands</span><span class="o">.</span>
+<span class="n">You</span> <span class="n">can</span> <span class="k">try</span> <span class="n">to</span> <span class="n">call</span> <span class="n">commands</span> <span class="k">with</span> <span class="o">&lt;-</span><span class="n">h</span><span class="o">&gt;</span> <span class="ow">or</span> <span class="o">&lt;--</span><span class="n">help</span><span class="o">&gt;</span> <span class="n">parameter</span> <span class="k">for</span> <span class="n">more</span> <span class="n">information</span><span class="o">.</span>
+
+<span class="n">Shell</span> <span class="n">supports</span> <span class="n">following</span> <span class="n">meta</span><span class="o">-</span><span class="n">keys</span><span class="p">:</span>
+<span class="n">Ctrl</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="n">key</span> <span class="n">from</span><span class="p">:</span> <span class="n">abcdefklnpuw</span><span class="p">)</span>
+<span class="n">Alt</span>  <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="n">key</span> <span class="n">from</span><span class="p">:</span> <span class="n">bf</span><span class="p">)</span>
+<span class="n">Please</span> <span class="n">refer</span> <span class="n">to</span> <span class="n">shell</span> <span class="n">documentation</span> <span class="k">for</span> <span class="n">more</span> <span class="n">details</span><span class="o">.</span>
+
+<span class="n">Available</span> <span class="n">commands</span><span class="p">:</span>
+<span class="n">bdb</span>                <span class="p">:</span><span class="n">Base</span> <span class="n">device</span> <span class="n">behaviour</span> <span class="n">manipulation</span><span class="o">.</span>
+<span class="n">clear</span>              <span class="p">:</span><span class="n">Clear</span> <span class="n">screen</span><span class="o">.</span>
+<span class="n">debug</span>              <span class="p">:</span><span class="n">Return</span> <span class="n">state</span> <span class="n">of</span> <span class="n">debug</span> <span class="n">mode</span><span class="o">.</span>
+<span class="n">device</span>             <span class="p">:</span><span class="n">Device</span> <span class="n">commands</span>
+<span class="n">devmem</span>             <span class="p">:</span><span class="n">Read</span><span class="o">/</span><span class="n">write</span> <span class="n">physical</span> <span class="n">memory</span><span class="s2">&quot;devmem address [width [value]]&quot;</span>
+<span class="n">flash</span>              <span class="p">:</span><span class="n">Flash</span> <span class="n">shell</span> <span class="n">commands</span>
+<span class="n">help</span>               <span class="p">:</span><span class="n">Prints</span> <span class="n">the</span> <span class="n">help</span> <span class="n">message</span><span class="o">.</span>
+<span class="n">history</span>            <span class="p">:</span><span class="n">Command</span> <span class="n">history</span><span class="o">.</span>
+<span class="n">kernel</span>             <span class="p">:</span><span class="n">Kernel</span> <span class="n">commands</span>
+<span class="n">nbr</span>                <span class="p">:</span><span class="n">Zigbee</span> <span class="n">neighbor</span> <span class="n">table</span><span class="o">.</span>
+<span class="n">nrf_clock_control</span>  <span class="p">:</span><span class="n">Clock</span> <span class="n">control</span> <span class="n">commmands</span>
+<span class="n">nvram</span>              <span class="p">:</span><span class="n">Zigbee</span> <span class="n">NVRAM</span> <span class="n">manipulation</span><span class="o">.</span>
+<span class="n">resize</span>             <span class="p">:</span><span class="n">Console</span> <span class="n">gets</span> <span class="n">terminal</span> <span class="n">screen</span> <span class="n">size</span> <span class="ow">or</span> <span class="n">assumes</span> <span class="n">default</span> <span class="ow">in</span>
+                    <span class="n">case</span> <span class="n">the</span> <span class="n">readout</span> <span class="n">fails</span><span class="o">.</span> <span class="n">It</span> <span class="n">must</span> <span class="n">be</span> <span class="n">executed</span> <span class="n">after</span> <span class="n">each</span>
+                    <span class="n">terminal</span> <span class="n">width</span> <span class="n">change</span> <span class="n">to</span> <span class="n">ensure</span> <span class="n">correct</span> <span class="n">text</span> <span class="n">display</span><span class="o">.</span>
+<span class="n">sensor</span>             <span class="p">:</span><span class="n">Sensor</span> <span class="n">commands</span>
+<span class="n">shell</span>              <span class="p">:</span><span class="n">Useful</span><span class="p">,</span> <span class="ow">not</span> <span class="n">Unix</span><span class="o">-</span><span class="n">like</span> <span class="n">shell</span> <span class="n">commands</span><span class="o">.</span>
+<span class="n">version</span>            <span class="p">:</span><span class="n">Print</span> <span class="n">firmware</span> <span class="n">version</span>
+<span class="n">zcl</span>                <span class="p">:</span><span class="n">ZCL</span> <span class="n">subsystem</span> <span class="n">commands</span><span class="o">.</span>
+<span class="n">zdo</span>                <span class="p">:</span><span class="n">ZDO</span> <span class="n">manipulation</span><span class="o">.</span>
+<span class="n">zscheduler</span>         <span class="p">:</span><span class="n">Zigbee</span> <span class="n">scheduler</span> <span class="n">manipulation</span><span class="o">.</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-role">
+<span id="id1"></span><h3><a class="toc-backref" href="#id49">bdb role</a><a class="headerlink" href="#bdb-role" title="Permalink to this headline">¶</a></h3>
+<p>Set or get the Zigbee role of a device.</p>
+<pre class="highlight literal-block">bdb role [<em>role</em>]</pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting only before <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.
+Reading only after <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+</div>
+<p>If the optional argument is not provided, get the state of the device.
+Returns the following values:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">zc</span></code> if it is a coordinator.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zr</span></code> it it is a router.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zed</span></code> if it is an end device.</p></li>
+</ul>
+<p>If the optional argument is provided, set the device role to <em>role</em>.
+Can be either <code class="docutils literal notranslate"><span class="pre">zc</span></code> or <code class="docutils literal notranslate"><span class="pre">zr</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Zigbee End Device is not currently supported by the Shell sample.</p>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-extpanid">
+<span id="id2"></span><h3><a class="toc-backref" href="#id50">bdb extpanid</a><a class="headerlink" href="#bdb-extpanid" title="Permalink to this headline">¶</a></h3>
+<p>Set or get the Zigbee Extended Pan ID value.</p>
+<pre class="highlight literal-block">bdb extpanid [<em>h:id</em>]</pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting only before <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.
+Reading only after <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+</div>
+<p>If the optional argument is not provided, gets the extended PAN ID of the joined network.</p>
+<p>If the optional argument is provided, gets the extended PAN ID to <em>id</em>.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-panid">
+<span id="id3"></span><h3><a class="toc-backref" href="#id51">bdb panid</a><a class="headerlink" href="#bdb-panid" title="Permalink to this headline">¶</a></h3>
+<p>Set or get the Zigbee PAN ID value.</p>
+<pre class="highlight literal-block">bdb panid [<em>h:id</em>]</pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting only before <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.
+Reading only after <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+</div>
+<p>If the optional argument is not provided, gets the PAN ID of the joined network.
+If the optional argument is provided, sets the PAN ID to <em>id</em>.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-start">
+<span id="id4"></span><h3><a class="toc-backref" href="#id52">bdb start</a><a class="headerlink" href="#bdb-start" title="Permalink to this headline">¶</a></h3>
+<p>Start the commissioning process.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">start</span>
+<span class="n">Started</span> <span class="n">coordinator</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-channel">
+<span id="id5"></span><h3><a class="toc-backref" href="#id53">bdb channel</a><a class="headerlink" href="#bdb-channel" title="Permalink to this headline">¶</a></h3>
+<p>Set or get the 802.15.4 channel.</p>
+<pre class="highlight literal-block">bdb channel <em>n</em></pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting only before <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+</div>
+<p>If the optional argument is not provided, get the current number and bitmask of the channel.</p>
+<p>If the optional argument is provided:</p>
+<ul class="simple">
+<li><p>If <em>n</em> is in <code class="docutils literal notranslate"><span class="pre">[11:26]</span></code> range, set to that channel.</p></li>
+<li><p>Otherwise, treat <em>n</em> as bitmask (logical or of a single bit shifted by channel number).</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">channel</span> <span class="mh">0x110000</span>
+<span class="n">Setting</span> <span class="n">channel</span> <span class="n">bitmask</span> <span class="n">to</span> <span class="mi">110000</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-ic-add">
+<span id="id6"></span><h3><a class="toc-backref" href="#id54">bdb ic add</a><a class="headerlink" href="#bdb-ic-add" title="Permalink to this headline">¶</a></h3>
+<p>Add information about the install code on the trust center.</p>
+<pre class="highlight literal-block">bdb ic add <em>h:install code</em> <em>h:eui64</em></pre>
+<p>For <em>h:eui64</em>, use the address of the joining device.
+For <em>h:install code</em>, use 128bit install code with correct CRC value.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Adding install codes only after <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+<p>Provide the install code as an ASCII-encoded hexadecimal file that includes CRC16/X-25 in little-endian order.</p>
+<p>For production devices, make sure that an install code is installed by the production configuration present in the flash.</p>
+<p>Must only be used on a coordinator.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">ic</span> <span class="n">add</span> <span class="mi">83</span><span class="n">FED3407A939723A5C639B26916D505C3B5</span> <span class="mb">0B010</span><span class="n">E2F79E9DBFA</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-ic-list">
+<span id="id7"></span><h3><a class="toc-backref" href="#id55">bdb ic list</a><a class="headerlink" href="#bdb-ic-list" title="Permalink to this headline">¶</a></h3>
+<p>Read and print install codes stored on the device.</p>
+<div class="highlight highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bdb</span> <span class="n">ic</span> <span class="nb">list</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use only after <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+<p>For production devices, make sure that an install code is installed by the production configuration present in the flash.</p>
+<p>Must only be used on a coordinator.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">ic</span> <span class="nb">list</span>
+<span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="n">EUI64</span><span class="p">:</span>           <span class="n">IC</span><span class="p">:</span>                                  <span class="n">options</span><span class="p">:</span>
+<span class="p">[</span>  <span class="mi">0</span><span class="p">]</span> <span class="mb">0b010</span><span class="n">e2f79e9dbfa</span> <span class="mi">83</span><span class="n">fed3407a939723a5c639b26916d505c3b5</span> <span class="mh">0x3</span>
+<span class="n">Total</span> <span class="n">entries</span> <span class="k">for</span> <span class="n">the</span> <span class="n">install</span> <span class="n">codes</span> <span class="n">table</span><span class="p">:</span> <span class="mi">1</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-ic-policy">
+<span id="id8"></span><h3><a class="toc-backref" href="#id56">bdb ic policy</a><a class="headerlink" href="#bdb-ic-policy" title="Permalink to this headline">¶</a></h3>
+<p>Set the trust center install code policy.</p>
+<pre class="highlight literal-block">bdb ic policy <em>enable|disable</em></pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For production devices, make sure that an install code is installed by the production configuration present in the flash.</p>
+<p>Must only be used on a coordinator.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">ic</span> <span class="n">policy</span> <span class="n">enable</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-ic-set">
+<span id="id9"></span><h3><a class="toc-backref" href="#id57">bdb ic set</a><a class="headerlink" href="#bdb-ic-set" title="Permalink to this headline">¶</a></h3>
+<p>Set install code on the device.</p>
+<pre class="highlight literal-block">bdb ic set <em>h:install code</em></pre>
+<p>Must only be used on a joining device.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting only before <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+<p>Provide the install code as an ASCII-encoded hexadecimal file that includes CRC16/X-25 in little-endian order.</p>
+<p>For production devices, make sure that an install code is installed by the production configuration present in the flash.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">ic</span> <span class="nb">set</span> <span class="mi">83</span><span class="n">fed3407a939723a5c639b26916d505c3b5</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-legacy">
+<span id="id10"></span><h3><a class="toc-backref" href="#id58">bdb legacy</a><a class="headerlink" href="#bdb-legacy" title="Permalink to this headline">¶</a></h3>
+<p>Enable or disable the legacy device support.</p>
+<pre class="highlight literal-block">bdb legacy <em>enable|disable</em></pre>
+<p>Allow or disallow legacy pre-r21 devices on the Zigbee network.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">legacy</span> <span class="n">enable</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-nwkkey">
+<span id="id11"></span><h3><a class="toc-backref" href="#id59">bdb nwkkey</a><a class="headerlink" href="#bdb-nwkkey" title="Permalink to this headline">¶</a></h3>
+<p>Set network key.</p>
+<pre class="highlight literal-block">bdb nwkkey <em>h:key</em></pre>
+<p>Set a pre-defined network key <em>key</em> instead of a random one.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting only before <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">nwkkey</span> <span class="mi">00112233445566778899</span><span class="n">aabbccddeeff</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-factory-reset">
+<span id="id12"></span><h3><a class="toc-backref" href="#id60">bdb factory_reset</a><a class="headerlink" href="#bdb-factory-reset" title="Permalink to this headline">¶</a></h3>
+<p>Perform a factory reset using local action.
+See Base Device Behavior specification chapter 9.5 for details.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">factory_reset</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="bdb-child-max">
+<span id="id13"></span><h3><a class="toc-backref" href="#id61">bdb child_max</a><a class="headerlink" href="#bdb-child-max" title="Permalink to this headline">¶</a></h3>
+<p>Set the amount of child devices that is equal to <em>d:nbr</em>.</p>
+<pre class="highlight literal-block">&gt; bdb child_max <em>d:nbr</em></pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting only before <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">child_max</span> <span class="mi">16</span>
+<span class="n">Setting</span> <span class="nb">max</span> <span class="n">children</span> <span class="n">to</span><span class="p">:</span> <span class="mi">16</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="zcl-cmd">
+<span id="id14"></span><h3><a class="toc-backref" href="#id62">zcl cmd</a><a class="headerlink" href="#zcl-cmd" title="Permalink to this headline">¶</a></h3>
+<p>Send a generic ZCL command to the remote node.</p>
+<pre class="highlight literal-block">zcl cmd [-d] <em>h:dst_addr</em> <em>d:ep</em> <em>h:cluster</em> [-p <em>h:profile</em>] <em>h:cmd_ID</em> [-l <em>h:payload</em>]</pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, the profile is set to Home Automation Profile, and the payload is empty.</p>
+<p>The payload requires the <strong>little-endian</strong> byte order.</p>
+<p>To send a request using binding table entries, set <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> and <code class="docutils literal notranslate"><span class="pre">ep</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>.
+To send as groupcast, set <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> to a group address and <code class="docutils literal notranslate"><span class="pre">ep</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</div>
+<p>Send a generic ZCL command with ID <code class="docutils literal notranslate"><span class="pre">cmd_ID</span></code> and payload <code class="docutils literal notranslate"><span class="pre">payload</span></code> to the cluster <code class="docutils literal notranslate"><span class="pre">cluster</span></code>.
+The cluster belongs to the profile <code class="docutils literal notranslate"><span class="pre">profile</span></code>, which resides on the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> of the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code>.
+Optional default response can be requested with <code class="docutils literal notranslate"><span class="pre">-d</span></code>.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zcl</span> <span class="n">cmd</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="mh">0x0006</span> <span class="mh">0x00</span>
+</pre></div>
+</div>
+<p>This command sends the Off command from the On/Off cluster (ZCL specification 3.8.2.3.1) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zcl</span> <span class="n">cmd</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="mh">0x0008</span> <span class="mh">0x00</span> <span class="o">-</span><span class="n">l</span> <span class="n">FF0A00</span>
+</pre></div>
+</div>
+<p>This command sends the Move to Level command from the Level Control cluster (ZCL specification 3.10.2.3.1) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to move the CurrentLevel attribute to a new value <code class="docutils literal notranslate"><span class="pre">255</span></code> in 1 second.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zcl</span> <span class="n">cmd</span> <span class="o">-</span><span class="n">d</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="mh">0x0008</span> <span class="o">-</span><span class="n">p</span> <span class="mh">0x0104</span> <span class="mh">0x00</span> <span class="o">-</span><span class="n">l</span> <span class="n">FF0A00</span>
+</pre></div>
+</div>
+<p>This command sends the same Move to Level command and requests additional Default response.
+The same Home Automation Profile is used, but is set directly instead.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zcl-attr-read">
+<span id="zcl-read-attr"></span><h3><a class="toc-backref" href="#id63">zcl attr read</a><a class="headerlink" href="#zcl-attr-read" title="Permalink to this headline">¶</a></h3>
+<p>Retrieve the attribute value of the remote node.</p>
+<pre class="highlight literal-block">zcl attr read <em>h:dst_addr</em> <em>d:ep</em> <em>h:cluster</em> [-c] <em>h:profile</em> <em>h:attr_id</em></pre>
+<p>Read the value of the attribute <code class="docutils literal notranslate"><span class="pre">attr_id</span></code> in the cluster <code class="docutils literal notranslate"><span class="pre">cluster</span></code>.
+The cluster belongs to the profile <code class="docutils literal notranslate"><span class="pre">profile</span></code>, which resides on the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> of the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code>.
+If the attribute is on the client role side of the cluster, use the <code class="docutils literal notranslate"><span class="pre">-c</span></code> switch.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">attr</span> <span class="n">read</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="mh">0x0000</span> <span class="mh">0x0104</span> <span class="mh">0x00</span>
+<span class="n">ID</span><span class="p">:</span> <span class="mi">0</span> <span class="n">Type</span><span class="p">:</span> <span class="mi">20</span> <span class="n">Value</span><span class="p">:</span> <span class="mi">3</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Read Attributes command (ZCL specification 2.5.1) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to reply with the ZCLVersion attribute value of the Basic cluster.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zcl-attr-write">
+<span id="id15"></span><h3><a class="toc-backref" href="#id64">zcl attr write</a><a class="headerlink" href="#zcl-attr-write" title="Permalink to this headline">¶</a></h3>
+<p>Write the attribute value to the remote node.</p>
+<pre class="highlight literal-block">zcl attr write <em>h:dst_addr</em> <em>d:ep</em> <em>h:cluster</em> [-c] <em>h:profile</em> <em>h:attr_id</em> <em>h:attr_type</em> <em>h:attr_value</em></pre>
+<p>Write the <code class="docutils literal notranslate"><span class="pre">attr_value</span></code> value of the attribute <code class="docutils literal notranslate"><span class="pre">attr_id</span></code> of the type <code class="docutils literal notranslate"><span class="pre">attr_type</span></code> in the cluster <code class="docutils literal notranslate"><span class="pre">cluster</span></code>.
+The cluster belongs to the profile <code class="docutils literal notranslate"><span class="pre">profile</span></code>, which resides on the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> of the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code>.
+If the attribute is on the client role side of the cluster, use the``-c`` switch.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">attr_value</span></code> value must be in the hexadecimal format, unless it is a string (<code class="docutils literal notranslate"><span class="pre">attr_type</span> <span class="pre">==</span> <span class="pre">42</span></code>), then it must be a string.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">attr</span> <span class="n">write</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="mh">0x0003</span> <span class="mh">0x0104</span> <span class="mh">0x00</span> <span class="mh">0x21</span> <span class="mh">0x0F</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Write Attributes command (ZCL specification 2.5.3) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to set the IdentifyTime attribute value to <code class="docutils literal notranslate"><span class="pre">15</span></code> in the identify cluster.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zcl-subscribe-on">
+<span id="id16"></span><h3><a class="toc-backref" href="#id65">zcl subscribe on</a><a class="headerlink" href="#zcl-subscribe-on" title="Permalink to this headline">¶</a></h3>
+<p>Subscribe to the attribute changes on the remote node.</p>
+<pre class="highlight literal-block">zcl subscribe on <em>h:addr</em> <em>d:ep</em> <em>h:cluster</em> <em>h:profile</em> <em>h:attr_id</em> <em>d:attr_type</em> [<em>d:min interval (s)</em>] [<em>d:max interval (s)</em>]</pre>
+<p>Enable reporting on the node identified by the address <code class="docutils literal notranslate"><span class="pre">addr</span></code>, with the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code>
+that uses the profile <code class="docutils literal notranslate"><span class="pre">profile</span></code> of the attribute <code class="docutils literal notranslate"><span class="pre">attr_id</span></code> with the type
+<code class="docutils literal notranslate"><span class="pre">attr_type</span></code> in the cluster <code class="docutils literal notranslate"><span class="pre">cluster</span></code>.</p>
+<p>The reports must be generated in intervals not shorter than <code class="docutils literal notranslate"><span class="pre">min</span> <span class="pre">interval</span></code>
+(1 second by default) and not longer than <code class="docutils literal notranslate"><span class="pre">max</span> <span class="pre">interval</span></code> (60 seconds by default).</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">subscribe</span> <span class="n">on</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="mh">0x0006</span> <span class="mh">0x0104</span> <span class="mh">0x00</span> <span class="mi">16</span> <span class="mi">5</span> <span class="mi">20</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Configure Reporting command (ZCL specification 2.5.7) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to configure reporting for the OnOff attribute of the On/Off cluster with minimum reporting interval of <code class="docutils literal notranslate"><span class="pre">5</span></code> seconds and maximum reporting interval of <code class="docutils literal notranslate"><span class="pre">20</span></code> seconds.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zcl-subscribe-off">
+<span id="id17"></span><h3><a class="toc-backref" href="#id66">zcl subscribe off</a><a class="headerlink" href="#zcl-subscribe-off" title="Permalink to this headline">¶</a></h3>
+<p>Unsubscribe from the attribute reports.</p>
+<pre class="highlight literal-block">zcl subscribe off <em>h:addr</em> <em>d:ep</em> <em>h:cluster</em> <em>h:profile</em> <em>h:attr_id</em> <em>d:attr_type</em></pre>
+<p>Disable reporting on the node identified by the address <code class="docutils literal notranslate"><span class="pre">addr</span></code>, with the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code>
+that uses the profile <code class="docutils literal notranslate"><span class="pre">profile</span></code> of the attribute <code class="docutils literal notranslate"><span class="pre">attr_id</span></code> with the type
+<code class="docutils literal notranslate"><span class="pre">attr_type</span></code> in the cluster <code class="docutils literal notranslate"><span class="pre">cluster</span></code>.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">subscribe</span> <span class="n">off</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="mh">0x0006</span> <span class="mh">0x0104</span> <span class="mh">0x00</span> <span class="mi">16</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Configure Reporting command (ZCL specification 2.5.7) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to stop issuing reports for the OnOff attribute of the On/Off cluster, by setting maximum reporting interval to <code class="docutils literal notranslate"><span class="pre">0xffff</span></code>.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zcl-ping">
+<span id="id18"></span><h3><a class="toc-backref" href="#id67">zcl ping</a><a class="headerlink" href="#zcl-ping" title="Permalink to this headline">¶</a></h3>
+<p>Ping other devices using ZCL.</p>
+<pre class="highlight literal-block">zcl ping [--no-echo] [--aps-ack] <em>h:dst_addr</em> <em>d:payload_size</em></pre>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zcl</span> <span class="n">ping</span> <span class="mb">0b010</span><span class="n">eaafd745dfa</span> <span class="mi">32</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use only after <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+</div>
+<p>Issue a ping-style shell command to another Shell node with the given 16-bit destination address (<em>dst_addr</em>) by using a payload equal to <em>payload_size</em> bytes.
+The command is sent and received on endpoints with the same ID.</p>
+<p>This shell command uses a custom ZCL frame, which is constructed as a ZCL frame of a custom ping ZCL cluster with the cluster ID <code class="docutils literal notranslate"><span class="pre">0xBEEF</span></code>.
+For details, see the implementation of <code class="xref c c-func docutils literal notranslate"><span class="pre">ping_request_send()</span></code> in <code class="file docutils literal notranslate"><span class="pre">subsys/zigbee/lib/zigbee_shell/src/zigbee_shell_cmd_ping.c</span></code>.</p>
+<p>The command measures the time needed for a Zigbee frame to travel between two nodes in the network (there and back again).
+The shell command sends a ping request ZCL command, which is followed by a ping reply ZCL command.
+The IDs of the ping request change depending on optional arguments.
+The ping reply ID stays the same (<code class="docutils literal notranslate"><span class="pre">0x01</span></code>).</p>
+<p>The following optional argument are available:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--aps-ack</span></code> requests an APS acknowledgment</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--no-echo</span></code> asks the destination node not to send the ping reply</p></li>
+</ul>
+<p>Both arguments can be used at the same time.
+See the following graphs for use cases.</p>
+<dl>
+<dt>Case 1: Ping with echo, but without the APS acknowledgment</dt><dd><p>This is the default case, without optional arguments.</p>
+<blockquote>
+<div><p class="mscgen">
+msc {
+hscale = &quot;1.3&quot;;
+App1 [label=&quot;Application 1&quot;],Node1 [label=&quot;Node 1&quot;],Node2 [label=&quot;Node 2&quot;];
+App1 rbox Node2     [label=&quot;Command ID: 0x02 - Ping request without the APS acknowledgment&quot;];
+App1&gt;&gt;Node1         [label=&quot;ping&quot;];
+Node1&gt;&gt;Node2        [label=&quot;ping request&quot;];
+Node1&lt;&lt;Node2        [label=&quot;MAC ACK&quot;];
+App1 rbox Node2     [label=&quot;Command ID: 0x01 - Ping reply&quot;];
+Node1&lt;&lt;Node2        [label=&quot;ping reply&quot;];
+Node1&gt;&gt;Node2        [label=&quot;MAC ACK&quot;];
+App1&lt;&lt;Node1         [label=&quot;Done&quot;];
+}
+</p>
+</div></blockquote>
+<p>In this default case, the <code class="docutils literal notranslate"><span class="pre">zcl</span> <span class="pre">ping</span></code> command measures the time between sending the ping request and receiving the ping reply.</p>
+</dd>
+<dt>Case 2: Ping with echo and with the APS acknowledgment</dt><dd><p>This is a case with the <code class="docutils literal notranslate"><span class="pre">--aps-ack</span></code> optional argument.</p>
+<blockquote>
+<div><blockquote>
+<div><p class="mscgen">
+msc {
+hscale = &quot;1.3&quot;;
+App1 [label=&quot;Application 1&quot;],Node1 [label=&quot;Node 1&quot;],Node2 [label=&quot;Node 2&quot;];
+App1 rbox Node2     [label=&quot;Command ID: 0x00 - Ping request with the APS acknowledgment&quot;];
+App1&gt;&gt;Node1         [label=&quot;ping&quot;];
+Node1&gt;&gt;Node2        [label=&quot;ping request&quot;];
+Node1&lt;&lt;Node2        [label=&quot;MAC ACK&quot;];
+Node1&lt;&lt;Node2        [label=&quot;APS ACK&quot;];
+Node1&gt;&gt;Node2        [label=&quot;MAC ACK&quot;];
+App1 rbox Node2     [label=&quot;Command ID: 0x01 - Ping reply&quot;];
+Node1&lt;&lt;Node2        [label=&quot;ping reply&quot;];
+Node1&gt;&gt;Node2        [label=&quot;MAC ACK&quot;];
+Node1&gt;&gt;Node2        [label=&quot;APS ACK&quot;];
+Node1&lt;&lt;Node2        [label=&quot;MAC ACK&quot;];
+App1&lt;&lt;Node1         [label=&quot;Done&quot;];
+}
+</p>
+</div></blockquote>
+<p>In this case, the <code class="docutils literal notranslate"><span class="pre">zcl</span> <span class="pre">ping</span></code> command measures the time between sending the ping request and receiving the ping reply.</p>
+</div></blockquote>
+</dd>
+<dt>Case 3: Ping without echo, but with the APS acknowledgment</dt><dd><p>This is a case with both optional arguments provided, <code class="docutils literal notranslate"><span class="pre">--aps-ack</span></code> and <code class="docutils literal notranslate"><span class="pre">--no-echo</span></code>.</p>
+<blockquote>
+<div><p class="mscgen">
+msc {
+hscale = &quot;1.3&quot;;
+App1 [label=&quot;Application 1&quot;],Node1 [label=&quot;Node 1&quot;],Node2 [label=&quot;Node 2&quot;];
+App1 rbox Node2     [label=&quot;Command ID: 0x03 - Ping request without echo&quot;];
+App1&gt;&gt;Node1         [label=&quot;ping&quot;];
+Node1&gt;&gt;Node2        [label=&quot;ping request&quot;];
+Node1&lt;&lt;Node2        [label=&quot;MAC ACK&quot;];
+Node1&lt;&lt;Node2        [label=&quot;APS ACK&quot;];
+Node1&gt;&gt;Node2        [label=&quot;MAC ACK&quot;];
+App1&lt;&lt;Node1         [label=&quot;Done&quot;];
+}
+</p>
+</div></blockquote>
+<p>In this case, the <code class="docutils literal notranslate"><span class="pre">zcl</span> <span class="pre">ping</span></code> command measures the time between sending the ping request and receiving the APS acknowledgment.</p>
+</dd>
+<dt>Case 4: Ping without echo and without the APS acknowledgment</dt><dd><p>This is a case with the <code class="docutils literal notranslate"><span class="pre">--no-echo</span></code> optional argument.</p>
+<blockquote>
+<div><p class="mscgen">
+msc {
+hscale = &quot;1.3&quot;;
+App1 [label=&quot;Application 1&quot;],Node1 [label=&quot;Node 1&quot;],Node2 [label=&quot;Node 2&quot;];
+App1 rbox Node2     [label=&quot;Command ID: 0x03 - Ping request without echo&quot;];
+App1&gt;&gt;Node1         [label=&quot;ping&quot;];
+Node1&gt;&gt;Node2        [label=&quot;ping request&quot;];
+App1&lt;&lt;Node1         [label=&quot;Done&quot;];
+Node1&lt;&lt;Node2        [label=&quot;MAC ACK&quot;];
+}
+</p>
+</div></blockquote>
+<p>In this case, the <code class="docutils literal notranslate"><span class="pre">zcl</span> <span class="pre">ping</span></code> command does not measure time after sending the ping request.</p>
+</dd>
+</dl>
+<hr class="docutils" />
+</div>
+<div class="section" id="zcl-groups-add">
+<span id="id19"></span><h3><a class="toc-backref" href="#id68">zcl groups add</a><a class="headerlink" href="#zcl-groups-add" title="Permalink to this headline">¶</a></h3>
+<p>Add the endpoint on the remote node to the group.</p>
+<pre class="highlight literal-block">zcl groups add <em>h:dst_addr</em> <em>d:ep</em> [-p h:profile] <em>h:group_id</em></pre>
+<p>Send Add Group command to the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> of the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> and add it to the group <code class="docutils literal notranslate"><span class="pre">group_id</span></code>.
+Providing profile ID <code class="docutils literal notranslate"><span class="pre">profile</span></code> is optional  (Home Automation Profile is used by default).
+This command can be sent as groupcast.
+To send the command as groupcast, set <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> to a group address and <code class="docutils literal notranslate"><span class="pre">ep</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+<p>Example 1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">add</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="mh">0x4321</span>
+<span class="n">Response</span> <span class="n">command</span> <span class="n">received</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="mh">0x4321</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Add Group command (ZCL specification 3.6.2.3.2) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to join the group <code class="docutils literal notranslate"><span class="pre">0x4321</span></code>.</p>
+<p>Example 2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">add</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="o">-</span><span class="n">p</span> <span class="mh">0x0104</span> <span class="mh">0x3210</span>
+<span class="n">Response</span> <span class="n">command</span> <span class="n">received</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="mh">0x3210</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Add Group command (ZCL specification 3.6.2.3.2) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code> with profile set to <code class="docutils literal notranslate"><span class="pre">0x0104</span></code>, asking it to join the group <code class="docutils literal notranslate"><span class="pre">0x3210</span></code>.</p>
+<p>Example 3:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">add</span> <span class="mh">0x3210</span> <span class="mi">0</span> <span class="mh">0x1000</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Add Group command (ZCL specification 3.6.2.3.2) as groupcast to devices that belong to the group <code class="docutils literal notranslate"><span class="pre">0x3210</span></code>, asking them to join the group <code class="docutils literal notranslate"><span class="pre">0x1000</span></code>.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zcl-groups-add-if-identify">
+<span id="id20"></span><h3><a class="toc-backref" href="#id69">zcl groups add_if_identify</a><a class="headerlink" href="#zcl-groups-add-if-identify" title="Permalink to this headline">¶</a></h3>
+<p>Add the endpoints on the remote nodes to the group if the endpoints are in the Identify mode.</p>
+<pre class="highlight literal-block">zcl groups add_if_identify <em>h:dst_addr</em> <em>d:ep</em> [-p h:profile] <em>h:group_id</em></pre>
+<p>Send Add Group If Identifying command to the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> of the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> and add it to the group <code class="docutils literal notranslate"><span class="pre">group_id</span></code> if the endpoint on the remote node is in the Identify mode.
+Providing profile ID <code class="docutils literal notranslate"><span class="pre">profile</span></code> is optional  (Home Automation Profile is used by default).
+This command can be sent as groupcast.
+To send the command as groupcast, set <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> to a group address and <code class="docutils literal notranslate"><span class="pre">ep</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+<p>Example 1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">add_if_identify</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="mh">0x4321</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Add Group If Identifying command (ZCL specification 3.6.2.3.7) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to join the group <code class="docutils literal notranslate"><span class="pre">0x4321</span></code> if is in the Identify mode.</p>
+<p>Example 2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">add_if_identify</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="o">-</span><span class="n">p</span> <span class="mh">0x0104</span> <span class="mh">0x3210</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Add Group If Identifying command (ZCL specification 3.6.2.3.7) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code> with profile set to <code class="docutils literal notranslate"><span class="pre">0x0104</span></code>, asking it to join the group <code class="docutils literal notranslate"><span class="pre">0x3210</span></code> if it is in the Identify mode.</p>
+<p>Example 3:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">add_if_identify</span> <span class="mh">0x3210</span> <span class="mi">0</span> <span class="mh">0x1000</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Add Group If Identifying command (ZCL specification 3.6.2.3.7) as groupcast to devices that belong to the group <code class="docutils literal notranslate"><span class="pre">0x3210</span></code>, asking them to join the group <code class="docutils literal notranslate"><span class="pre">0x1000</span></code> if they are in the Identify mode.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zcl-groups-get-member">
+<span id="id21"></span><h3><a class="toc-backref" href="#id70">zcl groups get_member</a><a class="headerlink" href="#zcl-groups-get-member" title="Permalink to this headline">¶</a></h3>
+<p>Get group membership from the endpoint on the remote node.</p>
+<pre class="highlight literal-block">zcl groups get_member <em>h:dst_addr</em> <em>d:ep</em> [-p h:profile] [h:group IDs ...]</pre>
+<p>Send Get Group Membership command to the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> of the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> to get which groups from the provided group list are including the endpoint on the remote node.
+If no group ID is provided, the remote node is requested to response with information about all groups it is part of.
+Providing profile ID <code class="docutils literal notranslate"><span class="pre">profile</span></code> is optional  (Home Automation Profile is used by default).
+This command can be sent as groupcast.
+To send the command as groupcast, set <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> to a group address and <code class="docutils literal notranslate"><span class="pre">ep</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>.
+Response from the remote node is parsed and printed only if the command was sent as unicast.</p>
+<p>Example 1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">get_member</span> <span class="mh">0x1234</span> <span class="mi">10</span>
+<span class="n">short_addr</span><span class="o">=</span><span class="mh">0x1234</span> <span class="n">ep</span><span class="o">=</span><span class="mi">10</span> <span class="n">capacity</span><span class="o">=</span><span class="mi">13</span> <span class="n">group_cnt</span><span class="o">=</span><span class="mi">3</span> <span class="n">group_list</span><span class="o">=</span><span class="mh">0x4321</span><span class="p">,</span><span class="mh">0x3210</span><span class="p">,</span><span class="mh">0x1000</span><span class="p">,</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Get Group Membership command (ZCL specification 3.6.2.3.4) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to respond with the list of groups that include the device.</p>
+<p>Example 2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">get_member</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="o">-</span><span class="n">p</span> <span class="mh">0x0104</span> <span class="mh">0x4321</span> <span class="mh">0x3210</span>
+<span class="n">short_addr</span><span class="o">=</span><span class="mh">0x1234</span> <span class="n">ep</span><span class="o">=</span><span class="mi">10</span> <span class="n">capacity</span><span class="o">=</span><span class="mi">13</span> <span class="n">group_cnt</span><span class="o">=</span><span class="mi">3</span> <span class="n">group_list</span><span class="o">=</span><span class="mh">0x4321</span><span class="p">,</span><span class="mh">0x3210</span><span class="p">,</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Get Group Membership command (ZCL specification 3.6.2.3.4) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code> with profile set to <code class="docutils literal notranslate"><span class="pre">0x0104</span></code>, asking it to respond with the list of groups that include the device and that are present in the group list provided in the command.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zcl-groups-remove">
+<span id="id22"></span><h3><a class="toc-backref" href="#id71">zcl groups remove</a><a class="headerlink" href="#zcl-groups-remove" title="Permalink to this headline">¶</a></h3>
+<p>Remove the endpoint on the remote node from the group.</p>
+<pre class="highlight literal-block">zcl groups remove <em>h:dst_addr</em> <em>d:ep</em> [-p h:profile] <em>h:group_id</em></pre>
+<p>Send Remove Group command to the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> of the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> and remove it from the group <code class="docutils literal notranslate"><span class="pre">group_id</span></code>.
+Providing profile ID <code class="docutils literal notranslate"><span class="pre">profile</span></code> is optional  (Home Automation Profile is used by default).
+This command can be sent as groupcast.
+To send the command as groupcast, set <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> to a group address and <code class="docutils literal notranslate"><span class="pre">ep</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+<p>Example 1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">remove</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="mh">0x4321</span>
+<span class="n">Response</span> <span class="n">command</span> <span class="n">received</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="mh">0x4321</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Remove Group command (ZCL specification 3.6.2.3.5) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to remove itself from the group <code class="docutils literal notranslate"><span class="pre">0x4321</span></code>.</p>
+<p>Example 2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">remove</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="o">-</span><span class="n">p</span> <span class="mh">0x0104</span> <span class="mh">0x3210</span>
+<span class="n">Response</span> <span class="n">command</span> <span class="n">received</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="mh">0x3210</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Remove Group command (ZCL specification 3.6.2.3.5) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code> with profile set to <code class="docutils literal notranslate"><span class="pre">0x0104</span></code>, asking it to remove itself from the group <code class="docutils literal notranslate"><span class="pre">0x3210</span></code>.</p>
+<p>Example 3:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">remove</span> <span class="mh">0x3210</span> <span class="mi">0</span> <span class="mh">0x1000</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Remove Group command (ZCL specification 3.6.2.3.5) as groupcast to devices that belong to the group <code class="docutils literal notranslate"><span class="pre">0x3210</span></code>, asking them to remove themselves from the group <code class="docutils literal notranslate"><span class="pre">0x1000</span></code>.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zcl-groups-remove-all">
+<span id="id23"></span><h3><a class="toc-backref" href="#id72">zcl groups remove_all</a><a class="headerlink" href="#zcl-groups-remove-all" title="Permalink to this headline">¶</a></h3>
+<p>Remove the endpoint on the remote node from all groups.</p>
+<pre class="highlight literal-block">zcl groups remove_all <em>h:dst_addr</em> <em>d:ep</em> [-p h:profile]</pre>
+<p>Send Remove All Groups command to the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> to the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code>.
+Providing profile ID <code class="docutils literal notranslate"><span class="pre">profile</span></code> is optional  (Home Automation Profile is used by default).
+This command can be sent as groupcast.
+To send the command as groupcast, set <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> to a group address and <code class="docutils literal notranslate"><span class="pre">ep</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+<p>Example 1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">remove_all</span> <span class="mh">0x1234</span> <span class="mi">10</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Remove All Groups command (ZCL specification 3.6.2.3.6) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to remove itself from all groups.</p>
+<p>Example 2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">remove_all</span> <span class="mh">0x1234</span> <span class="mi">10</span> <span class="o">-</span><span class="n">p</span> <span class="mh">0x0104</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Remove All Groups command (ZCL specification 3.6.2.3.6) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code> with profile set to <code class="docutils literal notranslate"><span class="pre">0x0104</span></code>, asking it to remove itself from all groups.</p>
+<p>Example 3:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zcl</span> <span class="n">groups</span> <span class="n">remove_all</span> <span class="mh">0x1000</span> <span class="mi">0</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<p>This command sends the Remove All Groups command (ZCL specification 3.6.2.3.6) as groupcast to devices that belong to the group <code class="docutils literal notranslate"><span class="pre">0x3210</span></code>, asking them to remove themselves from all groups.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-simple-desc-req">
+<span id="id24"></span><h3><a class="toc-backref" href="#id73">zdo simple_desc_req</a><a class="headerlink" href="#zdo-simple-desc-req" title="Permalink to this headline">¶</a></h3>
+<p>Send Simple Descriptor Request.</p>
+<pre class="highlight literal-block">zdo simple_desc_req <em>h:dst_addr</em> <em>d:ep</em></pre>
+<p>Send Simple Descriptor Request to the given 16-bit destination address of the node (<em>dst_addr</em>) and the endpoint <em>ep</em>.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zdo</span> <span class="n">simple_desc_req</span> <span class="mh">0xefba</span> <span class="mi">10</span>
+<span class="n">src_addr</span><span class="o">=</span><span class="mh">0xEFBA</span> <span class="n">ep</span><span class="o">=</span><span class="mh">0x260</span> <span class="n">profile_id</span><span class="o">=</span><span class="mh">0x0102</span> <span class="n">app_dev_id</span><span class="o">=</span><span class="mh">0x0</span> <span class="n">app_dev_ver</span><span class="o">=</span><span class="mh">0x5</span>
+<span class="n">in_clusters</span><span class="o">=</span><span class="mh">0x0000</span><span class="p">,</span><span class="mh">0x0003</span><span class="p">,</span><span class="mh">0x0004</span><span class="p">,</span><span class="mh">0x0005</span><span class="p">,</span><span class="mh">0x0006</span><span class="p">,</span><span class="mh">0x0008</span><span class="p">,</span><span class="mh">0x0300</span> <span class="n">out_clusters</span><span class="o">=</span><span class="mh">0x0300</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-active-ep">
+<span id="id25"></span><h3><a class="toc-backref" href="#id74">zdo active_ep</a><a class="headerlink" href="#zdo-active-ep" title="Permalink to this headline">¶</a></h3>
+<p>Send Active Endpoint Request.</p>
+<pre class="highlight literal-block">zdo active_ep <em>h:dst_addr</em></pre>
+<p>Send Active Endpoint Request to the 16-bit destination address of the node (<em>dst_addr</em>).</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zdo</span> <span class="n">active_ep</span> <span class="mh">0xb4fc</span>
+<span class="o">&gt;</span> <span class="n">src_addr</span><span class="o">=</span><span class="n">B4FC</span> <span class="n">ep</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-match-desc">
+<span id="id26"></span><h3><a class="toc-backref" href="#id75">zdo match_desc</a><a class="headerlink" href="#zdo-match-desc" title="Permalink to this headline">¶</a></h3>
+<p>Send match descriptor request.</p>
+<pre class="highlight literal-block">zdo match_desc <em>h:dst_addr</em>
+               <em>h:req_addr</em> <em>h:prof_id</em>
+               <em>d:n_input_clusters</em> [<em>h:input cluster IDs</em> ...]
+               <em>d:n_output_clusters</em> [<em>h:output cluster IDs</em> ...]</pre>
+<p>Send Match Descriptor Request to the 16-bit destination address of the node (<em>dst_addr</em>) that is a query about the requested address/type node (<em>req_addr</em>) of the <em>prof_id</em> profile ID, which must have at least one of input clusters (<em>n_input_clusters</em>), whose IDs are listed in <code class="docutils literal notranslate"><span class="pre">[...]</span></code>, or at least one of output clusters (<em>n_output_clusters</em>), whose IDs are listed in <code class="docutils literal notranslate"><span class="pre">[...]</span></code>.
+The IDs can be either decimal values or hexadecimal strings.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">match_desc</span> <span class="mh">0xfffd</span> <span class="mh">0xfffd</span> <span class="mh">0x0104</span> <span class="mi">1</span> <span class="mi">6</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>In this example, the command sends a Match Descriptor Request to all non-sleeping nodes regarding all non-sleeping nodes that have 1 input cluster ON/OFF (<code class="docutils literal notranslate"><span class="pre">ID</span> <span class="pre">6</span></code>) and 0 output clusters.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-bind-on">
+<span id="zdo-bind"></span><h3><a class="toc-backref" href="#id76">zdo bind on</a><a class="headerlink" href="#zdo-bind-on" title="Permalink to this headline">¶</a></h3>
+<p>Create a binding between two endpoints on two nodes.</p>
+<pre class="highlight literal-block">zdo bind on <em>h:source_eui64</em> <em>d:source_ep</em> <em>h:dst_addr</em>
+            <em>d:dst_ep</em> <em>h:source_cluster_id</em> <em>h:request_dst_addr</em></pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To bind the device to a group address, set <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> to a group address and <code class="docutils literal notranslate"><span class="pre">dst_ep</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</div>
+<p>Create bound connection between a device identified by <em>source_eui64</em> and endpoint <em>source_ep</em>, and a device identified by destination address <em>dst_addr</em> and destination endpoint <em>dst_ep</em>.
+The connection is created for ZCL commands and attributes assigned to the ZCL cluster <em>source_cluster_id</em> on the <em>request_dst_addr</em> node (usually short address corresponding to <em>source_eui64</em> argument).</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zdo</span> <span class="n">bind</span> <span class="n">on</span> <span class="mb">0B010</span><span class="n">E0405060708</span> <span class="mi">1</span> <span class="mb">0B010</span><span class="n">E4050607080</span> <span class="mi">2</span> <span class="mi">8</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-bind-off">
+<span id="zdo-unbind"></span><h3><a class="toc-backref" href="#id77">zdo bind off</a><a class="headerlink" href="#zdo-bind-off" title="Permalink to this headline">¶</a></h3>
+<p>Remove a binding between two endpoints on two nodes.</p>
+<pre class="highlight literal-block">zdo bind off <em>h:source_eui64</em> <em>d:source_ep</em> <em>h:dst_eui64</em>
+             <em>d:destination_ep</em> <em>h:source_cluster_id</em> <em>h:request_dst_addr</em></pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To unbind the device from a group address, set <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> to a group address and <code class="docutils literal notranslate"><span class="pre">dst_ep</span></code> to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</div>
+<p>Remove bound connection between a device identified by <em>source_eui64</em> and endpoint <em>source_ep</em>, and a device identified by destination address <em>dst_eui64</em> and destination endpoint <em>dst_ep</em>.
+The connection is removed for ZCL commands and attributes assigned to the ZCL cluster <em>source_cluster_id</em> on the <em>request_dst_addr</em> node (usually, the same address as for the <em>source_eui64</em> device).</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-mgmt-bind">
+<span id="id27"></span><h3><a class="toc-backref" href="#id78">zdo mgmt_bind</a><a class="headerlink" href="#zdo-mgmt-bind" title="Permalink to this headline">¶</a></h3>
+<p>Read the binding table from a node.</p>
+<pre class="highlight literal-block">zdo mgmt_bind <em>h:dst_addr</em> [<em>d:start_index</em>]</pre>
+<p>Send a request to the remote device identified by the 16-bit destination address (<em>dst_addr</em>) to read the binding table through <code class="docutils literal notranslate"><span class="pre">zdo</span> <span class="pre">mgmt_bind_req</span></code> (see spec. 2.4.3.3.4).
+If the whole binding table does not fit into a single <code class="docutils literal notranslate"><span class="pre">mgmt_bind_resp</span> <span class="pre">frame</span></code>, the request initiates a series of <code class="docutils literal notranslate"><span class="pre">mgmt_bind_req</span></code> requests to perform the full download of the binding table.
+<em>start_index</em> is the index of the first entry in the binding table where the reading starts.
+It is zero by default.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zdo</span> <span class="n">mgmt_bind</span> <span class="mh">0x1234</span>
+</pre></div>
+</div>
+<p>This command sends <code class="docutils literal notranslate"><span class="pre">mgmt_bind_req</span></code> to the device with short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code>, asking it to return its binding table.</p>
+<p>Sample output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="n">src_address</span>      <span class="n">src_endp</span> <span class="n">cluster_id</span> <span class="n">dst_addr_mode</span> <span class="n">dst_addr</span>         <span class="n">dst_endp</span>
+<span class="p">[</span>  <span class="mi">0</span><span class="p">]</span> <span class="mb">0b010</span><span class="n">ef8872c633e</span>       <span class="mi">10</span>     <span class="mh">0x0402</span>             <span class="mi">3</span> <span class="mb">0b010</span><span class="n">e21591eef3e</span>       <span class="mi">64</span>
+<span class="p">[</span>  <span class="mi">1</span><span class="p">]</span> <span class="mb">0b010</span><span class="n">ef8872c633e</span>       <span class="mi">10</span>     <span class="mh">0x0403</span>             <span class="mi">3</span> <span class="mb">0b010</span><span class="n">e21591eef3e</span>       <span class="mi">64</span>
+<span class="n">Total</span> <span class="n">entries</span> <span class="k">for</span> <span class="n">the</span> <span class="n">binding</span> <span class="n">table</span><span class="p">:</span> <span class="mi">2</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-mgmt-lqi">
+<span id="id28"></span><h3><a class="toc-backref" href="#id79">zdo mgmt_lqi</a><a class="headerlink" href="#zdo-mgmt-lqi" title="Permalink to this headline">¶</a></h3>
+<p>Send a ZDO Mgmt_Lqi_Req command to a remote device with the short address <em>short</em>.</p>
+<pre class="highlight literal-block">zdo mgmt_lqi <em>h:short</em> [<em>d:start_index</em>]</pre>
+<p><em>start_index</em> is the index of the first entry in the binding table where the reading starts.
+It is zero by default.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zdo</span> <span class="n">mgmt_lqi</span> <span class="mh">0x1234</span>
+</pre></div>
+</div>
+<p>This command sends <code class="docutils literal notranslate"><span class="pre">mgmt_lqi_req</span></code> to the device with short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code>, asking it to return its neighbor table.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-nwk-addr">
+<span id="id29"></span><h3><a class="toc-backref" href="#id80">zdo nwk_addr</a><a class="headerlink" href="#zdo-nwk-addr" title="Permalink to this headline">¶</a></h3>
+<p>Resolve the EUI64 address <em>eui64</em> to a short network address.</p>
+<pre class="highlight literal-block">zdo nwk_addr <em>h:eui64</em></pre>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zdo</span> <span class="n">nwk_addr</span> <span class="mb">0B010</span><span class="n">E0405060708</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-ieee-addr">
+<span id="id30"></span><h3><a class="toc-backref" href="#id81">zdo ieee_addr</a><a class="headerlink" href="#zdo-ieee-addr" title="Permalink to this headline">¶</a></h3>
+<p>Resolve the EUI64 address <em>short_addr</em> by sending the IEEE address request.</p>
+<pre class="highlight literal-block">zdo ieee_addr <em>h:short_addr</em></pre>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-eui64">
+<span id="id31"></span><h3><a class="toc-backref" href="#id82">zdo eui64</a><a class="headerlink" href="#zdo-eui64" title="Permalink to this headline">¶</a></h3>
+<p>Get the EUI64 address of the Zigbee device.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zdo</span> <span class="n">eui64</span>
+<span class="mb">0b010</span><span class="n">eaafd745dfa</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-short">
+<span id="id32"></span><h3><a class="toc-backref" href="#id83">zdo short</a><a class="headerlink" href="#zdo-short" title="Permalink to this headline">¶</a></h3>
+<p>Get the short 16-bit address of the Zigbee device.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zdo</span> <span class="n">short</span>
+<span class="mi">0000</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="zdo-mgmt-leave">
+<span id="id33"></span><h3><a class="toc-backref" href="#id84">zdo mgmt_leave</a><a class="headerlink" href="#zdo-mgmt-leave" title="Permalink to this headline">¶</a></h3>
+<p>Send a request to a remote device to leave the network through <code class="docutils literal notranslate"><span class="pre">zdo</span> <span class="pre">mgmt_leave_req</span></code> (see the specification section 2.4.3.3.5).</p>
+<pre class="highlight literal-block">zdo mgmt_leave <em>h:dst_addr</em> [<em>h:device_address</em>] [--children] [--rejoin]</pre>
+<p>Send <code class="docutils literal notranslate"><span class="pre">mgmt_leave_req</span></code> to a remote node specified by 16-bit destination address <em>dst_addr</em>.
+If the EUI64 <em>device_address</em> is omitted or it has a value equal to <code class="docutils literal notranslate"><span class="pre">0000000000000000</span></code>, the remote device at address <em>dst_addr</em> will remove itself from the network.
+If <em>device_address</em> has other value, it must be a long address corresponding to <em>dst_addr</em> or a long address of child node of <em>dst_addr</em>.
+The request is sent with <cite>Remove Children</cite> and <cite>Rejoin</cite> flags set to <code class="docutils literal notranslate"><span class="pre">0</span></code> by default.
+Use options <code class="docutils literal notranslate"><span class="pre">\--children</span></code> or <code class="docutils literal notranslate"><span class="pre">\--rejoin</span></code> to change the respective flags to <code class="docutils literal notranslate"><span class="pre">1</span></code>.
+For more details, see the section 2.4.3.3.5 of the specification.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zdo</span> <span class="n">mgmt_leave</span> <span class="mh">0x1234</span>
+</pre></div>
+</div>
+<p>This command sends <code class="docutils literal notranslate"><span class="pre">mgmt_leave_req</span></code> to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code>, asking it to remove itself from the network.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zdo</span> <span class="n">mgmt_leave</span> <span class="mh">0x1234</span> <span class="o">--</span><span class="n">rejoin</span>
+</pre></div>
+</div>
+<p>This command sends <code class="docutils literal notranslate"><span class="pre">mgmt_leave_req</span></code> to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code>, asking it to remove itself from the network and perform rejoin.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zdo</span> <span class="n">mgmt_leave</span> <span class="mh">0x1234</span> <span class="mb">0b010</span><span class="n">ef8872c633e</span>
+</pre></div>
+</div>
+<p>This command sends <code class="docutils literal notranslate"><span class="pre">mgmt_leave_req</span></code> to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code>, asking it to remove device <code class="docutils literal notranslate"><span class="pre">0b010ef8872c633e</span></code> from the network.
+If the target device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> also has a long address <code class="docutils literal notranslate"><span class="pre">0b010ef8872c633e</span></code>, it will remove itself from the network.
+If the target device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> has a child with long address <code class="docutils literal notranslate"><span class="pre">0b010ef8872c633e</span></code>, it will remove the child from the network.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zdo</span> <span class="n">mgmt_leave</span> <span class="mh">0x1234</span> <span class="o">--</span><span class="n">children</span>
+</pre></div>
+</div>
+<p>This command sends <code class="docutils literal notranslate"><span class="pre">mgmt_leave_req</span></code> to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code>, asking it to remove itself and all its children from the network.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="version">
+<span id="id34"></span><h3><a class="toc-backref" href="#id85">version</a><a class="headerlink" href="#version" title="Permalink to this headline">¶</a></h3>
+<p>Print the firmware version.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">version</span>
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">version</span>
+<span class="n">Shell</span><span class="p">:</span> <span class="n">Sep</span>  <span class="mi">3</span> <span class="mi">2020</span> <span class="mi">13</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mi">28</span>
+<span class="n">ZBOSS</span><span class="p">:</span> <span class="mf">3.3.0.2</span>
+<span class="n">Zephyr</span> <span class="n">kernel</span> <span class="n">version</span><span class="p">:</span> <span class="mf">2.3.99</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="debug">
+<span id="id35"></span><h3><a class="toc-backref" href="#id86">debug</a><a class="headerlink" href="#debug" title="Permalink to this headline">¶</a></h3>
+<p>Enable or disable the debug mode in the Shell.</p>
+<pre class="highlight literal-block">debug <em>on|off</em></pre>
+<p>This command unblocks several additional commands in the Shell.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When used, the additional commands can render the device unstable.</p>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="zscheduler-suspend">
+<span id="id36"></span><h3><a class="toc-backref" href="#id87">zscheduler suspend</a><a class="headerlink" href="#zscheduler-suspend" title="Permalink to this headline">¶</a></h3>
+<p>Suspend Zigbee scheduler processing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zscheduler</span> <span class="n">suspend</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use only after <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="zscheduler-resume">
+<span id="id37"></span><h3><a class="toc-backref" href="#id88">zscheduler resume</a><a class="headerlink" href="#zscheduler-resume" title="Permalink to this headline">¶</a></h3>
+<p>Resume Zigbee scheduler processing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zscheduler</span> <span class="n">resume</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use only after <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="nbr-monitor-on">
+<span id="id38"></span><h3><a class="toc-backref" href="#id89">nbr monitor on</a><a class="headerlink" href="#nbr-monitor-on" title="Permalink to this headline">¶</a></h3>
+<p>Start monitoring the list of active Zigbee neighbors.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nbr</span> <span class="n">monitor</span> <span class="n">on</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="nbr-monitor-off">
+<span id="id39"></span><h3><a class="toc-backref" href="#id90">nbr monitor off</a><a class="headerlink" href="#nbr-monitor-off" title="Permalink to this headline">¶</a></h3>
+<p>Stop monitoring the list of active Zigbee neighbors.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nbr</span> <span class="n">monitor</span> <span class="n">off</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="nbr-monitor-trigger">
+<span id="id40"></span><h3><a class="toc-backref" href="#id91">nbr monitor trigger</a><a class="headerlink" href="#nbr-monitor-trigger" title="Permalink to this headline">¶</a></h3>
+<p>Trigger logging the list of active Zigbee neighbors.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function will trigger logging only if the Zigbee active neighbor monitor is started (see <a class="reference internal" href="#nbr-monitor-on"><span class="std std-ref">nbr monitor on</span></a>).</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nbr</span> <span class="n">monitor</span> <span class="n">trigger</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="nvram-enable">
+<span id="id41"></span><h3><a class="toc-backref" href="#id92">nvram enable</a><a class="headerlink" href="#nvram-enable" title="Permalink to this headline">¶</a></h3>
+<p>Enable Zigbee NVRAM.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting only before <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nvram</span> <span class="n">enable</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+</div>
+<div class="section" id="nvram-disable">
+<span id="id42"></span><h3><a class="toc-backref" href="#id93">nvram disable</a><a class="headerlink" href="#nvram-disable" title="Permalink to this headline">¶</a></h3>
+<p>Disable Zigbee NVRAM.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting only before <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nvram</span> <span class="n">disable</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="zigbee_app_utils.html" class="btn btn-neutral float-right" title="Zigbee application utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="osif.html" class="btn btn-neutral" title="Zigbee ZBOSS OSIF" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2024, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="../_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

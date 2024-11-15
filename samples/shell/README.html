@@ -1,0 +1,496 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Zigbee: Shell &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="../../_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Zigbee: Template" href="../template/README.html" />
+    <link rel="prev" title="Zigbee: Network coordinator" href="../network_coordinator/README.html" />
+  <link rel="shortcut icon" href="../../_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick-start.html">Quick start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuring/index.html">Additional configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../zboss/index.html">ZBOSS Zigbee stack</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Samples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../light_bulb/README.html">Zigbee: Light bulb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_switch/README.html">Zigbee: Light switch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../network_coordinator/README.html">Zigbee: Network coordinator</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Zigbee: Shell</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sample-logging">Sample logging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#available-shell-interfaces">Available shell interfaces</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#user-interface">User interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#enabling-and-disabling-endpoint-logging">Enabling and disabling endpoint logging</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#building-and-running">Building and running</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#testing">Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../template/README.html">Zigbee: Template</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../lib/index.html">Libraries for Zigbee</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Zigbee add-on for nRF Connect SDK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Samples</a> &raquo;</li>
+        
+      <li>Zigbee: Shell</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/samples/shell/README.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zigbee-shell">
+<span id="zigbee-shell-sample"></span><h1>Zigbee: Shell<a class="headerlink" href="#zigbee-shell" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#requirements" id="id2">Requirements</a></p></li>
+<li><p><a class="reference internal" href="#overview" id="id3">Overview</a></p>
+<ul>
+<li><p><a class="reference internal" href="#sample-logging" id="id4">Sample logging</a></p></li>
+<li><p><a class="reference internal" href="#available-shell-interfaces" id="id5">Available shell interfaces</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#user-interface" id="id6">User interface</a></p></li>
+<li><p><a class="reference internal" href="#configuration" id="id7">Configuration</a></p>
+<ul>
+<li><p><a class="reference internal" href="#enabling-and-disabling-endpoint-logging" id="id8">Enabling and disabling endpoint logging</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#building-and-running" id="id9">Building and running</a></p>
+<ul>
+<li><p><a class="reference internal" href="#testing" id="id10">Testing</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#dependencies" id="id11">Dependencies</a></p></li>
+</ul>
+</div>
+<p>This Shell sample demonstrates a Zigbee router (with the possibility of being a coordinator) that uses the <a class="reference internal" href="../../lib/shell.html#lib-zigbee-shell"><span class="std std-ref">Zigbee shell</span></a> library for interaction.</p>
+<p>You can use this sample for several purposes, including:</p>
+<ul class="simple">
+<li><p>Initial configuration of the network - forming a network as coordinator, adding devices to the network with the install codes, setting the extended PAN ID.</p></li>
+<li><p>Benchmarking - measuring time needed for a message to travel from one node to another.</p></li>
+</ul>
+<div class="section" id="requirements">
+<h2><a class="toc-backref" href="#id2">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>The sample supports the following development kits:</p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Hardware platforms</p></th>
+<th class="head"><p>PCA</p></th>
+<th class="head"><p>Board name</p></th>
+<th class="head"><p>Board target</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf54l/index.html">nRF54L15 DK</a></p></td>
+<td><p>PCA10156</p></td>
+<td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html">nrf54l15dk</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nrf54l15dk/nrf54l15/cpuapp</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>To test this sample you also need to program the following samples:</p>
+<ul class="simple">
+<li><p>The <a class="reference internal" href="../network_coordinator/README.html#zigbee-network-coordinator-sample"><span class="std std-ref">Zigbee Network coordinator</span></a> sample on one separate device or using a second Zigbee Shell sample.</p></li>
+</ul>
+<p>Additionally, you can use this sample with any other <a class="reference internal" href="../../index.html#zigbee-index"><span class="std std-ref">Zigbee</span></a> sample application for testing the communication or other sample-specific functionalities.</p>
+</div>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id3">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The Zigbee Shell sample takes the Zigbee Router role and implements two clusters: Basic and Identify.
+The Basic cluster provides attributes and commands for determining basic information about the node.
+The Identify cluster allows to put the device into the identification mode, which provides a way to locate the device.
+The device also includes all Zigbee shell commands that allow for discovering, controlling and testing other Zigbee devices.</p>
+<div class="section" id="sample-logging">
+<h3><a class="toc-backref" href="#id4">Sample logging</a><a class="headerlink" href="#sample-logging" title="Permalink to this headline">¶</a></h3>
+<p>The Zigbee Shell sample does not use the default logging settings for the nRF Connect SDK samples.
+Unlike the default sample logging in the nRF Connect SDK, the Zigbee Shell sample’s logger is configured to also log module name and timestamps for every message.
+The sample has log shell commands enabled for configuring logging, for example the logging level for each log module.</p>
+<p>The <a class="reference internal" href="../../lib/shell.html#lib-zigbee-shell"><span class="std std-ref">Zigbee shell</span></a> library also enables the <a class="reference internal" href="../../lib/zigbee_logger_eprxzcl.html#lib-zigbee-logger-endpoint"><span class="std std-ref">Zigbee endpoint logger</span></a> library by default.
+This library will log information about every ZCL packet received, which can be useful for debugging.
+You can enable or disable logging from the endpoint logger module by using the commands described in the <a class="reference internal" href="#enabling-and-disabling-endpoint-logging">Enabling and disabling endpoint logging</a>.</p>
+</div>
+<div class="section" id="available-shell-interfaces">
+<h3><a class="toc-backref" href="#id5">Available shell interfaces</a><a class="headerlink" href="#available-shell-interfaces" title="Permalink to this headline">¶</a></h3>
+<p>You can run the Zigbee shell commands after connecting and configuring any of the <a class="reference internal" href="../../lib/shell.html#lib-zigbee-shell"><span class="std std-ref">supported backends</span></a> for testing.
+These interfaces are completely independent one from another and can be used simultaneously or exclusively.
+For information about setup, see <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/test_and_optimize.html">Testing and optimization</a>.</p>
+<p>The Zigbee Shell sample uses UART as the default shell backend.</p>
+<p>You can enable the UART backend for the logger, so that Zephyr logs are printed to both the shell backend and the UART.
+To do this, enable the <code class="docutils literal notranslate"><span class="pre">CONFIG_LOG_BACKEND_UART</span></code> Kconfig option.</p>
+</div>
+</div>
+<div class="section" id="user-interface">
+<h2><a class="toc-backref" href="#id6">User interface</a><a class="headerlink" href="#user-interface" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>LED 2:</dt><dd><p>Turns on when the device joins the network.</p>
+</dd>
+<dt>LED 3:</dt><dd><p>Blinks to indicate that the identification mode is on.</p>
+</dd>
+<dt>Button 3:</dt><dd><p>Starts or cancels the Identify mode.</p>
+</dd>
+</dl>
+<p>All other interactions with the application can be handled using serial communication.
+See <a class="reference internal" href="../../lib/shell.html#zigbee-shell-reference"><span class="std std-ref">Zigbee shell command list</span></a> for available serial commands.</p>
+</div>
+<div class="section" id="configuration">
+<h2><a class="toc-backref" href="#id7">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/index.html">Configuring and building</a> in the nRF Connect SDK documentation for information about how to permanently or temporarily change the configuration.</p>
+<div class="section" id="enabling-and-disabling-endpoint-logging">
+<h3><a class="toc-backref" href="#id8">Enabling and disabling endpoint logging</a><a class="headerlink" href="#enabling-and-disabling-endpoint-logging" title="Permalink to this headline">¶</a></h3>
+<p>Zigbee Shell sample has <a class="reference internal" href="../../lib/zigbee_logger_eprxzcl.html#lib-zigbee-logger-endpoint"><span class="std std-ref">Zigbee endpoint logger library</span></a> enabled by default and will log every ZCL packet received.</p>
+<p>You can enable and disable logs from endpoint logger using the <code class="docutils literal notranslate"><span class="pre">log</span> <span class="pre">enable</span></code> and <code class="docutils literal notranslate"><span class="pre">log</span> <span class="pre">disable</span></code> shell commands with the appropriate log module instance name, respectively:</p>
+<ul>
+<li><p>To disable the logs from Zigbee endpoint logger, use the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">log</span> <span class="n">disable</span> <span class="n">zigbee</span><span class="o">.</span><span class="n">eprxzcl</span>
+</pre></div>
+</div>
+</li>
+<li><p>To enable logs from Zigbee endpoint logger and set its logging to the info level (<code class="docutils literal notranslate"><span class="pre">inf</span></code>), use the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">log</span> <span class="n">enable</span> <span class="n">inf</span> <span class="n">zigbee</span><span class="o">.</span><span class="n">eprxzcl</span>
+</pre></div>
+</div>
+<p>You can also use the following command to see other available logging levels:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">log</span> <span class="n">enable</span> <span class="o">--</span><span class="n">help</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="building-and-running">
+<h2><a class="toc-backref" href="#id9">Building and running</a><a class="headerlink" href="#building-and-running" title="Permalink to this headline">¶</a></h2>
+<p>Make sure to configure the Zigbee stack before building and testing this sample.
+See <a class="reference internal" href="../../configuring.html#ug-zigbee-configuring"><span class="std std-ref">Configuring Zigbee add-on</span></a> for more information.</p>
+<p>This sample can be found under <code class="file docutils literal notranslate"><span class="pre">samples/shell</span></code> in the Zigbee add-on folder structure.</p>
+<p>To build the sample, follow the instructions in <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/building.html">Building an application</a> in the nRF Connect SDK documentation for your preferred building environment.
+See also <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/programming.html">Programming an application</a> for programming steps and <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/test_and_optimize.html">Testing and optimization</a> for general information about testing and debugging in the nRF Connect SDK.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When building <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#repository_application">repository applications</a> in the Zigbee add-on which is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/dev_model_and_contributions/code_base.html#repository_types">SDK repository</a>, building with sysbuild is <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/config_and_build_system.html#sysbuild_enabled_by_default">enabled by default</a>.
+If you work with out-of-tree <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#create-application-types-freestanding">freestanding applications</a>, you need to manually pass the <code class="docutils literal notranslate"><span class="pre">--sysbuild</span></code> parameter to every build command or <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/sysbuild/sysbuild_configuring_west.html">configure west to always use it</a>.</p>
+</div>
+<div class="section" id="testing">
+<span id="zigbee-shell-sample-testing"></span><h3><a class="toc-backref" href="#id10">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
+<p>In this testing procedure, both of the development kits are programmed with the Zigbee Shell sample.
+One of these samples acts as Zigbee Coordinator, the other one as Zigbee Router.</p>
+<p>After building the sample and programming it to your development kits, complete the following steps to test it:</p>
+<ol class="arabic">
+<li><p>Turn on the development kits.</p></li>
+<li><p>Set up the serial connection with the development kits using one of the <a class="reference internal" href="#available-shell-interfaces">Available shell interfaces</a>.</p></li>
+<li><p>To set one shell device to work as coordinator, run the following shell command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bdb</span> <span class="n">role</span> <span class="n">zc</span>
+</pre></div>
+</div>
+<p>This shell device is now the shell coordinator node.</p>
+</li>
+<li><p>Run the following command on the shell coordinator node to start a new Zigbee network:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bdb</span> <span class="n">start</span>
+</pre></div>
+</div>
+</li>
+<li><p>Run the following command on the second board programmed with the Shell sample:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bdb</span> <span class="n">start</span>
+</pre></div>
+</div>
+<p>The shell device joins the network.</p>
+</li>
+<li><p>To check that the shell device has commissioned, run the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zdo</span> <span class="n">short</span>
+</pre></div>
+</div>
+<p>The command returns the acquired short address of the shell device.</p>
+</li>
+<li><p>To check the communication between the nodes, issue a ping request with the acquired short address value and the payload size:</p>
+<pre class="highlight literal-block">zcl ping <em>zdo_short_address</em> <em>payload_size</em></pre>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zcl</span> <span class="n">ping</span> <span class="mh">0x2485</span> <span class="mi">10</span>
+</pre></div>
+</div>
+<p>The ping time response is returned when the ping is successful, followed by the additional information from the endpoint logger.
+For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ping</span> <span class="n">time</span><span class="p">:</span> <span class="mi">20</span> <span class="n">ms</span>
+<span class="n">Done</span>
+<span class="p">[</span><span class="mi">00</span><span class="p">:</span><span class="mi">00</span><span class="p">:</span><span class="mf">21.261</span><span class="p">,</span><span class="mi">810</span><span class="p">]</span> <span class="o">&lt;</span><span class="n">inf</span><span class="o">&gt;</span> <span class="n">zigbee</span><span class="o">.</span><span class="n">eprxzcl</span><span class="p">:</span> <span class="n">Received</span> <span class="n">ZCL</span> <span class="n">command</span> <span class="p">(</span><span class="mi">0</span><span class="p">):</span> <span class="n">src_addr</span><span class="o">=</span><span class="mh">0x2485</span><span class="p">(</span><span class="n">short</span><span class="p">)</span> <span class="n">src_ep</span><span class="o">=</span><span class="mi">64</span> <span class="n">dst_ep</span><span class="o">=</span><span class="mi">64</span> <span class="n">cluster_id</span><span class="o">=</span><span class="mh">0xbeef</span>
+<span class="n">profile_id</span><span class="o">=</span><span class="mh">0x0104</span> <span class="n">cmd_dir</span><span class="o">=</span><span class="mi">0</span> <span class="n">common_cmd</span><span class="o">=</span><span class="mi">0</span> <span class="n">cmd_id</span><span class="o">=</span><span class="mh">0x01</span> <span class="n">cmd_seq</span><span class="o">=</span><span class="mi">0</span> <span class="n">disable_def_resp</span><span class="o">=</span><span class="mi">1</span> <span class="n">manuf_code</span><span class="o">=</span><span class="n">void</span> <span class="n">payload</span><span class="o">=</span><span class="p">[</span><span class="n">cdcdcdcdcdcdcdcdcdcd</span><span class="p">]</span> <span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Disable the endpoint logger:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">log</span> <span class="n">disable</span> <span class="n">zigbee</span><span class="o">.</span><span class="n">eprxzcl</span>
+</pre></div>
+</div>
+</li>
+<li><p>Issue another ping request:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zcl</span> <span class="n">ping</span> <span class="mh">0x2485</span> <span class="mi">10</span>
+</pre></div>
+</div>
+<p>The result does not include the endpoint logger information anymore.
+For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Ping</span> <span class="n">time</span><span class="p">:</span> <span class="mi">20</span> <span class="n">ms</span>
+<span class="n">Done</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="dependencies">
+<h2><a class="toc-backref" href="#id11">Dependencies</a><a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>This sample uses the following nRF Connect SDK libraries:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../lib/shell.html#lib-zigbee-shell"><span class="std std-ref">Zigbee shell</span></a></p></li>
+<li><p><a class="reference internal" href="../../lib/zigbee_error_handler.html#lib-zigbee-error-handler"><span class="std std-ref">Zigbee error handler</span></a></p></li>
+<li><p><a class="reference internal" href="../../lib/zigbee_app_utils.html#lib-zigbee-application-utilities"><span class="std std-ref">Zigbee application utilities</span></a></p></li>
+<li><p>Zigbee subsystem:</p>
+<ul>
+<li><p><code class="file docutils literal notranslate"><span class="pre">zb_nrf_platform.h</span></code></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/others/dk_buttons_and_leds.html">DK Buttons and LEDs</a></p></li>
+</ul>
+<p>It uses the ZBOSS stack:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../zboss/index.html#zigbee-zboss"><span class="std std-ref">ZBOSS Zigbee stack</span></a> 4.1.4.2 (<a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zigbee_devguide.html">API documentation</a>)</p></li>
+</ul>
+<p>In addition, it uses the following Zephyr libraries:</p>
+<ul class="simple">
+<li><p><code class="file docutils literal notranslate"><span class="pre">include/zephyr.h</span></code></p></li>
+<li><p><code class="file docutils literal notranslate"><span class="pre">include/device.h</span></code></p></li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/logging/index.html">Logging</a></p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../template/README.html" class="btn btn-neutral float-right" title="Zigbee: Template" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../network_coordinator/README.html" class="btn btn-neutral" title="Zigbee: Network coordinator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2024, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="../../_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

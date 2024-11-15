@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Quick start guide &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Architectures" href="architectures.html" />
+    <link rel="prev" title="Requirements and setup" href="setup.html" />
+  <link rel="shortcut icon" href="_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Requirements and setup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick start guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start-requirements">Quick start requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#program-the-samples">Program the samples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test-the-network">Test the network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps">Next steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring/index.html">Additional configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zboss/index.html">ZBOSS Zigbee stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="samples/index.html">Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lib/index.html">Libraries for Zigbee</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Zigbee add-on for nRF Connect SDK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Quick start guide</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/quick-start.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="quick-start-guide">
+<span id="ug-zigee-qsg"></span><span id="zigbee-quickstart"></span><h1>Quick start guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#overview" id="id3">Overview</a></p></li>
+<li><p><a class="reference internal" href="#quick-start-requirements" id="id4">Quick start requirements</a></p></li>
+<li><p><a class="reference internal" href="#program-the-samples" id="id5">Program the samples</a></p></li>
+<li><p><a class="reference internal" href="#test-the-network" id="id6">Test the network</a></p></li>
+<li><p><a class="reference internal" href="#next-steps" id="id7">Next steps</a></p></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee support for the nRF54L Series.</p>
+</div>
+<p>This guide demonstrates some of the basic concepts of the Zigbee network using the Zigbee add-on for the nRF Connect SDK and the nRF Connect for VS Code extension.
+It guides you through programming and testing of the required samples.</p>
+<div class="section" id="overview">
+<h2><a class="toc-backref" href="#id3">Overview</a><a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>As part of this guide, you are going to program three Zigbee samples onto three different development kits in order to set up a basic Zigbee network composed of three devices, or nodes.
+A node is “a testable implementation of a Zigbee application on a single stack with a single network address, and on a single network”.</p>
+<div class="figure align-default" id="id2">
+<img alt="Zigbee star topology setup for this guide" src="_images/zigbee_qsg_topology.svg" /><p class="caption"><span class="caption-text">Zigbee star topology setup for this guide</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+<p>The figure shows the Zigbee network star topology you are going to set up.
+See <a class="reference internal" href="about.html#zigbee-topologies"><span class="std std-ref">Zigbee topologies</span></a> for more information.</p>
+<p>Each of the samples you will use for forming the network is based on the single-chip, single-protocol architecture, uses the default configuration (that is, without any additional sample extensions enabled) and has a clearly defined role:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="samples/network_coordinator/README.html#zigbee-network-coordinator-sample"><span class="std std-ref">Zigbee network coordinator</span></a> demonstrates the Zigbee Coordinator role and supports only the network steering commissioning mechanism.</p></li>
+<li><p><a class="reference internal" href="samples/light_bulb/README.html#zigbee-light-bulb-sample"><span class="std std-ref">Zigbee light bulb</span></a> demonstrates the Zigbee Router role and implements the Dimmable Light device specification, as defined in the Zigbee Home Automation public application profile.</p></li>
+<li><p><a class="reference internal" href="samples/light_switch/README.html#zigbee-light-switch-sample"><span class="std std-ref">Zigbee light switch</span></a> demonstrates the Zigbee End Device role and implements the Dimmer Switch device specification, as defined in the Zigbee Home Automation public application profile.
+Once commissioned into the network, it looks for devices with the implemented Level Control and On/Off clusters and can control the one that answers first.</p></li>
+</ul>
+<p>All these samples also implement the Basic and Identify clusters, which are the basic Zigbee clusters.</p>
+</div>
+<div class="section" id="quick-start-requirements">
+<h2><a class="toc-backref" href="#id4">Quick start requirements</a><a class="headerlink" href="#quick-start-requirements" title="Permalink to this headline">¶</a></h2>
+<p>For this quick start guide, you need to meet all software requirements listed on the <a class="reference internal" href="setup.html#zigbee-setup"><span class="std std-ref">Requirements and setup</span></a> page.
+When installing the nRF Connect SDK, use Visual Studio Code and the nRF Connect for VS Code extension.</p>
+<p>You also need <em>three</em> nRF54L15 development kits:</p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Hardware platforms</p></th>
+<th class="head"><p>PCA</p></th>
+<th class="head"><p>Board name</p></th>
+<th class="head"><p>Board target</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf54l/index.html">nRF54L15 DK</a></p></td>
+<td><p>PCA10156</p></td>
+<td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html">nrf54l15dk</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nrf54l15dk/nrf54l15/cpuapp</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure that you have three development kits before proceeding to the next steps.</p>
+</div>
+</div>
+<div class="numbered-step section" id="program-the-samples">
+<h2><a class="toc-backref" href="#id5">Program the samples</a><a class="headerlink" href="#program-the-samples" title="Permalink to this headline">¶</a></h2>
+<p>To program the samples, complete the following steps:</p>
+<ol class="arabic simple">
+<li><p>Open the nRF Connect for VS Code extension.</p></li>
+<li><p>Complete the steps listed on the <a class="reference external" href="https://docs.nordicsemi.com/bundle/nrf-connect-vscode/page/get_started/build_app_ncs.html">How to build an application</a> page in the nRF Connect for VS Code extension documentation.</p></li>
+</ol>
+<ol class="arabic" start="3">
+<li><p>Program the Zigbee network coordinator sample to one of the boards:</p>
+<ol class="loweralpha">
+<li><p>Connect your development kit using the serial port.</p></li>
+<li><p>In the <span class="guilabel">Connected Devices View</span>, click <span class="guilabel">Refresh Connected Devices</span>.
+Your development kit appears on the list.</p></li>
+<li><p>In the <span class="guilabel">Actions View</span>, click <span class="guilabel">Flash</span>.</p>
+<div class="figure align-default">
+<img alt="nRF Connect for Visual Studio Code - Refresh Connected Devices and Flash buttons" src="_images/zigbee_qsg_vsc_flash.png" />
+</div>
+</li>
+</ol>
+<p>When the programming is done, the <strong>LED 1</strong> on the development kit turns on to indicate that the Zigbee network is open.
+After some time, it turns off and the Zigbee network needs to be reopened (see below).</p>
+</li>
+<li><p>Add the Zigbee light switch sample.</p>
+<p>Repeat Steps 2 and 3 for the sample.</p>
+</li>
+<li><p>Add the Zigbee light bulb sample.</p>
+<p>Repeat Steps 2 and 3 for the sample.
+The <strong>LED 2</strong> turns on when the application is started.</p>
+</li>
+<li><p>Press <strong>Button 0</strong> on the development kit programmed with the network coordinator sample to reopen the Zigbee network.
+After some time, the devices join the Zigbee network.</p>
+<ul class="simple">
+<li><p>On the development kit programmed with the light bulb sample, <strong>LED 1</strong> turns on when the light bulb joins the network.</p></li>
+<li><p>On the development kit programmed with the light switch sample, <strong>LED 1</strong> turns on when the device joins the network and <strong>LED 2</strong> turns on when the light switch finds a light bulb to control.</p></li>
+</ul>
+</li>
+</ol>
+<dl>
+<dt>Reopening the network</dt><dd><p>If you find that you are having issues with your devices joining the Zigbee network, it may be because the network needs to be reopened manually.
+By default, the network remains open for 180 seconds at startup and after <strong>Button 0</strong> is pressed.
+After 180 seconds have passed, the network will close and needs to be re-opened.</p>
+<p>When the network is open, <strong>LED 1</strong> on the development kit programmed with the network coordinator sample will be on.
+If <strong>LED 1</strong> is not on, then the network is closed and needs to be reopened again.</p>
+<p>To reopen the network, press <strong>Button 0</strong> on the development kit that has been programmed as the network coordinator.</p>
+<p>For more information, see the <a class="reference internal" href="samples/network_coordinator/README.html#zigbee-network-coordinator-user-interface"><span class="std std-ref">User interface</span></a> section for the <a class="reference internal" href="samples/network_coordinator/README.html#zigbee-network-coordinator-sample"><span class="std std-ref">Zigbee Network coordinator</span></a> sample.</p>
+</dd>
+</dl>
+</div>
+<div class="numbered-step section" id="test-the-network">
+<h2><a class="toc-backref" href="#id6">Test the network</a><a class="headerlink" href="#test-the-network" title="Permalink to this headline">¶</a></h2>
+<p>After forming the Zigbee network, test the interaction between the devices:</p>
+<ol class="arabic simple">
+<li><p>Press <strong>Button 1</strong> once on the development kit programmed with the light switch sample to turn off the light bulb’s <strong>LED 1</strong>.</p></li>
+<li><p>Press <strong>Button 0</strong> once on the development kit programmed with the light switch sample to turn on the light bulb’s <strong>LED 1</strong>.</p></li>
+<li><p>Press and hold <strong>Button 0</strong> on the development kit programmed with the light switch sample to decrease the light bulb’s <strong>LED 1</strong> brightness.</p></li>
+<li><p>Press and hold <strong>Button 1</strong> on the development kit programmed with the light switch sample to increase the light bulb’s <strong>LED 1</strong> brightness.</p></li>
+</ol>
+</div>
+<div class="section" id="next-steps">
+<h2><a class="toc-backref" href="#id7">Next steps</a><a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
+<p>After you complete this quick start guide, we recommend that you get familiar with the following topics:</p>
+<ul class="simple">
+<li><p>If you want to start configuring samples:</p>
+<ul>
+<li><p><a class="reference internal" href="configuring.html#ug-zigbee-configuring"><span class="std std-ref">Configuring Zigbee add-on</span></a>.</p></li>
+<li><p><a class="reference internal" href="configuring/configuring_libraries.html#ug-zigbee-configuring-libraries"><span class="std std-ref">Configuring Zigbee libraries</span></a>.</p></li>
+<li><p><a class="reference internal" href="configuring/other_ecosystems.html#ug-zigbee-other-ecosystems"><span class="std std-ref">Configuring Zigbee samples for other ecosystems</span></a>.</p></li>
+<li><p>Zigbee sample variants - see the <a class="reference internal" href="samples/index.html#zigbee-samples"><span class="std std-ref">Zigbee samples</span></a> pages.</p></li>
+</ul>
+</li>
+<li><p>If you want to test a multiprotocol solution, see the <a class="reference internal" href="samples/light_switch/README.html#zigbee-light-switch-sample-nus"><span class="std std-ref">Multiprotocol Bluetooth LE extension</span></a> section of the light switch sample.</p></li>
+</ul>
+<ul class="simple">
+<li><p>If you want to learn more about ZBOSS:</p>
+<ul>
+<li><p>ZBOSS user guide - see <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zigbee_devguide.html">API documentation</a></p></li>
+<li><p><a class="reference internal" href="adding_clusters.html#ug-zigee-adding-clusters"><span class="std std-ref">Adding ZCL clusters to application</span></a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="architectures.html" class="btn btn-neutral float-right" title="Architectures" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="setup.html" class="btn btn-neutral" title="Requirements and setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2024, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

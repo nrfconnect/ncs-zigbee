@@ -1,0 +1,330 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Configuring Zigbee samples for other ecosystems &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="../_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ZBOSS Zigbee stack" href="../zboss/index.html" />
+    <link rel="prev" title="Configuring ZBOSS traces" href="configuring_zboss_traces.html" />
+  <link rel="shortcut icon" href="../_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Additional configurations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="configuring_libraries.html">Configuring Zigbee libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_zboss_traces.html">Configuring ZBOSS traces</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Configuring Zigbee samples for other ecosystems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#supported-types-of-zigbee-networks">Supported types of Zigbee networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuring-zigbee-samples-for-device-type-used">Configuring Zigbee samples for device type used</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#connecting-the-device-to-other-ecosystems">Connecting the device to other ecosystems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#checking-connection-status">Checking connection status</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zboss/index.html">ZBOSS Zigbee stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../samples/index.html">Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lib/index.html">Libraries for Zigbee</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Zigbee add-on for nRF Connect SDK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Additional configurations</a> &raquo;</li>
+        
+      <li>Configuring Zigbee samples for other ecosystems</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/configuring/other_ecosystems.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuring-zigbee-samples-for-other-ecosystems">
+<span id="ug-zigbee-other-ecosystems"></span><h1>Configuring Zigbee samples for other ecosystems<a class="headerlink" href="#configuring-zigbee-samples-for-other-ecosystems" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#supported-types-of-zigbee-networks" id="id2">Supported types of Zigbee networks</a></p></li>
+<li><p><a class="reference internal" href="#configuring-zigbee-samples-for-device-type-used" id="id3">Configuring Zigbee samples for device type used</a></p></li>
+<li><p><a class="reference internal" href="#connecting-the-device-to-other-ecosystems" id="id4">Connecting the device to other ecosystems</a></p>
+<ul>
+<li><p><a class="reference internal" href="#checking-connection-status" id="id5">Checking connection status</a></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>You can configure <a class="reference internal" href="../samples/index.html#zigbee-samples"><span class="std std-ref">Samples</span></a> in the Zigbee add-on for the nRF Connect SDK that you program onto Nordic Semiconductor’s hardware platforms to make them work within Zigbee networks of other ecosystems, such as Amazon Alexa, IKEA TRÅDFRI, or Philips Hue.
+This is only possible for Zigbee networks of other ecosystems that include the Trust Center.</p>
+<div class="section" id="supported-types-of-zigbee-networks">
+<h2><a class="toc-backref" href="#id2">Supported types of Zigbee networks</a><a class="headerlink" href="#supported-types-of-zigbee-networks" title="Permalink to this headline">¶</a></h2>
+<p>Zigbee samples in Zigbee add-on use the centralized type of Zigbee network.</p>
+<p>This type of Zigbee network is created by a Zigbee Coordinator that usually acts as the Trust Center.
+In this network, only the Trust Center can issue encryption keys and allow Routers and End Devices into the network.
+The Coordinator is usually implemented on a hub or a gateway, such as Amazon Echo.</p>
+</div>
+<div class="section" id="configuring-zigbee-samples-for-device-type-used">
+<h2><a class="toc-backref" href="#id3">Configuring Zigbee samples for device type used</a><a class="headerlink" href="#configuring-zigbee-samples-for-device-type-used" title="Permalink to this headline">¶</a></h2>
+<p>To make Zigbee samples in Zigbee add-on work within Zigbee networks of other ecosystems, it might be required to change Zigbee sample configuration, based on the device types you are using.
+The following configuration scenarios are possible:</p>
+<dl class="simple">
+<dt>Connecting Nordic device to a third-party Coordinator</dt><dd><p>If you are connecting a Nordic Semiconductor’s device programmed with a Zigbee sample to a third-party Zigbee Coordinator, set the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI</span></code> Kconfig option for the Zigbee sample in nRF Connect SDK.
+This will allow your device to scan all channels to find the Coordinator’s Zigbee network.</p>
+</dd>
+<dt>Connecting a third-party Zigbee 3.0 device to a Nordic-based Coordinator</dt><dd><p>If you are connecting a third-party Zigbee device that is compatible with Zigbee 3.0 to a Zigbee Coordinator that is programmed onto a Nordic Semiconductor’s device, no additional configuration is needed.</p>
+</dd>
+<dt>Connecting a third-party Zigbee legacy device to a Nordic-based Coordinator</dt><dd><p>If you are connecting a third-party Zigbee device that is not compatible with Zigbee 3.0 to a Zigbee Coordinator that is programmed onto a Nordic Semiconductor’s device, you must enable the legacy mode on the Coordinator by calling <code class="xref c c-func docutils literal notranslate"><span class="pre">zb_bdb_set_legacy_device_support()</span></code>.</p>
+</dd>
+</dl>
+<p>For the scenarios with the Nordic-based Coordinator, you can select the 802.15.4 channel on which the Coordinator will form the network by setting the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_CHANNEL</span></code> Kconfig option.
+Alternatively, you can enable the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI</span></code> Kconfig option to allow the Coordinator to use the best channel with least RF interference.</p>
+</div>
+<div class="section" id="connecting-the-device-to-other-ecosystems">
+<h2><a class="toc-backref" href="#id4">Connecting the device to other ecosystems</a><a class="headerlink" href="#connecting-the-device-to-other-ecosystems" title="Permalink to this headline">¶</a></h2>
+<p>After configuring the sample for other ecosystems, programming it and turning on the device, check the sample log output to see if joining (or forming) the Zigbee network is successful.</p>
+<div class="section" id="checking-connection-status">
+<h3><a class="toc-backref" href="#id5">Checking connection status</a><a class="headerlink" href="#checking-connection-status" title="Permalink to this headline">¶</a></h3>
+<p>If the following message or similar is shown, the joining was not successful:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">I</span><span class="p">:</span> <span class="n">Network</span> <span class="n">steering</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">successful</span> <span class="p">(</span><span class="n">status</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The connection process can fail for different reasons.
+The following instructions can help you troubleshoot the connection problem:</p>
+<ol class="arabic">
+<li><p>Make sure that the Coordinator node is up and running.</p></li>
+<li><p>Make sure that the network is accepting new devices.
+The most immediate way to verify this is to check if the <strong>LED 1</strong> on the Zigbee Coordinator node.
+If the LED is on, the network is configured correctly and it is open to new nodes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each ecosystem can also offer its own method for checking the network configuration.
+For example, on the Amazon Alexa ecosystem, you can say “Alexa, find my devices”.</p>
+</div>
+</li>
+<li><p>Make sure that the device is scanning through all channels to find the Zigbee network.
+For example, verify that the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI</span></code> Kconfig option is correctly set.</p></li>
+<li><p>Check if the device is compatible with Zigbee 3.0.
+If it is <em>not</em> compatible, enable the legacy mode by including a call to <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group__zboss__bdb__comm__params.html#ga8bf3b3beef192c00bcdca17ad1240921">zb_bdb_set_legacy_device_support</a>.</p></li>
+</ol>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../zboss/index.html" class="btn btn-neutral float-right" title="ZBOSS Zigbee stack" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="configuring_zboss_traces.html" class="btn btn-neutral" title="Configuring ZBOSS traces" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2024, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="../_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

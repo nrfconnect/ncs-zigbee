@@ -1,0 +1,281 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Requirements and setup &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/tabs.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quick start guide" href="quick-start.html" />
+    <link rel="prev" title="About Zigbee protocol" href="about.html" />
+  <link rel="shortcut icon" href="_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Requirements and setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#hardware-requirements">Hardware requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#software-requirements">Software requirements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quick-start.html">Quick start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring/index.html">Additional configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zboss/index.html">ZBOSS Zigbee stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="samples/index.html">Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lib/index.html">Libraries for Zigbee</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Zigbee add-on for nRF Connect SDK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Requirements and setup</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/setup.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="requirements-and-setup">
+<span id="zigbee-setup"></span><h1>Requirements and setup<a class="headerlink" href="#requirements-and-setup" title="Permalink to this headline">¶</a></h1>
+<p>This page outlines the requirements that you need to meet before you start working with the experimental support release of Zigbee add-on and Zigbee R23 protocol.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee support for the nRF54L Series.</p>
+</div>
+<div class="section" id="hardware-requirements">
+<h2>Hardware requirements<a class="headerlink" href="#hardware-requirements" title="Permalink to this headline">¶</a></h2>
+<p>Currently the nRF54L15 SoC is supported for use with Zigbee add-on.</p>
+<p>To work with the Zigbee add-on for the nRF Connect SDK and test the available samples, you need at least two <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf54l/index.html">nRF54L15 development kits (DK)</a>.</p>
+<p>For the <a class="reference internal" href="quick-start.html#zigbee-quickstart"><span class="std std-ref">Quick start guide</span></a>, you need three devices.</p>
+</div>
+<div class="section" id="software-requirements">
+<h2>Software requirements<a class="headerlink" href="#software-requirements" title="Permalink to this headline">¶</a></h2>
+<p>To work with the Zigbee add-on, you need to install the nRF Connect SDK, including all its prerequisites and the nRF Connect SDK toolchain.
+Follow the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/installation/install_ncs.html">Installing the nRF Connect SDK</a> instructions, with the following exception:</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-fG5SRlZTQ3w=" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-fG5SRlZTQ3w=" name="fG5SRlZTQ3w=" role="tab" tabindex="0">nRF Connect for VS Code extension</button><button aria-controls="panel-0-Y29tbWFuZCBsaW5l" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-Y29tbWFuZCBsaW5l" name="Y29tbWFuZCBsaW5l" role="tab" tabindex="-1">command line</button></div><div aria-labelledby="tab-0-fG5SRlZTQ3w=" class="sphinx-tabs-panel group-tab" id="panel-0-fG5SRlZTQ3w=" name="fG5SRlZTQ3w=" role="tabpanel" tabindex="0"><p>In the <strong>Get the nRF Connect SDK code</strong> part of the install instructions:</p>
+<p>In Step 4, select <span class="guilabel">Browse nRF Connect SDK Add-on Index</span> instead of selecting the SDK version, then select <span class="guilabel">Zigbee</span>, and select v0.1.0 of the Zigbee add-on, which also installs nRF Connect SDK v2.8.0.</p>
+</div><div aria-labelledby="tab-0-Y29tbWFuZCBsaW5l" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-Y29tbWFuZCBsaW5l" name="Y29tbWFuZCBsaW5l" role="tabpanel" tabindex="0"><p>In the <strong>Get the nRF Connect SDK code</strong> part of the install instructions:</p>
+<p>In Step 4, use the following command to initialize west with Zigbee add-on v0.1.0, which also initializes nRF Connect SDK v2.8.0:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">west init -m &quot;http://github.com/nrfconnect/ncs-zigbee&quot; --mr main</span>
+</pre></div>
+</div>
+</div></div>
+<p>To create an application, use <a class="reference internal" href="samples/template/README.html#zigbee-template-sample"><span class="std std-ref">Zigbee: Template</span></a> sample as a starting point.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="quick-start.html" class="btn btn-neutral float-right" title="Quick start guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="about.html" class="btn btn-neutral" title="About Zigbee protocol" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2024, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

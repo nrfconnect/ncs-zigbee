@@ -1,0 +1,405 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Zigbee ZBOSS OSIF &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="../_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Zigbee shell" href="shell.html" />
+    <link rel="prev" title="Libraries for Zigbee" href="index.html" />
+  <link rel="shortcut icon" href="../_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring/index.html">Additional configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../zboss/index.html">ZBOSS Zigbee stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../samples/index.html">Samples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Libraries for Zigbee</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Zigbee ZBOSS OSIF</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#zboss-osif-serial-abstract">ZBOSS OSIF serial abstract</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#zigbee-async-serial">Zigbee async serial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zigbee-serial-logger">Zigbee serial logger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#zigbee-logger">Zigbee logger</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shell.html">Zigbee shell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zigbee_app_utils.html">Zigbee application utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zigbee_error_handler.html">Zigbee error handler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zigbee_logger_eprxzcl.html">Zigbee endpoint logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zigbee_zcl_scenes.html">Zigbee ZCL scene helper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Zigbee add-on for nRF Connect SDK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Libraries for Zigbee</a> &raquo;</li>
+        
+      <li>Zigbee ZBOSS OSIF</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/lib/osif.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zigbee-zboss-osif">
+<span id="lib-zigbee-osif"></span><h1>Zigbee ZBOSS OSIF<a class="headerlink" href="#zigbee-zboss-osif" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#configuration" id="id3">Configuration</a></p></li>
+<li><p><a class="reference internal" href="#zboss-osif-serial-abstract" id="id4">ZBOSS OSIF serial abstract</a></p>
+<ul>
+<li><p><a class="reference internal" href="#zigbee-async-serial" id="id5">Zigbee async serial</a></p></li>
+<li><p><a class="reference internal" href="#zigbee-serial-logger" id="id6">Zigbee serial logger</a></p></li>
+<li><p><a class="reference internal" href="#zigbee-logger" id="id7">Zigbee logger</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#api-documentation" id="id8">API documentation</a></p></li>
+</ul>
+</div>
+<p>The Zigbee ZBOSS OSIF layer subsystem acts as the linking layer between the <a class="reference internal" href="../zboss/index.html#zigbee-zboss"><span class="std std-ref">ZBOSS Zigbee stack</span></a> and the Zigbee add-on for the nRF Connect SDK.</p>
+<div class="section" id="configuration">
+<span id="zigbee-osif-configuration"></span><h2><a class="toc-backref" href="#id3">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>The ZBOSS OSIF layer implements a series of functions used by ZBOSS and is included in the Zigbee subsystem.</p>
+<p>The ZBOSS OSIF layer is automatically enabled when you enable the ZBOSS library with the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_ADD_ON</span></code> Kconfig option.</p>
+<p>You can also configure the following OSIF-related Kconfig options:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_APP_CB_QUEUE_LENGTH</span></code> - Defines the length of the application callback and alarm queue.
+This queue is used to pass application callbacks and alarms from other threads or interrupts to the ZBOSS main loop context.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_DEBUG_FUNCTIONS</span></code> - Includes functions to suspend and resume the ZBOSS thread.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These functions are useful for debugging, but they can cause instability of the device.</p>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_RESET_ON_ASSERT</span></code> - Configures the ZBOSS OSIF layer to reset the device when a ZBOSS assert occurs.
+This option is enabled by default.
+Use it for production-ready applications.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_HALT_ON_ASSERT</span></code> - Configures the ZBOSS OSIF layer to halt the device when a ZBOSS assert occurs.
+Use this option only for testing and debugging your application.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_HAVE_SERIAL</span></code> - Enables the UART serial abstract for the ZBOSS OSIF layer and allows to configure the serial glue layer.
+For more information, see the <a class="reference internal" href="#zigbee-osif-zboss-osif-serial"><span class="std std-ref">ZBOSS OSIF serial abstract</span></a> section.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Serial abstract must be enabled when using the precompiled ZBOSS libraries since they have dependencies on it.</p>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_USE_BUTTONS</span></code> - Enables the buttons abstract for the ZBOSS OSIF layer.
+You can use this option if you want to test ZBOSS examples directly in the Zigbee add-on for the nRF Connect SDK.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_USE_DIMMABLE_LED</span></code> - Dimmable LED (PWM) abstract for the ZBOSS OSIF layer.
+You can use this option if you want to test ZBOSS examples directly in the Zigbee add-on for the nRF Connect SDK.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_USE_LEDS</span></code> - LEDs abstract for the ZBOSS OSIF layer.
+You can use this option if you want to test ZBOSS examples directly in the Zigbee add-on for the nRF Connect SDK.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_USE_SOFTWARE_AES</span></code> - Configures the ZBOSS OSIF layer to use the software encryption.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_NVRAM_PAGE_COUNT</span></code> - Configures the number of ZBOSS NVRAM logical pages.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_NVRAM_PAGE_SIZE</span></code> - Configures the size of the RAM-based ZBOSS NVRAM.
+This option is used only if the device does not have NVRAM storage.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_TIME_COUNTER</span></code> - Configures the ZBOSS OSIF layer to use a dedicated timer-based counter as the Zigbee time source.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_TIME_KTIMER</span></code> - Configures the ZBOSS OSIF layer to use Zephyr’s system time as the Zigbee time source.</p></li>
+</ul>
+<p>Additionally, the following Kconfig option is available when setting <a class="reference internal" href="../configuring.html#zigbee-ug-logging-logger-options"><span class="std std-ref">Zephyr’s logger options</span></a>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_OSIF_LOG_LEVEL</span></code> - Configures the custom logger options for the ZBOSS OSIF layer.</p></li>
+</ul>
+</div>
+<div class="section" id="zboss-osif-serial-abstract">
+<span id="zigbee-osif-zboss-osif-serial"></span><h2><a class="toc-backref" href="#id4">ZBOSS OSIF serial abstract</a><a class="headerlink" href="#zboss-osif-serial-abstract" title="Permalink to this headline">¶</a></h2>
+<p>Setting the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_HAVE_SERIAL</span></code> Kconfig option enables the serial abstract for the ZBOSS OSIF layer.</p>
+<p>The ZBOSS OSIF serial implements sets of backend functions that are used by the ZBOSS stack for serial communication:</p>
+<ul class="simple">
+<li><p>Zigbee async serial</p></li>
+<li><p>Zigbee serial logger</p></li>
+<li><p>Zigbee logger</p></li>
+</ul>
+<p>These backend functions serve logging ZBOSS traces that are useful for debugging and are provided in binary format.</p>
+<p>For more information about configuring ZBOSS stack logs, see <a class="reference internal" href="../configuring.html#zigbee-ug-logging-stack-logs"><span class="std std-ref">Stack logs</span></a>.</p>
+<div class="section" id="zigbee-async-serial">
+<span id="zigbee-osif-zigbee-async-serial"></span><h3><a class="toc-backref" href="#id5">Zigbee async serial</a><a class="headerlink" href="#zigbee-async-serial" title="Permalink to this headline">¶</a></h3>
+<p>The Zigbee async serial supports logging ZBOSS traces. When enabled, it logs ZBOSS traces in the binary format.
+The data received are internally buffered.</p>
+<div class="section" id="zigbee-async-serial-configuration-options">
+<h4>Zigbee async serial configuration options<a class="headerlink" href="#zigbee-async-serial-configuration-options" title="Permalink to this headline">¶</a></h4>
+<p>To configure this set of functions, use the following Kconfig options:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_HAVE_ASYNC_SERIAL</span></code> - This option enables Zigbee async serial.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_UART_SUPPORTS_FLOW_CONTROL</span></code> - This option should be set if serial device supports flow control.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_UART_RX_BUF_LEN</span></code> - This option enables and configures the size of internal RX and TX buffer.</p></li>
+</ul>
+<p>The Zigbee ZBOSS OSIF layer serial device needs to be provided in devicetree as follows:</p>
+<div class="highlight-devicetree notranslate"><div class="highlight"><pre><span></span><span class="nf">chosen</span><span class="cm"> </span><span class="p">{</span>
+    <span class="n">ncs</span><span class="p">,</span><span class="n">zigbee-uart</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">uart0</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="zigbee-serial-logger">
+<h3><a class="toc-backref" href="#id6">Zigbee serial logger</a><a class="headerlink" href="#zigbee-serial-logger" title="Permalink to this headline">¶</a></h3>
+<p>This set of functions uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/hardware/peripherals/uart.html">UART API</a> and can be configured to use either the UART peripheral.
+Data is buffered internally in ring buffer and printed in the binary format.
+This ring buffer has a size of 4096 bytes by default.</p>
+<div class="section" id="zigbee-serial-logger-configuration-options">
+<h4>Zigbee serial logger configuration options<a class="headerlink" href="#zigbee-serial-logger-configuration-options" title="Permalink to this headline">¶</a></h4>
+<p>Use the following Kconfig options to configure the Zigbee serial logger:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_TRACE_BINARY_LOGGING</span></code> - This option enables logging ZBOSS traces with Zigbee serial logger.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_TRACE_UART_LOGGING</span></code> - This option selects the UART serial backend.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE</span></code> - This option specifies the size of the internal ring buffer.</p></li>
+</ul>
+<p>The ZBOSS tracing serial device needs to be provided in Devicetree like this:</p>
+<div class="highlight-devicetree notranslate"><div class="highlight"><pre><span></span><span class="nf">chosen</span><span class="cm"> </span><span class="p">{</span>
+    <span class="n">ncs</span><span class="p">,</span><span class="n">zboss-trace-uart</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">uart1</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="zigbee-logger">
+<h3><a class="toc-backref" href="#id7">Zigbee logger</a><a class="headerlink" href="#zigbee-logger" title="Permalink to this headline">¶</a></h3>
+<p>This set of functions uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/logging/index.html">Logging</a> API for logging hexdumps of received binary data.
+Data is buffered internally in ring buffer.</p>
+<div class="section" id="zigbee-logger-configuration-options">
+<h4>Zigbee logger configuration options<a class="headerlink" href="#zigbee-logger-configuration-options" title="Permalink to this headline">¶</a></h4>
+<p>Use the following Kconfig options to configure the Zigbee logger:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_TRACE_HEXDUMP_LOGGING</span></code> - This option enables Logging ZBOSS Traces with Zigbee logger.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE</span></code> - This option specifies size of internal ring buffer.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id8">API documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Header files: <code class="file docutils literal notranslate"><span class="pre">subsys/osif/zb_nrf_platform.h</span></code></div>
+<div class="line">Source files: <code class="file docutils literal notranslate"><span class="pre">subsys/osif/</span></code></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>doxygengroup: Cannot find file: C:\work\Zigbee\ncs-zigbee\ncs-zigbee\docs\_build_doxygen\xml\index.xml</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="shell.html" class="btn btn-neutral float-right" title="Zigbee shell" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Libraries for Zigbee" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2024, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="../_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+var group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g =
+[
+    [ "ZB_ZCL_DECLARE_OCCUPANCY_SENSING_ATTRIB_LIST", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga5d1cd1ee5913318cd748e0ef2450687c", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_CLUSTER_REVISION_DEFAULT", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga2f20237ebf73a07cd54a8bcd31ea7285", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_MAX_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga2d29f7f2d02b60775b68ac119f07d0b6", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY_DEFAULT_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga0ed8e1e20f633f4524164b24cb580597", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY_NO_REPORTING_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga1aff0caf179bf16fada2c0e7508a0736", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY_DEFAULT_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga9f790b11a0c358a51b1e8eb18bd77da4", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY_NO_REPORTING_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga2b2324df46aa445edcc57e32d7ed2c2d", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_DEFAULT_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga3bfe1df5527b1305db675606f23a054c", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_MAX_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga587cf4b3c43a7b0e85088211a866cf6e", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_MIN_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gadc724172c877d0a121eccd8039fb0353", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PIR_OCC_TO_UNOCC_DELAY_DEFAULT_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gac889432007de2b98485b2248cc22029f", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PIR_OCC_TO_UNOCC_DELAY_MAX_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga1df7d8568d44895b105542eacb22f47f", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PIR_OCC_TO_UNOCC_DELAY_MIN_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga8bf341fd9a6241bf4facc398a905521b", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PIR_UNOCC_TO_OCC_DELAY_DEFAULT_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga44e00174cd45f330d9248f202f9a55c4", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PIR_UNOCC_TO_OCC_DELAY_MAX_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga5067f59302caaa6916c5e8f1e6a60e26", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PIR_UNOCC_TO_OCC_DELAY_MIN_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga5cc5c8ebe1776079907ed30b7e98ec9a", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PIR_UNOCC_TO_OCC_THRESHOLD_DEFAULT_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga6c74bc1eada4646fa9920ba9b4936106", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PIR_UNOCC_TO_OCC_THRESHOLD_MAX_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gaffd6efa43a65c034ed04b65611e59cd5", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_PIR_UNOCC_TO_OCC_THRESHOLD_MIN_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga91c06f750a3dbeefbb78194ee90cd088", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY_DEFAULT_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gadb145b80214ea5e2b63971962eff5c86", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY_MAX_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga0e3674736c17987a4471ea20062d7d98", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY_MIN_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga536e3ca1914b0dfeb294c931b09e311a", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY_DEFAULT_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gaac6605890781d26d3c9c71e6dfdc0485", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY_MAX_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gadc6da97a965f2200f831afd8b14f1958", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY_MIN_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga47e742fff54b080cd4c1cf939f662ebc", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_DEFAULT_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gac7e234c9e07ecd19538444df7945ad58", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_MAX_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gab133ecac455ae52b0670434fa28b5551", null ],
+    [ "ZB_ZCL_OCCUPANCY_SENSING_ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_MIN_VALUE", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gacbc3c10863736a338181353a8c106c97", null ],
+    [ "zb_zcl_occupancy_sensing_attr_e", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ga96a29bfd6c0daa95617f8f149532b176", [
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_OCCUPANCY_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176a2405205ba912da4484653d8214e0a466", null ],
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176aed58bde47d37e53b72c96abcb3b89cc0", null ],
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_BITMAP_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176aa9a16d70d75bc8b0f16b4ba7e6859558", null ],
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_PIR_OCC_TO_UNOCC_DELAY_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176a7d624e6906d22a3f59013bb6641a1009", null ],
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_PIR_UNOCC_TO_OCC_DELAY_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176a5eeb714191a9cf1be567a5e0db63542b", null ],
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_PIR_UNOCC_TO_OCC_THRESHOLD_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176acc9ab8ace472d5561443b361474d8e9f", null ],
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176a419388677ea133792b8117442cb3821a", null ],
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176a59fef1c1b7c56d16e42c4e4dfa387f90", null ],
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176a185a050b10b8e7bd7f6a1535c2017d69", null ],
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176a36fb2d9b71fd7592e93ec6b1d26380ef", null ],
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176a1ee2343c00f82ecbd9257e455de1b7ad", null ],
+      [ "ZB_ZCL_ATTR_OCCUPANCY_SENSING_PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ID", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gga96a29bfd6c0daa95617f8f149532b176a0b055daee581dca66ca3b88eae7e44f1", null ]
+    ] ],
+    [ "zb_zcl_occupancy_sensing_occupancy_e", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gad96b75bedd3206dcf5ae5597f7a298bb", [
+      [ "ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_UNOCCUPIED", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ggad96b75bedd3206dcf5ae5597f7a298bba0ef8e3d5a8ab6f8321fd827be6796939", null ],
+      [ "ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ggad96b75bedd3206dcf5ae5597f7a298bba628bdcb7b537ed25afde424d50c46659", null ]
+    ] ],
+    [ "zb_zcl_occupancy_sensing_occupancy_sensor_type_e", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#gadbf165a1595a2c4153246f61dd4208ca", [
+      [ "ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_PIR", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ggadbf165a1595a2c4153246f61dd4208caa594542e124009675e7f4c6ee96279e02", null ],
+      [ "ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_ULTRASONIC", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ggadbf165a1595a2c4153246f61dd4208caa6aa84dfe31cab2b44feb667065fa7ca9", null ],
+      [ "ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_PIR_AND_ULTRASONIC", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ggadbf165a1595a2c4153246f61dd4208caa3d27e9e78833c58c07be6876f0f4894a", null ],
+      [ "ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_RESERVED", "group___z_b___z_c_l___o_c_c_u_p_a_n_c_y___s_e_n_s_i_n_g.html#ggadbf165a1595a2c4153246f61dd4208caa0723edada9465e4299b91d7b4c9cac40", null ]
+    ] ]
+];

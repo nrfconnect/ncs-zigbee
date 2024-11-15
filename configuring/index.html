@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Additional configurations &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+  <script type="text/javascript" src="../_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuring Zigbee libraries" href="configuring_libraries.html" />
+    <link rel="prev" title="Configuring Zigbee add-on" href="../configuring.html" />
+  <link rel="shortcut icon" href="../_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Additional configurations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuring_libraries.html">Configuring Zigbee libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_zboss_traces.html">Configuring ZBOSS traces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_ecosystems.html">Configuring Zigbee samples for other ecosystems</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../zboss/index.html">ZBOSS Zigbee stack</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../samples/index.html">Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lib/index.html">Libraries for Zigbee</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Zigbee add-on for nRF Connect SDK</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Additional configurations</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/configuring/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="additional-configurations">
+<span id="ug-zigbee-additional-configuration"></span><h1>Additional configurations<a class="headerlink" href="#additional-configurations" title="Permalink to this headline">¶</a></h1>
+<p>The following pages detail additional configurations that can be useful when working with the Zigbee protocol in the nRF Connect SDK.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Subpages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="configuring_libraries.html">Configuring Zigbee libraries</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuring_libraries.html#configuring-zboss-osif">Configuring ZBOSS OSIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_libraries.html#configuring-zigbee-application-utilities">Configuring Zigbee application utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_libraries.html#configuring-zigbee-error-handler">Configuring Zigbee error handler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_libraries.html#configuring-zigbee-endpoint-logger">Configuring Zigbee endpoint logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_libraries.html#configuring-zigbee-zcl-scene-helper">Configuring Zigbee ZCL scene helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_libraries.html#configuring-zigbee-shell">Configuring Zigbee shell</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuring_zboss_traces.html">Configuring ZBOSS traces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuring_zboss_traces.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_zboss_traces.html#switch-to-zboss-libraries-with-compiled-in-trace-logs">Switch to ZBOSS libraries with compiled-in trace logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_zboss_traces.html#select-which-zboss-trace-logs-to-print">Select which ZBOSS trace logs to print</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuring_zboss_traces.html#configure-how-to-print-zboss-trace-logs">Configure how to print ZBOSS trace logs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="other_ecosystems.html">Configuring Zigbee samples for other ecosystems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="other_ecosystems.html#supported-types-of-zigbee-networks">Supported types of Zigbee networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_ecosystems.html#configuring-zigbee-samples-for-device-type-used">Configuring Zigbee samples for device type used</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_ecosystems.html#connecting-the-device-to-other-ecosystems">Connecting the device to other ecosystems</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="configuring_libraries.html" class="btn btn-neutral float-right" title="Configuring Zigbee libraries" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../configuring.html" class="btn btn-neutral" title="Configuring Zigbee add-on" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2024, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="../_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
