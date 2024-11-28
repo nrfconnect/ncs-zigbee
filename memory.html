@@ -1,53 +1,32 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Memory requirements &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
-  <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
-  <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+      <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/tabs.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script>let toggleHintShow = 'Click to show';</script>
         <script>let toggleHintHide = 'Click to hide';</script>
         <script>let toggleOpenOnPrint = 'true';</script>
         <script src="_static/togglebutton.js"></script>
         <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+        <script src="_static/tabs.js"></script>
+    <script src="_static/js/theme.js"></script>
   <script type="text/javascript" src="_static/js/ncs.js"></script>
 
     <link rel="author" title="About these documents" href="about.html" />
@@ -59,29 +38,17 @@
 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            Zigbee add-on for nRF Connect SDK
           </a>
-
-          
-            
-            
-          
-
-          
 <div id="searchbox" role="search">
   <div class="searchformwrapper">
     <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -92,18 +59,7 @@
   </div>
 </div>
 <script>$('#searchbox').show(0);</script>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="about.html">About Zigbee protocol</a></li>
@@ -125,79 +81,38 @@
 <li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">Zigbee add-on for nRF Connect SDK</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>Memory requirements</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Memory requirements</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/memory.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="memory-requirements">
-<span id="zigbee-memory"></span><h1>Memory requirements<a class="headerlink" href="#memory-requirements" title="Permalink to this headline">¶</a></h1>
-<div class="contents local topic" id="contents">
+             
+  <section id="memory-requirements">
+<span id="zigbee-memory"></span><h1>Memory requirements<a class="headerlink" href="#memory-requirements" title="Permalink to this heading"></a></h1>
+<nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#ram-and-flash-memory-requirements" id="id2">RAM and flash memory requirements</a></p></li>
 <li><p><a class="reference internal" href="#stack-memory-requirements" id="id3">Stack memory requirements</a></p></li>
 </ul>
-</div>
+</nav>
 <p>This page provides information about the amount of flash memory and RAM that is required by the <a class="reference internal" href="samples/index.html#zigbee-samples"><span class="std std-ref">Samples</span></a>, as well as stack memory requirements for <code class="docutils literal notranslate"><span class="pre">main</span></code> and <code class="docutils literal notranslate"><span class="pre">zboss</span></code> threads.
 Use it to check if your application has enough space for a given configuration.
 Values are provided for <a class="reference internal" href="zboss/index.html#zigbee-zboss"><span class="std std-ref">ZBOSS libraries</span></a>.</p>
@@ -207,8 +122,8 @@ Values are provided for <a class="reference internal" href="zboss/index.html#zig
 </div>
 <p>Samples were built using the available <a class="reference internal" href="zboss/index.html#zigbee-zboss"><span class="std std-ref">ZBOSS Zigbee stack</span></a>.
 Unless stated otherwise, the default <code class="file docutils literal notranslate"><span class="pre">prj.conf</span></code> was used.</p>
-<div class="section" id="ram-and-flash-memory-requirements">
-<span id="zigbee-memory-21540"></span><span id="zigbee-memory-5340"></span><span id="zigbee-memory-52833"></span><span id="zigbee-memory-52840"></span><h2><a class="toc-backref" href="#id2">RAM and flash memory requirements</a><a class="headerlink" href="#ram-and-flash-memory-requirements" title="Permalink to this headline">¶</a></h2>
+<section id="ram-and-flash-memory-requirements">
+<span id="zigbee-memory-21540"></span><span id="zigbee-memory-5340"></span><span id="zigbee-memory-52833"></span><span id="zigbee-memory-52840"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">RAM and flash memory requirements</a><a class="headerlink" href="#ram-and-flash-memory-requirements" title="Permalink to this heading"></a></h2>
 <p>RAM and flash memory requirement values differ depending on the programmed sample.</p>
 <p>The following tables list memory requirement values for Zigbee samples.</p>
 <p>Values are provided in kilobytes (KB).
@@ -216,16 +131,6 @@ Unless stated otherwise, the default <code class="file docutils literal notransl
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-0-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-0-0-0" name="0-0" role="tab" tabindex="0">nRF54L15</button></div><div aria-labelledby="tab-0-0-0" class="sphinx-tabs-panel" id="panel-0-0-0" name="0-0" role="tabpanel" tabindex="0"><p>The following table lists memory requirements for samples running on the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf54l/index.html">nRF54L15 DK</a> (<a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html">nrf54l15dk</a>).</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 42%" />
-<col style="width: 9%" />
-<col style="width: 9%" />
-<col style="width: 12%" />
-<col style="width: 10%" />
-<col style="width: 5%" />
-<col style="width: 9%" />
-<col style="width: 5%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Sample</p></th>
 <th class="head"><p>ROM, ZBOSS stack + App</p></th>
@@ -295,9 +200,9 @@ Unless stated otherwise, the default <code class="file docutils literal notransl
 </tbody>
 </table>
 </div></div>
-</div>
-<div class="section" id="stack-memory-requirements">
-<h2><a class="toc-backref" href="#id3">Stack memory requirements</a><a class="headerlink" href="#stack-memory-requirements" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="stack-memory-requirements">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Stack memory requirements</a><a class="headerlink" href="#stack-memory-requirements" title="Permalink to this heading"></a></h2>
 <p>The following table lists stack memory requirement values for <code class="docutils literal notranslate"><span class="pre">main</span></code> and <code class="docutils literal notranslate"><span class="pre">zboss</span></code> threads.
 These measurements were carried out with Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/debugging/thread-analyzer.html">Thread analyzer</a>, using the following Kconfig options for configuration:</p>
 <ul class="simple">
@@ -308,13 +213,6 @@ These measurements were carried out with Zephyr’s <a class="reference external
 <div class="sphinx-tabs docutils container">
 <div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-1-1-0" aria-selected="true" class="sphinx-tabs-tab" id="tab-1-1-0" name="1-0" role="tab" tabindex="0">nRF54L15</button></div><div aria-labelledby="tab-1-1-0" class="sphinx-tabs-panel" id="panel-1-1-0" name="1-0" role="tabpanel" tabindex="0"><p>The following table lists memory requirements for samples running on the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf54l/index.html">nRF54L15 DK</a> (<a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html">nrf54l15dk</a>).</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 34%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 17%" />
-<col style="width: 16%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Sample</p></th>
 <th class="head"><p><code class="docutils literal notranslate"><span class="pre">main</span></code> thread stack usage</p></th>
@@ -345,12 +243,11 @@ These measurements were carried out with Zephyr’s <a class="reference external
 </tbody>
 </table>
 </div></div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
   
@@ -388,22 +285,13 @@ These measurements were carried out with Zephyr’s <a class="reference external
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

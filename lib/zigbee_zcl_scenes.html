@@ -1,52 +1,30 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Zigbee ZCL scene helper &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
   
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script>let toggleHintShow = 'Click to show';</script>
         <script>let toggleHintHide = 'Click to hide';</script>
         <script>let toggleOpenOnPrint = 'true';</script>
         <script src="../_static/togglebutton.js"></script>
         <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
   <script type="text/javascript" src="../_static/js/ncs.js"></script>
 
     <link rel="author" title="About these documents" href="../about.html" />
@@ -58,29 +36,17 @@
 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            Zigbee add-on for nRF Connect SDK
           </a>
-
-          
-            
-            
-          
-
-          
 <div id="searchbox" role="search">
   <div class="searchformwrapper">
     <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -91,18 +57,7 @@
   </div>
 </div>
 <script>$('#searchbox').show(0);</script>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About Zigbee protocol</a></li>
@@ -132,81 +87,39 @@
 <li class="toctree-l1"><a class="reference internal" href="../release-notes.html">Release notes</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Zigbee add-on for nRF Connect SDK</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="index.html">Libraries for Zigbee</a> &raquo;</li>
-        
-      <li>Zigbee ZCL scene helper</li>
-    
-    
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Libraries for Zigbee</a></li>
+      <li class="breadcrumb-item active">Zigbee ZCL scene helper</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/lib/zigbee_zcl_scenes.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="zigbee-zcl-scene-helper">
-<span id="lib-zigbee-zcl-scenes"></span><h1>Zigbee ZCL scene helper<a class="headerlink" href="#zigbee-zcl-scene-helper" title="Permalink to this headline">¶</a></h1>
-<div class="contents local topic" id="contents">
+             
+  <section id="zigbee-zcl-scene-helper">
+<span id="lib-zigbee-zcl-scenes"></span><h1>Zigbee ZCL scene helper<a class="headerlink" href="#zigbee-zcl-scene-helper" title="Permalink to this heading"></a></h1>
+<nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#configuration" id="id3">Configuration</a></p></li>
 <li><p><a class="reference internal" href="#api-documentation" id="id4">API documentation</a></p></li>
 </ul>
-</div>
+</nav>
 <p>The Zigbee ZCL scene helper library provides a set of functions that implement the callbacks required by the ZCL scene cluster in the application.
 You can use this library to implement these mandatory callbacks and save the configured scenes in the non-volatile memory.
 For this purpose, it uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/settings/index.html">Settings</a> subsystem.</p>
@@ -217,8 +130,8 @@ For this purpose, it uses Zephyr’s <a class="reference external" href="https:/
 <li><p>Window covering</p></li>
 </ul>
 <p>If you are implementing clusters that are not included in this list, you must implement their logic manually instead of using this library.</p>
-<div class="section" id="configuration">
-<span id="lib-zigbee-zcl-scenes-options"></span><h2><a class="toc-backref" href="#id3">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<section id="configuration">
+<span id="lib-zigbee-zcl-scenes-options"></span><h2><a class="toc-backref" href="#id3" role="doc-backlink">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
 <p>To enable the Zigbee ZCL scene helper library, set the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SCENES</span></code> Kconfig option.</p>
 <p>Because the library uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/settings/index.html">Settings</a> subsystem, the application must call the following functions for the library to work correctly:</p>
 <ul class="simple">
@@ -232,18 +145,18 @@ For this purpose, it uses Zephyr’s <a class="reference external" href="https:/
 <li><p><code class="xref c c-func docutils literal notranslate"><span class="pre">settings_subsys_init()</span></code> must be called before <code class="xref c c-func docutils literal notranslate"><span class="pre">zcl_scenes_init()</span></code></p></li>
 <li><p><code class="xref c c-func docutils literal notranslate"><span class="pre">settings_load()</span></code> must be called after <code class="xref c c-func docutils literal notranslate"><span class="pre">zcl_scenes_init()</span></code></p></li>
 <li><p><code class="xref c c-func docutils literal notranslate"><span class="pre">zcl_scenes_cb()</span></code> must be called in the ZCL device callback:</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span> <span class="kt">void</span> <span class="nf">zcl_device_cb</span><span class="p">(</span><span class="n">zb_bufid_t</span> <span class="n">bufid</span><span class="p">)</span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">zcl_device_cb</span><span class="p">(</span><span class="n">zb_bufid_t</span><span class="w"> </span><span class="n">bufid</span><span class="p">)</span>
 <span class="p">{</span>
-   <span class="n">zb_zcl_device_callback_param_t</span>  <span class="o">*</span><span class="n">device_cb_param</span> <span class="o">=</span>
-      <span class="n">ZB_BUF_GET_PARAM</span><span class="p">(</span><span class="n">bufid</span><span class="p">,</span> <span class="n">zb_zcl_device_callback_param_t</span><span class="p">);</span>
-   <span class="k">switch</span> <span class="p">(</span><span class="n">device_cb_param</span><span class="o">-&gt;</span><span class="n">device_cb_id</span><span class="p">)</span> <span class="p">{</span>
-   <span class="p">...</span>
-   <span class="k">default</span><span class="o">:</span>
-      <span class="k">if</span> <span class="p">(</span><span class="n">zcl_scenes_cb</span><span class="p">(</span><span class="n">bufid</span><span class="p">)</span> <span class="o">==</span> <span class="n">ZB_FALSE</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">device_cb_param</span><span class="o">-&gt;</span><span class="n">status</span> <span class="o">=</span> <span class="n">RET_ERROR</span><span class="p">;</span>
-      <span class="p">}</span>
-      <span class="k">break</span><span class="p">;</span>
-   <span class="p">}</span>
+<span class="w">   </span><span class="n">zb_zcl_device_callback_param_t</span><span class="w">  </span><span class="o">*</span><span class="n">device_cb_param</span><span class="w"> </span><span class="o">=</span>
+<span class="w">      </span><span class="n">ZB_BUF_GET_PARAM</span><span class="p">(</span><span class="n">bufid</span><span class="p">,</span><span class="w"> </span><span class="n">zb_zcl_device_callback_param_t</span><span class="p">);</span>
+<span class="w">   </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">device_cb_param</span><span class="o">-&gt;</span><span class="n">device_cb_id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="p">...</span>
+<span class="w">   </span><span class="k">default</span><span class="o">:</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">zcl_scenes_cb</span><span class="p">(</span><span class="n">bufid</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">ZB_FALSE</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">device_cb_param</span><span class="o">-&gt;</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RET_ERROR</span><span class="p">;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -255,23 +168,52 @@ For this purpose, it uses Zephyr’s <a class="reference external" href="https:/
 <li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SCENE_TABLE_SIZE</span></code> - This option sets the value for the number of scenes that can be configured.</p></li>
 </ul>
 <p>To configure the logging level of the library, use the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SCENES_LOG_LEVEL</span></code> Kconfig option.</p>
-</div>
-<div class="section" id="api-documentation">
-<h2><a class="toc-backref" href="#id4">API documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="api-documentation">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">API documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this heading"></a></h2>
 <div class="line-block">
 <div class="line">Header file: <code class="file docutils literal notranslate"><span class="pre">include/zigbee/zigbee_zcl_scenes.h</span></code></div>
 <div class="line">Source file: <code class="file docutils literal notranslate"><span class="pre">subsys/zigbee/lib/zigbee_scenes/zigbee_zcl_scenes.c</span></code></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>doxygengroup: Cannot find file: C:\work\Zigbee\ncs-zigbee\ncs-zigbee\docs\_build_doxygen\xml\index.xml</p>
+<dl>
+<dt class="sig sig-object cpp">
+<span class="target" id="group__zigbee__scenes"></span><em><span class="pre">group</span></em> <span class="sig-name descname"><span class="pre">zigbee_scenes</span></span></dt>
+<dd><p>Library for handling ZCL scenes events for common clusters. </p>
+<p>Provides ZCL callback event processing function that handles ZCL scenes commands. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415zcl_scenes_initv">
+<span id="_CPPv315zcl_scenes_initv"></span><span id="_CPPv215zcl_scenes_initv"></span><span id="zcl_scenes_init__void"></span><span class="target" id="group__zigbee__scenes_1gaeaadfe4f165b6d09541d50337dee2b54"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">zcl_scenes_init</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415zcl_scenes_initv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialize the Zigbee ZCL scenes helper library. </p>
+<p>This function initializes the ZCL scene table as well as registers the settings observer for restoring scene table entries. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413zcl_scenes_cb10zb_bufid_t">
+<span id="_CPPv313zcl_scenes_cb10zb_bufid_t"></span><span id="_CPPv213zcl_scenes_cb10zb_bufid_t"></span><span id="zcl_scenes_cb__zb_bufid_t"></span><span class="target" id="group__zigbee__scenes_1gaf9e893cc30cd660c438722cafe23b701"></span><span class="n"><span class="pre">zb_bool_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">zcl_scenes_cb</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">zb_bufid_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bufid</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413zcl_scenes_cb10zb_bufid_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Function for passing ZCL callback events to the scenes helper library logic. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bufid</strong> – <strong>[in]</strong> Reference to the Zigbee stack buffer used to pass event.</p>
+</dd>
+<dt class="field-even">Return values<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ZB_TRUE</strong> – if the event was handled by the library </p></li>
+<li><p><strong>ZB_FALSE</strong> – if the event was not handled by the library </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
-</div>
-</div>
+</dd></dl>
+
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
   
@@ -309,22 +251,13 @@ For this purpose, it uses Zephyr’s <a class="reference external" href="https:/
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

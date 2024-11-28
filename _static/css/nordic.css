@@ -15,6 +15,23 @@
   color: #fff;
 }
 
+a.reference.internal[href*="#config-"] {
+  color: #404040;
+  font-weight: 700;
+  font-size: 75%;
+  font-family: SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,Courier,monospace;
+  border: 1px solid #e1e4e5;
+  background-color: white;
+}
+
+a.reference.internal[href="#sample-config"] {
+  color: #404040;
+  font-weight: 700;
+  font-size: 75%;
+  font-family: SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,Courier,monospace;
+  border: 1px solid #e1e4e5;
+}
+
 /* Set background and border for navigation pane */
 .wy-nav-side {
   background: #fafafa;
@@ -71,6 +88,10 @@ div.figure {
   padding-top: 10px;
 }
 
+.rst-content figure {
+    text-align: center;
+}
+
 /* differentiate more between headings */
 
 h5 {
@@ -103,6 +124,49 @@ footer table {
 .rst-content dl.class p.breathe-sectiondef-title {
   display: none !important;
 }
+
+.rst-content dl:not(.docutils) .sig-param,
+.rst-content dl:not(.docutils).class dt > code,
+.rst-content dl:not(.docutils).function dt > code,
+.rst-content dl:not(.docutils).method dt > code {
+  padding: 0 4px !important;
+}
+
+.rst-content dl:not(.docutils) .sig-param,
+.rst-content dl:not(.docutils).class dt > em,
+.rst-content dl:not(.docutils).function dt > em,
+.rst-content dl:not(.docutils).method dt > em {
+  padding: 0 4px !important;
+}
+
+.rst-content dl:not(.docutils).c.var .pre {
+  padding-right: 4px;
+}
+
+.rst-content dl:not(.docutils).c.type a.reference.internal .pre
+{
+  padding-right: 4px !important;
+}
+
+.rst-content section[id="configuration-options"] dl dt {
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: table;
+  margin: 6px 0;
+  font-size: 90%;
+  line-height: normal;
+  background: #e7f2fa;
+  color: #000000;
+  border-top: 3px solid #6ab0de;
+  padding: 6px;
+  position: relative;
+}
+
+.rst-content dl.c.struct .property {
+  padding-right: 4px !important;
+}
+
+
 .rst-content dl.group {
   margin: 0 0 12px 0px;
 }
@@ -141,10 +205,10 @@ div#version_status {
 
 /* numbered steps */
 
-div.numbered-step > h2::before,
-div.numbered-step > h3::before,
-div.numbered-step > h4::before,
-div.numbered-step > h5::before {
+section.numbered-step > h2::before,
+section.numbered-step > h3::before,
+section.numbered-step > h4::before,
+section.numbered-step > h5::before {
   background: var(--docset-color);
   border-radius: 0.8em;
   -moz-border-radius: 0.8em;
@@ -174,27 +238,27 @@ h5 {
   counter-reset: step-count-h6;
 }
 
-div.numbered-step > h2::before {
+section.numbered-step > h2::before {
   counter-increment: step-count-h2;
   content: counter(step-count-h2);
 }
 
-div.numbered-step > h3::before {
+section.numbered-step > h3::before {
   counter-increment: step-count-h3;
   content: counter(step-count-h3);
 }
 
-div.numbered-step > h4::before {
+section.numbered-step > h4::before {
   counter-increment: step-count-h4;
   content: counter(step-count-h4);
 }
 
-div.numbered-step > h5::before {
+section.numbered-step > h5::before {
   counter-increment: step-count-h5;
   content: counter(step-count-h5);
 }
 
-div.numbered-step > h6::before {
+section.numbered-step > h6::before {
   counter-increment: step-count-h6;
   content: counter(step-count-h6);
 }
@@ -277,10 +341,10 @@ div.numbered-step > h6::before {
   color: var(--docset-color);
 }
 
-div.numbered-step > h2::before,
-div.numbered-step > h3::before,
-div.numbered-step > h4::before,
-div.numbered-step > h5::before {
+section.numbered-step > h2::before,
+section.numbered-step > h3::before,
+section.numbered-step > h4::before,
+section.numbered-step > h5::before {
   background: var(--docset-color);
 }
 
@@ -338,4 +402,13 @@ kbd {
 
 .rst-columns {
   column-width: 18em;
+}
+
+/* add support for lists with roman numbering */
+
+.rst-content ol.lowerroman li {
+  list-style: lower-roman;
+}
+.rst-content ol.upperroman li {
+  list-style: upper-roman;
 }

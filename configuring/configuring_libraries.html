@@ -1,52 +1,30 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Configuring Zigbee libraries &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
   
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script>let toggleHintShow = 'Click to show';</script>
         <script>let toggleHintHide = 'Click to hide';</script>
         <script>let toggleOpenOnPrint = 'true';</script>
         <script src="../_static/togglebutton.js"></script>
         <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
   <script type="text/javascript" src="../_static/js/ncs.js"></script>
 
     <link rel="author" title="About these documents" href="../about.html" />
@@ -58,29 +36,17 @@
 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            Zigbee add-on for nRF Connect SDK
           </a>
-
-          
-            
-            
-          
-
-          
 <div id="searchbox" role="search">
   <div class="searchformwrapper">
     <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -91,18 +57,7 @@
   </div>
 </div>
 <script>$('#searchbox').show(0);</script>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About Zigbee protocol</a></li>
@@ -136,76 +91,34 @@
 <li class="toctree-l1"><a class="reference internal" href="../release-notes.html">Release notes</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Zigbee add-on for nRF Connect SDK</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="index.html">Additional configurations</a> &raquo;</li>
-        
-      <li>Configuring Zigbee libraries</li>
-    
-    
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Additional configurations</a></li>
+      <li class="breadcrumb-item active">Configuring Zigbee libraries</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/configuring/configuring_libraries.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="configuring-zigbee-libraries">
-<span id="ug-zigbee-configuring-libraries"></span><h1>Configuring Zigbee libraries<a class="headerlink" href="#configuring-zigbee-libraries" title="Permalink to this headline">¶</a></h1>
-<div class="contents local topic" id="contents">
+             
+  <section id="configuring-zigbee-libraries">
+<span id="ug-zigbee-configuring-libraries"></span><h1>Configuring Zigbee libraries<a class="headerlink" href="#configuring-zigbee-libraries" title="Permalink to this heading"></a></h1>
+<nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#configuring-zboss-osif" id="id2">Configuring ZBOSS OSIF</a></p></li>
 <li><p><a class="reference internal" href="#configuring-zigbee-application-utilities" id="id3">Configuring Zigbee application utilities</a></p>
@@ -218,37 +131,37 @@
 <li><p><a class="reference internal" href="#configuring-zigbee-zcl-scene-helper" id="id7">Configuring Zigbee ZCL scene helper</a></p></li>
 <li><p><a class="reference internal" href="#configuring-zigbee-shell" id="id8">Configuring Zigbee shell</a></p></li>
 </ul>
-</div>
+</nav>
 <p>The Zigbee protocol in the Zigbee add-on for the nRF Connect SDK can be customized by enabling and configuring several <a class="reference internal" href="../lib/index.html#lib-zigbee"><span class="std std-ref">Zigbee libraries</span></a>.
 This page lists options and steps required for configuring each of them.</p>
 <p>For details about the Kconfig options mentioned here, see the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/kconfig/index.html">Kconfig search</a> in the nRF Connect SDK documentation.</p>
-<div class="section" id="configuring-zboss-osif">
-<span id="ug-zigbee-configuring-components-osif"></span><h2><a class="toc-backref" href="#id2">Configuring ZBOSS OSIF</a><a class="headerlink" href="#configuring-zboss-osif" title="Permalink to this headline">¶</a></h2>
+<section id="configuring-zboss-osif">
+<span id="ug-zigbee-configuring-components-osif"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Configuring ZBOSS OSIF</a><a class="headerlink" href="#configuring-zboss-osif" title="Permalink to this heading"></a></h2>
 <p>The Zigbee ZBOSS OSIF layer subsystem acts as the linking layer between the <a class="reference internal" href="../zboss/index.html#zigbee-zboss"><span class="std std-ref">ZBOSS Zigbee stack</span></a> and the nRF Connect SDK.
 The layer is automatically enabled when you enable the ZBOSS library with the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_ADD_ON</span></code> Kconfig option.</p>
 <p>For more information about the library, see <a class="reference internal" href="../lib/osif.html#lib-zigbee-osif"><span class="std std-ref">Zigbee ZBOSS OSIF</span></a>.</p>
-</div>
-<div class="section" id="configuring-zigbee-application-utilities">
-<span id="ug-zigbee-configuring-components-application-utilities"></span><h2><a class="toc-backref" href="#id3">Configuring Zigbee application utilities</a><a class="headerlink" href="#configuring-zigbee-application-utilities" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="configuring-zigbee-application-utilities">
+<span id="ug-zigbee-configuring-components-application-utilities"></span><h2><a class="toc-backref" href="#id3" role="doc-backlink">Configuring Zigbee application utilities</a><a class="headerlink" href="#configuring-zigbee-application-utilities" title="Permalink to this heading"></a></h2>
 <p>The <a class="reference internal" href="../lib/zigbee_app_utils.html#lib-zigbee-application-utilities"><span class="std std-ref">Zigbee application utilities</span></a> library provides a set of components that are ready for use in Zigbee applications.</p>
 <p>To enable and use this library, set the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_APP_UTILS</span></code> Kconfig option.</p>
 <p>For additional logs for this library, configure the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_APP_UTILS_LOG_LEVEL_CHOICE</span></code> Kconfig option.
 See <a class="reference internal" href="../configuring.html#zigbee-ug-logging-logger-options"><span class="std std-ref">Zephyr’s logger options</span></a> for more information.</p>
-<div class="section" id="default-signal-handler">
-<h3><a class="toc-backref" href="#id4">Default signal handler</a><a class="headerlink" href="#default-signal-handler" title="Permalink to this headline">¶</a></h3>
+<section id="default-signal-handler">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Default signal handler</a><a class="headerlink" href="#default-signal-handler" title="Permalink to this heading"></a></h3>
 <p>The default signal handler provides the default logic for handling ZBOSS stack signals.
 For more information, see <a class="reference internal" href="../lib/zigbee_app_utils.html#lib-zigbee-signal-handler"><span class="std std-ref">Zigbee default signal handler</span></a>.</p>
 <p>After enabling the Zigbee application utilities library, you can use this component by calling the <code class="xref c c-func docutils literal notranslate"><span class="pre">zigbee_default_signal_handler()</span></code> in the application’s <code class="xref c c-func docutils literal notranslate"><span class="pre">zboss_signal_handler()</span></code> implementation.</p>
-</div>
-</div>
-<div class="section" id="configuring-zigbee-error-handler">
-<span id="ug-zigbee-configuring-components-error-handler"></span><h2><a class="toc-backref" href="#id5">Configuring Zigbee error handler</a><a class="headerlink" href="#configuring-zigbee-error-handler" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="configuring-zigbee-error-handler">
+<span id="ug-zigbee-configuring-components-error-handler"></span><h2><a class="toc-backref" href="#id5" role="doc-backlink">Configuring Zigbee error handler</a><a class="headerlink" href="#configuring-zigbee-error-handler" title="Permalink to this heading"></a></h2>
 <p>The Zigbee error handler library provides a set of macros that can be used to assert on nrfxlib’s Zigbee ZBOSS stack API return codes.</p>
 <p>To use this library, include its <code class="file docutils literal notranslate"><span class="pre">zigbee_error_handler.h</span></code> header in your application and pass the error code that should be checked using its macros.</p>
 <p>For more information about the library, see <a class="reference internal" href="../lib/zigbee_error_handler.html#lib-zigbee-error-handler"><span class="std std-ref">Zigbee error handler</span></a>.</p>
-</div>
-<div class="section" id="configuring-zigbee-endpoint-logger">
-<span id="ug-zigbee-configuring-components-logger-ep"></span><h2><a class="toc-backref" href="#id6">Configuring Zigbee endpoint logger</a><a class="headerlink" href="#configuring-zigbee-endpoint-logger" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="configuring-zigbee-endpoint-logger">
+<span id="ug-zigbee-configuring-components-logger-ep"></span><h2><a class="toc-backref" href="#id6" role="doc-backlink">Configuring Zigbee endpoint logger</a><a class="headerlink" href="#configuring-zigbee-endpoint-logger" title="Permalink to this heading"></a></h2>
 <p>The Zigbee endpoint logger library provides an endpoint handler for parsing and logging incoming ZCL frames with all their fields.</p>
 <p>To enable the endpoint logger library in your application, complete the following steps:</p>
 <ol class="arabic">
@@ -268,9 +181,9 @@ This is because the Zigbee shell library registers its own handler for the endpo
 </li>
 </ol>
 <p>For more information about the library, see <a class="reference internal" href="../lib/zigbee_logger_eprxzcl.html#lib-zigbee-logger-endpoint"><span class="std std-ref">Zigbee endpoint logger</span></a>.</p>
-</div>
-<div class="section" id="configuring-zigbee-zcl-scene-helper">
-<span id="ug-zigbee-configuring-components-scene-helper"></span><h2><a class="toc-backref" href="#id7">Configuring Zigbee ZCL scene helper</a><a class="headerlink" href="#configuring-zigbee-zcl-scene-helper" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="configuring-zigbee-zcl-scene-helper">
+<span id="ug-zigbee-configuring-components-scene-helper"></span><h2><a class="toc-backref" href="#id7" role="doc-backlink">Configuring Zigbee ZCL scene helper</a><a class="headerlink" href="#configuring-zigbee-zcl-scene-helper" title="Permalink to this heading"></a></h2>
 <p>The Zigbee ZCL scene helper library provides a set of functions that implement the callbacks required by the ZCL scene cluster in the application.</p>
 <p>To enable the Zigbee ZCL scene helper library, set the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SCENES</span></code> Kconfig option.</p>
 <p>Because the library uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/settings/index.html">Settings</a> subsystem, the application must call the following functions for the library to work correctly:</p>
@@ -281,9 +194,9 @@ This is because the Zigbee shell library registers its own handler for the endpo
 <li><p><code class="xref c c-func docutils literal notranslate"><span class="pre">settings_load()</span></code></p></li>
 </ul>
 <p>For more information about the library, see <a class="reference internal" href="../lib/zigbee_zcl_scenes.html#lib-zigbee-zcl-scenes"><span class="std std-ref">Zigbee ZCL scene helper</span></a>.</p>
-</div>
-<div class="section" id="configuring-zigbee-shell">
-<span id="ug-zigbee-configuring-components-shell"></span><h2><a class="toc-backref" href="#id8">Configuring Zigbee shell</a><a class="headerlink" href="#configuring-zigbee-shell" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="configuring-zigbee-shell">
+<span id="ug-zigbee-configuring-components-shell"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">Configuring Zigbee shell</a><a class="headerlink" href="#configuring-zigbee-shell" title="Permalink to this heading"></a></h2>
 <p>The Zigbee shell library implements a set of <a class="reference internal" href="../lib/shell.html#zigbee-shell-reference"><span class="std std-ref">Zigbee shell commands</span></a> that can be used with all Zigbee samples for testing and debugging.</p>
 <p>You can add support for Zigbee shell commands to any of the available <a class="reference internal" href="../samples/index.html#zigbee-samples"><span class="std std-ref">Zigbee samples</span></a>.
 Some of the commands use an endpoint for sending packets, so no endpoint handler is allowed to be registered for this endpoint.</p>
@@ -303,12 +216,11 @@ Logging of the incoming ZCL frames uses the logging level set with the <code cla
 <li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL_LOG_LEVEL</span></code> - This option sets the logging level for Zigbee shell logs.
 See <a class="reference internal" href="../configuring.html#zigbee-ug-logging-logger-options"><span class="std std-ref">Zephyr’s logger options</span></a> for more information.</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
   
@@ -346,22 +258,13 @@ See <a class="reference internal" href="../configuring.html#zigbee-ug-logging-lo
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

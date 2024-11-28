@@ -1,52 +1,30 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Adding ZCL clusters to application &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
-  <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
-  <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/nordic.css" type="text/css" />
+      <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script>let toggleHintShow = 'Click to show';</script>
         <script>let toggleHintHide = 'Click to hide';</script>
         <script>let toggleOpenOnPrint = 'true';</script>
         <script src="_static/togglebutton.js"></script>
         <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
   <script type="text/javascript" src="_static/js/ncs.js"></script>
 
     <link rel="author" title="About these documents" href="about.html" />
@@ -56,29 +34,17 @@
 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            Zigbee add-on for nRF Connect SDK
           </a>
-
-          
-            
-            
-          
-
-          
 <div id="searchbox" role="search">
   <div class="searchformwrapper">
     <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -89,18 +55,7 @@
   </div>
 </div>
 <script>$('#searchbox').show(0);</script>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About Zigbee protocol</a></li>
@@ -118,78 +73,37 @@
 <li class="toctree-l1"><a class="reference internal" href="release-notes.html">Release notes</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">Zigbee add-on for nRF Connect SDK</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>Adding ZCL clusters to application</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Adding ZCL clusters to application</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/adding_clusters.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="adding-zcl-clusters-to-application">
-<span id="ug-zigee-adding-clusters"></span><h1>Adding ZCL clusters to application<a class="headerlink" href="#adding-zcl-clusters-to-application" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="adding-zcl-clusters-to-application">
+<span id="ug-zigee-adding-clusters"></span><h1>Adding ZCL clusters to application<a class="headerlink" href="#adding-zcl-clusters-to-application" title="Permalink to this heading"></a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee support for the nRF54L Series.</p>
 </div>
-<div class="contents local topic" id="contents">
+<nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#requirements" id="id2">Requirements</a></p></li>
 <li><p><a class="reference internal" href="#copy-zigbee-template-sample" id="id3">Copy Zigbee template sample</a></p></li>
@@ -212,7 +126,7 @@
 </ul>
 </li>
 </ul>
-</div>
+</nav>
 <p>Once you are familiar with Zigbee in the nRF Connect SDK and you have tested some of the available <a class="reference internal" href="samples/index.html#zigbee-samples"><span class="std std-ref">Samples</span></a>, you can use the <a class="reference internal" href="samples/template/README.html#zigbee-template-sample"><span class="std std-ref">Zigbee template</span></a> sample to create your own application with a custom set of ZCL clusters.
 For example, you can create a sensor application that uses a temperature sensor with an on/off switch, with the sensor periodically updating its measured value when it is active.</p>
 <p>Adding ZCL clusters to an application consists of expanding the Zigbee template sample with new application clusters.
@@ -224,8 +138,8 @@ For more information about the ZCL terminology, see <a class="reference external
 <p>An application can implement appropriate callback functions to be informed about specific cluster state changes.
 These functions can be used to alter the device’s behavior when the state of a cluster is changing as a result of some external event.</p>
 <p>Read the following sections for detailed steps about how to expand the Zigbee template sample.</p>
-<div class="section" id="requirements">
-<span id="ug-zigee-adding-clusters-requirements"></span><h2><a class="toc-backref" href="#id2">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<section id="requirements">
+<span id="ug-zigee-adding-clusters-requirements"></span><h2><a class="toc-backref" href="#id2" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
 <p>To take advantage of this guide, you need to be familiar with <a class="reference internal" href="architectures.html#ug-zigbee-architectures"><span class="std std-ref">Architectures</span></a> and <a class="reference internal" href="configuring.html#ug-zigbee-configuring"><span class="std std-ref">Configuring Zigbee add-on</span></a>, and have built and tested at least one of the available <a class="reference internal" href="samples/index.html#zigbee-samples"><span class="std std-ref">Samples</span></a>.</p>
 <p>To test the functionalities implemented in this user guide, you need the following hardware and software:</p>
 <ul class="simple">
@@ -234,9 +148,9 @@ These functions can be used to alter the device’s behavior when the state of a
 </ul>
 <p>You can also optionally use <a class="reference external" href="https://docs.nordicsemi.com/bundle/ug_sniffer_802154/page/UG/sniffer_802154/intro_802154.html">nRF Sniffer for 802.15.4</a> configured for capturing Zigbee packets with Wireshark (see <a class="reference external" href="https://docs.nordicsemi.com/bundle/ug_sniffer_802154/page/UG/sniffer_802154/configuring_sniffer_802154_zigbee.html">Configuring Wireshark for Zigbee</a>) to gather some of the required information, such as the short address of a Zigbee node.
 However, this guide does not describe Wireshark usage.</p>
-</div>
-<div class="numbered-step section" id="copy-zigbee-template-sample">
-<span id="ug-zigee-adding-clusters-copying-template"></span><h2><a class="toc-backref" href="#id3">Copy Zigbee template sample</a><a class="headerlink" href="#copy-zigbee-template-sample" title="Permalink to this headline">¶</a></h2>
+</section>
+<section class="numbered-step" id="copy-zigbee-template-sample">
+<span id="ug-zigee-adding-clusters-copying-template"></span><h2><a class="toc-backref" href="#id3" role="doc-backlink">Copy Zigbee template sample</a><a class="headerlink" href="#copy-zigbee-template-sample" title="Permalink to this heading"></a></h2>
 <p>Use the <a class="reference internal" href="samples/template/README.html#zigbee-template-sample"><span class="std std-ref">Zigbee template</span></a> sample as the base for adding new ZCL clusters:</p>
 <ol class="arabic simple">
 <li><p>Make sure that you meet the requirements for building the sample.</p></li>
@@ -244,9 +158,9 @@ However, this guide does not describe Wireshark usage.</p>
 <li><p>Copy the contents of the <code class="file docutils literal notranslate"><span class="pre">samples/zigbee/template</span></code> directory to a new directory meant for your custom application.
 For example, <code class="file docutils literal notranslate"><span class="pre">samples/zigbee/sensor</span></code>.</p></li>
 </ol>
-</div>
-<div class="numbered-step section" id="add-on-off-switch-and-temperature-sensor-functionalities">
-<span id="ug-zigee-adding-clusters-adding-clusters"></span><h2><a class="toc-backref" href="#id4">Add On/Off Switch and Temperature Sensor functionalities</a><a class="headerlink" href="#add-on-off-switch-and-temperature-sensor-functionalities" title="Permalink to this headline">¶</a></h2>
+</section>
+<section class="numbered-step" id="add-on-off-switch-and-temperature-sensor-functionalities">
+<span id="ug-zigee-adding-clusters-adding-clusters"></span><h2><a class="toc-backref" href="#id4" role="doc-backlink">Add On/Off Switch and Temperature Sensor functionalities</a><a class="headerlink" href="#add-on-off-switch-and-temperature-sensor-functionalities" title="Permalink to this heading"></a></h2>
 <p>As mentioned in the introduction, each functionality of a Zigbee node is defined as a cluster, with its unique group of attributes, commands, or functions.
 Clusters can be grouped into devices with unique device identifiers.
 Moreover, clusters can have either server or client role, which defines the way they are used.</p>
@@ -256,8 +170,8 @@ Moreover, clusters can have either server or client role, which defines the way 
 <li><p>ZCL library specification, Client/Server Model section</p></li>
 </ul>
 <p>Extending the Zigbee node’s functionalities with an On/Off Switch and a Temperature Sensor requires adding On/Off Switch and Temperature Sensor logical devices defined in the Home Automation Profile specification.</p>
-<div class="section" id="add-on-off-switch-device">
-<span id="ug-zigee-adding-clusters-add-switch"></span><h3><a class="toc-backref" href="#id5">Add On/Off Switch device</a><a class="headerlink" href="#add-on-off-switch-device" title="Permalink to this headline">¶</a></h3>
+<section id="add-on-off-switch-device">
+<span id="ug-zigee-adding-clusters-add-switch"></span><h3><a class="toc-backref" href="#id5" role="doc-backlink">Add On/Off Switch device</a><a class="headerlink" href="#add-on-off-switch-device" title="Permalink to this heading"></a></h3>
 <p>To create an On/Off Switch device, we are going to declare the following clusters:</p>
 <ul class="simple">
 <li><p>Identify</p></li>
@@ -279,23 +193,23 @@ Before we declare the cluster list, we are going to create clusters with attribu
 <li><p>Open the <code class="file docutils literal notranslate"><span class="pre">main.c</span></code> file of the copied template sample.
 You can find this file in the directory to which you <a class="reference internal" href="#ug-zigee-adding-clusters-copying-template"><span class="std std-ref">copied the sample</span></a>.</p></li>
 <li><p>Define variables for the On/Off Switch Configuration cluster’s attributes and declare attribute list for them by embedding these attributes into the <code class="docutils literal notranslate"><span class="pre">zb_device_ctx</span></code> structure:</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="nc">zb_device_ctx</span> <span class="p">{</span>
-        <span class="n">zb_zcl_basic_attrs_t</span>     <span class="n">basic_attr</span><span class="p">;</span>
-        <span class="n">zb_zcl_identify_attrs_t</span>  <span class="n">identify_attr</span><span class="p">;</span>
-        <span class="n">zb_uint8_t</span>               <span class="n">on_off_switch_type_attr</span><span class="p">;</span>
-        <span class="n">zb_uint8_t</span>               <span class="n">on_off_switch_actions_attr</span><span class="p">;</span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">zb_device_ctx</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">zb_zcl_basic_attrs_t</span><span class="w">     </span><span class="n">basic_attr</span><span class="p">;</span>
+<span class="w">        </span><span class="n">zb_zcl_identify_attrs_t</span><span class="w">  </span><span class="n">identify_attr</span><span class="p">;</span>
+<span class="w">        </span><span class="n">zb_uint8_t</span><span class="w">               </span><span class="n">on_off_switch_type_attr</span><span class="p">;</span>
+<span class="w">        </span><span class="n">zb_uint8_t</span><span class="w">               </span><span class="n">on_off_switch_actions_attr</span><span class="p">;</span>
 <span class="p">};</span>
 
 <span class="n">ZB_ZCL_DECLARE_ON_OFF_SWITCH_CONFIGURATION_ATTRIB_LIST</span><span class="p">(</span>
-        <span class="n">on_off_switch_attr_list</span><span class="p">,</span>
-        <span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">on_off_switch_type_attr</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">on_off_switch_actions_attr</span><span class="p">);</span>
+<span class="w">        </span><span class="n">on_off_switch_attr_list</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">on_off_switch_type_attr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">on_off_switch_actions_attr</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>At this point, you have all the clusters required to declare the On/Off Switch cluster list.</p>
 </li>
 <li><p>Create the On/Off Switch cluster list using the Basic and Identify clusters from the Zigbee template sample and the On/Off Switch Configuration cluster you’ve just created, as shown in the following snippet:</p>
 <div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST</span><span class="p">(</span><span class="n">on_off_switch_clusters</span><span class="p">,</span>
-        <span class="n">on_off_switch_attr_list</span><span class="p">,</span> <span class="n">basic_attr_list</span><span class="p">,</span> <span class="n">identify_attr_list</span><span class="p">);</span>
+<span class="w">        </span><span class="n">on_off_switch_attr_list</span><span class="p">,</span><span class="w"> </span><span class="n">basic_attr_list</span><span class="p">,</span><span class="w"> </span><span class="n">identify_attr_list</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>You can read more about this step in the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/using_zigbee__z_c_l.html#att_declaration">Declaring attributes</a> section of the ZBOSS stack documentation.</p>
@@ -305,7 +219,7 @@ For example:</p>
 <div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="c1">// Exemplary 11. endpoint will be used for On/Off Switch cluster</span>
 <span class="cp">#define ON_OFF_SWITCH_ENDPOINT          11</span>
 
-<span class="n">ZB_HA_DECLARE_ON_OFF_SWITCH_EP</span><span class="p">(</span><span class="n">on_off_switch_ep</span><span class="p">,</span> <span class="n">ON_OFF_SWITCH_ENDPOINT</span><span class="p">,</span> <span class="n">on_off_switch_clusters</span><span class="p">);</span>
+<span class="n">ZB_HA_DECLARE_ON_OFF_SWITCH_EP</span><span class="p">(</span><span class="n">on_off_switch_ep</span><span class="p">,</span><span class="w"> </span><span class="n">ON_OFF_SWITCH_ENDPOINT</span><span class="p">,</span><span class="w"> </span><span class="n">on_off_switch_clusters</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Every cluster in the On/Off cluster list that you have declared in the previous step is going to use the same endpoint.</p>
@@ -320,7 +234,7 @@ You can read more about Simple Descriptors in the official <a class="reference e
 </li>
 <li><p>Create an application context with all declared endpoints, given that the Zigbee template sample declares the device context for a single endpoint.
 Modify this declaration, so that the device can have another endpoint for the On/Off device:</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">ZBOSS_DECLARE_DEVICE_CTX_2_EP</span><span class="p">(</span><span class="n">app_template_ctx</span><span class="p">,</span> <span class="n">on_off_switch_ep</span><span class="p">,</span> <span class="n">app_template_ep</span><span class="p">);</span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">ZBOSS_DECLARE_DEVICE_CTX_2_EP</span><span class="p">(</span><span class="n">app_template_ctx</span><span class="p">,</span><span class="w"> </span><span class="n">on_off_switch_ep</span><span class="p">,</span><span class="w"> </span><span class="n">app_template_ep</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>You can read more about this step in the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/using_zigbee__z_c_l.html#zigbee_device_context_dec">Declaring Zigbee device context</a> and <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/using_zigbee__z_c_l.html#zigbee_device_context_mult_ep_dec">Declaring Zigbee device context with multiple endpoints</a> sections of the ZBOSS stack documentation.</p>
@@ -333,9 +247,9 @@ Modify this declaration, so that the device can have another endpoint for the On
 You can read more about this step in the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/using_zigbee__z_c_l.html#register_zigbee_device">Registering device context</a> section of the ZBOSS stack documentation.</p>
 </li>
 </ol>
-</div>
-<div class="section" id="add-temperature-sensor-device">
-<span id="ug-zigee-adding-clusters-add-temp"></span><h3><a class="toc-backref" href="#id6">Add Temperature Sensor device</a><a class="headerlink" href="#add-temperature-sensor-device" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="add-temperature-sensor-device">
+<span id="ug-zigee-adding-clusters-add-temp"></span><h3><a class="toc-backref" href="#id6" role="doc-backlink">Add Temperature Sensor device</a><a class="headerlink" href="#add-temperature-sensor-device" title="Permalink to this heading"></a></h3>
 <p>The process of adding Temperature Sensor device is similar to <a class="reference internal" href="#ug-zigee-adding-clusters-add-switch"><span class="std std-ref">adding the On/Off switch device</span></a>.</p>
 <p>To create a Temperature Sensor device, we are going to declare the following clusters:</p>
 <ul class="simple">
@@ -349,53 +263,53 @@ You can read more about this step in the <a class="reference external" href="htt
 <p>In case of Temperature Measurement cluster, variables needed to hold its attributes are declared in the <code class="docutils literal notranslate"><span class="pre">zb_zcl_temp_measurement_attrs_t</span></code> structure, which is defined in <code class="file docutils literal notranslate"><span class="pre">addons/zcl/zb_zcl_temp_measurement_addons.h</span></code>.
 Some of clusters have its attributes combined into helper structures in <code class="file docutils literal notranslate"><span class="pre">addons/zcl/zb_zcl_*_addons.h</span></code>.
 The following snippet shows how to include the header and add a new field in <code class="docutils literal notranslate"><span class="pre">zb_device_ctx</span></code>, and then declare the attribute list:</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;addons/zcl/zb_zcl_temp_measurement_addons.h&gt;</span><span class="cp"></span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;addons/zcl/zb_zcl_temp_measurement_addons.h&gt;</span>
 
 
-<span class="k">struct</span> <span class="nc">zb_device_ctx</span> <span class="p">{</span>
-        <span class="n">zb_zcl_basic_attrs_t</span>            <span class="n">basic_attr</span><span class="p">;</span>
-        <span class="n">zb_zcl_identify_attrs_t</span>         <span class="n">identify_attr</span><span class="p">;</span>
-        <span class="n">zb_uint8_t</span>                      <span class="n">on_off_switch_type_attr</span><span class="p">;</span>
-        <span class="n">zb_uint8_t</span>                      <span class="n">on_off_switch_actions_attr</span><span class="p">;</span>
-        <span class="n">zb_zcl_temp_measurement_attrs_t</span> <span class="n">temp_measure_attrs</span><span class="p">;</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">zb_device_ctx</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">zb_zcl_basic_attrs_t</span><span class="w">            </span><span class="n">basic_attr</span><span class="p">;</span>
+<span class="w">        </span><span class="n">zb_zcl_identify_attrs_t</span><span class="w">         </span><span class="n">identify_attr</span><span class="p">;</span>
+<span class="w">        </span><span class="n">zb_uint8_t</span><span class="w">                      </span><span class="n">on_off_switch_type_attr</span><span class="p">;</span>
+<span class="w">        </span><span class="n">zb_uint8_t</span><span class="w">                      </span><span class="n">on_off_switch_actions_attr</span><span class="p">;</span>
+<span class="w">        </span><span class="n">zb_zcl_temp_measurement_attrs_t</span><span class="w"> </span><span class="n">temp_measure_attrs</span><span class="p">;</span>
 <span class="p">};</span>
 
 
 <span class="n">ZB_ZCL_DECLARE_TEMP_MEASUREMENT_ATTRIB_LIST</span><span class="p">(</span><span class="n">temp_measurement_attr_list</span><span class="p">,</span>
-                                            <span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">temp_measure_attrs</span><span class="p">.</span><span class="n">measure_value</span><span class="p">,</span>
-                                            <span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">temp_measure_attrs</span><span class="p">.</span><span class="n">min_measure_value</span><span class="p">,</span>
-                                            <span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">temp_measure_attrs</span><span class="p">.</span><span class="n">max_measure_value</span><span class="p">,</span>
-                                            <span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">temp_measure_attrs</span><span class="p">.</span><span class="n">tolerance</span><span class="p">);</span>
+<span class="w">                                            </span><span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">temp_measure_attrs</span><span class="p">.</span><span class="n">measure_value</span><span class="p">,</span>
+<span class="w">                                            </span><span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">temp_measure_attrs</span><span class="p">.</span><span class="n">min_measure_value</span><span class="p">,</span>
+<span class="w">                                            </span><span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">temp_measure_attrs</span><span class="p">.</span><span class="n">max_measure_value</span><span class="p">,</span>
+<span class="w">                                            </span><span class="o">&amp;</span><span class="n">dev_ctx</span><span class="p">.</span><span class="n">temp_measure_attrs</span><span class="p">.</span><span class="n">tolerance</span><span class="p">);</span>
 </pre></div>
 </div>
 </li>
 <li><p>Create a Temperature Sensor device by declaring its cluster list using Basic, Identify, and the newly created Temperature Measurement clusters:</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">ZB_HA_DECLARE_TEMPERATURE_SENSOR_CLUSTER_LIST</span><span class="p">(</span><span class="n">temperature_sensor_clusters</span><span class="p">,</span> <span class="n">basic_attr_list</span><span class="p">,</span> <span class="n">identify_attr_list</span><span class="p">,</span> <span class="n">temp_measurement_attr_list</span><span class="p">);</span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">ZB_HA_DECLARE_TEMPERATURE_SENSOR_CLUSTER_LIST</span><span class="p">(</span><span class="n">temperature_sensor_clusters</span><span class="p">,</span><span class="w"> </span><span class="n">basic_attr_list</span><span class="p">,</span><span class="w"> </span><span class="n">identify_attr_list</span><span class="p">,</span><span class="w"> </span><span class="n">temp_measurement_attr_list</span><span class="p">);</span>
 </pre></div>
 </div>
 </li>
 <li><p>Choose and declare the endpoint for the Temperature Sensor device:</p>
 <div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#define TEMPERATURE_SENSOR_ENDPOINT  12</span>
 
-<span class="n">ZB_HA_DECLARE_TEMPERATURE_SENSOR_EP</span><span class="p">(</span><span class="n">temperature_sensor_ep</span><span class="p">,</span> <span class="n">TEMPERATURE_SENSOR_ENDPOINT</span><span class="p">,</span> <span class="n">temperature_sensor_clusters</span><span class="p">);</span>
+<span class="n">ZB_HA_DECLARE_TEMPERATURE_SENSOR_EP</span><span class="p">(</span><span class="n">temperature_sensor_ep</span><span class="p">,</span><span class="w"> </span><span class="n">TEMPERATURE_SENSOR_ENDPOINT</span><span class="p">,</span><span class="w"> </span><span class="n">temperature_sensor_clusters</span><span class="p">);</span>
 </pre></div>
 </div>
 </li>
 <li><p>Declare the device context for the created endpoint by modifying the device context declaration, so that the device can have another endpoint:</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">ZBOSS_DECLARE_DEVICE_CTX_3_EP</span><span class="p">(</span><span class="n">app_template_ctx</span><span class="p">,</span> <span class="n">temperature_sensor_ep</span><span class="p">,</span> <span class="n">on_off_switch_ep</span><span class="p">,</span> <span class="n">app_template_ep</span><span class="p">);</span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">ZBOSS_DECLARE_DEVICE_CTX_3_EP</span><span class="p">(</span><span class="n">app_template_ctx</span><span class="p">,</span><span class="w"> </span><span class="n">temperature_sensor_ep</span><span class="p">,</span><span class="w"> </span><span class="n">on_off_switch_ep</span><span class="p">,</span><span class="w"> </span><span class="n">app_template_ep</span><span class="p">);</span>
 </pre></div>
 </div>
 </li>
 </ol>
 <p>At this point, we have added On/Off Switch and Temperature Sensor functionalities to the application.</p>
-</div>
-</div>
-<div class="numbered-step section" id="verify-cluster-changes">
-<span id="ug-zigee-adding-clusters-testing"></span><h2><a class="toc-backref" href="#id7">Verify cluster changes</a><a class="headerlink" href="#verify-cluster-changes" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section class="numbered-step" id="verify-cluster-changes">
+<span id="ug-zigee-adding-clusters-testing"></span><h2><a class="toc-backref" href="#id7" role="doc-backlink">Verify cluster changes</a><a class="headerlink" href="#verify-cluster-changes" title="Permalink to this heading"></a></h2>
 <p>To verify the existence of the On/Off Switch and Temperature Sensor clusters in the device, we are going to send ZDO commands to read Simple Descriptors.
 For this purpose, we are going to use the <a class="reference internal" href="samples/network_coordinator/README.html#zigbee-network-coordinator-sample"><span class="std std-ref">Zigbee network coordinator</span></a> to create a simple Zigbee network with the node that is programmed with the extended application.</p>
-<div class="section" id="prepare-network-coordinator-for-testing">
-<h3><a class="toc-backref" href="#id8">Prepare network coordinator for testing</a><a class="headerlink" href="#prepare-network-coordinator-for-testing" title="Permalink to this headline">¶</a></h3>
+<section id="prepare-network-coordinator-for-testing">
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Prepare network coordinator for testing</a><a class="headerlink" href="#prepare-network-coordinator-for-testing" title="Permalink to this heading"></a></h3>
 <p>To prepare the network coordinator for testing the newly extended application based on the Zigbee template, complete the following steps:</p>
 <ol class="arabic">
 <li><p>Make sure you meet the requirements to use the <a class="reference internal" href="samples/network_coordinator/README.html#zigbee-network-coordinator-sample"><span class="std std-ref">Zigbee network coordinator</span></a> sample.</p></li>
@@ -431,7 +345,7 @@ The following output appears:</p>
 <span class="n">nrf_clock_control</span>  <span class="p">:</span><span class="n">Clock</span> <span class="n">control</span> <span class="n">commmands</span>
 <span class="n">nvram</span>              <span class="p">:</span><span class="n">Zigbee</span> <span class="n">NVRAM</span> <span class="n">manipulation</span><span class="o">.</span>
 <span class="n">resize</span>             <span class="p">:</span><span class="n">Console</span> <span class="n">gets</span> <span class="n">terminal</span> <span class="n">screen</span> <span class="n">size</span> <span class="ow">or</span> <span class="n">assumes</span> <span class="n">default</span> <span class="ow">in</span>
-                    <span class="n">case</span> <span class="n">the</span> <span class="n">readout</span> <span class="n">fails</span><span class="o">.</span> <span class="n">It</span> <span class="n">must</span> <span class="n">be</span> <span class="n">executed</span> <span class="n">after</span> <span class="n">each</span>
+                    <span class="k">case</span> <span class="n">the</span> <span class="n">readout</span> <span class="n">fails</span><span class="o">.</span> <span class="n">It</span> <span class="n">must</span> <span class="n">be</span> <span class="n">executed</span> <span class="n">after</span> <span class="n">each</span>
                     <span class="n">terminal</span> <span class="n">width</span> <span class="n">change</span> <span class="n">to</span> <span class="n">ensure</span> <span class="n">correct</span> <span class="n">text</span> <span class="n">display</span><span class="o">.</span>
 <span class="n">sensor</span>             <span class="p">:</span><span class="n">Sensor</span> <span class="n">commands</span>
 <span class="n">shell</span>              <span class="p">:</span><span class="n">Useful</span><span class="p">,</span> <span class="ow">not</span> <span class="n">Unix</span><span class="o">-</span><span class="n">like</span> <span class="n">shell</span> <span class="n">commands</span><span class="o">.</span>
@@ -445,9 +359,9 @@ The following output appears:</p>
 </ol>
 <p>This output means that the Zigbee shell is enabled on the network coordinator node device.
 You can read more about the Zigbee shell on its <a class="reference internal" href="lib/shell.html#lib-zigbee-shell"><span class="std std-ref">documentation page</span></a>.</p>
-</div>
-<div class="section" id="run-the-extended-application">
-<h3><a class="toc-backref" href="#id9">Run the extended application</a><a class="headerlink" href="#run-the-extended-application" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="run-the-extended-application">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Run the extended application</a><a class="headerlink" href="#run-the-extended-application" title="Permalink to this heading"></a></h3>
 <p>We are now going to add the extended application node device to the Zigbee network.
 Complete the following steps:</p>
 <ol class="arabic">
@@ -465,9 +379,9 @@ The device connects to the Zigbee network when a notification similar to the fol
 <p>The Extended PAN ID and the PAN ID in your notification will be different.</p>
 </li>
 </ol>
-</div>
-<div class="section" id="verify-cluster-operation">
-<h3><a class="toc-backref" href="#id10">Verify cluster operation</a><a class="headerlink" href="#verify-cluster-operation" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="verify-cluster-operation">
+<h3><a class="toc-backref" href="#id10" role="doc-backlink">Verify cluster operation</a><a class="headerlink" href="#verify-cluster-operation" title="Permalink to this heading"></a></h3>
 <p>Reading Simple Descriptors that we have implemented when <a class="reference internal" href="#ug-zigee-adding-clusters-adding-clusters"><span class="std std-ref">adding new clusters</span></a> can help us verify that everything is working as it should.
 You can read the descriptors in different ways, but for the purpose of this guide we are going to use Zigbee Device Object commands (ZDO commands) issued from the network coordinator node with the Zigbee shell enabled.
 ZDO is an interface for accessing lower layers of the Zigbee network.
@@ -478,8 +392,8 @@ Issuing ZDO commands allows us to check different information about the network.
 <li><p>Issue ZDO commands to read the list of clusters contained on a device, if you know the device’s short address.</p></li>
 </ul>
 <p>Both options are described in the following sections.</p>
-<div class="section" id="looking-for-a-specific-cluster-in-the-zigbee-network">
-<h4>Looking for a specific cluster in the Zigbee network<a class="headerlink" href="#looking-for-a-specific-cluster-in-the-zigbee-network" title="Permalink to this headline">¶</a></h4>
+<section id="looking-for-a-specific-cluster-in-the-zigbee-network">
+<h4>Looking for a specific cluster in the Zigbee network<a class="headerlink" href="#looking-for-a-specific-cluster-in-the-zigbee-network" title="Permalink to this heading"></a></h4>
 <p>You can send a match descriptor request when you want to find a specific cluster in the network.
 This request is a broadcast command that expects profile and cluster IDs as return values.
 When using the network coordinator node with the Zigbee shell enabled, you can send the ZDO match descriptor request in the following way:</p>
@@ -511,9 +425,9 @@ The following output appears:</p>
 </div>
 </li>
 </ol>
-</div>
-<div class="section" id="reading-a-clusters-list-of-a-specific-zigbee-node">
-<h4>Reading a clusters list of a specific Zigbee node<a class="headerlink" href="#reading-a-clusters-list-of-a-specific-zigbee-node" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="reading-a-clusters-list-of-a-specific-zigbee-node">
+<h4>Reading a clusters list of a specific Zigbee node<a class="headerlink" href="#reading-a-clusters-list-of-a-specific-zigbee-node" title="Permalink to this heading"></a></h4>
 <p>To read the cluster list existing on a Zigbee node, you can use the Simple Descriptor Request command.
 This command requires the short address and the endpoint as arguments.</p>
 <p>Complete the following steps to read the cluster list of a Zigbee node:</p>
@@ -542,102 +456,101 @@ This command requires the short address and the endpoint as arguments.</p>
 <p>In this notification, the simple descriptor contains Basic Cluster, Identify Cluster and On/Off Switch Configuration with server roles (<code class="docutils literal notranslate"><span class="pre">in_clusters</span></code>) and Identify, Groups, Scenes, and On/Off configured with client roles (<code class="docutils literal notranslate"><span class="pre">out_clusters</span></code>).</p>
 </li>
 </ol>
-</div>
-</div>
-</div>
-<div class="section" id="further-expanding-the-custom-application">
-<h2><a class="toc-backref" href="#id11">Further expanding the custom application</a><a class="headerlink" href="#further-expanding-the-custom-application" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+</section>
+<section id="further-expanding-the-custom-application">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Further expanding the custom application</a><a class="headerlink" href="#further-expanding-the-custom-application" title="Permalink to this heading"></a></h2>
 <p>You can further expand the application with more features.</p>
-<div class="section" id="passing-zcl-events-to-the-application">
-<span id="ug-zigee-adding-clusters-passing-events"></span><h3><a class="toc-backref" href="#id12">Passing ZCL events to the application</a><a class="headerlink" href="#passing-zcl-events-to-the-application" title="Permalink to this headline">¶</a></h3>
+<section id="passing-zcl-events-to-the-application">
+<span id="ug-zigee-adding-clusters-passing-events"></span><h3><a class="toc-backref" href="#id12" role="doc-backlink">Passing ZCL events to the application</a><a class="headerlink" href="#passing-zcl-events-to-the-application" title="Permalink to this heading"></a></h3>
 <p>Declaring and registering a set of clusters that defines a Zigbee node makes these clusters discoverable across the Zigbee network and ready to communicate with another nodes.
 For example, the communication between a light switch node and a light bulb node uses ZCL commands to change the attributes of the On/Off device embedded in the light bulb.
 Altering the attribute does nothing more than changing values of a specific variable.
 The application is supposed to react to these changes and produce appropriate behavior, but we need to inform it about these changes first.</p>
 <p>To inform the application about attributes changes, you can pass ZCL events to it with a callback that follows generic callback definition (referred to as <em>ZCL callback</em>).
 This is shown in the following snippet:</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="n">zb_callback_t</span><span class="p">)(</span><span class="n">zb_uint8_t</span> <span class="n">param</span><span class="p">);</span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="n">zb_callback_t</span><span class="p">)(</span><span class="n">zb_uint8_t</span><span class="w"> </span><span class="n">param</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">param</span></code> argument passed to the callback contains information about the changed attributes.
 This argument is actually a ZBOSS buffer that contains the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#ga0dfcc989252b93252f8bb1d27d2639fa">zb_zcl_device_callback_param_t</a> structure whose definition fragment is as follows:</p>
 <div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="cm">/* For the full definition please refer to zboss_api_zcl.h */</span>
-<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">zb_zcl_device_callback_param_s</span>
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">zb_zcl_device_callback_param_s</span>
 <span class="p">{</span>
-        <span class="cm">/** Type of device callback */</span>
-        <span class="n">zb_zcl_device_callback_id_t</span> <span class="n">device_cb_id</span><span class="p">;</span>
-        <span class="n">zb_uint8_t</span> <span class="n">endpoint</span><span class="p">;</span>
-        <span class="n">zb_zcl_attr_access_t</span> <span class="n">attr_type</span><span class="p">;</span>
+<span class="w">        </span><span class="cm">/** Type of device callback */</span>
+<span class="w">        </span><span class="n">zb_zcl_device_callback_id_t</span><span class="w"> </span><span class="n">device_cb_id</span><span class="p">;</span>
+<span class="w">        </span><span class="n">zb_uint8_t</span><span class="w"> </span><span class="n">endpoint</span><span class="p">;</span>
+<span class="w">        </span><span class="n">zb_zcl_attr_access_t</span><span class="w"> </span><span class="n">attr_type</span><span class="p">;</span>
 
-        <span class="cm">/** Return status (see zb_ret_t) */</span>
-        <span class="n">zb_ret_t</span> <span class="n">status</span><span class="p">;</span>
+<span class="w">        </span><span class="cm">/** Return status (see zb_ret_t) */</span>
+<span class="w">        </span><span class="n">zb_ret_t</span><span class="w"> </span><span class="n">status</span><span class="p">;</span>
 
-        <span class="cm">/** Callback custom data */</span>
-        <span class="k">union</span>
-        <span class="p">{</span>
-                <span class="n">zb_zcl_set_attr_value_param_t</span>  <span class="n">set_attr_value_param</span><span class="p">;</span>
-                <span class="cp">#if defined (ZB_ZCL_SUPPORT_CLUSTER_ON_OFF)</span>
-                <span class="cm">/* Off with effect command, On/Off cluster */</span>
-                <span class="n">zb_zcl_on_off_set_effect_value_param_t</span>  <span class="n">on_off_set_effect_value_param</span><span class="p">;</span>
-                <span class="cm">/* */</span>
-                <span class="cp">#endif</span>
-                <span class="cp">#if defined(ZB_ZCL_SUPPORT_CLUSTER_IDENTIFY)</span>
-                <span class="n">zb_zcl_identify_effect_value_param_t</span>  <span class="n">identify_effect_value_param</span><span class="p">;</span>
-                <span class="cp">#endif</span>
+<span class="w">        </span><span class="cm">/** Callback custom data */</span>
+<span class="w">        </span><span class="k">union</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">                </span><span class="n">zb_zcl_set_attr_value_param_t</span><span class="w">  </span><span class="n">set_attr_value_param</span><span class="p">;</span>
+<span class="w">                </span><span class="cp">#if defined (ZB_ZCL_SUPPORT_CLUSTER_ON_OFF)</span>
+<span class="w">                </span><span class="cm">/* Off with effect command, On/Off cluster */</span>
+<span class="w">                </span><span class="n">zb_zcl_on_off_set_effect_value_param_t</span><span class="w">  </span><span class="n">on_off_set_effect_value_param</span><span class="p">;</span>
+<span class="w">                </span><span class="cm">/* */</span>
+<span class="w">                </span><span class="cp">#endif</span>
+<span class="w">                </span><span class="cp">#if defined(ZB_ZCL_SUPPORT_CLUSTER_IDENTIFY)</span>
+<span class="w">                </span><span class="n">zb_zcl_identify_effect_value_param_t</span><span class="w">  </span><span class="n">identify_effect_value_param</span><span class="p">;</span>
+<span class="w">                </span><span class="cp">#endif</span>
 
-                <span class="cm">/* .</span>
+<span class="w">                </span><span class="cm">/* .</span>
 <span class="cm">                   .</span>
 <span class="cm">                   .</span>
 <span class="cm">                */</span>
 
-                <span class="n">zb_zcl_device_cmd_generic_param_t</span> <span class="n">gnr</span><span class="p">;</span>
-        <span class="p">}</span> <span class="n">cb_param</span><span class="p">;</span>
-<span class="p">}</span> <span class="n">zb_zcl_device_callback_param_t</span><span class="p">;</span>
+<span class="w">                </span><span class="n">zb_zcl_device_cmd_generic_param_t</span><span class="w"> </span><span class="n">gnr</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="n">cb_param</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">zb_zcl_device_callback_param_t</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>Both the On/Off Switch device and the Temperature Sensor device have client roles.
 For this reason, their attributes are not supposed to change.
 To show how you can use the ZCL event, read the following section.</p>
-<div class="section" id="reading-device-callback-parameters-from-a-zboss-buffer">
-<h4>Reading device callback parameters from a ZBOSS buffer<a class="headerlink" href="#reading-device-callback-parameters-from-a-zboss-buffer" title="Permalink to this headline">¶</a></h4>
+<section id="reading-device-callback-parameters-from-a-zboss-buffer">
+<h4>Reading device callback parameters from a ZBOSS buffer<a class="headerlink" href="#reading-device-callback-parameters-from-a-zboss-buffer" title="Permalink to this heading"></a></h4>
 <p>The ZCL callback implemented in the <span class="xref std std-ref">lib_zigbee_fota</span> library is a good example of how to use the ZCL event.</p>
 <p>To read the device callback parameters from a ZBOSS buffer, complete the following steps:</p>
 <ol class="arabic">
 <li><p>In the <code class="file docutils literal notranslate"><span class="pre">main.c</span></code> file of the copied template sample, use the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#ga0dfcc989252b93252f8bb1d27d2639fa">zb_zcl_device_callback_param_t</a> structure to get the ZCL callback parameters from the buffer in the following manner:</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">zb_zcl_device_callback_param_t</span> <span class="o">*</span><span class="n">device_cb_param</span> <span class="o">=</span> <span class="n">ZB_BUF_GET_PARAM</span><span class="p">(</span><span class="n">bufid</span><span class="p">,</span> <span class="n">zb_zcl_device_callback_param_t</span><span class="p">);</span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">zb_zcl_device_callback_param_t</span><span class="w"> </span><span class="o">*</span><span class="n">device_cb_param</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ZB_BUF_GET_PARAM</span><span class="p">(</span><span class="n">bufid</span><span class="p">,</span><span class="w"> </span><span class="n">zb_zcl_device_callback_param_t</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Once the parameters are obtained, the application can use them to perform some action based on a new attribute values.</p>
 </li>
 <li><p>Make the application check the callback ID by reading the appropriate field from the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#gad27454b213ce8a00540ebc75288966ad">zb_zcl_device_callback_id_t</a> structure.
 For example, the Zigbee FOTA library uses the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#gga35caa2e3a9ef37535b1f75e0fe919266a8a87688c465e80b46ad821741a60fe84">ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID</a> macro:</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">device_cb_param</span><span class="o">-&gt;</span><span class="n">device_cb_id</span> <span class="o">!=</span> <span class="n">ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID</span><span class="p">)</span> <span class="p">{</span>
-          <span class="k">return</span><span class="p">;</span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">device_cb_param</span><span class="o">-&gt;</span><span class="n">device_cb_id</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="k">return</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>Depending on the device callback ID, different data is passed to the callback and held by the <code class="docutils literal notranslate"><span class="pre">cb_param</span></code> field of <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#ga0dfcc989252b93252f8bb1d27d2639fa">zb_zcl_device_callback_param_t</a>.
 In general, the data associated with the callback ID is contained in the <code class="docutils literal notranslate"><span class="pre">set_attr_value_param</span></code> field of <code class="docutils literal notranslate"><span class="pre">cb_param</span></code>, but some clusters have their data structure already defined.
 For example, OTA uses <code class="docutils literal notranslate"><span class="pre">ota_value_param</span></code> fields, as shown in the following snippet:</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">zb_zcl_ota_upgrade_value_param_t</span> <span class="o">*</span><span class="n">ota_upgrade_value</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="n">device_cb_param</span><span class="o">-&gt;</span><span class="n">cb_param</span><span class="p">.</span><span class="n">ota_value_param</span><span class="p">);</span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">zb_zcl_ota_upgrade_value_param_t</span><span class="w"> </span><span class="o">*</span><span class="n">ota_upgrade_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="p">(</span><span class="n">device_cb_param</span><span class="o">-&gt;</span><span class="n">cb_param</span><span class="p">.</span><span class="n">ota_value_param</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>To see the field usage associated with other clusters, refer to the <a class="reference internal" href="samples/light_bulb/README.html#zigbee-light-bulb-sample"><span class="std std-ref">Zigbee: Light bulb</span></a> sample.</p>
 </li>
 <li><p>Make the ZCL callback pass the status of its execution to the caller by setting the appropriate return status in the <code class="docutils literal notranslate"><span class="pre">status</span></code> field of the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#ga0dfcc989252b93252f8bb1d27d2639fa">zb_zcl_device_callback_param_t</a> structure passed to the callback:</p>
-<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">device_cb_param</span><span class="o">-&gt;</span><span class="n">status</span> <span class="o">=</span> <span class="n">RET_OK</span><span class="p">;</span>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="n">device_cb_param</span><span class="o">-&gt;</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RET_OK</span><span class="p">;</span>
 </pre></div>
 </div>
 </li>
 </ol>
-</div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
   
@@ -666,22 +579,13 @@ For example, OTA uses <code class="docutils literal notranslate"><span class="pr
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

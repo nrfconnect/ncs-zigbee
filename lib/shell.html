@@ -1,52 +1,30 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Zigbee shell &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/tabs.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/nordic.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
   
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script>let toggleHintShow = 'Click to show';</script>
         <script>let toggleHintHide = 'Click to hide';</script>
         <script>let toggleOpenOnPrint = 'true';</script>
         <script src="../_static/togglebutton.js"></script>
         <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
   <script type="text/javascript" src="../_static/js/ncs.js"></script>
 
     <link rel="author" title="About these documents" href="../about.html" />
@@ -58,29 +36,17 @@
 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            Zigbee add-on for nRF Connect SDK
           </a>
-
-          
-            
-            
-          
-
-          
 <div id="searchbox" role="search">
   <div class="searchformwrapper">
     <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -91,18 +57,7 @@
   </div>
 </div>
 <script>$('#searchbox').show(0);</script>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About Zigbee protocol</a></li>
@@ -182,76 +137,34 @@
 <li class="toctree-l1"><a class="reference internal" href="../release-notes.html">Release notes</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Zigbee add-on for nRF Connect SDK</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="index.html">Libraries for Zigbee</a> &raquo;</li>
-        
-      <li>Zigbee shell</li>
-    
-    
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Libraries for Zigbee</a></li>
+      <li class="breadcrumb-item active">Zigbee shell</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/lib/shell.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="zigbee-shell">
-<span id="lib-zigbee-shell"></span><h1>Zigbee shell<a class="headerlink" href="#zigbee-shell" title="Permalink to this headline">¶</a></h1>
-<div class="contents local topic" id="contents">
+             
+  <section id="zigbee-shell">
+<span id="lib-zigbee-shell"></span><h1>Zigbee shell<a class="headerlink" href="#zigbee-shell" title="Permalink to this heading"></a></h1>
+<nav class="contents local" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#configuration" id="id44">Configuration</a></p></li>
 <li><p><a class="reference internal" href="#supported-backends" id="id45">Supported backends</a></p></li>
@@ -307,11 +220,11 @@
 </ul>
 </li>
 </ul>
-</div>
+</nav>
 <p>The Zigbee shell library implements a set of Zigbee shell commands that allow you to control the device behavior and perform operations in the Zigbee network, such as steering the network, discovering devices, and reading the network properties.
 Enabling a device to work with these commands simplifies testing and debugging of an existing network and reduces the amount of reprogramming operations.</p>
-<div class="section" id="configuration">
-<span id="zigbee-shell-extending-samples"></span><h2><a class="toc-backref" href="#id44">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<section id="configuration">
+<span id="zigbee-shell-extending-samples"></span><h2><a class="toc-backref" href="#id44" role="doc-backlink">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
 <p>The Zigbee shell commands are implemented using Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/shell/index.html">Shell</a> interface.
 By default, Zephyr shell uses the UART backend.
 To change this and other Zephyr’s shell settings (for example, the prompt or the maximum amount of accepted command arguments), read the documentation page in Zephyr.</p>
@@ -328,9 +241,9 @@ Some of the commands use an endpoint for sending packets, so no endpoint handler
 <li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL_ZCL_CMD_TIMEOUT</span></code></p></li>
 </ul>
 <p>For detailed steps about configuring the library in a Zigbee sample or application, see <a class="reference internal" href="../configuring/configuring_libraries.html#ug-zigbee-configuring-components-logger-ep"><span class="std std-ref">Configuring Zigbee endpoint logger</span></a>.</p>
-</div>
-<div class="section" id="supported-backends">
-<h2><a class="toc-backref" href="#id45">Supported backends</a><a class="headerlink" href="#supported-backends" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="supported-backends">
+<h2><a class="toc-backref" href="#id45" role="doc-backlink">Supported backends</a><a class="headerlink" href="#supported-backends" title="Permalink to this heading"></a></h2>
 <p>Zigbee shell commands are available for the following backends when testing samples:</p>
 <ul class="simple">
 <li><p>UART</p></li>
@@ -338,12 +251,12 @@ Some of the commands use an endpoint for sending packets, so no endpoint handler
 </ul>
 <p>You can run the Zigbee shell commands after connecting and configuring the backend for testing.
 For more information, see <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/test_and_optimize.html">Testing and optimization</a> in the nRF Connect SDK documentation.</p>
-</div>
-<div class="section" id="zigbee-shell-command-list">
-<span id="zigbee-shell-reference"></span><h2><a class="toc-backref" href="#id46">Zigbee shell command list</a><a class="headerlink" href="#zigbee-shell-command-list" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="zigbee-shell-command-list">
+<span id="zigbee-shell-reference"></span><h2><a class="toc-backref" href="#id46" role="doc-backlink">Zigbee shell command list</a><a class="headerlink" href="#zigbee-shell-command-list" title="Permalink to this heading"></a></h2>
 <p>This section lists commands that are supported by <a class="reference internal" href="../samples/index.html#zigbee-samples"><span class="std std-ref">Zigbee samples</span></a>.</p>
-<div class="section" id="description-convention">
-<h3><a class="toc-backref" href="#id47">Description convention</a><a class="headerlink" href="#description-convention" title="Permalink to this headline">¶</a></h3>
+<section id="description-convention">
+<h3><a class="toc-backref" href="#id47" role="doc-backlink">Description convention</a><a class="headerlink" href="#description-convention" title="Permalink to this heading"></a></h3>
 <p>Every command prints <code class="docutils literal notranslate"><span class="pre">Done</span></code> when it is finished, or an error with the reason why it occurs.</p>
 <p>The command argument description uses the following convention:</p>
 <ul>
@@ -362,9 +275,9 @@ For more information, see <a class="reference external" href="https://docs.nordi
 </li>
 </ul>
 <hr class="docutils" />
-</div>
-<div class="section" id="help">
-<span id="shell-help"></span><h3><a class="toc-backref" href="#id48">help</a><a class="headerlink" href="#help" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="help">
+<span id="shell-help"></span><h3><a class="toc-backref" href="#id48" role="doc-backlink">help</a><a class="headerlink" href="#help" title="Permalink to this heading"></a></h3>
 <p>Display help for all available shell commands.</p>
 <pre class="highlight literal-block">[<em>group</em>] help</pre>
 <p>If the optional argument is not provided, displays help for all command groups.</p>
@@ -395,7 +308,7 @@ For example, <code class="docutils literal notranslate"><span class="pre">zdo</s
 <span class="n">nrf_clock_control</span>  <span class="p">:</span><span class="n">Clock</span> <span class="n">control</span> <span class="n">commmands</span>
 <span class="n">nvram</span>              <span class="p">:</span><span class="n">Zigbee</span> <span class="n">NVRAM</span> <span class="n">manipulation</span><span class="o">.</span>
 <span class="n">resize</span>             <span class="p">:</span><span class="n">Console</span> <span class="n">gets</span> <span class="n">terminal</span> <span class="n">screen</span> <span class="n">size</span> <span class="ow">or</span> <span class="n">assumes</span> <span class="n">default</span> <span class="ow">in</span>
-                    <span class="n">case</span> <span class="n">the</span> <span class="n">readout</span> <span class="n">fails</span><span class="o">.</span> <span class="n">It</span> <span class="n">must</span> <span class="n">be</span> <span class="n">executed</span> <span class="n">after</span> <span class="n">each</span>
+                    <span class="k">case</span> <span class="n">the</span> <span class="n">readout</span> <span class="n">fails</span><span class="o">.</span> <span class="n">It</span> <span class="n">must</span> <span class="n">be</span> <span class="n">executed</span> <span class="n">after</span> <span class="n">each</span>
                     <span class="n">terminal</span> <span class="n">width</span> <span class="n">change</span> <span class="n">to</span> <span class="n">ensure</span> <span class="n">correct</span> <span class="n">text</span> <span class="n">display</span><span class="o">.</span>
 <span class="n">sensor</span>             <span class="p">:</span><span class="n">Sensor</span> <span class="n">commands</span>
 <span class="n">shell</span>              <span class="p">:</span><span class="n">Useful</span><span class="p">,</span> <span class="ow">not</span> <span class="n">Unix</span><span class="o">-</span><span class="n">like</span> <span class="n">shell</span> <span class="n">commands</span><span class="o">.</span>
@@ -406,9 +319,9 @@ For example, <code class="docutils literal notranslate"><span class="pre">zdo</s
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-role">
-<span id="id1"></span><h3><a class="toc-backref" href="#id49">bdb role</a><a class="headerlink" href="#bdb-role" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-role">
+<span id="id1"></span><h3><a class="toc-backref" href="#id49" role="doc-backlink">bdb role</a><a class="headerlink" href="#bdb-role" title="Permalink to this heading"></a></h3>
 <p>Set or get the Zigbee role of a device.</p>
 <pre class="highlight literal-block">bdb role [<em>role</em>]</pre>
 <div class="admonition note">
@@ -430,9 +343,9 @@ Can be either <code class="docutils literal notranslate"><span class="pre">zc</s
 <p>Zigbee End Device is not currently supported by the Shell sample.</p>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-extpanid">
-<span id="id2"></span><h3><a class="toc-backref" href="#id50">bdb extpanid</a><a class="headerlink" href="#bdb-extpanid" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-extpanid">
+<span id="id2"></span><h3><a class="toc-backref" href="#id50" role="doc-backlink">bdb extpanid</a><a class="headerlink" href="#bdb-extpanid" title="Permalink to this heading"></a></h3>
 <p>Set or get the Zigbee Extended Pan ID value.</p>
 <pre class="highlight literal-block">bdb extpanid [<em>h:id</em>]</pre>
 <div class="admonition note">
@@ -443,9 +356,9 @@ Reading only after <a class="reference internal" href="#bdb-start"><span class="
 <p>If the optional argument is not provided, gets the extended PAN ID of the joined network.</p>
 <p>If the optional argument is provided, gets the extended PAN ID to <em>id</em>.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-panid">
-<span id="id3"></span><h3><a class="toc-backref" href="#id51">bdb panid</a><a class="headerlink" href="#bdb-panid" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-panid">
+<span id="id3"></span><h3><a class="toc-backref" href="#id51" role="doc-backlink">bdb panid</a><a class="headerlink" href="#bdb-panid" title="Permalink to this heading"></a></h3>
 <p>Set or get the Zigbee PAN ID value.</p>
 <pre class="highlight literal-block">bdb panid [<em>h:id</em>]</pre>
 <div class="admonition note">
@@ -456,9 +369,9 @@ Reading only after <a class="reference internal" href="#bdb-start"><span class="
 <p>If the optional argument is not provided, gets the PAN ID of the joined network.
 If the optional argument is provided, sets the PAN ID to <em>id</em>.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-start">
-<span id="id4"></span><h3><a class="toc-backref" href="#id52">bdb start</a><a class="headerlink" href="#bdb-start" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-start">
+<span id="id4"></span><h3><a class="toc-backref" href="#id52" role="doc-backlink">bdb start</a><a class="headerlink" href="#bdb-start" title="Permalink to this heading"></a></h3>
 <p>Start the commissioning process.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">start</span>
 <span class="n">Started</span> <span class="n">coordinator</span>
@@ -466,9 +379,9 @@ If the optional argument is provided, sets the PAN ID to <em>id</em>.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-channel">
-<span id="id5"></span><h3><a class="toc-backref" href="#id53">bdb channel</a><a class="headerlink" href="#bdb-channel" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-channel">
+<span id="id5"></span><h3><a class="toc-backref" href="#id53" role="doc-backlink">bdb channel</a><a class="headerlink" href="#bdb-channel" title="Permalink to this heading"></a></h3>
 <p>Set or get the 802.15.4 channel.</p>
 <pre class="highlight literal-block">bdb channel <em>n</em></pre>
 <div class="admonition note">
@@ -488,9 +401,9 @@ If the optional argument is provided, sets the PAN ID to <em>id</em>.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-ic-add">
-<span id="id6"></span><h3><a class="toc-backref" href="#id54">bdb ic add</a><a class="headerlink" href="#bdb-ic-add" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-ic-add">
+<span id="id6"></span><h3><a class="toc-backref" href="#id54" role="doc-backlink">bdb ic add</a><a class="headerlink" href="#bdb-ic-add" title="Permalink to this heading"></a></h3>
 <p>Add information about the install code on the trust center.</p>
 <pre class="highlight literal-block">bdb ic add <em>h:install code</em> <em>h:eui64</em></pre>
 <p>For <em>h:eui64</em>, use the address of the joining device.
@@ -508,9 +421,9 @@ For <em>h:install code</em>, use 128bit install code with correct CRC value.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-ic-list">
-<span id="id7"></span><h3><a class="toc-backref" href="#id55">bdb ic list</a><a class="headerlink" href="#bdb-ic-list" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-ic-list">
+<span id="id7"></span><h3><a class="toc-backref" href="#id55" role="doc-backlink">bdb ic list</a><a class="headerlink" href="#bdb-ic-list" title="Permalink to this heading"></a></h3>
 <p>Read and print install codes stored on the device.</p>
 <div class="highlight highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bdb</span> <span class="n">ic</span> <span class="nb">list</span>
 </pre></div>
@@ -530,9 +443,9 @@ For <em>h:install code</em>, use 128bit install code with correct CRC value.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-ic-policy">
-<span id="id8"></span><h3><a class="toc-backref" href="#id56">bdb ic policy</a><a class="headerlink" href="#bdb-ic-policy" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-ic-policy">
+<span id="id8"></span><h3><a class="toc-backref" href="#id56" role="doc-backlink">bdb ic policy</a><a class="headerlink" href="#bdb-ic-policy" title="Permalink to this heading"></a></h3>
 <p>Set the trust center install code policy.</p>
 <pre class="highlight literal-block">bdb ic policy <em>enable|disable</em></pre>
 <div class="admonition note">
@@ -546,9 +459,9 @@ For <em>h:install code</em>, use 128bit install code with correct CRC value.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-ic-set">
-<span id="id9"></span><h3><a class="toc-backref" href="#id57">bdb ic set</a><a class="headerlink" href="#bdb-ic-set" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-ic-set">
+<span id="id9"></span><h3><a class="toc-backref" href="#id57" role="doc-backlink">bdb ic set</a><a class="headerlink" href="#bdb-ic-set" title="Permalink to this heading"></a></h3>
 <p>Set install code on the device.</p>
 <pre class="highlight literal-block">bdb ic set <em>h:install code</em></pre>
 <p>Must only be used on a joining device.</p>
@@ -564,9 +477,9 @@ For <em>h:install code</em>, use 128bit install code with correct CRC value.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-legacy">
-<span id="id10"></span><h3><a class="toc-backref" href="#id58">bdb legacy</a><a class="headerlink" href="#bdb-legacy" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-legacy">
+<span id="id10"></span><h3><a class="toc-backref" href="#id58" role="doc-backlink">bdb legacy</a><a class="headerlink" href="#bdb-legacy" title="Permalink to this heading"></a></h3>
 <p>Enable or disable the legacy device support.</p>
 <pre class="highlight literal-block">bdb legacy <em>enable|disable</em></pre>
 <p>Allow or disallow legacy pre-r21 devices on the Zigbee network.</p>
@@ -576,9 +489,9 @@ For <em>h:install code</em>, use 128bit install code with correct CRC value.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-nwkkey">
-<span id="id11"></span><h3><a class="toc-backref" href="#id59">bdb nwkkey</a><a class="headerlink" href="#bdb-nwkkey" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-nwkkey">
+<span id="id11"></span><h3><a class="toc-backref" href="#id59" role="doc-backlink">bdb nwkkey</a><a class="headerlink" href="#bdb-nwkkey" title="Permalink to this heading"></a></h3>
 <p>Set network key.</p>
 <pre class="highlight literal-block">bdb nwkkey <em>h:key</em></pre>
 <p>Set a pre-defined network key <em>key</em> instead of a random one.</p>
@@ -592,9 +505,9 @@ For <em>h:install code</em>, use 128bit install code with correct CRC value.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-factory-reset">
-<span id="id12"></span><h3><a class="toc-backref" href="#id60">bdb factory_reset</a><a class="headerlink" href="#bdb-factory-reset" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-factory-reset">
+<span id="id12"></span><h3><a class="toc-backref" href="#id60" role="doc-backlink">bdb factory_reset</a><a class="headerlink" href="#bdb-factory-reset" title="Permalink to this heading"></a></h3>
 <p>Perform a factory reset using local action.
 See Base Device Behavior specification chapter 9.5 for details.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">bdb</span> <span class="n">factory_reset</span>
@@ -602,9 +515,9 @@ See Base Device Behavior specification chapter 9.5 for details.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="bdb-child-max">
-<span id="id13"></span><h3><a class="toc-backref" href="#id61">bdb child_max</a><a class="headerlink" href="#bdb-child-max" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bdb-child-max">
+<span id="id13"></span><h3><a class="toc-backref" href="#id61" role="doc-backlink">bdb child_max</a><a class="headerlink" href="#bdb-child-max" title="Permalink to this heading"></a></h3>
 <p>Set the amount of child devices that is equal to <em>d:nbr</em>.</p>
 <pre class="highlight literal-block">&gt; bdb child_max <em>d:nbr</em></pre>
 <div class="admonition note">
@@ -618,9 +531,9 @@ See Base Device Behavior specification chapter 9.5 for details.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="zcl-cmd">
-<span id="id14"></span><h3><a class="toc-backref" href="#id62">zcl cmd</a><a class="headerlink" href="#zcl-cmd" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zcl-cmd">
+<span id="id14"></span><h3><a class="toc-backref" href="#id62" role="doc-backlink">zcl cmd</a><a class="headerlink" href="#zcl-cmd" title="Permalink to this heading"></a></h3>
 <p>Send a generic ZCL command to the remote node.</p>
 <pre class="highlight literal-block">zcl cmd [-d] <em>h:dst_addr</em> <em>d:ep</em> <em>h:cluster</em> [-p <em>h:profile</em>] <em>h:cmd_ID</em> [-l <em>h:payload</em>]</pre>
 <div class="admonition note">
@@ -648,9 +561,9 @@ Optional default response can be requested with <code class="docutils literal no
 <p>This command sends the same Move to Level command and requests additional Default response.
 The same Home Automation Profile is used, but is set directly instead.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zcl-attr-read">
-<span id="zcl-read-attr"></span><h3><a class="toc-backref" href="#id63">zcl attr read</a><a class="headerlink" href="#zcl-attr-read" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zcl-attr-read">
+<span id="zcl-read-attr"></span><h3><a class="toc-backref" href="#id63" role="doc-backlink">zcl attr read</a><a class="headerlink" href="#zcl-attr-read" title="Permalink to this heading"></a></h3>
 <p>Retrieve the attribute value of the remote node.</p>
 <pre class="highlight literal-block">zcl attr read <em>h:dst_addr</em> <em>d:ep</em> <em>h:cluster</em> [-c] <em>h:profile</em> <em>h:attr_id</em></pre>
 <p>Read the value of the attribute <code class="docutils literal notranslate"><span class="pre">attr_id</span></code> in the cluster <code class="docutils literal notranslate"><span class="pre">cluster</span></code>.
@@ -664,9 +577,9 @@ If the attribute is on the client role side of the cluster, use the <code class=
 </div>
 <p>This command sends the Read Attributes command (ZCL specification 2.5.1) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to reply with the ZCLVersion attribute value of the Basic cluster.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zcl-attr-write">
-<span id="id15"></span><h3><a class="toc-backref" href="#id64">zcl attr write</a><a class="headerlink" href="#zcl-attr-write" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zcl-attr-write">
+<span id="id15"></span><h3><a class="toc-backref" href="#id64" role="doc-backlink">zcl attr write</a><a class="headerlink" href="#zcl-attr-write" title="Permalink to this heading"></a></h3>
 <p>Write the attribute value to the remote node.</p>
 <pre class="highlight literal-block">zcl attr write <em>h:dst_addr</em> <em>d:ep</em> <em>h:cluster</em> [-c] <em>h:profile</em> <em>h:attr_id</em> <em>h:attr_type</em> <em>h:attr_value</em></pre>
 <p>Write the <code class="docutils literal notranslate"><span class="pre">attr_value</span></code> value of the attribute <code class="docutils literal notranslate"><span class="pre">attr_id</span></code> of the type <code class="docutils literal notranslate"><span class="pre">attr_type</span></code> in the cluster <code class="docutils literal notranslate"><span class="pre">cluster</span></code>.
@@ -683,9 +596,9 @@ If the attribute is on the client role side of the cluster, use the``-c`` switch
 </div>
 <p>This command sends the Write Attributes command (ZCL specification 2.5.3) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to set the IdentifyTime attribute value to <code class="docutils literal notranslate"><span class="pre">15</span></code> in the identify cluster.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zcl-subscribe-on">
-<span id="id16"></span><h3><a class="toc-backref" href="#id65">zcl subscribe on</a><a class="headerlink" href="#zcl-subscribe-on" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zcl-subscribe-on">
+<span id="id16"></span><h3><a class="toc-backref" href="#id65" role="doc-backlink">zcl subscribe on</a><a class="headerlink" href="#zcl-subscribe-on" title="Permalink to this heading"></a></h3>
 <p>Subscribe to the attribute changes on the remote node.</p>
 <pre class="highlight literal-block">zcl subscribe on <em>h:addr</em> <em>d:ep</em> <em>h:cluster</em> <em>h:profile</em> <em>h:attr_id</em> <em>d:attr_type</em> [<em>d:min interval (s)</em>] [<em>d:max interval (s)</em>]</pre>
 <p>Enable reporting on the node identified by the address <code class="docutils literal notranslate"><span class="pre">addr</span></code>, with the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code>
@@ -700,9 +613,9 @@ that uses the profile <code class="docutils literal notranslate"><span class="pr
 </div>
 <p>This command sends the Configure Reporting command (ZCL specification 2.5.7) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to configure reporting for the OnOff attribute of the On/Off cluster with minimum reporting interval of <code class="docutils literal notranslate"><span class="pre">5</span></code> seconds and maximum reporting interval of <code class="docutils literal notranslate"><span class="pre">20</span></code> seconds.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zcl-subscribe-off">
-<span id="id17"></span><h3><a class="toc-backref" href="#id66">zcl subscribe off</a><a class="headerlink" href="#zcl-subscribe-off" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zcl-subscribe-off">
+<span id="id17"></span><h3><a class="toc-backref" href="#id66" role="doc-backlink">zcl subscribe off</a><a class="headerlink" href="#zcl-subscribe-off" title="Permalink to this heading"></a></h3>
 <p>Unsubscribe from the attribute reports.</p>
 <pre class="highlight literal-block">zcl subscribe off <em>h:addr</em> <em>d:ep</em> <em>h:cluster</em> <em>h:profile</em> <em>h:attr_id</em> <em>d:attr_type</em></pre>
 <p>Disable reporting on the node identified by the address <code class="docutils literal notranslate"><span class="pre">addr</span></code>, with the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code>
@@ -715,9 +628,9 @@ that uses the profile <code class="docutils literal notranslate"><span class="pr
 </div>
 <p>This command sends the Configure Reporting command (ZCL specification 2.5.7) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code>, asking it to stop issuing reports for the OnOff attribute of the On/Off cluster, by setting maximum reporting interval to <code class="docutils literal notranslate"><span class="pre">0xffff</span></code>.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zcl-ping">
-<span id="id18"></span><h3><a class="toc-backref" href="#id67">zcl ping</a><a class="headerlink" href="#zcl-ping" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zcl-ping">
+<span id="id18"></span><h3><a class="toc-backref" href="#id67" role="doc-backlink">zcl ping</a><a class="headerlink" href="#zcl-ping" title="Permalink to this heading"></a></h3>
 <p>Ping other devices using ZCL.</p>
 <pre class="highlight literal-block">zcl ping [--no-echo] [--aps-ack] <em>h:dst_addr</em> <em>d:payload_size</em></pre>
 <p>Example:</p>
@@ -747,7 +660,7 @@ See the following graphs for use cases.</p>
 <dt>Case 1: Ping with echo, but without the APS acknowledgment</dt><dd><p>This is the default case, without optional arguments.</p>
 <blockquote>
 <div><p class="mscgen">
-msc {
+<img src="../_images/mscgen-ca04abe1233142017c1f46fb5f46d1c1b9f398a8.png" alt="msc {
 hscale = &quot;1.3&quot;;
 App1 [label=&quot;Application 1&quot;],Node1 [label=&quot;Node 1&quot;],Node2 [label=&quot;Node 2&quot;];
 App1 rbox Node2     [label=&quot;Command ID: 0x02 - Ping request without the APS acknowledgment&quot;];
@@ -758,8 +671,8 @@ App1 rbox Node2     [label=&quot;Command ID: 0x01 - Ping reply&quot;];
 Node1&lt;&lt;Node2        [label=&quot;ping reply&quot;];
 Node1&gt;&gt;Node2        [label=&quot;MAC ACK&quot;];
 App1&lt;&lt;Node1         [label=&quot;Done&quot;];
-}
-</p>
+}" usemap="#ca04abe1233142017c1f46fb5f46d1c1b9f398a8" />
+<map id="ca04abe1233142017c1f46fb5f46d1c1b9f398a8" name="ca04abe1233142017c1f46fb5f46d1c1b9f398a8"></map></p>
 </div></blockquote>
 <p>In this default case, the <code class="docutils literal notranslate"><span class="pre">zcl</span> <span class="pre">ping</span></code> command measures the time between sending the ping request and receiving the ping reply.</p>
 </dd>
@@ -767,7 +680,7 @@ App1&lt;&lt;Node1         [label=&quot;Done&quot;];
 <blockquote>
 <div><blockquote>
 <div><p class="mscgen">
-msc {
+<img src="../_images/mscgen-1775de0c8e4ff5d49f27b72a1087ed6217810944.png" alt="msc {
 hscale = &quot;1.3&quot;;
 App1 [label=&quot;Application 1&quot;],Node1 [label=&quot;Node 1&quot;],Node2 [label=&quot;Node 2&quot;];
 App1 rbox Node2     [label=&quot;Command ID: 0x00 - Ping request with the APS acknowledgment&quot;];
@@ -782,8 +695,8 @@ Node1&gt;&gt;Node2        [label=&quot;MAC ACK&quot;];
 Node1&gt;&gt;Node2        [label=&quot;APS ACK&quot;];
 Node1&lt;&lt;Node2        [label=&quot;MAC ACK&quot;];
 App1&lt;&lt;Node1         [label=&quot;Done&quot;];
-}
-</p>
+}" usemap="#1775de0c8e4ff5d49f27b72a1087ed6217810944" />
+<map id="1775de0c8e4ff5d49f27b72a1087ed6217810944" name="1775de0c8e4ff5d49f27b72a1087ed6217810944"></map></p>
 </div></blockquote>
 <p>In this case, the <code class="docutils literal notranslate"><span class="pre">zcl</span> <span class="pre">ping</span></code> command measures the time between sending the ping request and receiving the ping reply.</p>
 </div></blockquote>
@@ -791,7 +704,7 @@ App1&lt;&lt;Node1         [label=&quot;Done&quot;];
 <dt>Case 3: Ping without echo, but with the APS acknowledgment</dt><dd><p>This is a case with both optional arguments provided, <code class="docutils literal notranslate"><span class="pre">--aps-ack</span></code> and <code class="docutils literal notranslate"><span class="pre">--no-echo</span></code>.</p>
 <blockquote>
 <div><p class="mscgen">
-msc {
+<img src="../_images/mscgen-1f2f90b4e8f53af80961323178efeac92fbd27dc.png" alt="msc {
 hscale = &quot;1.3&quot;;
 App1 [label=&quot;Application 1&quot;],Node1 [label=&quot;Node 1&quot;],Node2 [label=&quot;Node 2&quot;];
 App1 rbox Node2     [label=&quot;Command ID: 0x03 - Ping request without echo&quot;];
@@ -801,15 +714,15 @@ Node1&lt;&lt;Node2        [label=&quot;MAC ACK&quot;];
 Node1&lt;&lt;Node2        [label=&quot;APS ACK&quot;];
 Node1&gt;&gt;Node2        [label=&quot;MAC ACK&quot;];
 App1&lt;&lt;Node1         [label=&quot;Done&quot;];
-}
-</p>
+}" usemap="#1f2f90b4e8f53af80961323178efeac92fbd27dc" />
+<map id="1f2f90b4e8f53af80961323178efeac92fbd27dc" name="1f2f90b4e8f53af80961323178efeac92fbd27dc"></map></p>
 </div></blockquote>
 <p>In this case, the <code class="docutils literal notranslate"><span class="pre">zcl</span> <span class="pre">ping</span></code> command measures the time between sending the ping request and receiving the APS acknowledgment.</p>
 </dd>
 <dt>Case 4: Ping without echo and without the APS acknowledgment</dt><dd><p>This is a case with the <code class="docutils literal notranslate"><span class="pre">--no-echo</span></code> optional argument.</p>
 <blockquote>
 <div><p class="mscgen">
-msc {
+<img src="../_images/mscgen-1834a7516b670a451dec6910c65fcb6be94f094f.png" alt="msc {
 hscale = &quot;1.3&quot;;
 App1 [label=&quot;Application 1&quot;],Node1 [label=&quot;Node 1&quot;],Node2 [label=&quot;Node 2&quot;];
 App1 rbox Node2     [label=&quot;Command ID: 0x03 - Ping request without echo&quot;];
@@ -817,16 +730,16 @@ App1&gt;&gt;Node1         [label=&quot;ping&quot;];
 Node1&gt;&gt;Node2        [label=&quot;ping request&quot;];
 App1&lt;&lt;Node1         [label=&quot;Done&quot;];
 Node1&lt;&lt;Node2        [label=&quot;MAC ACK&quot;];
-}
-</p>
+}" usemap="#1834a7516b670a451dec6910c65fcb6be94f094f" />
+<map id="1834a7516b670a451dec6910c65fcb6be94f094f" name="1834a7516b670a451dec6910c65fcb6be94f094f"></map></p>
 </div></blockquote>
 <p>In this case, the <code class="docutils literal notranslate"><span class="pre">zcl</span> <span class="pre">ping</span></code> command does not measure time after sending the ping request.</p>
 </dd>
 </dl>
 <hr class="docutils" />
-</div>
-<div class="section" id="zcl-groups-add">
-<span id="id19"></span><h3><a class="toc-backref" href="#id68">zcl groups add</a><a class="headerlink" href="#zcl-groups-add" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zcl-groups-add">
+<span id="id19"></span><h3><a class="toc-backref" href="#id68" role="doc-backlink">zcl groups add</a><a class="headerlink" href="#zcl-groups-add" title="Permalink to this heading"></a></h3>
 <p>Add the endpoint on the remote node to the group.</p>
 <pre class="highlight literal-block">zcl groups add <em>h:dst_addr</em> <em>d:ep</em> [-p h:profile] <em>h:group_id</em></pre>
 <p>Send Add Group command to the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> of the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> and add it to the group <code class="docutils literal notranslate"><span class="pre">group_id</span></code>.
@@ -854,9 +767,9 @@ To send the command as groupcast, set <code class="docutils literal notranslate"
 </div>
 <p>This command sends the Add Group command (ZCL specification 3.6.2.3.2) as groupcast to devices that belong to the group <code class="docutils literal notranslate"><span class="pre">0x3210</span></code>, asking them to join the group <code class="docutils literal notranslate"><span class="pre">0x1000</span></code>.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zcl-groups-add-if-identify">
-<span id="id20"></span><h3><a class="toc-backref" href="#id69">zcl groups add_if_identify</a><a class="headerlink" href="#zcl-groups-add-if-identify" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zcl-groups-add-if-identify">
+<span id="id20"></span><h3><a class="toc-backref" href="#id69" role="doc-backlink">zcl groups add_if_identify</a><a class="headerlink" href="#zcl-groups-add-if-identify" title="Permalink to this heading"></a></h3>
 <p>Add the endpoints on the remote nodes to the group if the endpoints are in the Identify mode.</p>
 <pre class="highlight literal-block">zcl groups add_if_identify <em>h:dst_addr</em> <em>d:ep</em> [-p h:profile] <em>h:group_id</em></pre>
 <p>Send Add Group If Identifying command to the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> of the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> and add it to the group <code class="docutils literal notranslate"><span class="pre">group_id</span></code> if the endpoint on the remote node is in the Identify mode.
@@ -882,9 +795,9 @@ To send the command as groupcast, set <code class="docutils literal notranslate"
 </div>
 <p>This command sends the Add Group If Identifying command (ZCL specification 3.6.2.3.7) as groupcast to devices that belong to the group <code class="docutils literal notranslate"><span class="pre">0x3210</span></code>, asking them to join the group <code class="docutils literal notranslate"><span class="pre">0x1000</span></code> if they are in the Identify mode.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zcl-groups-get-member">
-<span id="id21"></span><h3><a class="toc-backref" href="#id70">zcl groups get_member</a><a class="headerlink" href="#zcl-groups-get-member" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zcl-groups-get-member">
+<span id="id21"></span><h3><a class="toc-backref" href="#id70" role="doc-backlink">zcl groups get_member</a><a class="headerlink" href="#zcl-groups-get-member" title="Permalink to this heading"></a></h3>
 <p>Get group membership from the endpoint on the remote node.</p>
 <pre class="highlight literal-block">zcl groups get_member <em>h:dst_addr</em> <em>d:ep</em> [-p h:profile] [h:group IDs ...]</pre>
 <p>Send Get Group Membership command to the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> of the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> to get which groups from the provided group list are including the endpoint on the remote node.
@@ -908,9 +821,9 @@ Response from the remote node is parsed and printed only if the command was sent
 </div>
 <p>This command sends the Get Group Membership command (ZCL specification 3.6.2.3.4) to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code> and endpoint <code class="docutils literal notranslate"><span class="pre">10</span></code> with profile set to <code class="docutils literal notranslate"><span class="pre">0x0104</span></code>, asking it to respond with the list of groups that include the device and that are present in the group list provided in the command.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zcl-groups-remove">
-<span id="id22"></span><h3><a class="toc-backref" href="#id71">zcl groups remove</a><a class="headerlink" href="#zcl-groups-remove" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zcl-groups-remove">
+<span id="id22"></span><h3><a class="toc-backref" href="#id71" role="doc-backlink">zcl groups remove</a><a class="headerlink" href="#zcl-groups-remove" title="Permalink to this heading"></a></h3>
 <p>Remove the endpoint on the remote node from the group.</p>
 <pre class="highlight literal-block">zcl groups remove <em>h:dst_addr</em> <em>d:ep</em> [-p h:profile] <em>h:group_id</em></pre>
 <p>Send Remove Group command to the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> of the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code> and remove it from the group <code class="docutils literal notranslate"><span class="pre">group_id</span></code>.
@@ -938,9 +851,9 @@ To send the command as groupcast, set <code class="docutils literal notranslate"
 </div>
 <p>This command sends the Remove Group command (ZCL specification 3.6.2.3.5) as groupcast to devices that belong to the group <code class="docutils literal notranslate"><span class="pre">0x3210</span></code>, asking them to remove themselves from the group <code class="docutils literal notranslate"><span class="pre">0x1000</span></code>.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zcl-groups-remove-all">
-<span id="id23"></span><h3><a class="toc-backref" href="#id72">zcl groups remove_all</a><a class="headerlink" href="#zcl-groups-remove-all" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zcl-groups-remove-all">
+<span id="id23"></span><h3><a class="toc-backref" href="#id72" role="doc-backlink">zcl groups remove_all</a><a class="headerlink" href="#zcl-groups-remove-all" title="Permalink to this heading"></a></h3>
 <p>Remove the endpoint on the remote node from all groups.</p>
 <pre class="highlight literal-block">zcl groups remove_all <em>h:dst_addr</em> <em>d:ep</em> [-p h:profile]</pre>
 <p>Send Remove All Groups command to the endpoint <code class="docutils literal notranslate"><span class="pre">ep</span></code> to the remote node <code class="docutils literal notranslate"><span class="pre">dst_addr</span></code>.
@@ -966,9 +879,9 @@ To send the command as groupcast, set <code class="docutils literal notranslate"
 </div>
 <p>This command sends the Remove All Groups command (ZCL specification 3.6.2.3.6) as groupcast to devices that belong to the group <code class="docutils literal notranslate"><span class="pre">0x3210</span></code>, asking them to remove themselves from all groups.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-simple-desc-req">
-<span id="id24"></span><h3><a class="toc-backref" href="#id73">zdo simple_desc_req</a><a class="headerlink" href="#zdo-simple-desc-req" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-simple-desc-req">
+<span id="id24"></span><h3><a class="toc-backref" href="#id73" role="doc-backlink">zdo simple_desc_req</a><a class="headerlink" href="#zdo-simple-desc-req" title="Permalink to this heading"></a></h3>
 <p>Send Simple Descriptor Request.</p>
 <pre class="highlight literal-block">zdo simple_desc_req <em>h:dst_addr</em> <em>d:ep</em></pre>
 <p>Send Simple Descriptor Request to the given 16-bit destination address of the node (<em>dst_addr</em>) and the endpoint <em>ep</em>.</p>
@@ -980,9 +893,9 @@ To send the command as groupcast, set <code class="docutils literal notranslate"
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-active-ep">
-<span id="id25"></span><h3><a class="toc-backref" href="#id74">zdo active_ep</a><a class="headerlink" href="#zdo-active-ep" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-active-ep">
+<span id="id25"></span><h3><a class="toc-backref" href="#id74" role="doc-backlink">zdo active_ep</a><a class="headerlink" href="#zdo-active-ep" title="Permalink to this heading"></a></h3>
 <p>Send Active Endpoint Request.</p>
 <pre class="highlight literal-block">zdo active_ep <em>h:dst_addr</em></pre>
 <p>Send Active Endpoint Request to the 16-bit destination address of the node (<em>dst_addr</em>).</p>
@@ -993,9 +906,9 @@ To send the command as groupcast, set <code class="docutils literal notranslate"
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-match-desc">
-<span id="id26"></span><h3><a class="toc-backref" href="#id75">zdo match_desc</a><a class="headerlink" href="#zdo-match-desc" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-match-desc">
+<span id="id26"></span><h3><a class="toc-backref" href="#id75" role="doc-backlink">zdo match_desc</a><a class="headerlink" href="#zdo-match-desc" title="Permalink to this heading"></a></h3>
 <p>Send match descriptor request.</p>
 <pre class="highlight literal-block">zdo match_desc <em>h:dst_addr</em>
                <em>h:req_addr</em> <em>h:prof_id</em>
@@ -1009,9 +922,9 @@ The IDs can be either decimal values or hexadecimal strings.</p>
 </div>
 <p>In this example, the command sends a Match Descriptor Request to all non-sleeping nodes regarding all non-sleeping nodes that have 1 input cluster ON/OFF (<code class="docutils literal notranslate"><span class="pre">ID</span> <span class="pre">6</span></code>) and 0 output clusters.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-bind-on">
-<span id="zdo-bind"></span><h3><a class="toc-backref" href="#id76">zdo bind on</a><a class="headerlink" href="#zdo-bind-on" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-bind-on">
+<span id="zdo-bind"></span><h3><a class="toc-backref" href="#id76" role="doc-backlink">zdo bind on</a><a class="headerlink" href="#zdo-bind-on" title="Permalink to this heading"></a></h3>
 <p>Create a binding between two endpoints on two nodes.</p>
 <pre class="highlight literal-block">zdo bind on <em>h:source_eui64</em> <em>d:source_ep</em> <em>h:dst_addr</em>
             <em>d:dst_ep</em> <em>h:source_cluster_id</em> <em>h:request_dst_addr</em></pre>
@@ -1026,9 +939,9 @@ The connection is created for ZCL commands and attributes assigned to the ZCL cl
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-bind-off">
-<span id="zdo-unbind"></span><h3><a class="toc-backref" href="#id77">zdo bind off</a><a class="headerlink" href="#zdo-bind-off" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-bind-off">
+<span id="zdo-unbind"></span><h3><a class="toc-backref" href="#id77" role="doc-backlink">zdo bind off</a><a class="headerlink" href="#zdo-bind-off" title="Permalink to this heading"></a></h3>
 <p>Remove a binding between two endpoints on two nodes.</p>
 <pre class="highlight literal-block">zdo bind off <em>h:source_eui64</em> <em>d:source_ep</em> <em>h:dst_eui64</em>
              <em>d:destination_ep</em> <em>h:source_cluster_id</em> <em>h:request_dst_addr</em></pre>
@@ -1039,9 +952,9 @@ The connection is created for ZCL commands and attributes assigned to the ZCL cl
 <p>Remove bound connection between a device identified by <em>source_eui64</em> and endpoint <em>source_ep</em>, and a device identified by destination address <em>dst_eui64</em> and destination endpoint <em>dst_ep</em>.
 The connection is removed for ZCL commands and attributes assigned to the ZCL cluster <em>source_cluster_id</em> on the <em>request_dst_addr</em> node (usually, the same address as for the <em>source_eui64</em> device).</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-mgmt-bind">
-<span id="id27"></span><h3><a class="toc-backref" href="#id78">zdo mgmt_bind</a><a class="headerlink" href="#zdo-mgmt-bind" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-mgmt-bind">
+<span id="id27"></span><h3><a class="toc-backref" href="#id78" role="doc-backlink">zdo mgmt_bind</a><a class="headerlink" href="#zdo-mgmt-bind" title="Permalink to this heading"></a></h3>
 <p>Read the binding table from a node.</p>
 <pre class="highlight literal-block">zdo mgmt_bind <em>h:dst_addr</em> [<em>d:start_index</em>]</pre>
 <p>Send a request to the remote device identified by the 16-bit destination address (<em>dst_addr</em>) to read the binding table through <code class="docutils literal notranslate"><span class="pre">zdo</span> <span class="pre">mgmt_bind_req</span></code> (see spec. 2.4.3.3.4).
@@ -1062,9 +975,9 @@ It is zero by default.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-mgmt-lqi">
-<span id="id28"></span><h3><a class="toc-backref" href="#id79">zdo mgmt_lqi</a><a class="headerlink" href="#zdo-mgmt-lqi" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-mgmt-lqi">
+<span id="id28"></span><h3><a class="toc-backref" href="#id79" role="doc-backlink">zdo mgmt_lqi</a><a class="headerlink" href="#zdo-mgmt-lqi" title="Permalink to this heading"></a></h3>
 <p>Send a ZDO Mgmt_Lqi_Req command to a remote device with the short address <em>short</em>.</p>
 <pre class="highlight literal-block">zdo mgmt_lqi <em>h:short</em> [<em>d:start_index</em>]</pre>
 <p><em>start_index</em> is the index of the first entry in the binding table where the reading starts.
@@ -1075,9 +988,9 @@ It is zero by default.</p>
 </div>
 <p>This command sends <code class="docutils literal notranslate"><span class="pre">mgmt_lqi_req</span></code> to the device with short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code>, asking it to return its neighbor table.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-nwk-addr">
-<span id="id29"></span><h3><a class="toc-backref" href="#id80">zdo nwk_addr</a><a class="headerlink" href="#zdo-nwk-addr" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-nwk-addr">
+<span id="id29"></span><h3><a class="toc-backref" href="#id80" role="doc-backlink">zdo nwk_addr</a><a class="headerlink" href="#zdo-nwk-addr" title="Permalink to this heading"></a></h3>
 <p>Resolve the EUI64 address <em>eui64</em> to a short network address.</p>
 <pre class="highlight literal-block">zdo nwk_addr <em>h:eui64</em></pre>
 <p>Example:</p>
@@ -1085,15 +998,15 @@ It is zero by default.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-ieee-addr">
-<span id="id30"></span><h3><a class="toc-backref" href="#id81">zdo ieee_addr</a><a class="headerlink" href="#zdo-ieee-addr" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-ieee-addr">
+<span id="id30"></span><h3><a class="toc-backref" href="#id81" role="doc-backlink">zdo ieee_addr</a><a class="headerlink" href="#zdo-ieee-addr" title="Permalink to this heading"></a></h3>
 <p>Resolve the EUI64 address <em>short_addr</em> by sending the IEEE address request.</p>
 <pre class="highlight literal-block">zdo ieee_addr <em>h:short_addr</em></pre>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-eui64">
-<span id="id31"></span><h3><a class="toc-backref" href="#id82">zdo eui64</a><a class="headerlink" href="#zdo-eui64" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-eui64">
+<span id="id31"></span><h3><a class="toc-backref" href="#id82" role="doc-backlink">zdo eui64</a><a class="headerlink" href="#zdo-eui64" title="Permalink to this heading"></a></h3>
 <p>Get the EUI64 address of the Zigbee device.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zdo</span> <span class="n">eui64</span>
 <span class="mb">0b010</span><span class="n">eaafd745dfa</span>
@@ -1101,9 +1014,9 @@ It is zero by default.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-short">
-<span id="id32"></span><h3><a class="toc-backref" href="#id83">zdo short</a><a class="headerlink" href="#zdo-short" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-short">
+<span id="id32"></span><h3><a class="toc-backref" href="#id83" role="doc-backlink">zdo short</a><a class="headerlink" href="#zdo-short" title="Permalink to this heading"></a></h3>
 <p>Get the short 16-bit address of the Zigbee device.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">zdo</span> <span class="n">short</span>
 <span class="mi">0000</span>
@@ -1111,9 +1024,9 @@ It is zero by default.</p>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="zdo-mgmt-leave">
-<span id="id33"></span><h3><a class="toc-backref" href="#id84">zdo mgmt_leave</a><a class="headerlink" href="#zdo-mgmt-leave" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zdo-mgmt-leave">
+<span id="id33"></span><h3><a class="toc-backref" href="#id84" role="doc-backlink">zdo mgmt_leave</a><a class="headerlink" href="#zdo-mgmt-leave" title="Permalink to this heading"></a></h3>
 <p>Send a request to a remote device to leave the network through <code class="docutils literal notranslate"><span class="pre">zdo</span> <span class="pre">mgmt_leave_req</span></code> (see the specification section 2.4.3.3.5).</p>
 <pre class="highlight literal-block">zdo mgmt_leave <em>h:dst_addr</em> [<em>h:device_address</em>] [--children] [--rejoin]</pre>
 <p>Send <code class="docutils literal notranslate"><span class="pre">mgmt_leave_req</span></code> to a remote node specified by 16-bit destination address <em>dst_addr</em>.
@@ -1142,9 +1055,9 @@ If the target device with the short address <code class="docutils literal notran
 </div>
 <p>This command sends <code class="docutils literal notranslate"><span class="pre">mgmt_leave_req</span></code> to the device with the short address <code class="docutils literal notranslate"><span class="pre">0x1234</span></code>, asking it to remove itself and all its children from the network.</p>
 <hr class="docutils" />
-</div>
-<div class="section" id="version">
-<span id="id34"></span><h3><a class="toc-backref" href="#id85">version</a><a class="headerlink" href="#version" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="version">
+<span id="id34"></span><h3><a class="toc-backref" href="#id85" role="doc-backlink">version</a><a class="headerlink" href="#version" title="Permalink to this heading"></a></h3>
 <p>Print the firmware version.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">version</span>
 </pre></div>
@@ -1158,9 +1071,9 @@ If the target device with the short address <code class="docutils literal notran
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="debug">
-<span id="id35"></span><h3><a class="toc-backref" href="#id86">debug</a><a class="headerlink" href="#debug" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="debug">
+<span id="id35"></span><h3><a class="toc-backref" href="#id86" role="doc-backlink">debug</a><a class="headerlink" href="#debug" title="Permalink to this heading"></a></h3>
 <p>Enable or disable the debug mode in the Shell.</p>
 <pre class="highlight literal-block">debug <em>on|off</em></pre>
 <p>This command unblocks several additional commands in the Shell.</p>
@@ -1169,9 +1082,9 @@ If the target device with the short address <code class="docutils literal notran
 <p>When used, the additional commands can render the device unstable.</p>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="zscheduler-suspend">
-<span id="id36"></span><h3><a class="toc-backref" href="#id87">zscheduler suspend</a><a class="headerlink" href="#zscheduler-suspend" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zscheduler-suspend">
+<span id="id36"></span><h3><a class="toc-backref" href="#id87" role="doc-backlink">zscheduler suspend</a><a class="headerlink" href="#zscheduler-suspend" title="Permalink to this heading"></a></h3>
 <p>Suspend Zigbee scheduler processing.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zscheduler</span> <span class="n">suspend</span>
 </pre></div>
@@ -1181,9 +1094,9 @@ If the target device with the short address <code class="docutils literal notran
 <p>Use only after <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="zscheduler-resume">
-<span id="id37"></span><h3><a class="toc-backref" href="#id88">zscheduler resume</a><a class="headerlink" href="#zscheduler-resume" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="zscheduler-resume">
+<span id="id37"></span><h3><a class="toc-backref" href="#id88" role="doc-backlink">zscheduler resume</a><a class="headerlink" href="#zscheduler-resume" title="Permalink to this heading"></a></h3>
 <p>Resume Zigbee scheduler processing.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zscheduler</span> <span class="n">resume</span>
 </pre></div>
@@ -1193,25 +1106,25 @@ If the target device with the short address <code class="docutils literal notran
 <p>Use only after <a class="reference internal" href="#bdb-start"><span class="std std-ref">bdb start</span></a>.</p>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="nbr-monitor-on">
-<span id="id38"></span><h3><a class="toc-backref" href="#id89">nbr monitor on</a><a class="headerlink" href="#nbr-monitor-on" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="nbr-monitor-on">
+<span id="id38"></span><h3><a class="toc-backref" href="#id89" role="doc-backlink">nbr monitor on</a><a class="headerlink" href="#nbr-monitor-on" title="Permalink to this heading"></a></h3>
 <p>Start monitoring the list of active Zigbee neighbors.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nbr</span> <span class="n">monitor</span> <span class="n">on</span>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="nbr-monitor-off">
-<span id="id39"></span><h3><a class="toc-backref" href="#id90">nbr monitor off</a><a class="headerlink" href="#nbr-monitor-off" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="nbr-monitor-off">
+<span id="id39"></span><h3><a class="toc-backref" href="#id90" role="doc-backlink">nbr monitor off</a><a class="headerlink" href="#nbr-monitor-off" title="Permalink to this heading"></a></h3>
 <p>Stop monitoring the list of active Zigbee neighbors.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nbr</span> <span class="n">monitor</span> <span class="n">off</span>
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="nbr-monitor-trigger">
-<span id="id40"></span><h3><a class="toc-backref" href="#id91">nbr monitor trigger</a><a class="headerlink" href="#nbr-monitor-trigger" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="nbr-monitor-trigger">
+<span id="id40"></span><h3><a class="toc-backref" href="#id91" role="doc-backlink">nbr monitor trigger</a><a class="headerlink" href="#nbr-monitor-trigger" title="Permalink to this heading"></a></h3>
 <p>Trigger logging the list of active Zigbee neighbors.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1221,9 +1134,9 @@ If the target device with the short address <code class="docutils literal notran
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="nvram-enable">
-<span id="id41"></span><h3><a class="toc-backref" href="#id92">nvram enable</a><a class="headerlink" href="#nvram-enable" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="nvram-enable">
+<span id="id41"></span><h3><a class="toc-backref" href="#id92" role="doc-backlink">nvram enable</a><a class="headerlink" href="#nvram-enable" title="Permalink to this heading"></a></h3>
 <p>Enable Zigbee NVRAM.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1233,9 +1146,9 @@ If the target device with the short address <code class="docutils literal notran
 </pre></div>
 </div>
 <hr class="docutils" />
-</div>
-<div class="section" id="nvram-disable">
-<span id="id42"></span><h3><a class="toc-backref" href="#id93">nvram disable</a><a class="headerlink" href="#nvram-disable" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="nvram-disable">
+<span id="id42"></span><h3><a class="toc-backref" href="#id93" role="doc-backlink">nvram disable</a><a class="headerlink" href="#nvram-disable" title="Permalink to this heading"></a></h3>
 <p>Disable Zigbee NVRAM.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1244,13 +1157,12 @@ If the target device with the short address <code class="docutils literal notran
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nvram</span> <span class="n">disable</span>
 </pre></div>
 </div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
   
@@ -1288,22 +1200,13 @@ If the target device with the short address <code class="docutils literal notran
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
