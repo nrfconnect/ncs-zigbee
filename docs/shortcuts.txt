@@ -1,6 +1,6 @@
 .. ### Versions
 
-.. |addon_version| replace:: 0.1.0
+.. |addon_version| replace:: 0.2.0
 .. |ncs_version| replace:: 2.8.0
 .. |zigbee_version| replace:: Zigbee 3.0
 .. |zboss_version| replace:: 4.1.4.2
@@ -40,6 +40,6 @@
 .. |zigbee_ncp_package| replace:: It contains the full development-ready source code for host and evaluation-ready firmware for the nRF54L15 DK.
    The package comes with prebuilt libraries compatible with 64-bit Ubuntu 22.04 Linux.
 .. |zigbee_ncp_package_more_info| replace:: For information about how to recompile the package libraries for a different host architecture or operating system, see the `NCP Host documentation`_.
-   For information about how to use NCP Host for Zigbee in the |NCS| or build the firmware using the NCP sample, see the :ref:`NCP sample <zigbee_ncp_sample>`.
+   For information about how to use NCP Host with the |addon| for the |NCS| or build the firmware using the NCP sample, see the :ref:`NCP sample <zigbee_ncp_sample>`.
 .. |zigbee_shell_config| replace:: You can add support for Zigbee shell commands to any of the available :ref:`Zigbee samples <zigbee_samples>`.
    Some of the commands use an endpoint for sending packets, so no endpoint handler is allowed to be registered for this endpoint.

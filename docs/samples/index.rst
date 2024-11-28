@@ -76,11 +76,13 @@ The following table lists variants and extensions available for each Zigbee samp
       - Light bulb
       - Light switch
       - Network coordinator
+      - NCP
       - Shell
       - Template
     * - Sleepy End Device behavior
       - :ref:`*** <zigbee_ug_sed>`
       - ✔
+      -
       -
       - :ref:`** <zigbee_ug_sed>`
       - :ref:`** <zigbee_ug_sed>`
@@ -88,18 +90,21 @@ The following table lists variants and extensions available for each Zigbee samp
       - `*** <Multiprotocol support_>`_
       - ✔
       - `*** <Multiprotocol support_>`_
+      -
       - `*** <Multiprotocol support_>`_
       - `*** <Multiprotocol support_>`_
     * - Endpoint logger
       - :ref:`** <ug_zigbee_configuring_components_logger_ep>`
       - :ref:`** <ug_zigbee_configuring_components_logger_ep>`
       - :ref:`** <ug_zigbee_configuring_components_logger_ep>`
+      -
       - ✔
       - :ref:`** <ug_zigbee_configuring_components_logger_ep>`
     * - ZCL scene helper
       - ✔
       - :ref:`*** <ug_zigbee_configuring_components_scene_helper>`
       - :ref:`*** <ug_zigbee_configuring_components_scene_helper>`
+      -
       - :ref:`*** <ug_zigbee_configuring_components_scene_helper>`
       - :ref:`*** <ug_zigbee_configuring_components_scene_helper>`
 

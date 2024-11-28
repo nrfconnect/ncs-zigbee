@@ -14,8 +14,6 @@ This page describes the platform designs that are possible with the Zigbee stack
 
 The designs are described from the least to the most complex, that is from simple applications that consist of a single chip running single or multiple protocols to scenarios in which the nRF SoC acts as a network co-processor when the application is running on a much more powerful host processor.
 
-.. include:: /includes/coprocessor_note.txt
-
 .. _ug_zigbee_platform_design_soc:
 
 System-on-Chip designs
@@ -94,8 +92,6 @@ This platform design is suitable for the following development kit:
 
 Co-processor designs
 ********************
-
-.. include:: /includes/coprocessor_note.txt
 
 In co-processor designs, the application runs on one processor (the host processor) and communicates with another processor that provides the radio interface.
 In these designs, the more powerful processor (host) interacts with the Zigbee network through a connectivity device, for example a Nordic Semiconductor's device with the Zigbee interface.

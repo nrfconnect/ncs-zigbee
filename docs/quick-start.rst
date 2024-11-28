@@ -123,11 +123,10 @@ After you complete this quick start guide, we recommend that you get familiar wi
 
 * If you want to test a multiprotocol solution, see the :ref:`zigbee_light_switch_sample_nus` section of the light switch sample.
 
-..
-  * If you want to start developing for co-processor designs:
+* If you want to start developing for co-processor designs:
 
-    * :ref:`ug_zigbee_platform_design_ncp`
-    * `NCP Host documentation`_
+  * :ref:`ug_zigbee_platform_design_ncp`
+  * `NCP Host documentation`_
 
 * If you want to learn more about ZBOSS:
 
