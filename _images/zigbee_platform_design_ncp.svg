@@ -70,9 +70,9 @@
 			<text x="49.88" y="371" class="st5">Application</text>		</g>
 		<g id="shape142-21" transform="translate(266.465,-253.691)">
 			<title>Sheet.142</title>
-			<desc>UART/USB</desc>
+			<desc>UART</desc>
 			<path d="M74.56 367.59 L0 367.59 L0 382.93 L74.56 382.93 L74.56 367.59" class="st2"/>
-			<text x="11.59" y="378.86" class="st7">UART/USB</text>		</g>
+			<text x="23.59" y="378.86" class="st7">UART</text>		</g>
 		<g id="shape143-25" transform="translate(191.953,-9.12982)">
 			<title>Sheet.143</title>
 			<desc>nRF SoC</desc>

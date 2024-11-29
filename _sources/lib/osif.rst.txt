@@ -70,23 +70,23 @@ The ZBOSS OSIF serial implements sets of backend functions that are used by the 
 
 These backend functions serve logging ZBOSS traces that are useful for debugging and are provided in binary format.
 
-..
-  These backend functions serve one or both of the following purposes:
 
-  * Logging ZBOSS traces - Used for handling stack logs that are useful for debugging and are provided in binary format.
-  * Handling NCP communication with the host device - Used only for the :ref:`NCP architecture <ug_zigbee_platform_design_ncp>`.
+These backend functions serve one or both of the following purposes:
 
-  The following table shows which sets of functions serve which purpose.
+* Logging ZBOSS traces - Used for handling stack logs that are useful for debugging and are provided in binary format.
+* Handling NCP communication with the host device - Used only for the :ref:`NCP architecture <ug_zigbee_platform_design_ncp>`.
 
-  .. _osif_table:
+The following table shows which sets of functions serve which purpose.
 
-  +----------------------------+---------------+---------------+----------+
-  |                            | Async serial  | Serial logger | Logger   |
-  +============================+===============+===============+==========+
-  | Logging ZBOSS traces       | -             | -             | -        |
-  +----------------------------+---------------+---------------+----------+
-  | Handling NCP communication | -             |               |          |
-  +----------------------------+---------------+---------------+----------+
+.. _osif_table:
+
++----------------------------+---------------+---------------+----------+
+|                            | Async serial  | Serial logger | Logger   |
++============================+===============+===============+==========+
+| Logging ZBOSS traces       | -             | -             | -        |
++----------------------------+---------------+---------------+----------+
+| Handling NCP communication | -             |               |          |
++----------------------------+---------------+---------------+----------+
 
 For more information about configuring ZBOSS stack logs, see :ref:`zigbee_ug_logging_stack_logs`.
 
@@ -116,16 +116,14 @@ To configure this set of functions, use the following Kconfig options:
 * ``CONFIG_ZIGBEE_HAVE_ASYNC_SERIAL`` - This option enables Zigbee async serial.
 * ``CONFIG_ZIGBEE_UART_SUPPORTS_FLOW_CONTROL`` - This option should be set if serial device supports flow control.
 * ``CONFIG_ZIGBEE_UART_RX_BUF_LEN`` - This option enables and configures the size of internal RX and TX buffer.
-
-..
-  * ``CONFIG_ZBOSS_TRACE_BINARY_NCP_TRANSPORT_LOGGING`` - This option enables logging ZBOSS traces in binary format with Zigbee async serial.
+* ``CONFIG_ZBOSS_TRACE_BINARY_NCP_TRANSPORT_LOGGING`` - This option enables logging ZBOSS traces in binary format with Zigbee async serial.
 
 The Zigbee ZBOSS OSIF layer serial device needs to be provided in devicetree as follows:
 
 .. code-block:: devicetree
 
    chosen {
-       ncs,zigbee-uart = &uart0;
+       ncs,zigbee-uart = &uart20;
    };
 
 Zigbee serial logger
@@ -149,7 +147,7 @@ The ZBOSS tracing serial device needs to be provided in Devicetree like this:
 .. code-block:: devicetree
 
    chosen {
-       ncs,zboss-trace-uart = &uart1;
+       ncs,zboss-trace-uart = &uart21;
    };
 
 Zigbee logger

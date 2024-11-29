@@ -188,6 +188,45 @@ This option is used only if the device does not have NVRAM storage.</p></li>
 <li><p>Zigbee logger</p></li>
 </ul>
 <p>These backend functions serve logging ZBOSS traces that are useful for debugging and are provided in binary format.</p>
+<p>These backend functions serve one or both of the following purposes:</p>
+<ul class="simple">
+<li><p>Logging ZBOSS traces - Used for handling stack logs that are useful for debugging and are provided in binary format.</p></li>
+<li><p>Handling NCP communication with the host device - Used only for the <a class="reference internal" href="../architectures.html#ug-zigbee-platform-design-ncp"><span class="std std-ref">NCP architecture</span></a>.</p></li>
+</ul>
+<p>The following table shows which sets of functions serve which purpose.</p>
+<table class="docutils align-default" id="osif-table">
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>Async serial</p></th>
+<th class="head"><p>Serial logger</p></th>
+<th class="head"><p>Logger</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Logging ZBOSS traces</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Handling NCP communication</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <p>For more information about configuring ZBOSS stack logs, see <a class="reference internal" href="../configuring.html#zigbee-ug-logging-stack-logs"><span class="std std-ref">Stack logs</span></a>.</p>
 <section id="zigbee-async-serial">
 <span id="zigbee-osif-zigbee-async-serial"></span><h3><a class="toc-backref" href="#id5" role="doc-backlink">Zigbee async serial</a><a class="headerlink" href="#zigbee-async-serial" title="Permalink to this heading"></a></h3>
@@ -200,10 +239,11 @@ The data received are internally buffered.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_HAVE_ASYNC_SERIAL</span></code> - This option enables Zigbee async serial.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_UART_SUPPORTS_FLOW_CONTROL</span></code> - This option should be set if serial device supports flow control.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_UART_RX_BUF_LEN</span></code> - This option enables and configures the size of internal RX and TX buffer.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_TRACE_BINARY_NCP_TRANSPORT_LOGGING</span></code> - This option enables logging ZBOSS traces in binary format with Zigbee async serial.</p></li>
 </ul>
 <p>The Zigbee ZBOSS OSIF layer serial device needs to be provided in devicetree as follows:</p>
 <div class="highlight-devicetree notranslate"><div class="highlight"><pre><span></span><span class="nf">chosen</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">ncs</span><span class="p">,</span><span class="n">zigbee-uart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">uart0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ncs</span><span class="p">,</span><span class="n">zigbee-uart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">uart20</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 </div>
@@ -224,7 +264,7 @@ This ring buffer has a size of 4096 bytes by default.</p>
 </ul>
 <p>The ZBOSS tracing serial device needs to be provided in Devicetree like this:</p>
 <div class="highlight-devicetree notranslate"><div class="highlight"><pre><span></span><span class="nf">chosen</span><span class="cm"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">ncs</span><span class="p">,</span><span class="n">zboss-trace-uart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">uart1</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ncs</span><span class="p">,</span><span class="n">zboss-trace-uart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">uart21</span><span class="p">;</span>
 <span class="p">};</span>
 </pre></div>
 </div>

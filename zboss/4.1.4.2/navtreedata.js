@@ -24,6 +24,8 @@ var NAVTREE =
 [
   [ "Developing with ZBOSS for Zigbee", "index.html", [
     [ "ZBOSS stack user guide", "zigbee_devguide.html", "zigbee_devguide" ],
+    [ "ZBOSS stack user guide", "zigbee_devguide.html", "zigbee_devguide" ],
+    [ "ZBOSS NCP Host user guide", "zboss_ncp_host_intro.html", "zboss_ncp_host_intro" ],
     [ "Deprecated List", "deprecated.html", null ],
     [ "API Reference", "modules.html", "modules" ],
     [ "Data Structures", "usergroup0.html", [

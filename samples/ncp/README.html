@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zigbee: NCP &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/nordic.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/togglebutton.css" type="text/css" />
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/js/theme.js"></script>
+  <script type="text/javascript" src="../../_static/js/ncs.js"></script>
+
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Zigbee: Network coordinator" href="../network_coordinator/README.html" />
+    <link rel="prev" title="Zigbee: Light switch" href="../light_switch/README.html" />
+  <link rel="shortcut icon" href="../../_static/images/favicon.ico"/>
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Zigbee add-on for nRF Connect SDK
+          </a>
+<div id="searchbox" role="search">
+  <div class="searchformwrapper">
+    <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+  </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About Zigbee protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../setup.html">Requirements and setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quick-start.html">Quick start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architectures.html">Architectures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../commissioning.html">Commissioning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../memory.html">Memory requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuring/index.html">Additional configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../zboss/index.html">ZBOSS Zigbee stack</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Samples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../light_bulb/README.html">Zigbee: Light bulb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../light_switch/README.html">Zigbee: Light switch</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Zigbee: NCP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#serial-communication-setup">Serial communication setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vendor-specific-commands">Vendor-specific commands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#user-interface">User interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-and-running">Building and running</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#testing">Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../network_coordinator/README.html">Zigbee: Network coordinator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../shell/README.html">Zigbee: Shell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../template/README.html">Zigbee: Template</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../lib/index.html">Libraries for Zigbee</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Zigbee add-on for nRF Connect SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Samples</a></li>
+      <li class="breadcrumb-item active">Zigbee: NCP</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/samples/ncp/README.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="zigbee-ncp">
+<span id="zigbee-ncp-sample"></span><h1>Zigbee: NCP<a class="headerlink" href="#zigbee-ncp" title="Permalink to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#requirements" id="id3">Requirements</a></p></li>
+<li><p><a class="reference internal" href="#overview" id="id4">Overview</a></p></li>
+<li><p><a class="reference internal" href="#configuration" id="id5">Configuration</a></p>
+<ul>
+<li><p><a class="reference internal" href="#serial-communication-setup" id="id6">Serial communication setup</a></p></li>
+<li><p><a class="reference internal" href="#vendor-specific-commands" id="id7">Vendor-specific commands</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#user-interface" id="id8">User interface</a></p></li>
+<li><p><a class="reference internal" href="#building-and-running" id="id9">Building and running</a></p>
+<ul>
+<li><p><a class="reference internal" href="#testing" id="id10">Testing</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#dependencies" id="id11">Dependencies</a></p></li>
+</ul>
+</nav>
+<p>The <a class="reference internal" href="../../index.html#zigbee-index"><span class="std std-ref">Zigbee</span></a> NCP sample demonstrates the usage of Zigbee’s <a class="reference internal" href="../../architectures.html#ug-zigbee-platform-design-ncp-details"><span class="std std-ref">Network Co-Processor (NCP)</span></a> architecture.</p>
+<p>Together with the source code from <a class="reference internal" href="../../tools.html#ug-zigbee-tools-ncp-host"><span class="std std-ref">ZBOSS NCP Host</span></a>, you can use this sample to create a complete and functional Zigbee device.
+For example, as shown in the <a class="reference internal" href="#testing">Testing</a> scenario, you can program a development kit with the NCP sample and bundle it with the simple gateway application on the NCP host processor.</p>
+<p>You can then use this sample together with the <a class="reference internal" href="../light_bulb/README.html#zigbee-light-bulb-sample"><span class="std std-ref">Zigbee Light bulb</span></a> to set up a basic Zigbee network.</p>
+<section id="requirements">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Requirements</a><a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
+<p>The sample supports the following development kits:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Hardware platforms</p></th>
+<th class="head"><p>PCA</p></th>
+<th class="head"><p>Board name</p></th>
+<th class="head"><p>Board target</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf54l/index.html">nRF54L15 DK</a></p></td>
+<td><p>PCA10156</p></td>
+<td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html">nrf54l15dk</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">nrf54l15dk/nrf54l15/cpuapp</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>To test this sample, you also need the following:</p>
+<ul>
+<li><p><a class="reference internal" href="../../tools.html#ug-zigbee-tools-ncp-host"><span class="std std-ref">ZBOSS NCP Host</span></a> tool, which is based on the ZBOSS stack and requires a PC with an operating system compatible with the 64-bit Ubuntu 18.04 Linux.
+The tool is available for download as a standalone <code class="file docutils literal notranslate"><span class="pre">zip</span></code> package using the following link:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/nrfconnect/ncs-zigbee/resources/ncp_host_v3.0.0.zip">ZBOSS NCP Host</a> (3.0.0)</p></li>
+</ul>
+<p>For more information, see also the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zboss_ncp_host_intro.html">NCP Host documentation</a>.</p>
+</li>
+<li><p>The <a class="reference internal" href="../light_bulb/README.html#zigbee-light-bulb-sample"><span class="std std-ref">Zigbee: Light bulb</span></a> sample programmed on one separate device.</p></li>
+</ul>
+<p>This means that you need at least two development kits for testing this sample.</p>
+<figure class="align-default" id="id2">
+<img alt="Zigbee NCP sample setup overview" src="../../_images/zigbee_ncp_sample_overview.svg" /><figcaption>
+<p><span class="caption-text">Zigbee NCP sample setup overview</span><a class="headerlink" href="#id2" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="overview">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Overview</a><a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p>The sample demonstrates using a Nordic Semiconductor’s Development Kit as a Zigbee Network Co-Processor.</p>
+<p>The sample uses the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_LIBRARY_NCP_DEV</span></code> Kconfig option, which is available as part of the <a class="reference internal" href="../../zboss/configuration.html#zboss-configuration"><span class="std std-ref">ZBOSS library configuration</span></a>.
+The NCP Kconfig option extends the compilation process with an implementation of the ZBOSS API serialization through NCP commands.
+It also implements the ZBOSS default signal handler function that controls the ZBOSS and commissioning logic.</p>
+<p>The NCP application creates and starts a ZBOSS thread as well as the communication channel for NCP commands that are exchanged between the connectivity device and the host processor.</p>
+</section>
+<section id="configuration">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<p>See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/index.html">Configuring and building</a> in the nRF Connect SDK documentation for information about how to permanently or temporarily change the configuration.</p>
+<p>See <a class="reference internal" href="../../configuring.html#ug-zigbee-configuring-eui64"><span class="std std-ref">IEEE 802.15.4 EUI-64 configuration</span></a> for information about how to configure the IEEE address for this sample.</p>
+<section id="serial-communication-setup">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Serial communication setup</a><a class="headerlink" href="#serial-communication-setup" title="Permalink to this heading"></a></h3>
+<p>The communication channel uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/hardware/peripherals/uart.html">UART API</a> API. The serial device is selected in devicetree like this:</p>
+<div class="highlight-devicetree notranslate"><div class="highlight"><pre><span></span><span class="nf">chosen</span><span class="cm"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">ncs</span><span class="p">,</span><span class="n">zigbee-uart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">uart20</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>By default, Zephyr’s logger uses <code class="docutils literal notranslate"><span class="pre">uart20</span></code> and the NCP sample communicates through the UART serialization using <code class="docutils literal notranslate"><span class="pre">uart1</span></code>.
+The DTS overlay file configures <code class="docutils literal notranslate"><span class="pre">uart21</span></code> to be connected to the on-board J-Link instead of <code class="docutils literal notranslate"><span class="pre">uart20</span></code>.
+As the result, Zephyr’s logger <code class="docutils literal notranslate"><span class="pre">uart20</span></code> is available only through GPIO pins (<strong>P1.08</strong> and <strong>P1.09</strong>).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">uart20</span></code> pins are configured by devicetree overlay files for each supported development kit in the <code class="file docutils literal notranslate"><span class="pre">boards</span></code> directory.</p>
+</section>
+<section id="vendor-specific-commands">
+<span id="zigbee-ncp-vendor-specific-commands"></span><h3><a class="toc-backref" href="#id7" role="doc-backlink">Vendor-specific commands</a><a class="headerlink" href="#vendor-specific-commands" title="Permalink to this heading"></a></h3>
+<p>You can extend the NCP sample with support for vendor-specific commands to implement new features, such as controlling LEDs.
+These commands let you request custom actions over the ZBOSS NCP protocol.</p>
+<p>Vendor-specific commands are sent over the NCP protocol using the following types of packets:</p>
+<ul>
+<li><p>Request</p>
+<p>These can be sent only by the host.
+The nRF SoC must respond to all of them.</p>
+</li>
+<li><p>Response</p>
+<p>These can be sent only by the nRF SoC.
+The nRF SoC can send them only when requested by the host.
+This limitation can be bypassed by indications.</p>
+</li>
+<li><p>Indication</p>
+<p>These can be sent only by the nRF SoC.
+The indications are sent on demand from the nRF SoC to the host, for example to inform the host about polling avoidance or sudden or rare events, such as pressing the button.
+Indications are neither responded to nor acknowledged.</p>
+</li>
+</ul>
+<p>By default, the NCP sample already supports the vendor-specific commands for controlling a LED.</p>
+<section id="implementing-vendor-specific-commands">
+<h4>Implementing vendor-specific commands<a class="headerlink" href="#implementing-vendor-specific-commands" title="Permalink to this heading"></a></h4>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The steps in this section describe the process of implementing the vendor-specific commands in the NCP sample.
+Documentation for the implementation steps for the host side is not yet available.</p>
+</div>
+<p>To implement custom vendor-specific commands, you need to modify the NCP sample as follows:</p>
+<ol class="arabic">
+<li><p>Implement a callback for handling custom commands requests.</p>
+<p>The function must follow the <code class="xref c c-struct docutils literal notranslate"><span class="pre">zb_ncp_custom_request_cb_t</span></code> declaration.
+For an example, see <code class="xref c c-func docutils literal notranslate"><span class="pre">ncp_vendor_specific_req_handler()</span></code> in the sample.
+This function parses the command payload, validates it, performs required action on <strong>LED 1</strong>, and sends a response.</p>
+</li>
+<li><p>Register the handler function using <code class="xref c c-func docutils literal notranslate"><span class="pre">zb_ncp_custom_register_request_cb()</span></code>, as implemented in the sample.</p>
+<p>Once the callback is registered, it is called for every custom command request received from the host.</p>
+</li>
+<li><p>At the end of the custom request callback, implement the response to the request using one of the following options:</p>
+<ul class="simple">
+<li><p>Implement an immediate response that is sent just after the request is received and parsed.
+For this option, make sure that the length of the response is returned from the custom command callback (implemented in step 1) and <code class="xref c c-func docutils literal notranslate"><span class="pre">zb_ncp_custom_response()</span></code> is called with a buffer that contains both the response payload and the parameters encapsulated in <code class="xref c c-struct docutils literal notranslate"><span class="pre">ncp_hl_custom_resp_t</span></code>.</p></li>
+<li><p>Implement a delayed response that can be useful for example to implement commands that require more time to complete.
+For this option, make sure that <code class="xref c c-macro docutils literal notranslate"><span class="pre">NCP_RET_LATER</span></code> is returned from the custom command callback (implemented in step 1) and <code class="xref c c-func docutils literal notranslate"><span class="pre">zb_ncp_custom_response()</span></code> is called after this callback.</p></li>
+</ul>
+<p>If the function fails, it must return an error code, while a response is automatically generated by the stack.
+See <code class="xref c c-func docutils literal notranslate"><span class="pre">ncp_vendor_specific_req_handler()</span></code> for an example of the immediate response.</p>
+</li>
+<li><p>Implement custom indications by using <code class="xref c c-func docutils literal notranslate"><span class="pre">zb_ncp_custom_indication()</span></code> to send an indication to the host.</p>
+<p>The NCP sample demonstrates the indication usage to inform the host about the index of the LED that is controlled by custom requests.
+The indication is sent three seconds after start-up.
+See <code class="xref c c-func docutils literal notranslate"><span class="pre">custom_indication()</span></code> in the sample to see how to pass the data to the indication’s payload.</p>
+</li>
+</ol>
+<p>Once you complete these steps and configure the vendor-specific commands on the host, you can call these commands from the host to use the extended functionalities in the NCP sample.</p>
+</section>
+</section>
+</section>
+<section id="user-interface">
+<span id="zigbee-ncp-user-interface"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">User interface</a><a class="headerlink" href="#user-interface" title="Permalink to this heading"></a></h2>
+<p>All the NCP sample’s interactions with the application are automatically handled using serial communication.</p>
+</section>
+<section id="building-and-running">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Building and running</a><a class="headerlink" href="#building-and-running" title="Permalink to this heading"></a></h2>
+<p>Make sure to configure the Zigbee stack before building and testing this sample.
+See <a class="reference internal" href="../../configuring.html#ug-zigbee-configuring"><span class="std std-ref">Configuring Zigbee add-on</span></a> for more information.</p>
+<p>This sample can be found under <code class="file docutils literal notranslate"><span class="pre">samples/ncp</span></code> in the Zigbee add-on folder structure.</p>
+<p>To build the sample, follow the instructions in <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/building.html">Building an application</a> in the nRF Connect SDK documentation for your preferred building environment.
+See also <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/programming.html">Programming an application</a> for programming steps and <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/test_and_optimize.html">Testing and optimization</a> for general information about testing and debugging in the nRF Connect SDK.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When building <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#repository_application">repository applications</a> in the Zigbee add-on which is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/dev_model_and_contributions/code_base.html#repository_types">SDK repository</a>, building with sysbuild is <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/config_and_build_system.html#sysbuild_enabled_by_default">enabled by default</a>.
+If you work with out-of-tree <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#create-application-types-freestanding">freestanding applications</a>, you need to manually pass the <code class="docutils literal notranslate"><span class="pre">--sysbuild</span></code> parameter to every build command or <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/sysbuild/sysbuild_configuring_west.html">configure west to always use it</a>.</p>
+</div>
+<section id="testing">
+<span id="zigbee-ncp-testing"></span><h3><a class="toc-backref" href="#id10" role="doc-backlink">Testing</a><a class="headerlink" href="#testing" title="Permalink to this heading"></a></h3>
+<p>After building the sample and programming it to your development kit, complete the following steps to test it:</p>
+<ol class="arabic">
+<li><p>Download and extract the <a class="reference external" href="https://github.com/nrfconnect/ncs-zigbee/resources/ncp_host_v3.0.0.zip">ZBOSS NCP Host</a> package.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you are using a Linux distribution different than the 64-bit Ubuntu 22.04, make sure to rebuild the package libraries and applications.
+Follow the instructions in the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zboss_ncp_host.html#rebuilding_libs">Rebuilding the ZBOSS libraries for host</a> section in the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zboss_ncp_host_intro.html">NCP Host documentation</a>.</p>
+</div>
+</li>
+<li><p>Get the kit’s serial port name (for example, <code class="docutils literal notranslate"><span class="pre">/dev/ttyACM0</span></code>).</p></li>
+<li><p>Turn on the development kit that runs the Light bulb sample.</p></li>
+<li><p>To start the simple gateway application, run the following command with <em>serial_port_name</em> replaced with the serial port name used for communication with the NCP sample:</p>
+<div class="highlight highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NCP_SLAVE_PTY</span><span class="o">=*</span><span class="n">serial_port_name</span><span class="o">*</span> <span class="o">./</span><span class="n">application</span><span class="o">/</span><span class="n">simple_gw</span><span class="o">/</span><span class="n">simple_gw</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>The simple gateway device forms the Zigbee network and opens the network for 180 seconds for new devices to join.
+When the light bulb joins the network, the <strong>LED 2</strong> on the light bulb device turns on to indicate that it is connected to the simple gateway.
+The gateway then starts discovering the On/Off cluster.
+When it is found, the simple gateway configures bindings and reporting for the device.
+It then starts sending On/Off toggle commands with a 15-second interval that toggle the <strong>LED 1</strong> on the light bulb on and off.</p>
+</section>
+</section>
+<section id="dependencies">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Dependencies</a><a class="headerlink" href="#dependencies" title="Permalink to this heading"></a></h2>
+<p>This sample uses the following nRF Connect SDK libraries:</p>
+<ul class="simple">
+<li><p>Zigbee subsystem:</p>
+<ul>
+<li><p><code class="file docutils literal notranslate"><span class="pre">zb_nrf_platform.h</span></code></p></li>
+</ul>
+</li>
+</ul>
+<p>It uses the ZBOSS stack:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../zboss/index.html#zigbee-zboss"><span class="std std-ref">ZBOSS Zigbee stack</span></a> 4.1.4.2 (<a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zigbee_devguide.html">API documentation</a>)</p></li>
+</ul>
+<p>In addition, it uses the following Zephyr libraries:</p>
+<ul class="simple">
+<li><p><code class="file docutils literal notranslate"><span class="pre">include/device.h</span></code></p></li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/logging/index.html">Logging</a></p></li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/hardware/peripherals/uart.html">UART API</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../network_coordinator/README.html" class="btn btn-neutral float-right" title="Zigbee: Network coordinator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../light_switch/README.html" class="btn btn-neutral" title="Zigbee: Light switch" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+
+<table>
+<tr>
+<td>
+    <p>
+        &copy; Copyright 2024, Nordic Semiconductor.
+
+    </p>
+</td>
+<td id="nordiclogo">
+  <a href="https://www.nordicsemi.com/"><img src="../../_static/images/nordic.svg" border="0"/></a>
+</td>
+</tr>
+</table>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
