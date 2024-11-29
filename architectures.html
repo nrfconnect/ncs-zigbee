@@ -133,11 +133,6 @@
 </div>
 <p>This page describes the platform designs that are possible with the Zigbee stack on the nRF54L15 development kit.</p>
 <p>The designs are described from the least to the most complex, that is from simple applications that consist of a single chip running single or multiple protocols to scenarios in which the nRF SoC acts as a network co-processor when the application is running on a much more powerful host processor.</p>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Co-processor designs are not supported for this release of the Zigbee add-on for the nRF Connect SDK.
-Support is planned for a future release.</p>
-</div>
 <section id="system-on-chip-designs">
 <span id="ug-zigbee-platform-design-soc"></span><h2><a class="toc-backref" href="#id5" role="doc-backlink">System-on-Chip designs</a><a class="headerlink" href="#system-on-chip-designs" title="Permalink to this heading"></a></h2>
 <p>The single-chip solution has a combined RFIC (the IEEE 802.15.4 in case of Zigbee) and processor.
@@ -221,11 +216,6 @@ The application uses the <a class="reference internal" href="zboss/index.html#zi
 </section>
 <section id="co-processor-designs">
 <span id="ug-zigbee-platform-design-ncp"></span><h2><a class="toc-backref" href="#id8" role="doc-backlink">Co-processor designs</a><a class="headerlink" href="#co-processor-designs" title="Permalink to this heading"></a></h2>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Co-processor designs are not supported for this release of the Zigbee add-on for the nRF Connect SDK.
-Support is planned for a future release.</p>
-</div>
 <p>In co-processor designs, the application runs on one processor (the host processor) and communicates with another processor that provides the radio interface.
 In these designs, the more powerful processor (host) interacts with the Zigbee network through a connectivity device, for example a Nordic Semiconductor’s device with the Zigbee interface.</p>
 <p>The co-processor designs can be used when a device requires additional functionalities or more compute power than what Nordic Semiconductor’s devices have to offer, but the more powerful processor does not have a suitable radio interface.
@@ -233,7 +223,7 @@ The split stack architectures are most commonly used to design a Zigbee gateway,
 <section id="network-co-processor-ncp">
 <span id="ug-zigbee-platform-design-ncp-details"></span><h3><a class="toc-backref" href="#id9" role="doc-backlink">Network Co-Processor (NCP)</a><a class="headerlink" href="#network-co-processor-ncp" title="Permalink to this heading"></a></h3>
 <p>In this design, the host processor runs the Zigbee application layer (ZCL) and the Zigbee commissioning logic.
-The connectivity device (nRF SoC) runs the <span class="xref std std-ref">NCP application</span> that contains lower parts of the Zigbee stack (802.15.4 PHY/MAC and the Zigbee PRO network layer), as well as provides commands to execute BDB commissioning primitives.
+The connectivity device (nRF SoC) runs the <a class="reference internal" href="samples/ncp/README.html#zigbee-ncp-sample"><span class="std std-ref">NCP application</span></a> that contains lower parts of the Zigbee stack (802.15.4 PHY/MAC and the Zigbee PRO network layer), as well as provides commands to execute BDB commissioning primitives.
 The host processor communicates with the NCP through a serial interface (UART).</p>
 <p>The NCP design has the following advantages:</p>
 <ul class="simple">

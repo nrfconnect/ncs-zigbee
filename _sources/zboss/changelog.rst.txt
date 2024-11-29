@@ -12,6 +12,15 @@ ZBOSS stack changelog
    
 All notable changes to the ZBOSS stack are documented in ZBOSS documentation. 
 
+|addon| v0.2.0
+**************
+
+ZBOSS 4.1.4.2
+  `Documentation <ZBOSS 4.1.4.2 Documentation_>`_ | `Release notes <ZBOSS 4.1.4.2 changelog_>`_
+
+NCP Host 3.0.0
+  `Documentation <NCP Host 3.0.0 Documentation_>`_ | `Release notes <NCP Host 3.0.0 changelog_>`_
+
 |addon| v0.1.0
 **************
 
