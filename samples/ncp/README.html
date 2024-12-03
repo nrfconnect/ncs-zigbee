@@ -205,7 +205,7 @@ It also implements the ZBOSS default signal handler function that controls the Z
 <span class="p">};</span>
 </pre></div>
 </div>
-<p>By default, Zephyr’s logger uses <code class="docutils literal notranslate"><span class="pre">uart20</span></code> and the NCP sample communicates through the UART serialization using <code class="docutils literal notranslate"><span class="pre">uart1</span></code>.
+<p>By default, Zephyr’s logger uses <code class="docutils literal notranslate"><span class="pre">uart20</span></code> and the NCP sample communicates through the UART serialization using <code class="docutils literal notranslate"><span class="pre">uart21</span></code>.
 The DTS overlay file configures <code class="docutils literal notranslate"><span class="pre">uart21</span></code> to be connected to the on-board J-Link instead of <code class="docutils literal notranslate"><span class="pre">uart20</span></code>.
 As the result, Zephyr’s logger <code class="docutils literal notranslate"><span class="pre">uart20</span></code> is available only through GPIO pins (<strong>P1.08</strong> and <strong>P1.09</strong>).</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">uart20</span></code> pins are configured by devicetree overlay files for each supported development kit in the <code class="file docutils literal notranslate"><span class="pre">boards</span></code> directory.</p>
