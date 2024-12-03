@@ -67,7 +67,7 @@ The communication channel uses Zephyr's `UART API`_ API. The serial device is se
        ncs,zigbee-uart = &uart20;
    };
 
-By default, Zephyr's logger uses ``uart20`` and the NCP sample communicates through the UART serialization using ``uart1``.
+By default, Zephyr's logger uses ``uart20`` and the NCP sample communicates through the UART serialization using ``uart21``.
 The DTS overlay file configures ``uart21`` to be connected to the on-board J-Link instead of ``uart20``.
 As the result, Zephyr's logger ``uart20`` is available only through GPIO pins (**P1.08** and **P1.09**).
 
