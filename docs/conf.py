@@ -28,6 +28,7 @@ extensions = [
     'sphinxcontrib.mscgen',
     'sphinx_tabs.tabs',
     'sphinx_togglebutton',
+    'page_filter',
 ]
 
 templates_path = ['_templates']
