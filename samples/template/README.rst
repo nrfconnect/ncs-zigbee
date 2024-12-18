@@ -16,7 +16,7 @@ Requirements
 
 The sample supports the following development kit:
 
-.. include:: /includes/device_table_nrf54l15.txt
+.. include:: /includes/device_table_single_multi.txt
 
 ..
   You can use one or more of the development kits listed above and mix different development kits.

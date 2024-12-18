@@ -142,7 +142,7 @@
 .. _`ZBOSS stack release notes`:
 .. _`external ZBOSS development guide and API documentation`: https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zigbee_devguide.html
 .. _`Stack commissioning start sequence`: https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/using_zigbee__z_c_l.html#stack_start_initiation
-.. _`ZBOSS NCP Host`: https://github.com/nrfconnect/ncs-zigbee/resources/ncp_host_v3.0.0.zip
+.. _`ZBOSS NCP Host`: https://github.com/nrfconnect/ncs-zigbee/raw/refs/heads/main/resources/ncp_host_v3.0.0.zip
 .. _`NCP Host documentation`: https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zboss_ncp_host_intro.html
 .. _`Rebuilding the ZBOSS libraries for host`: https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zboss_ncp_host.html#rebuilding_libs
 .. _`process the frame`: https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/using_zigbee__z_c_l.html#process_zcl_cmd

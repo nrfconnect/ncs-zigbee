@@ -19,7 +19,7 @@ Requirements
 
 The sample supports the following development kits:
 
-.. include:: /includes/device_table_nrf54l15.txt
+.. include:: /includes/device_table_ncp.txt
 
 To test this sample, you also need the following:
 

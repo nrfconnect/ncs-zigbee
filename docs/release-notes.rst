@@ -16,15 +16,13 @@ See also the `Release notes for the nRF Connect SDK`_ and the :ref:`zboss_change
 The |addon| v\ |addon_version| is compatible with |NCS| v\ |ncs_version| and uses the ZBOSS stack version |zboss_version|.
 For a full list of |addon|, related |NCS| and ZBOSS stack and NCP host package versions, view the following table:
 
-.. toggle::
-
-   +-------------------+------------------+-----------------------+---------------------+
-   | |addon| version   | |NCS| version    | ZBOSS stack version   | NCP host version    |
-   +===================+==================+=======================+=====================+
-   | 0.2.0             | 2.8.0            | 4.1.4.2               | 3.0.0               | 
-   +-------------------+                  +                       +---------------------+
-   | 0.1.0             |                  |                       | N/A                 | 
-   +-------------------+------------------+-----------------------+---------------------+
++-------------------+------------------+-----------------------+---------------------+
+| |addon| version   | |NCS| version    | ZBOSS stack version   | NCP host version    |
++===================+==================+=======================+=====================+
+| 0.2.0             | 2.8.0            | 4.1.4.2               | 3.0.0               | 
++-------------------+                  +                       +---------------------+
+| 0.1.0             |                  |                       | N/A                 | 
++-------------------+------------------+-----------------------+---------------------+
 
 .. _zigbee_release:
 
