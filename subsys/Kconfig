@@ -23,7 +23,7 @@ menuconfig ZIGBEE_ADD_ON
 	imply FLASH_PAGE_LAYOUT
 	imply FLASH_MAP
 	imply MPU_ALLOW_FLASH_WRITE
-	depends on (SOC_NRF52840 || SOC_NRF54L15)
+	depends on SOC_NRF54L15
 
 if ZIGBEE_ADD_ON
 
@@ -335,11 +335,6 @@ config ZIGBEE_UART_TX_BUF_LEN
 	default 128
 
 endif #ZIGBEE_HAVE_ASYNC_SERIAL
-
-config ZIGBEE_USE_SOFTWARE_AES
-	bool "Use software based AES"
-	select NRF_OBERON
-	default n
 
 config NRF_SECURITY
 	default y
