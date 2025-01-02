@@ -9,7 +9,6 @@
 #include <zboss_api.h>
 #if CONFIG_NRF_SECURITY
 #include <psa/crypto.h>
-#include <ocrypto_curve25519.h>
 #else
 #error No crypto suite for Zigbee stack has been selected
 #endif
@@ -87,6 +86,30 @@ zb_int_t zb_osif_scalarmult(zb_uint8_t *result_point,
                             const zb_uint8_t *scalar,
                             const zb_uint8_t *point)
 {
-	ocrypto_curve25519_scalarmult(result_point, scalar, point);
+	psa_status_t status;
+	mbedtls_svc_key_id_t key_id;
+	size_t output_length;
+
+	ZVUNUSED(status);
+
+	psa_init();
+
+	psa_key_attributes_t key_attributes = PSA_KEY_ATTRIBUTES_INIT;
+	psa_set_key_usage_flags(&key_attributes, PSA_KEY_USAGE_DERIVE);
+	psa_set_key_lifetime(&key_attributes, PSA_KEY_LIFETIME_VOLATILE);
+	psa_set_key_algorithm(&key_attributes, PSA_ALG_ECDH);
+	psa_set_key_type(&key_attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_MONTGOMERY));
+
+	status = psa_import_key(&key_attributes, scalar, ZB_ECC_CURVE25519_BASE_POINT_LEN, &key_id);
+	__ASSERT(status == PSA_SUCCESS, "psa_import failed! (Error: %d)", status);
+
+	psa_reset_key_attributes(&key_attributes);
+
+	status = psa_raw_key_agreement(PSA_ALG_ECDH, key_id, point, ZB_ECC_CURVE25519_BASE_POINT_LEN,
+			 result_point, ZB_ECC_SECRET_MAX_LEN, &output_length);
+	__ASSERT(status == PSA_SUCCESS, "psa_raw_key_agreement failed! (Error: %d)", status);
+
+	psa_destroy_key(key_id);
+
 	return 0;
 }
