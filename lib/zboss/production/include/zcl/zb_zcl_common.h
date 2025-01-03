@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -2530,5 +2530,23 @@ zb_zcl_status_t zb_zcl_set_attr_val_manuf_internal(zb_uint8_t ep,
                                                    zb_uint8_t *value,
                                                    zb_bool_t check_access,
                                                    zb_bool_t check_attr_writable);
+
+
+/**
+ * @brief Map return code to ZCL status code
+ *
+ * @param ret_code - return code from command handler
+ *
+ * @return zb_zcl_status_t according ret_code
+ */
+zb_zcl_status_t zb_zcl_map_ret_code_to_zcl_status(zb_ret_t ret_code);
+
+/* Attribute count on a list, except for the cluster revision ID at the 
+beginning and the empty one at the end */
+#define ZB_ZCL_ATTRIB_LIST_GET_COUNT(list)    ZB_ARRAY_SIZE((list)) - 2
+
+/* Pointer of the first attribute on a list, after cluster revision ID */
+#define ZB_ZCL_ATTRIB_LIST_GET_PTR(list)      (zb_zcl_attr_t *)(list) + 1
+
 /** @endcond */ /* DOXYGEN_ZCL_SECTION */
 #endif /* ZB_ZCL_COMMON_H */

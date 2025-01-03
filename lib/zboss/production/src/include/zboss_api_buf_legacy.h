@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -765,14 +765,17 @@ zb_ret_t zb_get_buf_delayed_2param(
 #else
 #define ZB_GET_OUT_BUF_DELAYED2(callback, user_param) zb_get_buf_delayed_2param(callback, ZB_OUT_BUFFER, ZB_TRUE, user_param)
 #endif
+/** @cond internals_doc */
+
 
 /**
    Do nothing in ZB_SWITCH_BUF
  */
 #define ZB_SWITCH_BUF(buf, to_in)
 
-#endif /* #ifdef ZB_LEGACY_BUFS */
 
-/*! @} */ /* bufleg */
+/*! @} */
+
+#endif /* #ifdef ZB_LEGACY_BUFS */
 
 #endif /* ZBOSS_API_BUF_LEGACY_H */
