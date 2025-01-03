@@ -7,7 +7,8 @@ tests:
     build_only: true
     integration_platforms:
       - nrf54l15dk/nrf54l15/cpuapp
-    platform_allow: nrf54l15dk/nrf54l15/cpuapp
+      - nrf54l15dk/nrf54l10/cpuapp
+    platform_allow: nrf54l15dk/nrf54l15/cpuapp nrf54l15dk/nrf54l10/cpuapp
     tags: ci_build smoke sysbuild ci_samples_zigbee
   sample.zigbee.light_switch.multiprotocol:
     sysbuild: true
@@ -15,7 +16,8 @@ tests:
     extra_args: OVERLAY_CONFIG=overlay-multiprotocol_ble.conf
     integration_platforms:
       - nrf54l15dk/nrf54l15/cpuapp
-    platform_allow: nrf54l15dk/nrf54l15/cpuapp
+      - nrf54l15dk/nrf54l10/cpuapp
+    platform_allow: nrf54l15dk/nrf54l15/cpuapp nrf54l15dk/nrf54l10/cpuapp
     tags: ci_build sysbuild ci_samples_zigbee
   sample.zigbee.light_switch.with_shell:
     sysbuild: true
@@ -25,5 +27,6 @@ tests:
       CONFIG_ZIGBEE_SHELL_ENDPOINT=1 CONFIG_LOG_MODE_DEFERRED=y
     integration_platforms:
       - nrf54l15dk/nrf54l15/cpuapp
-    platform_allow: nrf54l15dk/nrf54l15/cpuapp
+      - nrf54l15dk/nrf54l10/cpuapp
+    platform_allow: nrf54l15dk/nrf54l15/cpuapp nrf54l15dk/nrf54l10/cpuapp
     tags: ci_build shell sysbuild ci_samples_zigbee
