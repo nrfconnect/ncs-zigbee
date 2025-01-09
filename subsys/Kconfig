@@ -379,6 +379,10 @@ config ZIGBEE_TC_REJOIN_ENABLED
 	bool "Enables Trust Center Rejoin"
 	default y
 
+config ZIGBEE_DEV_REJOIN_TIMEOUT_MS
+	int "Timeout in ms after which End Device stops to send beacons if can not join/rejoin a network"
+	default 200000
+
 DT_CHOSEN_NCS_ZIGBEE_TIMER := ncs,zigbee-timer
 
 choice ZIGBEE_TIME_SOURCE

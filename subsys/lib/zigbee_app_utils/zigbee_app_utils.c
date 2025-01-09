@@ -20,13 +20,6 @@
 /* Number of retries until the pin value stabilizes. */
 #define READ_RETRIES  10
 
-/* Timeout after which End Device stops to send beacons
- * if can not join/rejoin a network.
- */
-#ifndef ZB_DEV_REJOIN_TIMEOUT_MS
-#define ZB_DEV_REJOIN_TIMEOUT_MS (1000 * 200)
-#endif
-
 /* Maximum interval between join/rejoin attempts. */
 #define REJOIN_INTERVAL_MAX_S    (15 * 60)
 
@@ -823,7 +816,7 @@ static void rejoin_the_network(zb_uint8_t param)
  *        is not running, device is not joined and device is not waiting
  *        for the user input, start rejoin procedure. Additionally,
  *        schedule alarm to stop rejoin procedure after the timeout
- *        defined by ZB_DEV_REJOIN_TIMEOUT_MS.
+ *        defined by CONFIG_ZIGBEE_DEV_REJOIN_TIMEOUT_MS.
  */
 static void start_network_rejoin(void)
 {
@@ -848,7 +841,7 @@ static void start_network_rejoin(void)
 				stop_network_rejoin,
 				ZB_TRUE,
 				ZB_MILLISECONDS_TO_BEACON_INTERVAL(
-					ZB_DEV_REJOIN_TIMEOUT_MS));
+					CONFIG_ZIGBEE_DEV_REJOIN_TIMEOUT_MS));
 			ZB_ERROR_CHECK(zb_err_code);
 #endif
 
