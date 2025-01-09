@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -356,6 +356,7 @@ ZB_CONFIG_PRE zb_ncp_pending_calls_t gc_ncp_pending_calls[ZB_CONFIG_N_BUF_IDS] Z
 
 #endif  /* ZB_CONFIGURABLE_MEM */
 
+/*! @} */
 /*! @} */
 
 #endif /* ZB_MEM_CONFIG_CONTEXT_H */

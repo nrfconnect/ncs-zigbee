@@ -11,10 +11,10 @@
  * Please use release scripts to update it's contents.
  *
  * Repositories:
- * platform_ncs       bab62cf3718c0b5fb6dff37b63c719926a03d1b0 https://projecttools.nordicsemi.no/bitbucket/scm/zoi/platform_ncs.git
- * zboss-stack-src    968e8bb3f98f445c5443d56469c86fd158ab0946 https://projecttools.nordicsemi.no/bitbucket/scm/zoi/zboss_r23
- * zboss-stack-doc    a831ea16723267717ed850de1b79fd95d2e79c34 https://projecttools.nordicsemi.no/bitbucket/scm/zoi/zboss_doc
- * nrf                e22ae59ba56b4db7af25664c3b59c8e1a64908d1 https://github.com/edmont/sdk-nrf
+ * platform_ncs       1758c20c0f766f1c4501059919ba6feea1d61947 https://projecttools.nordicsemi.no/bitbucket/scm/zoi/platform_ncs.git
+ * zboss-stack-src    9b64fcb8d7ab6bf10baf2aa8fd18927ac2d98166 https://projecttools.nordicsemi.no/bitbucket/scm/zoi/zboss_r23
+ * zboss-stack-doc    5dec0139723e7c8157a4e0ab21609e5168319524 https://projecttools.nordicsemi.no/bitbucket/scm/zoi/zboss_doc
+ * nrf                e15db586a0c36ba830768df50f7328fcd312eef8 https://github.com/edmont/sdk-nrf
  * zephyr             74bb2cf0a96ad8be4d98c390040b91fbb95e91b7 https://github.com/nrfconnect/sdk-zephyr
  * wfa-qt-control-app af011c8a8d338ba529f17aed2cc2ef4c1c591a58 https://github.com/nrfconnect/sdk-wi-fiquicktrack-controlappc
  * mcuboot            b1cbeef4d76d5f96885a518025634b197d56dd8f https://github.com/nrfconnect/sdk-mcuboot
@@ -69,16 +69,16 @@
 
 
 /** ZBOSS build tag */
-#define ZBOSS_BUILD_TAG "zigbee_add_on-release-4.1.0.1"
+#define ZBOSS_BUILD_TAG "zigbee_add_on-release-4.1.0.2"
 
 /** ZBOSS platform build tag */
-#define ZBOSS_PLATFORM_BUILD_TAG "v4.1.0.1+v6.0.0"
+#define ZBOSS_PLATFORM_BUILD_TAG "v4.1.0.2+v6.0.1""
 
 /** ZBOSS build date (UTC) */
-#define ZBOSS_BUILD_DATE 20241114
+#define ZBOSS_BUILD_DATE 20250109
 
 /** ZBOSS build time (UTC) */
-#define ZBOSS_BUILD_TIME 121909
+#define ZBOSS_BUILD_TIME 145325
 
 
 #endif /* ZBOSS_BUILD_INFO_H__ */

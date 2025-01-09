@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2021 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -51,6 +51,16 @@
 /** @addtogroup ncp_dev_api
   *  @{
   */
+
+/** Performs custom initialization steps after the stack is initialized and started.
+ *
+ * Background: The library provides the complete MAIN() routine for initializing and running the stack
+ * in NCP mode. This callout functon is for customizing it.
+ *
+ * The library contains a weak, empty implementation, so the application can replace it with another
+ * one if necessary.
+ */
+void zb_ncp_app_fw_custom_post_start(void);
 
 /** Return code which is raised if @ref zb_ncp_custom_response will be called later*/
 #define NCP_RET_LATER (255U)
