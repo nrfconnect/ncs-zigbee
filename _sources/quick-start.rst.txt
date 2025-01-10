@@ -45,7 +45,7 @@ When installing the |NCS|, use |VSC| and the |nRFVSC|.
 
 You also need *three* nRF54L15 development kits:
 
-.. include:: /includes/device_table_nrf54l15.txt
+.. include:: /includes/device_table_all.txt
 
 .. note::
 

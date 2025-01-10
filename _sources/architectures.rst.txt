@@ -56,7 +56,7 @@ This is the design most commonly used for End Devices and Routers.
 
 This platform design is suitable for the following development kits:
 
-.. include:: /includes/device_table_nrf54l15.txt
+.. include:: /includes/device_table_single_multi.txt
 
 Single-chip, multiprotocol (SoC)
 ================================
@@ -86,7 +86,7 @@ For more information, see `Multiprotocol support`_ in the |NCS| documentation an
 
 This platform design is suitable for the following development kit:
 
-.. include:: /includes/device_table_nrf54l15.txt
+.. include:: /includes/device_table_single_multi.txt
 
 .. _ug_zigbee_platform_design_ncp:
 
@@ -126,17 +126,17 @@ It also has the following disadvantages:
 
    Split Zigbee architecture
 
-..
-  The |addon| for the |NCS| includes the :ref:`ug_zigbee_tools_ncp_host` tool.
-  |zigbee_ncp_package|
+
+The |addon| for the |NCS| includes the :ref:`ug_zigbee_tools_ncp_host` tool.
+|zigbee_ncp_package|
 
 
-  The tool is available for download as a standalone :file:`zip` package using the following link:
+The tool is available for download as a standalone :file:`zip` package using the following link:
 
-    * `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
+  * `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
 
-    |zigbee_ncp_package_more_info|
+|zigbee_ncp_package_more_info|
 
-  This platform design is suitable for the following development kits:
+This platform design is suitable for the following development kits:
 
-  .. include:: /includes/device_table_ncp.txt
+.. include:: /includes/device_table_ncp.txt
