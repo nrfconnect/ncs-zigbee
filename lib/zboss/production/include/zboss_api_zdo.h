@@ -739,7 +739,7 @@ typedef zb_uint8_t zb_zdp_status_t;
 #define ZB_SE_SIGNAL_APS_KEY_FAIL 40U
 
 #endif /* ZB_ENABLE_SE_MIN_CONFIG */
-
+/** @endcond */ 
 /** @cond DOXYGEN_SE_SECTION */
 
 /** ZC / our MAC suspended our device tx: out of Duty cycle (sub-ghz only)

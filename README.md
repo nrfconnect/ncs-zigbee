@@ -1,6 +1,6 @@
 # Zigbee add-on for nRF Connect SDK (Experimental support)
 
-> This is an [experimental](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html) release of Zigbee support for Nordic Semiconductor’s nRF54L15 SoC.
+> This is an [experimental](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html) release of Zigbee support for Nordic Semiconductor’s nRF54L Series.
 
 The Zigbee add-on for the nRF Connect SDK provides support for developing Zigbee applications based on the third-party precompiled ZBOSS stack. This stack is included as the ZBOSS Zigbee R23 stack library. In combination with the nRF Connect SDK, the Zigbee add-on allows for development of low-power connected solutions.
 
