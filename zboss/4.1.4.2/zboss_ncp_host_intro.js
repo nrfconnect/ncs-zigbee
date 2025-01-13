@@ -1,6 +1,7 @@
 var zboss_ncp_host_intro =
 [
     [ "NCP Host release notes", "zboss_ncp_host_release_notes.html", [
+      [ "ZBOSS NCP Host v3.0.1", "zboss_ncp_host_release_notes.html#ncp_host_301", null ],
       [ "ZBOSS NCP Host v3.0.0", "zboss_ncp_host_release_notes.html#ncp_host_300", null ]
     ] ],
     [ "NCP Host user guide", "zboss_ncp_host.html", [

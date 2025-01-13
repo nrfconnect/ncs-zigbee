@@ -1,5 +1,6 @@
 var NAVTREEINDEX27 =
 {
+"structzb__zcl__device__callback__param__s.html#a781f888f1dcb1d6a876a100c47bb8b39":[3,0,1,0,0,0],
 "structzb__zcl__device__callback__param__s.html#a8d07ebdc70e0decd56c3a7902991ed8d":[3,0,1,0,0,2],
 "structzb__zcl__device__callback__param__s.html#ada92bec8a1c8a42df527ee59795dfcdc":[3,0,1,0,0,6],
 "structzb__zcl__device__temp__config__attrs__s.html":[3,10,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX27 =
 "structzb__zcl__ias__zone__notification__param__s.html":[3,0,1,4,9,5],
 "structzb__zcl__ias__zone__notification__param__s.html#a1ab0db84887628bc166c29bfa7181e0f":[3,0,1,4,9,5,0],
 "structzb__zcl__ias__zone__notification__param__s.html#abe1828fd392cde20d151e595827f42f7":[3,0,1,4,9,5,2],
-"structzb__zcl__ias__zone__notification__param__s.html#afcbbe4930b36b4f6195e2180af589c6b":[3,0,1,4,9,5,1],
-"structzb__zcl__ias__zone__status__change__not__s.html":[3,0,1,4,9,1]
+"structzb__zcl__ias__zone__notification__param__s.html#afcbbe4930b36b4f6195e2180af589c6b":[3,0,1,4,9,5,1]
 };

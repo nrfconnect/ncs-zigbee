@@ -291,6 +291,7 @@ var annotated =
     [ "zb_zcl_scenes_store_scene_res_s", "structzb__zcl__scenes__store__scene__res__s.html", "structzb__zcl__scenes__store__scene__res__s" ],
     [ "zb_zcl_scenes_view_scene_req_s", "structzb__zcl__scenes__view__scene__req__s.html", "structzb__zcl__scenes__view__scene__req__s" ],
     [ "zb_zcl_scenes_view_scene_res_fixed_size_s", "structzb__zcl__scenes__view__scene__res__fixed__size__s.html", "structzb__zcl__scenes__view__scene__res__fixed__size__s" ],
+    [ "zb_zcl_set_attr_value_param_s", "structzb__zcl__set__attr__value__param__s.html", "structzb__zcl__set__attr__value__param__s" ],
     [ "zb_zcl_temp_measurement_attrs_t", "structzb__zcl__temp__measurement__attrs__t.html", "structzb__zcl__temp__measurement__attrs__t" ],
     [ "zb_zcl_time_attrs_s", "structzb__zcl__time__attrs__s.html", "structzb__zcl__time__attrs__s" ],
     [ "zb_zcl_tunnel_request_params_out_s", "structzb__zcl__tunnel__request__params__out__s.html", "structzb__zcl__tunnel__request__params__out__s" ],

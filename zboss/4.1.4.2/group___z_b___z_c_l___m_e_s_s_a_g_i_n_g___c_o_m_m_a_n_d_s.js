@@ -28,7 +28,7 @@ var group___z_b___z_c_l___m_e_s_s_a_g_i_n_g___c_o_m_m_a_n_d_s =
     [ "zb_zcl_messaging_get_last_message_response_s", "structzb__zcl__messaging__get__last__message__response__s.html", [
       [ "display_message", "structzb__zcl__messaging__get__last__message__response__s.html#a9c4095ba38b982f1910b7a0c47ae9563", null ],
       [ "display_protected_message", "structzb__zcl__messaging__get__last__message__response__s.html#ae3ff8d1f48e033af983a3e01f145a5ad", null ],
-      [ "resp", "structzb__zcl__messaging__get__last__message__response__s.html#aef20799f9fb36d45a23a17b158ba66a8", null ],
+      [ "resp", "structzb__zcl__messaging__get__last__message__response__s.html#af08bd4638553129a7a554b97312804a2", null ],
       [ "resp_type", "structzb__zcl__messaging__get__last__message__response__s.html#ada967340b7d3088bb7b38edf74b6b303", null ]
     ] ],
     [ "ZB_ZCL_DECLARE_MESSAGING_ATTR_LIST", "group___z_b___z_c_l___m_e_s_s_a_g_i_n_g___c_o_m_m_a_n_d_s.html#ga29a4d3586d22f2c79a521b8338c667ae", null ],

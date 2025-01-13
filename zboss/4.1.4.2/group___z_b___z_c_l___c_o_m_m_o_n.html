@@ -104,6 +104,9 @@ Modules</h2></td></tr>
 Data Structures</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structzb__zcl__command__send__status__s.html">zb_zcl_command_send_status_s</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structzb__zcl__set__attr__value__param__s.html">zb_zcl_set_attr_value_param_s</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare for change attribute for User Application.  <a href="structzb__zcl__set__attr__value__param__s.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
@@ -127,6 +130,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:ga47ee18d3901717c7e68922874d76c4ef"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="group__base__types.html#ga83793366ad4d54e8b65840d82a751498">zb_uint16_t</a>(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___z_b___z_c_l___c_o_m_m_o_n.html#ga47ee18d3901717c7e68922874d76c4ef">zb_zcl_peer_revision_cb_t</a>) (<a class="el" href="group__base__types.html#ga18a7e5c477a2c48d021be71d173cf2b8">zb_ieee_addr_t</a> ieee_addr, <a class="el" href="group__base__types.html#ga83793366ad4d54e8b65840d82a751498">zb_uint16_t</a> cluster_id, <a class="el" href="group__base__types.html#gaa82a9657ef11a3947586065cf8066256">zb_uint8_t</a> cluster_role, <a class="el" href="group__base__types.html#gaa82a9657ef11a3947586065cf8066256">zb_uint8_t</a> endpoint)</td></tr>
 <tr class="memdesc:ga47ee18d3901717c7e68922874d76c4ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get peer Cluster revision callback.  <a href="group___z_b___z_c_l___c_o_m_m_o_n.html#ga47ee18d3901717c7e68922874d76c4ef">More...</a><br /></td></tr>
 <tr class="separator:ga47ee18d3901717c7e68922874d76c4ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0fe76b9dc5253fc8e8284ac6169da2d1"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structzb__zcl__set__attr__value__param__s.html">zb_zcl_set_attr_value_param_s</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___z_b___z_c_l___c_o_m_m_o_n.html#ga0fe76b9dc5253fc8e8284ac6169da2d1">zb_zcl_set_attr_value_param_t</a></td></tr>
+<tr class="memdesc:ga0fe76b9dc5253fc8e8284ac6169da2d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare for change attribute for User Application.  <a href="group___z_b___z_c_l___c_o_m_m_o_n.html#ga0fe76b9dc5253fc8e8284ac6169da2d1">More...</a><br /></td></tr>
+<tr class="separator:ga0fe76b9dc5253fc8e8284ac6169da2d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -351,6 +357,23 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>peer Cluster revision attribute value, 0xFFFF - if the revision is unknown </dd></dl>
+
+</div>
+</div>
+<a id="ga0fe76b9dc5253fc8e8284ac6169da2d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0fe76b9dc5253fc8e8284ac6169da2d1">&#9670;&nbsp;</a></span>zb_zcl_set_attr_value_param_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structzb__zcl__set__attr__value__param__s.html">zb_zcl_set_attr_value_param_s</a> <a class="el" href="group___z_b___z_c_l___c_o_m_m_o_n.html#ga0fe76b9dc5253fc8e8284ac6169da2d1">zb_zcl_set_attr_value_param_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Declare for change attribute for User Application. </p>
+<dl class="section note"><dt>Note</dt><dd>Size of values must be twice as large as maximum size of a possible attribute </dd></dl>
 
 </div>
 </div>
@@ -1587,7 +1610,7 @@ RET_OUT_OF_RANGE if parameter is out of range </dd></dl>
 <div id="nav-path" class="topicfooter">
 <a href="mailto:docfeedback@nordicsemi.no?subject=Documentation%20feedback" id="maillink">Documentation feedback</a> | <a href="https://devzone.nordicsemi.com/questions/" target="_blank">Developer Zone</a> | <a href="http://response.nordicsemi.com/subscribe-to-our-newsletters" target="_blank">Subscribe</a> | Updated <span id="date"/>
 <script>
-var date = new Date("Mon Dec 30 2024" + " UTC");
+var date = new Date("Mon Jan 13 2025" + " UTC");
 document.getElementById("date").innerHTML = date.toJSON().slice(0, 10);
 var url=window.location.href.split("?")[0];
 var filename=url.substring(url.lastIndexOf('/')+1);

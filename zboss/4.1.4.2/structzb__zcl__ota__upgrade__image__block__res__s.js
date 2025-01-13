@@ -9,8 +9,8 @@ var structzb__zcl__ota__upgrade__image__block__res__s =
     [ "image_type", "structzb__zcl__ota__upgrade__image__block__res__s.html#a042692a6c6b95af70ae0b7130fd86ac6", null ],
     [ "manufacturer", "structzb__zcl__ota__upgrade__image__block__res__s.html#aaddc0a26ee95a63de4a1417ec4a391da", null ],
     [ "request_time", "structzb__zcl__ota__upgrade__image__block__res__s.html#af0bcf7a3ae3cc738f31d8a09d84c0dbe", null ],
-    [ "response", "structzb__zcl__ota__upgrade__image__block__res__s.html#ac352cc1bc1703c53e41c8110efa3f12d", null ],
+    [ "response", "structzb__zcl__ota__upgrade__image__block__res__s.html#a4f1e3ddce3ac1c7fe968bedb9115c055", null ],
     [ "status", "structzb__zcl__ota__upgrade__image__block__res__s.html#ad2186c0b3e921b45f9c82b465a5b634e", null ],
-    [ "success", "structzb__zcl__ota__upgrade__image__block__res__s.html#a4de80816c4962db2fc6456750261b214", null ],
-    [ "wait_for_data", "structzb__zcl__ota__upgrade__image__block__res__s.html#a2c871334563c698a3bcc0a0e4cc2310c", null ]
+    [ "success", "structzb__zcl__ota__upgrade__image__block__res__s.html#a6aaf858e77fe10ff9970578fa2384d63", null ],
+    [ "wait_for_data", "structzb__zcl__ota__upgrade__image__block__res__s.html#a92d189025383d9741c0c7e2c0a1aea62", null ]
 ];

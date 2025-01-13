@@ -105,6 +105,8 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ga0424d3117f5b51c9c66ff4f185532a4a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ncp__dev__api.html#ga0424d3117f5b51c9c66ff4f185532a4a">zb_ncp_app_fw_custom_post_start</a> (void)</td></tr>
+<tr class="separator:ga0424d3117f5b51c9c66ff4f185532a4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaffcc8949a862e83fbaea80953e892f2a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ncp__dev__api.html#gaffcc8949a862e83fbaea80953e892f2a">zb_ncp_custom_register_request_cb</a> (<a class="el" href="group__ncp__dev__api.html#gad3310ebfefb75b2464d2bb6762e0192d">zb_ncp_custom_request_cb_t</a> cb)</td></tr>
 <tr class="separator:gaffcc8949a862e83fbaea80953e892f2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9a46b56e40da2d59b4154e3e5548abc8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__ncp__dev__api.html#ga9a46b56e40da2d59b4154e3e5548abc8">zb_ncp_custom_indication</a> (<a class="el" href="group__base__types.html#gaa82a9657ef11a3947586065cf8066256">zb_uint8_t</a> param)</td></tr>
@@ -154,6 +156,27 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="ga0424d3117f5b51c9c66ff4f185532a4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0424d3117f5b51c9c66ff4f185532a4a">&#9670;&nbsp;</a></span>zb_ncp_app_fw_custom_post_start()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void zb_ncp_app_fw_custom_post_start </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Performs custom initialization steps after the stack is initialized and started.</p>
+<p>Background: The library provides the complete <a class="el" href="group__zboss__general__api.html#ga84a1db082e6e00f004955e5ff48c2f2d">MAIN()</a> routine for initializing and running the stack in NCP mode. This callout functon is for customizing it.</p>
+<p>The library contains a weak, empty implementation, so the application can replace it with another one if necessary. </p>
+
+</div>
+</div>
 <a id="ga9a46b56e40da2d59b4154e3e5548abc8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga9a46b56e40da2d59b4154e3e5548abc8">&#9670;&nbsp;</a></span>zb_ncp_custom_indication()</h2>
 
@@ -236,7 +259,7 @@ Functions</h2></td></tr>
 <div id="nav-path" class="topicfooter">
 <a href="mailto:docfeedback@nordicsemi.no?subject=Documentation%20feedback" id="maillink">Documentation feedback</a> | <a href="https://devzone.nordicsemi.com/questions/" target="_blank">Developer Zone</a> | <a href="http://response.nordicsemi.com/subscribe-to-our-newsletters" target="_blank">Subscribe</a> | Updated <span id="date"/>
 <script>
-var date = new Date("Mon Dec 30 2024" + " UTC");
+var date = new Date("Mon Jan 13 2025" + " UTC");
 document.getElementById("date").innerHTML = date.toJSON().slice(0, 10);
 var url=window.location.href.split("?")[0];
 var filename=url.substring(url.lastIndexOf('/')+1);

@@ -111,6 +111,7 @@ var group__zb__zcl__common__types =
     [ "ZB_ZCL_STATUS_INVALID_VALUE", "group__zb__zcl__common__types.html#ga4cba84aadd14cceb6eee4ef270b96e49", null ],
     [ "ZB_ZCL_STATUS_LIMIT_REACHED", "group__zb__zcl__common__types.html#gaa27472ae3296e6eed3108c63d6bd21d5", null ],
     [ "ZB_ZCL_STATUS_MALFORMED_CMD", "group__zb__zcl__common__types.html#gabbb2406547c123311190071f4e40f2bd", null ],
+    [ "ZB_ZCL_STATUS_NO_IMAGE_AVAILABLE", "group__zb__zcl__common__types.html#ga40340face93339a888513484607f21f1", null ],
     [ "ZB_ZCL_STATUS_NOT_AUTHORIZED", "group__zb__zcl__common__types.html#ga6d7e0993019230fe843140bccbccf508", null ],
     [ "ZB_ZCL_STATUS_NOT_FOUND", "group__zb__zcl__common__types.html#ga82496dd554cfa1f3373c1e91abde585e", null ],
     [ "ZB_ZCL_STATUS_NOTIFICATION_PENDING", "group__zb__zcl__common__types.html#ga3f90a577a0073d881a92e695d7ea462d", null ],
