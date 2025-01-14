@@ -1,6 +1,6 @@
 .. ### Versions
 
-.. |addon_version| replace:: 0.3.0
+.. |addon_version| replace:: 0.3.1
 .. |ncs_version| replace:: 2.9.0
 .. |zigbee_version| replace:: Zigbee 3.0
 .. |zboss_version| replace:: 4.1.4.2
