@@ -117,6 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="lib/index.html">Libraries for Zigbee</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#addon-v0-3-1-14-01-2025">Zigbee add-on v0.3.1 - 14/01/2025</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#addon-v0-3-0-10-01-2025">Zigbee add-on v0.3.0 - 10/01/2025</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#addon-v0-2-0-28-11-2024">Zigbee add-on v0.2.0 - 28/11/2024</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#addon-v0-1-0-15-11-2024">Zigbee add-on v0.1.0 - 15/11/2024</a></li>
@@ -193,9 +194,10 @@
 <span id="example-release-notes"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#addon-v0-3-0-10-01-2025" id="id2">Zigbee add-on v0.3.0 - 10/01/2025</a></p></li>
-<li><p><a class="reference internal" href="#addon-v0-2-0-28-11-2024" id="id3">Zigbee add-on v0.2.0 - 28/11/2024</a></p></li>
-<li><p><a class="reference internal" href="#addon-v0-1-0-15-11-2024" id="id4">Zigbee add-on v0.1.0 - 15/11/2024</a></p></li>
+<li><p><a class="reference internal" href="#addon-v0-3-1-14-01-2025" id="id2">Zigbee add-on v0.3.1 - 14/01/2025</a></p></li>
+<li><p><a class="reference internal" href="#addon-v0-3-0-10-01-2025" id="id3">Zigbee add-on v0.3.0 - 10/01/2025</a></p></li>
+<li><p><a class="reference internal" href="#addon-v0-2-0-28-11-2024" id="id4">Zigbee add-on v0.2.0 - 28/11/2024</a></p></li>
+<li><p><a class="reference internal" href="#addon-v0-1-0-15-11-2024" id="id5">Zigbee add-on v0.1.0 - 15/11/2024</a></p></li>
 </ul>
 </div>
 <p>All the notable changes to the Zigbee add-on for the nRF Connect SDK are listed here.
@@ -204,7 +206,7 @@ See also the <a class="reference external" href="https://docs.nordicsemi.com/bun
 <p class="admonition-title">Note</p>
 <p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee support for the nRF54L Series.</p>
 </div>
-<p>The Zigbee add-on v0.3.0 is compatible with nRF Connect SDK v2.9.0 and uses the ZBOSS stack version 4.1.4.2.
+<p>The Zigbee add-on v0.3.1 is compatible with nRF Connect SDK v2.9.0 and uses the ZBOSS stack version 4.1.4.2.
 For a full list of Zigbee add-on releases, related nRF Connect SDK and ZBOSS stack and NCP host package versions, view the following table:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -221,22 +223,35 @@ For a full list of Zigbee add-on releases, related nRF Connect SDK and ZBOSS sta
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>0.3.0</p></td>
-<td><p>2.9.0</p></td>
-<td rowspan="3"><p>4.1.4.2</p></td>
-<td><p>3.0.1</p></td>
+<tr class="row-even"><td><p>0.3.1</p></td>
+<td rowspan="2"><p>2.9.0</p></td>
+<td rowspan="4"><p>4.1.4.2</p></td>
+<td rowspan="2"><p>3.0.1</p></td>
 </tr>
-<tr class="row-odd"><td><p>0.2.0</p></td>
+<tr class="row-odd"><td><p>0.3.0</p></td>
+</tr>
+<tr class="row-even"><td><p>0.2.0</p></td>
 <td rowspan="2"><p>2.8.0</p></td>
 <td><p>3.0.0</p></td>
 </tr>
-<tr class="row-even"><td><p>0.1.0</p></td>
+<tr class="row-odd"><td><p>0.1.0</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
 </table>
+<div class="section" id="addon-v0-3-1-14-01-2025">
+<span id="zigbee-release"></span><h2><a class="toc-backref" href="#id2">Zigbee add-on v0.3.1 - 14/01/2025</a><a class="headerlink" href="#addon-v0-3-1-14-01-2025" title="Permalink to this headline">¶</a></h2>
+<p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release.</p>
+<ul class="simple">
+<li><p>Added:</p>
+<ul>
+<li><p>Fix ZCL common function.</p></li>
+</ul>
+</li>
+</ul>
+</div>
 <div class="section" id="addon-v0-3-0-10-01-2025">
-<span id="zigbee-release"></span><h2><a class="toc-backref" href="#id2">Zigbee add-on v0.3.0 - 10/01/2025</a><a class="headerlink" href="#addon-v0-3-0-10-01-2025" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Zigbee add-on v0.3.0 - 10/01/2025</a><a class="headerlink" href="#addon-v0-3-0-10-01-2025" title="Permalink to this headline">¶</a></h2>
 <p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release.</p>
 <ul class="simple">
 <li><p>Added:</p>
@@ -250,7 +265,7 @@ For a full list of Zigbee add-on releases, related nRF Connect SDK and ZBOSS sta
 </ul>
 </div>
 <div class="section" id="addon-v0-2-0-28-11-2024">
-<h2><a class="toc-backref" href="#id3">Zigbee add-on v0.2.0 - 28/11/2024</a><a class="headerlink" href="#addon-v0-2-0-28-11-2024" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Zigbee add-on v0.2.0 - 28/11/2024</a><a class="headerlink" href="#addon-v0-2-0-28-11-2024" title="Permalink to this headline">¶</a></h2>
 <p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release.</p>
 <ul class="simple">
 <li><p>Added:</p>
@@ -263,7 +278,7 @@ For a full list of Zigbee add-on releases, related nRF Connect SDK and ZBOSS sta
 </ul>
 </div>
 <div class="section" id="addon-v0-1-0-15-11-2024">
-<h2><a class="toc-backref" href="#id4">Zigbee add-on v0.1.0 - 15/11/2024</a><a class="headerlink" href="#addon-v0-1-0-15-11-2024" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Zigbee add-on v0.1.0 - 15/11/2024</a><a class="headerlink" href="#addon-v0-1-0-15-11-2024" title="Permalink to this headline">¶</a></h2>
 <p>Initial release.</p>
 <ul class="simple">
 <li><p>Added:</p>
