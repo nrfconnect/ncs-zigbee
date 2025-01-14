@@ -2830,7 +2830,7 @@ zb_uint8_t zb_zcl_get_backward_compatible_statuses_mode(void)
 
 zb_ret_t zb_zcl_set_backward_compatible_statuses_mode(zb_uint8_t statuses_mode)
 {
-  if (statuses_mode > ZB_ZCL_STATUSES_PRE_ZCL8_MODE)
+  if (statuses_mode > ZB_ZCL_STATUSES_ZCL8_MODE)
   {
     return RET_OUT_OF_RANGE;
   }
