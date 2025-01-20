@@ -231,10 +231,10 @@
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee support for the nRF54L Series.</p>
+<p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee support for the nRF54L Series.</p>
 </div>
 <p>This page describes what is needed to start working with Zigbee using the Zigbee add-on for the nRF Connect SDK.
-For details about the Kconfig options mentioned here, see the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/kconfig/index.html">Kconfig search</a> in the nRF Connect SDK documentation.</p>
+For details about the Kconfig options mentioned here, see the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/kconfig/index.html">Kconfig search</a> in the nRF Connect SDK documentation.</p>
 <div class="section" id="required-libraries-and-drivers">
 <span id="zigbee-ug-libs"></span><h2><a class="toc-backref" href="#id2">Required libraries and drivers</a><a class="headerlink" href="#required-libraries-and-drivers" title="Permalink to this headline">¶</a></h2>
 <p>Zigbee requires the following modules:</p>
@@ -242,7 +242,7 @@ For details about the Kconfig options mentioned here, see the <a class="referenc
 <li><p><a class="reference internal" href="zboss/index.html#zigbee-zboss"><span class="std std-ref">ZBOSS Zigbee stack</span></a>, with the <a class="reference internal" href="lib/osif.html#lib-zigbee-osif"><span class="std std-ref">Zigbee ZBOSS OSIF</span></a> subsystem acting as the linking layer between the ZBOSS stack and the nRF Connect SDK.
 The ZBOSS library is enabled by the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_ADD_ON</span></code> Kconfig option.
 For more information about the ZBOSS stack, see also the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/zigbee_devguide.html">external ZBOSS development guide and API documentation</a>.</p></li>
-<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/connectivity/networking/api/ieee802154.html">IEEE 802.15.4</a> radio driver - This library is automatically enabled when working with Zigbee on Nordic Semiconductor’s development kits.</p></li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/connectivity/networking/api/ieee802154.html">IEEE 802.15.4</a> radio driver - This library is automatically enabled when working with Zigbee on Nordic Semiconductor’s development kits.</p></li>
 </ul>
 </div>
 <div class="section" id="mandatory-configuration">
@@ -257,7 +257,7 @@ Setting this option enables all the peripherals required for the correct operati
 </ul>
 <p>Setting any of these options enables the respective ZBOSS role library.
 This is needed because End Devices use different libraries than Routers and Coordinators.</p>
-<p>For instructions about how to set Kconfig options, see <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/index.html">Configuring and building</a> in the nRF Connect SDK documentation.</p>
+<p>For instructions about how to set Kconfig options, see <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/index.html">Configuring and building</a> in the nRF Connect SDK documentation.</p>
 <div class="section" id="sleepy-end-device-behavior">
 <span id="zigbee-ug-sed"></span><h3><a class="toc-backref" href="#id4">Sleepy End Device behavior</a><a class="headerlink" href="#sleepy-end-device-behavior" title="Permalink to this headline">¶</a></h3>
 <p>The Sleepy End Device (SED) behavior is a Zigbee stack feature that enables the sleepy behavior for the end device.</p>
@@ -350,7 +350,7 @@ The ZBOSS stack can be started using one of the following options:</p>
 <div class="section" id="custom-logging-per-module">
 <span id="zigbee-ug-logging"></span><h3><a class="toc-backref" href="#id9">Custom logging per module</a><a class="headerlink" href="#custom-logging-per-module" title="Permalink to this headline">¶</a></h3>
 <p>Logging is handled with the <code class="docutils literal notranslate"><span class="pre">CONFIG_LOG</span></code> Kconfig option.
-This option enables logging for both the stack and Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/logging/index.html">Logging</a> API.</p>
+This option enables logging for both the stack and Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/logging/index.html">Logging</a> API.</p>
 <div class="section" id="default-zigbee-application-logging">
 <span id="zigbee-ug-logging-application-logs"></span><h4>Default Zigbee application logging<a class="headerlink" href="#default-zigbee-application-logging" title="Permalink to this headline">¶</a></h4>
 <p>The Zigbee application uses the <code class="docutils literal notranslate"><span class="pre">INF</span></code> logging level by default.
@@ -358,7 +358,7 @@ This level can be changed only by modifying the sample code.</p>
 </div>
 <div class="section" id="stack-logs">
 <span id="zigbee-ug-logging-stack-logs"></span><h4>Stack logs<a class="headerlink" href="#stack-logs" title="Permalink to this headline">¶</a></h4>
-<p>The stack logs are independent from Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/logging/index.html">Logging</a> API.
+<p>The stack logs are independent from Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/logging/index.html">Logging</a> API.
 To customize them, use the following Kconfig options:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_ERROR_PRINT_TO_LOG</span></code> - Allows the application to log ZBOSS error names; enabled by default.</p></li>
@@ -368,7 +368,7 @@ To customize them, use the following Kconfig options:</p>
 <p>The stack logs are provided in a binary format.
 You can configure how they are printed with the following Kconfig options:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_TRACE_HEXDUMP_LOGGING</span></code> - Stack logs are printed as hexdump using Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/logging/index.html">Logging</a> API.
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_TRACE_HEXDUMP_LOGGING</span></code> - Stack logs are printed as hexdump using Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/logging/index.html">Logging</a> API.
 This option is enabled by default.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_TRACE_BINARY_LOGGING</span></code> - Stack logs are printed in the binary format using one of the following independent serial backends of your choice:</p>
 <ul class="simple">
@@ -383,7 +383,7 @@ This backend is enabled by default.</p></li>
 </div>
 </li>
 </ul>
-<p>Stack logs are stored in the internal buffer if they are printed using Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/logging/index.html">Logging</a> API or the independent serial backend.
+<p>Stack logs are stored in the internal buffer if they are printed using Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/logging/index.html">Logging</a> API or the independent serial backend.
 You can customize the buffer size with the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE</span></code> Kconfig option.
 The buffer size must be larger than <code class="docutils literal notranslate"><span class="pre">256</span></code> and smaller than <code class="docutils literal notranslate"><span class="pre">2147483648</span></code></p>
 </div>
@@ -412,7 +412,7 @@ To do this, configure the related Kconfig option for one or more modules:</p>
 </div>
 <div class="section" id="reduced-power-consumption">
 <h3><a class="toc-backref" href="#id10">Reduced power consumption</a><a class="headerlink" href="#reduced-power-consumption" title="Permalink to this headline">¶</a></h3>
-<p>You can reduce the amount of power used by your device by enabling the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/others/ram_pwrdn.html">RAM power-down</a> library.
+<p>You can reduce the amount of power used by your device by enabling the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/others/ram_pwrdn.html">RAM power-down</a> library.
 This library is also used for <a class="reference internal" href="#power-saving-during-sleep">Power saving during sleep</a>.</p>
 </div>
 </div>

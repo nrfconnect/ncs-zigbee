@@ -221,7 +221,7 @@
 </div>
 <p>The Zigbee protocol in the Zigbee add-on for the nRF Connect SDK can be customized by enabling and configuring several <a class="reference internal" href="../lib/index.html#lib-zigbee"><span class="std std-ref">Zigbee libraries</span></a>.
 This page lists options and steps required for configuring each of them.</p>
-<p>For details about the Kconfig options mentioned here, see the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/kconfig/index.html">Kconfig search</a> in the nRF Connect SDK documentation.</p>
+<p>For details about the Kconfig options mentioned here, see the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/kconfig/index.html">Kconfig search</a> in the nRF Connect SDK documentation.</p>
 <div class="section" id="configuring-zboss-osif">
 <span id="ug-zigbee-configuring-components-osif"></span><h2><a class="toc-backref" href="#id2">Configuring ZBOSS OSIF</a><a class="headerlink" href="#configuring-zboss-osif" title="Permalink to this headline">¶</a></h2>
 <p>The Zigbee ZBOSS OSIF layer subsystem acts as the linking layer between the <a class="reference internal" href="../zboss/index.html#zigbee-zboss"><span class="std std-ref">ZBOSS Zigbee stack</span></a> and the nRF Connect SDK.
@@ -273,7 +273,7 @@ This is because the Zigbee shell library registers its own handler for the endpo
 <span id="ug-zigbee-configuring-components-scene-helper"></span><h2><a class="toc-backref" href="#id7">Configuring Zigbee ZCL scene helper</a><a class="headerlink" href="#configuring-zigbee-zcl-scene-helper" title="Permalink to this headline">¶</a></h2>
 <p>The Zigbee ZCL scene helper library provides a set of functions that implement the callbacks required by the ZCL scene cluster in the application.</p>
 <p>To enable the Zigbee ZCL scene helper library, set the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SCENES</span></code> Kconfig option.</p>
-<p>Because the library uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/settings/index.html">Settings</a> subsystem, the application must call the following functions for the library to work correctly:</p>
+<p>Because the library uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/settings/index.html">Settings</a> subsystem, the application must call the following functions for the library to work correctly:</p>
 <ul class="simple">
 <li><p><code class="xref c c-func docutils literal notranslate"><span class="pre">zcl_scenes_init()</span></code></p></li>
 <li><p><code class="xref c c-func docutils literal notranslate"><span class="pre">zcl_scenes_cb()</span></code></p></li>
@@ -289,7 +289,7 @@ This is because the Zigbee shell library registers its own handler for the endpo
 Some of the commands use an endpoint for sending packets, so no endpoint handler is allowed to be registered for this endpoint.</p>
 <p>To extend a sample with the Zigbee shell command support, set the following Kconfig options:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL</span></code> - This option enables Zigbee shell and Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/shell/index.html">Shell</a> interface.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL</span></code> - This option enables Zigbee shell and Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/shell/index.html">Shell</a> interface.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL_ENDPOINT</span></code> - This option specifies the endpoint number to be used by the Zigbee shell instance.
 The endpoint must be present at the device and you must not register an endpoint handler for this endpoint.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SHELL_DEBUG_CMD</span></code> - This option enables commands useful for testing and debugging.
