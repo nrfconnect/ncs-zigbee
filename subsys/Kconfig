@@ -382,6 +382,9 @@ config ZIGBEE_TC_REJOIN_ENABLED
 config ZIGBEE_DEV_REJOIN_TIMEOUT_MS
 	int "Timeout in ms after which End Device stops to send beacons if can not join/rejoin a network"
 	default 200000
+	range 20000 4200000
+	help
+	  The range is limited up to 70 minutes to avoid internal overflows.
 
 DT_CHOSEN_NCS_ZIGBEE_TIMER := ncs,zigbee-timer
 
