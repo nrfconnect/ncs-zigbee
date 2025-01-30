@@ -4,7 +4,9 @@
 # This CMake file is picked by the Zephyr build system because it is defined
 # as the module CMake entry point (see zephyr/module.yml).
 
-zephyr_include_directories(include)
+if (CONFIG_ZIGBEE_ADD_ON)
+  zephyr_include_directories(include)
 
-add_subdirectory(lib)
-add_subdirectory(subsys)
+  add_subdirectory(lib)
+  add_subdirectory(subsys)
+endif()
