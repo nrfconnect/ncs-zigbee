@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['range_20extender_653',['Range Extender',['../group__ha__range__extender.html',1,'']]],
-  ['r23_5fallhubs_654',['R23_allhubs',['../group__r23__allhubs.html',1,'']]],
-  ['r23_5fdev_5fiterview_655',['R23_dev_iterview',['../group__r23__dev__iterview.html',1,'']]],
-  ['r23_5fr22_656',['R23_r22',['../group__r23__r22.html',1,'']]],
-  ['r23_5fsecur_657',['R23_secur',['../group__r23__secur.html',1,'']]],
+  ['range_20extender_654',['Range Extender',['../group__ha__range__extender.html',1,'']]],
+  ['r23_20_28zigbee_202023_29_20specific_20services_655',['r23 (Zigbee 2023) specific services',['../group__r23.html',1,'']]],
+  ['r23_20all_20hubs_656',['r23 All Hubs',['../group__r23__allhubs.html',1,'']]],
+  ['r23_20specific_20security_657',['r23 specific security',['../group__r23__secur.html',1,'']]],
   ['radius_658',['radius',['../structzb__aps__hdr__s.html#a9a7c5aae1ecaecbf21a22d907743e182',1,'zb_aps_hdr_s']]],
   ['rate_659',['rate',['../structzb__zcl__color__control__move__hue__req__s.html#a722e6bad0501a1540938d4fd4f8dbb60',1,'zb_zcl_color_control_move_hue_req_s::rate()'],['../structzb__zcl__color__control__move__saturation__req__s.html#ac8b24239ece5c753b4939b93294333ed',1,'zb_zcl_color_control_move_saturation_req_s::rate()'],['../structzb__zcl__color__control__enhanced__move__hue__req__s.html#ae1e49dd303a731422892d48c54310277',1,'zb_zcl_color_control_enhanced_move_hue_req_s::rate()'],['../structzb__zcl__color__control__move__color__temp__req__s.html#a0f59d76b825bd05247a53587e42538db',1,'zb_zcl_color_control_move_color_temp_req_s::rate()'],['../structzb__zcl__level__control__move__req__s.html#a8b0a743bfed1b8464267bff709e77406',1,'zb_zcl_level_control_move_req_s::rate()']]],
   ['rate_5flabel_660',['rate_label',['../structzb__zcl__price__publish__price__payload__s.html#a4d9d8d0f775f2563cbbcacdf5f4dce94',1,'zb_zcl_price_publish_price_payload_s']]],

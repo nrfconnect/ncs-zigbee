@@ -1,5 +1,6 @@
 var group__api__zb =
 [
+    [ "r23 (Zigbee 2023) specific services", "group__r23.html", "group__r23" ],
     [ "HA API", "group__ha__api.html", "group__ha__api" ],
     [ "ZCL API", "group__zcl__api.html", "group__zcl__api" ],
     [ "ZDO API", "group__zdo__api.html", "group__zdo__api" ],

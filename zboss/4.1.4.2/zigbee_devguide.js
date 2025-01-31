@@ -89,5 +89,78 @@ var zigbee_devguide =
       ] ],
       [ "3. ZBOSS ZCL8 API", "zcl8_guide.html#zc8_api", null ],
       [ "4. References", "zcl8_guide.html#zcl8_references", null ]
+    ] ],
+    [ "ZBOSS Zigbee 2023 (r23) features", "r23_new_features.html", [
+      [ "New features in ZBOSS r23 codebase", "r23_new_features.html#r23_codebase_features", null ],
+      [ "r23 stack certified Platform vs certified Product status", "r23_new_features.html#r23_certification", null ],
+      [ "Short list of new r23 features", "r23_new_features.html#r23_brief", [
+        [ "New r23 Security features", "r23_new_features.html#r23_brief_secur", [
+          [ "Key establishment and related features", "r23_new_features.html#r23_key_est", null ],
+          [ "ZB 3.0/SE coexistence: initial join & key update methods info", "r23_new_features.html#r23_30_se", null ],
+          [ "Trust Center swapout", "r23_new_features.html#r23_tcsw", null ]
+        ] ],
+        [ "All Hubs / WWAH", "r23_new_features.html#r23_allhubs_brief", [
+          [ "Closing holes in r22 security (r22.2 and beyond)", "r23_new_features.html#r22_holes_close", null ],
+          [ "Restricted mode.", "r23_new_features.html#r23_restricted_mode", null ]
+        ] ],
+        [ "APS fragmentation", "r23_new_features.html#r23_apsfrag", null ],
+        [ "APS ACK req in APS commands", "r23_new_features.html#r23_apsack", null ],
+        [ "Runtime switch of r23 ZBOSS into r22 mode", "r23_new_features.html#r23_r22_switch", null ],
+        [ "Extension for group tx in apsde-data.req", "r23_new_features.html#r23_group_tx_brief", null ]
+      ] ],
+      [ "ZBOSS r23 Details and ZBOSS API description", "r23_new_features.html#r23_details", [
+        [ "DLK", "r23_new_features.html#r23_dlk", [
+          [ "Why DLK improves Zigbee security", "r23_new_features.html#r23_whydlk", null ],
+          [ "Initial starting DLK", "r23_new_features.html#r23_startdlk", null ],
+          [ "Force TCLK update", "r23_new_features.html#r23_force_tclkup", null ],
+          [ "Device DLK capabilities", "r23_new_features.html#r23_dlk_cap", null ],
+          [ "Key negotiation methods", "r23_new_features.html#r23_keyneg_method", null ],
+          [ "PSK secrets", "r23_new_features.html#r23_psk_secret", null ],
+          [ "Authentication token", "r23_new_features.html#r23_auth_tok", null ],
+          [ "Installcode and passcode PSK", "r23_new_features.html#r23_ic_passc", null ],
+          [ "API to enable/disable PSK secrets", "r23_new_features.html#r23_ena_psk_secret", null ]
+        ] ],
+        [ "Device interview", "r23_new_features.html#r23_dev_interview", [
+          [ "TC API", "r23_new_features.html#r23_dev_interview_tc", null ],
+          [ "Joiner API", "r23_new_features.html#r23_dev_interview_joiner", null ]
+        ] ],
+        [ "APS frame counter synchronization", "r23_new_features.html#r23_aps_cnt_sync", null ],
+        [ "ZB 3.0/SE: get authentication level", "r23_new_features.html#r23_z3se", null ],
+        [ "Trust Center swapout", "r23_new_features.html#r23_tc_sw", [
+          [ "TC API", "r23_new_features.html#r23_tcsw_api", null ],
+          [ "API for ZR and ZED", "r23_new_features.html#r23_tcsw_zrzed", null ]
+        ] ],
+        [ "PANID conflict resolution API", "r23_new_features.html#r23_panid_conflict", null ]
+      ] ],
+      [ "All Hubs, WWAH and related r23 features", "r23_new_features.html#r23_allhubs", [
+        [ "WWAH / All Hubs features related to security", "r23_new_features.html#r23_allhub_secur", [
+          [ "All Hubs Restricted vs WWAH Configuration mode.", "r23_new_features.html#r23_allhub_restr", null ],
+          [ "nwkLeaveRequestAllowed setting", "r23_new_features.html#r23_leavereq", null ]
+        ] ],
+        [ "requireLinkKeyEncryptionForApsTransportKey", "r23_new_features.html#r23_linkkeyencr", [
+          [ "Disabling channel and/or pan id change", "r23_new_features.html#r23_disable_panid_change", null ],
+          [ "PANID and channel change by TC", "r23_new_features.html#r23_panid_ch", null ]
+        ] ],
+        [ "Other All Hubs features", "r23_new_features.html#r23_allhubs_other", [
+          [ "ZDO decommission req", "r23_new_features.html#r23_decommis", null ],
+          [ "ZDO Clear All Bindings req", "r23_new_features.html#r23_clearallbind", null ],
+          [ "Parent selection: hub connectivity, preferred parent, long uptime bits", "r23_new_features.html#r23_parentsel", null ],
+          [ "Beacon survey", "r23_new_features.html#r23_beacon_surv", null ]
+        ] ],
+        [ "WWAH features not covered by r23", "r23_new_features.html#wwah_not_r23", null ],
+        [ "Runtime switch of r23 ZBOSS into r22 mode", "r23_new_features.html#r23_r23_switch", null ],
+        [ "Group TX in apsde-data.req", "r23_new_features.html#r23_group_tx", null ],
+        [ "Other ZBOSS API introduced in r23 codebase", "r23_new_features.html#r23_other_api", [
+          [ "New signals", "r23_new_features.html#r23_sig", null ]
+        ] ],
+        [ "The chain of signal handlers", "r23_new_features.html#r23_sig_hnd_chain", null ],
+        [ "New debug API for key broadcastiung", "r23_new_features.html#r23_key_br", null ],
+        [ "Stack internals update", "r23_new_features.html#r23_int", [
+          [ "LQA instead of LQI", "r23_new_features.html#r23_lqa", null ],
+          [ "Discovery table instead of extended neighbor", "r23_new_features.html#r23_disc_tbl", null ],
+          [ "NVRAM structures change", "r23_new_features.html#r23_nvram", null ]
+        ] ]
+      ] ],
+      [ "Sniffer for r23", "r23_new_features.html#r23_sniff", null ]
     ] ]
 ];
