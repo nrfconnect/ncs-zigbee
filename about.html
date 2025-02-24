@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>About Zigbee protocol &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  <title>About Zigbee protocol &mdash; Zigbee R23 add-on for nRF Connect SDK 1.0.0 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Requirements and setup" href="setup.html" />
-    <link rel="prev" title="Zigbee add-on for the nRF Connect SDK" href="index.html" />
+    <link rel="prev" title="Zigbee R23 add-on for the nRF Connect SDK" href="index.html" />
   <link rel="shortcut icon" href="_static/images/favicon.ico"/>
 
 </head>
@@ -69,7 +69,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+            <a href="index.html" class="icon icon-home"> Zigbee R23 add-on for nRF Connect SDK
           
 
           
@@ -115,7 +115,7 @@
 <li class="toctree-l1"><a class="reference internal" href="architectures.html">Architectures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="commissioning.html">Commissioning</a></li>
 <li class="toctree-l1"><a class="reference internal" href="memory.html">Memory requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring.html">Configuring Zigbee R23 add-on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuring/index.html">Additional configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="zboss/index.html">ZBOSS Zigbee stack</a></li>
 <li class="toctree-l1"><a class="reference internal" href="samples/index.html">Samples</a></li>
@@ -137,7 +137,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Zigbee add-on for nRF Connect SDK</a>
+          <a href="index.html">Zigbee R23 add-on for nRF Connect SDK</a>
         
       </nav>
 
@@ -193,9 +193,9 @@
 <span id="zigbee-about"></span><h1>About Zigbee protocol<a class="headerlink" href="#about-zigbee-protocol" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee support for the nRF54L Series.</p>
+<p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee R23 support for the nRF54L Series.</p>
 </div>
-<p>The Zigbee add-on for the nRF Connect SDK uses the ZBOSS library, a third-party precompiled Zigbee stack.
+<p>The Zigbee R23 add-on for the nRF Connect SDK uses the ZBOSS library, a third-party precompiled Zigbee stack.
 It includes all mandatory features of the Zigbee 3.0 specification and provides an Application Programming Interface (API) to access different services.
 The stack comes with the following features:</p>
 <ul class="simple">
@@ -242,7 +242,7 @@ Based on different factors of responses, such as signal strength, the new device
 <p>For end devices, the parent device (a coordinator or a router) can store information meant for them.
 This is required because the end devices do not receive packets directly from other devices.
 Each packet meant for an end device needs to go through its parent, and the end devices need to regularly request and respond to packets from the parents.
-For example, in the Zigbee add-on for the nRF Connect SDK, the Zigbee light switch device requests packets from the parent every three seconds.
+For example, in the Zigbee R23 add-on for the nRF Connect SDK, the Zigbee light switch device requests packets from the parent every three seconds.
 The end device does not route packets.
 It can also disable its radio to reduce the power consumption between the regular packet requests if the Sleepy End Device behavior is enabled.</p>
 </div>
@@ -253,7 +253,7 @@ It can also disable its radio to reduce the power consumption between the regula
 <li><p><a class="reference internal" href="architectures.html#ug-zigbee-architectures"><span class="std std-ref">Architectures</span></a> page to learn more about the Zigbee architecture.</p></li>
 <li><p><a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/using_zigbee__z_c_l.html#ZCL_definitions">Common ZCL terms and definitions</a> section in the ZBOSS user guide.</p></li>
 <li><p>Zigbee topologies in section 1.1.4 of the <a class="reference external" href="https://csa-iot.org/developer-resource/specifications-download-request/">Zigbee Specification</a>.</p></li>
-<li><p><a class="reference internal" href="configuring.html#zigbee-ug-sed"><span class="std std-ref">Sleepy End Device behavior</span></a> section on the <a class="reference internal" href="configuring.html#ug-zigbee-configuring"><span class="std std-ref">Configuring Zigbee add-on</span></a> page.</p></li>
+<li><p><a class="reference internal" href="configuring.html#zigbee-ug-sed"><span class="std std-ref">Sleepy End Device behavior</span></a> section on the <a class="reference internal" href="configuring.html#ug-zigbee-configuring"><span class="std std-ref">Configuring Zigbee R23 add-on</span></a> page.</p></li>
 </ul>
 </div>
 </div>
@@ -269,7 +269,7 @@ It can also disable its radio to reduce the power consumption between the regula
         <a href="setup.html" class="btn btn-neutral float-right" title="Requirements and setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Zigbee add-on for the nRF Connect SDK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="Zigbee R23 add-on for the nRF Connect SDK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -282,7 +282,7 @@ It can also disable its radio to reduce the power consumption between the regula
 <tr>
 <td>
     <p>
-        &copy; Copyright 2024, Nordic Semiconductor.
+        &copy; Copyright 2025, Nordic Semiconductor.
 
     </p>
 </td>

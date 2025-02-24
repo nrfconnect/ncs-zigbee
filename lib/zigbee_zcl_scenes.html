@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Zigbee ZCL scene helper &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  <title>Zigbee ZCL scene helper &mdash; Zigbee R23 add-on for nRF Connect SDK 1.0.0 documentation</title>
   
 
   
@@ -69,7 +69,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+            <a href="../index.html" class="icon icon-home"> Zigbee R23 add-on for nRF Connect SDK
           
 
           
@@ -111,7 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../architectures.html">Architectures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commissioning.html">Commissioning</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../memory.html">Memory requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring.html">Configuring Zigbee R23 add-on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../configuring/index.html">Additional configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../zboss/index.html">ZBOSS Zigbee stack</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../samples/index.html">Samples</a></li>
@@ -145,7 +145,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Zigbee add-on for nRF Connect SDK</a>
+          <a href="../index.html">Zigbee R23 add-on for nRF Connect SDK</a>
         
       </nav>
 
@@ -209,7 +209,7 @@
 </div>
 <p>The Zigbee ZCL scene helper library provides a set of functions that implement the callbacks required by the ZCL scene cluster in the application.
 You can use this library to implement these mandatory callbacks and save the configured scenes in the non-volatile memory.
-For this purpose, it uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/settings/index.html">Settings</a> subsystem.</p>
+For this purpose, it uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/settings/index.html">Settings</a> subsystem.</p>
 <p>This library is capable of recalling attribute values for the following ZCL clusters:</p>
 <ul class="simple">
 <li><p>On/off</p></li>
@@ -220,7 +220,7 @@ For this purpose, it uses Zephyr’s <a class="reference external" href="https:/
 <div class="section" id="configuration">
 <span id="lib-zigbee-zcl-scenes-options"></span><h2><a class="toc-backref" href="#id3">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>To enable the Zigbee ZCL scene helper library, set the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_SCENES</span></code> Kconfig option.</p>
-<p>Because the library uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/settings/index.html">Settings</a> subsystem, the application must call the following functions for the library to work correctly:</p>
+<p>Because the library uses Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/settings/index.html">Settings</a> subsystem, the application must call the following functions for the library to work correctly:</p>
 <ul class="simple">
 <li><p><code class="xref c c-func docutils literal notranslate"><span class="pre">zcl_scenes_init()</span></code></p></li>
 <li><p><code class="xref c c-func docutils literal notranslate"><span class="pre">zcl_scenes_cb()</span></code></p></li>
@@ -323,7 +323,7 @@ For this purpose, it uses Zephyr’s <a class="reference external" href="https:/
 <tr>
 <td>
     <p>
-        &copy; Copyright 2024, Nordic Semiconductor.
+        &copy; Copyright 2025, Nordic Semiconductor.
 
     </p>
 </td>

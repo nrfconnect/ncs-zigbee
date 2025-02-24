@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Zigbee application utilities &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  <title>Zigbee application utilities &mdash; Zigbee R23 add-on for nRF Connect SDK 1.0.0 documentation</title>
   
 
   
@@ -69,7 +69,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+            <a href="../index.html" class="icon icon-home"> Zigbee R23 add-on for nRF Connect SDK
           
 
           
@@ -111,7 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../architectures.html">Architectures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commissioning.html">Commissioning</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../memory.html">Memory requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuring.html">Configuring Zigbee R23 add-on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../configuring/index.html">Additional configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../zboss/index.html">ZBOSS Zigbee stack</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../samples/index.html">Samples</a></li>
@@ -152,7 +152,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">Zigbee add-on for nRF Connect SDK</a>
+          <a href="../index.html">Zigbee R23 add-on for nRF Connect SDK</a>
         
       </nav>
 
@@ -470,7 +470,7 @@ The period is limited to the time specified in <code class="docutils literal not
 <li><p>The procedure to join or rejoin the network can be restarted by calling <code class="xref c c-func docutils literal notranslate"><span class="pre">user_input_indicate()</span></code>, but it needs to be implemented in the application (for example, by calling <code class="xref c c-func docutils literal notranslate"><span class="pre">user_input_indicate()</span></code> when a button is pressed).
 The procedure is restarted only if the device was unable to join and the procedure is not running.</p></li>
 </ul>
-<p>For the end device, the application alarm is scheduled with <code class="docutils literal notranslate"><span class="pre">stop_network_rejoin(ZB_TRUE)</span></code>, to be called after the amount of time specified in <code class="docutils literal notranslate"><span class="pre">ZB_DEV_REJOIN_TIMEOUT_MS</span></code>.</p>
+<p>For the end device, the application alarm is scheduled with <code class="docutils literal notranslate"><span class="pre">stop_network_rejoin(ZB_TRUE)</span></code>, to be called after the amount of time specified in <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_DEV_REJOIN_TIMEOUT_MS</span></code>.</p>
 <p>If <code class="xref c c-func docutils literal notranslate"><span class="pre">stop_network_rejoin()</span></code> is called with <code class="docutils literal notranslate"><span class="pre">was_scheduled</span></code> set to <code class="docutils literal notranslate"><span class="pre">ZB_TRUE</span></code>, <code class="xref c c-func docutils literal notranslate"><span class="pre">user_input_indicate()</span></code> can restart the rejoin procedure.
 <code class="xref c c-func docutils literal notranslate"><span class="pre">user_input_indicate()</span></code> restarts the rejoin procedure if the device did not join the network and is not trying to join a network.
 It is safe to call this function from an interrupt and to call it multiple times.</p>
@@ -620,6 +620,9 @@ This option is set to 5 seconds by default.</p>
 </dd>
 <dt>Trust Center Rejoin</dt><dd><p>To enable the Trust Center Rejoin feature, use the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_TC_REJOIN_ENABLED</span></code> Kconfig option.
 This option is enabled by default.</p>
+</dd>
+<dt>Rejoin Timeout</dt><dd><p>To adjust maximum timeout for when an end device is attempting to join or rejoin a network, use the <code class="docutils literal notranslate"><span class="pre">CONFIG_ZIGBEE_DEV_REJOIN_TIMEOUT_MS</span></code> Kconfig option.
+This option is set to 200 seconds by default.</p>
 </dd>
 </dl>
 <p>For detailed steps about configuring the library in a Zigbee sample or application, see <a class="reference internal" href="../configuring/configuring_libraries.html#ug-zigbee-configuring-components-application-utilities"><span class="std std-ref">Configuring Zigbee application utilities</span></a>.</p>
@@ -921,7 +924,7 @@ Function for setting the Erase persistent storage, depending on the erase pin. <
 <tr>
 <td>
     <p>
-        &copy; Copyright 2024, Nordic Semiconductor.
+        &copy; Copyright 2025, Nordic Semiconductor.
 
     </p>
 </td>

@@ -45,7 +45,7 @@
 			<desc>Schedule stop_network_rejoin(ZB_TRUE) after ZB_DEV_REJOIN_TIM...</desc>
 			<rect x="0" y="505.641" width="147.827" height="59.45" class="st1"/>
 			<text x="55.5" y="519.17" class="st2">Schedule <tspan x="9.8" dy="1.2em" class="st5">stop_network_rejoin(ZB_TRUE) </tspan><tspan
-						x="64.09" dy="1.2em" class="st5">after </tspan><tspan x="10.05" dy="1.38em" class="st5">ZB_DEV_REJOIN_TIMEOUT_MS</tspan></text>		</g>
+						x="64.09" dy="1.2em" class="st5">after </tspan><tspan x="10.05" dy="1.38em" class="st5">CONFIG_ZIGBEE_DEV_REJOIN_TIMEOUT_MS</tspan></text>		</g>
 		<g id="shape1423-16" transform="translate(135.547,-258.052)">
 			<title>Hexagon.1423</title>
 			<desc>role == end device</desc>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Zigbee: Light switch &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  <title>Zigbee: Light switch &mdash; Zigbee R23 add-on for nRF Connect SDK 1.0.0 documentation</title>
   
 
   
@@ -69,7 +69,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+            <a href="../../index.html" class="icon icon-home"> Zigbee R23 add-on for nRF Connect SDK
           
 
           
@@ -111,7 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../architectures.html">Architectures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../commissioning.html">Commissioning</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../memory.html">Memory requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuring.html">Configuring Zigbee R23 add-on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../configuring/index.html">Additional configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../zboss/index.html">ZBOSS Zigbee stack</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Samples</a><ul class="current">
@@ -168,7 +168,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">Zigbee add-on for nRF Connect SDK</a>
+          <a href="../../index.html">Zigbee R23 add-on for nRF Connect SDK</a>
         
       </nav>
 
@@ -274,14 +274,14 @@ See <a class="reference internal" href="#zigbee-light-switch-activating-variants
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf54l/index.html">nRF54L15 DK</a></p></td>
+<tr class="row-even"><td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf54l/index.html">nRF54L15 DK</a></p></td>
 <td><p>PCA10156</p></td>
-<td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html">nrf54l15dk</a></p></td>
+<td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html">nrf54l15dk</a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">nrf54l15dk/nrf54l15/cpuapp</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf54l/index.html">nRF54L10 emulation on the nRF54L15 DK</a></p></td>
+<tr class="row-odd"><td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf54l/index.html">nRF54L10 emulation on the nRF54L15 DK</a></p></td>
 <td><p>PCA10156</p></td>
-<td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html">nrf54l15dk</a></p></td>
+<td><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html">nrf54l15dk</a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">nrf54l15dk/nrf54l10/cpuapp</span></code></p></td>
 </tr>
 </tbody>
@@ -317,22 +317,22 @@ After restarting the device, it will boot with the sleepy behavior enabled.</p>
 <div class="section" id="multiprotocol-bluetooth-le-extension">
 <span id="zigbee-light-switch-sample-nus"></span><h3><a class="toc-backref" href="#id9">Multiprotocol Bluetooth LE extension</a><a class="headerlink" href="#multiprotocol-bluetooth-le-extension" title="Permalink to this headline">¶</a></h3>
 <p>This optional extension demonstrates dynamic concurrent switching between two protocols, Bluetooth® LE and Zigbee.
-It uses the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/bluetooth_services/services/nus.html">Nordic UART Service (NUS)</a> library.</p>
+It uses the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/bluetooth_services/services/nus.html">Nordic UART Service (NUS)</a> library.</p>
 <p>When this extension is enabled, you can use:</p>
 <ul class="simple">
 <li><p>Buttons on the light switch device to operate on the Zigbee network</p></li>
 <li><p>Nordic UART Service to operate on the Bluetooth LE network</p></li>
 </ul>
 <p>Both networks are independent from each other.</p>
-<p>To support both protocols at the same time, the Zigbee stack uses the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/connectivity/networking/api/ieee802154.html">IEEE 802.15.4</a> radio during the inactive time of the Bluetooth LE radio (using the Timeslot API of the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrfxlib/mpsl/README.html">Multiprotocol Service Layer</a>).
+<p>To support both protocols at the same time, the Zigbee stack uses the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/connectivity/networking/api/ieee802154.html">IEEE 802.15.4</a> radio during the inactive time of the Bluetooth LE radio (using the Timeslot API of the <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrfxlib/mpsl/README.html">Multiprotocol Service Layer</a>).
 Depending on the Bluetooth LE connection interval, the nRF52 development kits can spend up to 99% of the radio time on the Zigbee protocol.</p>
 <p>Transmitting and receiving data when using this example does not break connection from any of the used radio protocols, either Bluetooth LE or Zigbee.</p>
-<p>For more information about the multiprotocol feature, see <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/protocols/multiprotocol/index.html">Multiprotocol support</a> in the nRF Connect SDK documentation.</p>
+<p>For more information about the multiprotocol feature, see <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/protocols/multiprotocol/index.html">Multiprotocol support</a> in the nRF Connect SDK documentation.</p>
 </div>
 </div>
 <div class="section" id="configuration">
 <span id="zigbee-light-switch-configuration"></span><h2><a class="toc-backref" href="#id10">Configuration</a><a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
-<p>See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/index.html">Configuring and building</a> in the nRF Connect SDK documentation for information about how to permanently or temporarily change the configuration.</p>
+<p>See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/index.html">Configuring and building</a> in the nRF Connect SDK documentation for information about how to permanently or temporarily change the configuration.</p>
 <div class="section" id="source-file-setup">
 <h3><a class="toc-backref" href="#id11">Source file setup</a><a class="headerlink" href="#source-file-setup" title="Permalink to this headline">¶</a></h3>
 <p>This sample is split into the following source files:</p>
@@ -352,8 +352,8 @@ For example, when building from the command line, use the following command:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">west build samples/zigbee/light_switch -b nrf54l15dk/nrfnrf54l15/cpuapp -- -DEXTRA_CONF_FILE=&#39;overlay-multiprotocol_ble.conf&#39;</span>
 </pre></div>
 </div>
-<p>See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/cmake/index.html#providing_cmake_options">Providing CMake options</a> in the nRF Connect SDK documentation for instructions on how to add flags to your build.
-For more information about configuration files in the nRF Connect SDK, see <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/config_and_build_system.html">Build and configuration system</a> in the nRF Connect SDK documentation.</p>
+<p>See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/cmake/index.html#providing_cmake_options">Providing CMake options</a> in the nRF Connect SDK documentation for instructions on how to add flags to your build.
+For more information about configuration files in the nRF Connect SDK, see <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/config_and_build_system.html">Build and configuration system</a> in the nRF Connect SDK documentation.</p>
 </div>
 </div>
 <div class="section" id="configurable-transmission-power">
@@ -405,7 +405,7 @@ Releasing the button within this time does not trigger the factory reset procedu
 <h3><a class="toc-backref" href="#id16">Multiprotocol Bluetooth LE extension assignments</a><a class="headerlink" href="#multiprotocol-bluetooth-le-extension-assignments" title="Permalink to this headline">¶</a></h3>
 <dl>
 <dt>LED 0:</dt><dd><p>Lit and solid when a Bluetooth LE Central is connected to the NUS service.
-Available when using <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/bluetooth_services/services/nus.html">Nordic UART Service (NUS)</a> in the multiprotocol configuration.</p>
+Available when using <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/bluetooth_services/services/nus.html">Nordic UART Service (NUS)</a> in the multiprotocol configuration.</p>
 </dd>
 <dt>UART command assignments:</dt><dd><p>The following command assignments are configured and used in nRF Toolbox when <a class="reference internal" href="#zigbee-light-switch-testing-ble"><span class="std std-ref">Testing multiprotocol Bluetooth LE extension</span></a>:</p>
 <ul class="simple">
@@ -424,14 +424,14 @@ See <a class="reference internal" href="#zigbee-light-switch-testing-ble"><span 
 <div class="section" id="building-and-running">
 <h2><a class="toc-backref" href="#id17">Building and running</a><a class="headerlink" href="#building-and-running" title="Permalink to this headline">¶</a></h2>
 <p>Make sure to configure the Zigbee stack before building and testing this sample.
-See <a class="reference internal" href="../../configuring.html#ug-zigbee-configuring"><span class="std std-ref">Configuring Zigbee add-on</span></a> for more information.</p>
-<p>This sample can be found under <code class="file docutils literal notranslate"><span class="pre">samples/light_switch</span></code> in the Zigbee add-on folder structure.</p>
-<p>To build the sample, follow the instructions in <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/building.html">Building an application</a> in the nRF Connect SDK documentation for your preferred building environment.
-See also <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/programming.html">Programming an application</a> for programming steps and <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/test_and_optimize.html">Testing and optimization</a> for general information about testing and debugging in the nRF Connect SDK.</p>
+See <a class="reference internal" href="../../configuring.html#ug-zigbee-configuring"><span class="std std-ref">Configuring Zigbee R23 add-on</span></a> for more information.</p>
+<p>This sample can be found under <code class="file docutils literal notranslate"><span class="pre">samples/light_switch</span></code> in the Zigbee R23 add-on folder structure.</p>
+<p>To build the sample, follow the instructions in <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/building.html">Building an application</a> in the nRF Connect SDK documentation for your preferred building environment.
+See also <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/programming.html">Programming an application</a> for programming steps and <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/test_and_optimize.html">Testing and optimization</a> for general information about testing and debugging in the nRF Connect SDK.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>When building <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#repository_application">repository applications</a> in the Zigbee add-on which is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/dev_model_and_contributions/code_base.html#repository_types">SDK repository</a>, building with sysbuild is <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/config_and_build_system.html#sysbuild_enabled_by_default">enabled by default</a>.
-If you work with out-of-tree <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/create_application.html#create-application-types-freestanding">freestanding applications</a>, you need to manually pass the <code class="docutils literal notranslate"><span class="pre">--sysbuild</span></code> parameter to every build command or <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/config_and_build/sysbuild/sysbuild_configuring_west.html">configure west to always use it</a>.</p>
+<p>When building <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/create_application.html#repository_application">repository applications</a> in the Zigbee R23 add-on which is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/dev_model_and_contributions/code_base.html#repository_types">SDK repository</a>, building with sysbuild is <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/config_and_build_system.html#sysbuild_enabled_by_default">enabled by default</a>.
+If you work with out-of-tree <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/create_application.html#create-application-types-freestanding">freestanding applications</a>, you need to manually pass the <code class="docutils literal notranslate"><span class="pre">--sysbuild</span></code> parameter to every build command or <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/sysbuild/sysbuild_configuring_west.html">configure west to always use it</a>.</p>
 </div>
 <div class="section" id="testing">
 <span id="zigbee-light-switch-testing"></span><h3><a class="toc-backref" href="#id18">Testing</a><a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
@@ -509,7 +509,7 @@ This indicates that the Bluetooth LE connection is established.</p>
 <div class="section" id="sample-output">
 <h4>Sample output<a class="headerlink" href="#sample-output" title="Permalink to this headline">¶</a></h4>
 <p>You can observe the sample logging output through a serial port after connecting with a terminal emulator (for example, nRF Connect Serial Terminal).
-See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/test_and_optimize.html">Testing and optimization</a> in the nRF Connect SDK documentation for the required settings and steps.</p>
+See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/test_and_optimize.html">Testing and optimization</a> in the nRF Connect SDK documentation for the required settings and steps.</p>
 </div>
 </div>
 </div>
@@ -517,7 +517,7 @@ See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-l
 <h2><a class="toc-backref" href="#id19">Dependencies</a><a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
 <p>This sample uses the following nRF Connect SDK libraries:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/others/ram_pwrdn.html">RAM power-down</a></p></li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/others/ram_pwrdn.html">RAM power-down</a></p></li>
 <li><p><a class="reference internal" href="../../lib/zigbee_error_handler.html#lib-zigbee-error-handler"><span class="std std-ref">Zigbee error handler</span></a></p></li>
 <li><p><a class="reference internal" href="../../lib/zigbee_app_utils.html#lib-zigbee-application-utilities"><span class="std std-ref">Zigbee application utilities</span></a></p></li>
 <li><p>Zigbee subsystem:</p>
@@ -525,7 +525,7 @@ See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-l
 <li><p><code class="file docutils literal notranslate"><span class="pre">zb_nrf_platform.h</span></code></p></li>
 </ul>
 </li>
-<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/others/dk_buttons_and_leds.html">DK Buttons and LEDs</a></p></li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/others/dk_buttons_and_leds.html">DK Buttons and LEDs</a></p></li>
 </ul>
 <p>It uses the ZBOSS stack:</p>
 <ul class="simple">
@@ -535,13 +535,13 @@ See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-l
 <ul class="simple">
 <li><p><code class="file docutils literal notranslate"><span class="pre">include/zephyr.h</span></code></p></li>
 <li><p><code class="file docutils literal notranslate"><span class="pre">include/device.h</span></code></p></li>
-<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/services/logging/index.html">Logging</a></p></li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/logging/index.html">Logging</a></p></li>
 </ul>
 <p>The following dependencies are added by the multiprotocol Bluetooth LE extension:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrfxlib/softdevice_controller/README.html">SoftDevice Controller</a></p></li>
-<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/libraries/bluetooth_services/services/nus.html">Nordic UART Service (NUS)</a></p></li>
-<li><p>Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/connectivity/bluetooth/api/index.html">Bluetooth API</a>:</p>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrfxlib/softdevice_controller/README.html">SoftDevice Controller</a></p></li>
+<li><p><a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/bluetooth_services/services/nus.html">Nordic UART Service (NUS)</a></p></li>
+<li><p>Zephyr’s <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/connectivity/bluetooth/api/index.html">Bluetooth API</a>:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">include/bluetooth/bluetooth.h</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">include/bluetooth/gatt.h</span></code></p></li>
@@ -578,7 +578,7 @@ See <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-l
 <tr>
 <td>
     <p>
-        &copy; Copyright 2024, Nordic Semiconductor.
+        &copy; Copyright 2025, Nordic Semiconductor.
 
     </p>
 </td>

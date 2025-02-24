@@ -308,7 +308,7 @@ The rejoin procedure is different for routers and end devices in the following a
   * The procedure to join or rejoin the network can be restarted by calling :c:func:`user_input_indicate`, but it needs to be implemented in the application (for example, by calling :c:func:`user_input_indicate` when a button is pressed).
     The procedure is restarted only if the device was unable to join and the procedure is not running.
 
-  For the end device, the application alarm is scheduled with ``stop_network_rejoin(ZB_TRUE)``, to be called after the amount of time specified in ``ZB_DEV_REJOIN_TIMEOUT_MS``.
+  For the end device, the application alarm is scheduled with ``stop_network_rejoin(ZB_TRUE)``, to be called after the amount of time specified in ``CONFIG_ZIGBEE_DEV_REJOIN_TIMEOUT_MS``.
 
   If :c:func:`stop_network_rejoin` is called with ``was_scheduled`` set to ``ZB_TRUE``, :c:func:`user_input_indicate` can restart the rejoin procedure.
   :c:func:`user_input_indicate` restarts the rejoin procedure if the device did not join the network and is not trying to join a network.
@@ -479,6 +479,10 @@ Factory reset button
 Trust Center Rejoin
     To enable the Trust Center Rejoin feature, use the ``CONFIG_ZIGBEE_TC_REJOIN_ENABLED`` Kconfig option.
     This option is enabled by default.
+
+Rejoin Timeout
+    To adjust maximum timeout for when an end device is attempting to join or rejoin a network, use the ``CONFIG_ZIGBEE_DEV_REJOIN_TIMEOUT_MS`` Kconfig option.
+    This option is set to 200 seconds by default.
 
 For detailed steps about configuring the library in a Zigbee sample or application, see :ref:`ug_zigbee_configuring_components_application_utilities`.
 

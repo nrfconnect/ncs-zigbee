@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Commissioning &mdash; Zigbee add-on for nRF Connect SDK 1.0.0 documentation</title>
+  <title>Commissioning &mdash; Zigbee R23 add-on for nRF Connect SDK 1.0.0 documentation</title>
   
 
   
@@ -69,7 +69,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> Zigbee add-on for nRF Connect SDK
+            <a href="index.html" class="icon icon-home"> Zigbee R23 add-on for nRF Connect SDK
           
 
           
@@ -126,7 +126,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="memory.html">Memory requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuring.html">Configuring Zigbee add-on</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuring.html">Configuring Zigbee R23 add-on</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuring/index.html">Additional configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="zboss/index.html">ZBOSS Zigbee stack</a></li>
 <li class="toctree-l1"><a class="reference internal" href="samples/index.html">Samples</a></li>
@@ -148,7 +148,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Zigbee add-on for nRF Connect SDK</a>
+          <a href="index.html">Zigbee R23 add-on for nRF Connect SDK</a>
         
       </nav>
 
@@ -218,7 +218,7 @@
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee support for the nRF54L Series.</p>
+<p>This is an <a class="reference external" href="https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/releases_and_maturity/software_maturity.html">experimental</a> release of Zigbee R23 support for the nRF54L Series.</p>
 </div>
 <p>Commissioning is a process that allows a new Zigbee device to join a Zigbee network.
 The device is configured into the network, so that it can start communicating with other network nodes.
@@ -239,13 +239,13 @@ For more information, see the <a class="reference external" href="https://nrfcon
 <li><p><a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group__zboss__bdb__comm__start.html#ga0b54e93a19cadc5fc02df8eab18ecd45">bdb_start_top_level_commissioning()</a> that should be started after the stack initialization (for example, from the ZBOSS signal handler) and requires providing the commissioning mode’s <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group__zboss__bdb__comm__start.html#ga9c44bbce9f6f6b19b623837914959c02">zb_bdb_commissioning_mode_mask_e</a> mask.</p></li>
 </ul>
 <p>For more information, see the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/using_zigbee__z_c_l.html#stack_start_initiation">Stack commissioning start sequence</a> section in the ZBOSS stack documentation.</p>
-<p>With the Zigbee add-on, the application can use <a class="reference internal" href="lib/zigbee_app_utils.html#lib-zigbee-signal-handler"><span class="std std-ref">Zigbee default signal handler</span></a> to handle the ZBOSS signals and start the commissioning.</p>
+<p>With the Zigbee R23 add-on, the application can use <a class="reference internal" href="lib/zigbee_app_utils.html#lib-zigbee-signal-handler"><span class="std std-ref">Zigbee default signal handler</span></a> to handle the ZBOSS signals and start the commissioning.</p>
 </div>
 <div class="section" id="commissioning-modes">
 <span id="zigbee-commissioning-modes"></span><h2><a class="toc-backref" href="#id7">Commissioning modes</a><a class="headerlink" href="#commissioning-modes" title="Permalink to this headline">¶</a></h2>
 <p>Zigbee commissioning is organized into four different modes:</p>
 <ul class="simple">
-<li><p>Touchlink commissioning (optional; not supported in the Zigbee add-on for the nRF Connect SDK)</p></li>
+<li><p>Touchlink commissioning (optional; not supported in the Zigbee R23 add-on for the nRF Connect SDK)</p></li>
 <li><p>Network Steering</p></li>
 <li><p>Network Formation</p></li>
 <li><p>Finding and Binding (optional)</p></li>
@@ -265,7 +265,7 @@ For example, Network Formation is not executed for End Devices.</p>
 <span id="zigbee-commissioning-modes-touchlink"></span><h3><a class="toc-backref" href="#id8">Touchlink</a><a class="headerlink" href="#touchlink" title="Permalink to this headline">¶</a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The Touchlink mode is optional in Zigbee and is not supported in the Zigbee add-on for the nRF Connect SDK.</p>
+<p>The Touchlink mode is optional in Zigbee and is not supported in the Zigbee R23 add-on for the nRF Connect SDK.</p>
 </div>
 <p>The Touchlink mode allows commissioning of devices in close proximity to each other, which means that the key criterium for this mode is the signal strength.
 It involves an initiator device and a target device, where the initiator is a member of an existing Zigbee network or it can form a new network.
@@ -295,8 +295,8 @@ If the node has the End Device role, its commissioning procedure stops here.</p>
 For this purpose, it needs credentials, which usually take form of a network key.
 For <a class="reference internal" href="#centralized-security-network">Centralized security network</a>, the authentication and authorization also involves establishing a unique Trust Center Link Key (TCLK).</p>
 <dl>
-<dt>Network Steering in the Zigbee add-on for the nRF Connect SDK</dt><dd><p>In the ZBOSS stack, Network Steering is started using the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ae31d4a2067eb711a43f7049b08710299">ZB_BDB_NETWORK_STEERING</a> bit mask.</p>
-<p>In the Zigbee add-on, Network Steering for a node on a network can be started using the following additional options:</p>
+<dt>Network Steering in the Zigbee R23 add-on for the nRF Connect SDK</dt><dd><p>In the ZBOSS stack, Network Steering is started using the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ae31d4a2067eb711a43f7049b08710299">ZB_BDB_NETWORK_STEERING</a> bit mask.</p>
+<p>In the Zigbee R23 add-on, Network Steering for a node on a network can be started using the following additional options:</p>
 <ul class="simple">
 <li><p>When running the <a class="reference internal" href="samples/network_coordinator/README.html#zigbee-network-coordinator-sample"><span class="std std-ref">Zigbee Coordinator sample</span></a>, you can press the associated button.</p></li>
 <li><p>If you are using the <a class="reference internal" href="lib/shell.html#lib-zigbee-shell"><span class="std std-ref">Zigbee shell</span></a> library in your application, you can use the <code class="docutils literal notranslate"><span class="pre">bdb</span> <span class="pre">start</span></code> command.
@@ -321,8 +321,8 @@ Depending on the node role:</p>
 <p>If Network Formation is successful, you can add nodes to the new network using <a class="reference internal" href="#network-steering">Network Steering</a>.
 If unsuccessful, the commissioning procedure stops here.</p>
 <dl>
-<dt>Network Formation in the Zigbee add-on for the nRF Connect SDK</dt><dd><p>In the ZBOSS stack, Network Formation is started using the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ac723cfd38f78c08a673ec3664539027c">ZB_BDB_NETWORK_FORMATION</a> bit mask.</p>
-<p>In the Zigbee add-on, when using the <a class="reference internal" href="lib/zigbee_app_utils.html#lib-zigbee-signal-handler"><span class="std std-ref">Zigbee default signal handler</span></a> and the application implements the Zigbee Coordinator role, the Network Formation procedure is started right after the stack initialization.</p>
+<dt>Network Formation in the Zigbee R23 add-on for the nRF Connect SDK</dt><dd><p>In the ZBOSS stack, Network Formation is started using the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ac723cfd38f78c08a673ec3664539027c">ZB_BDB_NETWORK_FORMATION</a> bit mask.</p>
+<p>In the Zigbee R23 add-on, when using the <a class="reference internal" href="lib/zigbee_app_utils.html#lib-zigbee-signal-handler"><span class="std std-ref">Zigbee default signal handler</span></a> and the application implements the Zigbee Coordinator role, the Network Formation procedure is started right after the stack initialization.</p>
 </dd>
 </dl>
 <div class="section" id="centralized-security-network">
@@ -370,7 +370,7 @@ The procedure is performed using ZDO simple descriptor requests and responses fo
 </ul>
 <p>Finding and Binding can be terminated if there are no corresponding clusters on the target node.</p>
 <dl>
-<dt>Finding and Binding in the Zigbee add-on for the nRF Connect SDK</dt><dd><p>In the ZBOSS stack, Finding and Binding is started using the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ad9bcb56a6668b6ba6f37edc73a796b58">ZB_BDB_FINDING_N_BINDING</a> bit mask.</p>
+<dt>Finding and Binding in the Zigbee R23 add-on for the nRF Connect SDK</dt><dd><p>In the ZBOSS stack, Finding and Binding is started using the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ad9bcb56a6668b6ba6f37edc73a796b58">ZB_BDB_FINDING_N_BINDING</a> bit mask.</p>
 <p>Apart from the BDB top-level procedure API, you can use the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group__zboss__bdb__comm__fb.html#gae6fd60a050559ef0aa3c3e5ec32bc515">zb_bdb_finding_binding_initiator()</a> function to manually control which binding table entries are to be created.
 For more information, see the <a class="reference external" href="https://nrfconnect.github.io/ncs-zigbee/zboss/4.1.4.2/group__zboss__bdb__api.html">BDB Commissioning API</a> section in the ZBOSS stack documentation.</p>
 </dd>
@@ -407,7 +407,7 @@ For more information, see the <a class="reference external" href="https://nrfcon
 <tr>
 <td>
     <p>
-        &copy; Copyright 2024, Nordic Semiconductor.
+        &copy; Copyright 2025, Nordic Semiconductor.
 
     </p>
 </td>
