@@ -8,7 +8,7 @@ Release notes
    :depth: 2
 
 All the notable changes to the |addon| for the |NCS| are listed here.
-See also the `Release notes for the nRF Connect SDK`_ and the :ref:`zboss_changelog`
+See also the `Release notes for the nRF Connect SDK`_ and the :ref:`zboss_changelog`.
 
 .. note::
    .. include:: /includes/experimental_note.txt

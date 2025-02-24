@@ -6,7 +6,7 @@
 .. |zboss_version| replace:: 4.1.4.2
 
 .. |NCS| replace:: nRF Connect SDK
-.. |addon| replace:: Zigbee add-on
+.. |addon| replace:: Zigbee R23 add-on
 
 .. |VSC| replace:: Visual Studio Code
 .. |nRFVSC| replace:: nRF Connect for VS Code extension

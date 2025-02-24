@@ -1,1 +1,1 @@
-This is an `experimental <Software maturity levels_>`_ release of Zigbee support for the nRF54L Series.
+This is an `experimental <Software maturity levels_>`_ release of Zigbee R23 support for the nRF54L Series.
