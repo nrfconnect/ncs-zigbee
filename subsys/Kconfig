@@ -27,7 +27,7 @@ menuconfig ZIGBEE_ADD_ON
 	imply FLASH_PAGE_LAYOUT
 	imply FLASH_MAP
 	imply MPU_ALLOW_FLASH_WRITE
-	depends on (SOC_NRF54L15 || SOC_NRF54L10 || SOC_NRF54L05)
+	depends on (SOC_NRF54L15 || SOC_NRF54L10 || SOC_NRF54L05 || SOC_NRF52840)
 
 if ZIGBEE_ADD_ON
 
@@ -346,7 +346,10 @@ config NRF_SECURITY
 if NRF_SECURITY
 
 config PSA_CRYPTO_DRIVER_CRACEN
-	default y
+    default y if SOC_SERIES_NRF54LX
+
+config PSA_CRYPTO_DRIVER_CC3XX
+    default y if SOC_NRF52840
 
 endif
 
