@@ -52,31 +52,63 @@ Configuration
 User interface
 **************
 
-LED 0:
-    Blinks to indicate that the main application thread is running.
+.. tabs::
 
-LED 2:
-    Indicates whether the network is open or closed:
+   .. group-tab:: nRF54L15 DK
 
-    * On - The network is open.
-    * Off - The network is closed.
+      LED 0:
+          Blinks to indicate that the main application thread is running.
 
-LED 3:
-    Blinks when the Network coordinator is in Identify mode.
+      LED 2:
+          Indicates whether the network is open or closed:
 
-Button 0:
-    Reopens the network for 180 seconds.
+          * On - The network is open.
+          * Off - The network is closed.
 
-    .. note::
-         The network is also opened after startup.
+      LED 3:
+          Blinks when the Network coordinator is in Identify mode.
 
-Button 3:
-    Depending on how long the button is pressed:
+      Button 0:
+          Reopens the network for 180 seconds.
 
-    * If pressed for less than five seconds, it starts or cancels the Identify mode.
-    * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
-      The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
-      Releasing the button within this time does not trigger the factory reset procedure.
+          .. note::
+               The network is also opened after startup.
+
+      Button 3:
+          Depending on how long the button is pressed:
+
+          * If pressed for less than five seconds, it starts or cancels the Identify mode.
+          * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
+            The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+            Releasing the button within this time does not trigger the factory reset procedure.
+
+   .. group-tab:: nRF52840 DK
+
+      LED 1:
+          Blinks to indicate that the main application thread is running.
+
+      LED 3:
+          Indicates whether the network is open or closed:
+
+          * On - The network is open.
+          * Off - The network is closed.
+
+      LED 4:
+          Blinks when the Network coordinator is in Identify mode.
+
+      Button 1:
+          Reopens the network for 180 seconds.
+
+          .. note::
+               The network is also opened after startup.
+
+      Button 4:
+          Depending on how long the button is pressed:
+
+          * If pressed for less than five seconds, it starts or cancels the Identify mode.
+          * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
+            The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+            Releasing the button within this time does not trigger the factory reset procedure.
 
 Building and running
 ********************
@@ -93,28 +125,56 @@ Testing
 
 After programming the sample to your development kit, complete the following steps to test it:
 
-1. Turn on the development kit that runs the coordinator sample.
+.. tabs::
 
-   * When **LED 0** starts blinking, the main application thread has started.
-   * When **LED 2** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
+   .. group-tab:: nRF54L15 DK
 
-#. Turn on the other development kits that you programmed.
+      1. Turn on the development kit that runs the coordinator sample.
 
-   * When **LED 2** turns on the development kit that runs the Light bulb sample, it has become a Router inside the network.
-   * When **LED 2** turns on the development kit that runs the Light switch sample, it has become an End Device, connected directly to the Coordinator.
+         * When **LED 0** starts blinking, the main application thread has started.
+         * When **LED 2** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
 
-   .. note::
-       If **LED 2** on the development kits does not turn on, press **Button 0** on the Coordinator to reopen the network.
+      #. Turn on the other development kits that you programmed.
 
-#. Optionally, if you are testing with both the Light bulb and the Light switch samples, complete the following additional steps:
+         * When **LED 2** turns on the development kit that runs the Light bulb sample, it has become a Router inside the network.
+         * When **LED 2** turns on the development kit that runs the Light switch sample, it has become an End Device, connected directly to the Coordinator.
 
-   a. Wait until **LED 3** on the development kit that runs the Light switch sample turns on.
+         .. note::
+             If **LED 2** on the development kits does not turn on, press **Button 0** on the Coordinator to reopen the network.
 
-      This LED indicates that the switch found a light bulb to control.
+      #. Optionally, if you are testing with both the Light bulb and the Light switch samples, complete the following additional steps:
 
-   #. Use buttons on the development kit that runs the Light switch sample to control the light bulb, as described in the Light switch sample's user interface section.
+         a. Wait until **LED 3** on the development kit that runs the Light switch sample turns on.
 
-      The result of using the buttons is reflected on the light bulb's **LED 1**.
+            This LED indicates that the switch found a light bulb to control.
+
+         #. Use buttons on the development kit that runs the Light switch sample to control the light bulb, as described in the Light switch sample's user interface section.
+
+            The result of using the buttons is reflected on the light bulb's **LED 1**.
+   .. group-tab:: nRF52840 DK
+
+      1. Turn on the development kit that runs the coordinator sample.
+
+         * When **LED 1** starts blinking, the main application thread has started.
+         * When **LED 3** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
+
+      #. Turn on the other development kits that you programmed.
+
+         * When **LED 3** turns on the development kit that runs the Light bulb sample, it has become a Router inside the network.
+         * When **LED 3** turns on the development kit that runs the Light switch sample, it has become an End Device, connected directly to the Coordinator.
+
+         .. note::
+             If **LED 3** on the development kits does not turn on, press **Button 1** on the Coordinator to reopen the network.
+
+      #. Optionally, if you are testing with both the Light bulb and the Light switch samples, complete the following additional steps:
+
+         a. Wait until **LED 4** on the development kit that runs the Light switch sample turns on.
+
+            This LED indicates that the switch found a light bulb to control.
+
+         #. Use buttons on the development kit that runs the Light switch sample to control the light bulb, as described in the Light switch sample's user interface section.
+
+            The result of using the buttons is reflected on the light bulb's **LED 4**.
 
 You can now use buttons on the light switch to control the light bulb, as described in the :ref:`zigbee_light_switch_user_interface` section of the Light switch sample page.
 

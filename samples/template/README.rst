@@ -46,19 +46,38 @@ Configuration
 User interface
 **************
 
-LED 2:
-    Turns on when the device joins the network.
+.. tabs::
 
-LED 3:
-    Blinks to indicate that the identification mode is on.
+   .. group-tab:: nRF54L15 DK
 
-Button 3:
-    Depending on how long the button is pressed:
+     LED 2:
+         Turns on when the device joins the network.
 
-    * If pressed for less than five seconds, it starts or cancels the Identify mode.
-    * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
-      The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
-      Releasing the button within this time does not trigger the factory reset procedure.
+     LED 3:
+         Blinks to indicate that the identification mode is on.
+
+     Button 3:
+         Depending on how long the button is pressed:
+
+         * If pressed for less than five seconds, it starts or cancels the Identify mode.
+         * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
+           The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+           Releasing the button within this time does not trigger the factory reset procedure.
+   .. group-tab:: nRF52840 DK
+
+     LED 3:
+         Turns on when the device joins the network.
+
+     LED 4:
+         Blinks to indicate that the identification mode is on.
+
+     Button 4:
+         Depending on how long the button is pressed:
+
+         * If pressed for less than five seconds, it starts or cancels the Identify mode.
+         * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
+           The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+           Releasing the button within this time does not trigger the factory reset procedure.
 
 Building and running
 ********************
@@ -75,16 +94,32 @@ Testing
 
 After programming the sample to your development kit, complete the following steps to test it:
 
-1. Turn on the development kit that runs the Network coordinator sample.
+.. tabs::
 
-   When **LED 2** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
+   .. group-tab:: nRF54L15 DK
+   
+      1. Turn on the development kit that runs the Network coordinator sample.
 
-#. Turn on the development kit that runs the Template sample.
+         When **LED 2** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
 
-   When **LED 2** turns on, the light bulb has become a Router inside the network.
+      #. Turn on the development kit that runs the Template sample.
 
-   .. note::
-        If **LED 2** does not turn on, press **Button 0** on the Coordinator to reopen the network.
+         When **LED 2** turns on, the light bulb has become a Router inside the network.
+
+         .. note::
+              If **LED 2** does not turn on, press **Button 0** on the Coordinator to reopen the network.
+   .. group-tab:: nRF52840 DK
+   
+      1. Turn on the development kit that runs the Network coordinator sample.
+
+         When **LED 3** turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
+
+      #. Turn on the development kit that runs the Template sample.
+
+         When **LED 3** turns on, the light bulb has become a Router inside the network.
+
+         .. note::
+              If **LED 3** does not turn on, press **Button 1** on the Coordinator to reopen the network.
 
 The device running the Template sample is now part of the Zigbee network as a Router.
 As a result, the network range is extended by the template application radio range.

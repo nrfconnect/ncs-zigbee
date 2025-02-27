@@ -11,12 +11,15 @@ This page outlines the requirements that you need to meet before you start worki
 Hardware requirements
 *********************
 
-The |addon| supports the nRF54L series: nRF54L15, nRF54L10 and nRF54L05 SoCs.
+For the :ref:`zigbee_quickstart`, you need three development kits of the following types:
 
-To work with the |addon| for the |NCS| and test the available samples, you need at least two `nRF54L15 development kits (DK) <Developing with nRF54L Series_>`_.
+.. include:: /includes/device_table_all.txt
 
-For the :ref:`zigbee_quickstart`, you need three devices.
+You can mix different development kits.
 
+.. note::
+   Make sure that you have three development kits before proceeding to the next steps.
+   
 Software requirements
 *********************
 
@@ -33,7 +36,7 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
    .. group-tab:: command line
 
-      In the **Get the nRF Connect SDK code** part of the install instructions:
+      In the **Get the nRF Connect "SDK code** part of the install instructions:
 
       In Step 4, use the following command to initialize west with |addon| v\ |addon_version|, which also initializes |NCS| v\ |ncs_version|:
 

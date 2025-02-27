@@ -19,7 +19,6 @@
 .. _`Configuring devicetree`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/hardware/index.html
 
 .. _`Developing with nRF52 Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf52/index.html
-.. _`Developing with nRF53 Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf53/index.html
 .. _`Developing with nRF54L Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf54l/index.html
 .. _`Developing with Front-End Modules`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/fem/index.html
 .. _`Developing with the nRF21540 EK`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/fem/21540ek_dev_guide.html
@@ -76,7 +75,10 @@
 .. _`Pulse Width Modulation (PWM)`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/hardware/peripherals/pwm.html
 .. _`UART API`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/hardware/peripherals/uart.html
 .. _`Shields`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/hardware/porting/shields.html
+.. _`Board support`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/board_names.html#programming-board-names
 
+.. _`nrf52840dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/boards/nordic/nrf52840dk/doc/index.html
+.. _`nrf52840dongle`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf52840dongle/doc/index.html#nrf52840dongle-nrf52840
 .. _`nrf54l15dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html
 
 .. _`USB DFU (Device Firmware Upgrade)`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/samples/subsys/usb/dfu/README.html

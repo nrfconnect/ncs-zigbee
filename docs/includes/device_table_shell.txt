@@ -18,3 +18,7 @@
      - PCA10056
      - `nrf52840dk`_
      - ``nrf52840dk/nrf52840``
+   * - `nRF52840 Dongle <Developing with nRF52 Series_>`_
+     - PCA10059
+     - `nrf52840dongle`_
+     - ``nrf52840dongle/nrf52840``

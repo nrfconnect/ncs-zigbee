@@ -23,7 +23,7 @@ The sample supports the following development kits:
 
 To test this sample, you also need the following:
 
-* :ref:`ug_zigbee_tools_ncp_host` tool, which is based on the ZBOSS stack and requires a PC with an operating system compatible with the 64-bit Ubuntu 18.04 Linux.
+* :ref:`ug_zigbee_tools_ncp_host` tool, which is based on the ZBOSS stack and requires a PC with an operating system compatible with the 64-bit Ubuntu |ubuntu_version| Linux.
   The tool is available for download as a standalone :file:`zip` package using the following link:
 
   * `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
@@ -59,19 +59,123 @@ See :ref:`ug_zigbee_configuring_eui64` for information about how to configure th
 Serial communication setup
 ==========================
 
-The communication channel uses Zephyr's `UART API`_ API. The serial device is selected in devicetree like this:
+The communication channel uses Zephyr's `UART API`_.
+
+.. tabs::
+
+   .. group-tab:: nRF54L15 DK
+      
+      The serial device is selected in devicetree like this:
+
+      .. code-block:: devicetree
+
+         chosen {
+             ncs,zigbee-uart = &uart20;
+         };
+
+      By default, Zephyr's logger uses ``uart20`` and the NCP sample communicates through the UART serialization using ``uart21``.
+      The DTS overlay file configures ``uart21`` to be connected to the on-board J-Link instead of ``uart20``.
+      As the result, Zephyr's logger ``uart20`` is available only through GPIO pins (**P1.08** and **P1.09**).
+
+      The ``uart20`` pins are configured by devicetree overlay files for each supported development kit in the :file:`boards` directory.
+
+   .. group-tab:: nRF52840 DK
+
+      The serial device is selected in devicetree like this:
+
+      .. code-block:: devicetree
+
+         chosen {
+             ncs,zigbee-uart = &uart0;
+         };
+
+      By default, Zephyr's logger uses ``uart0`` and the NCP sample communicates through the UART serialization using ``uart1``.
+      The DTS overlay file configures ``uart1`` to be connected to the on-board J-Link instead of ``uart0``.
+      As the result, Zephyr's logger ``uart0`` is available only through GPIO pins (**P1.00** and **P1.01**).
+
+      The ``uart0`` pins are configured by devicetree overlay files for each supported development kit in the :file:`boards` directory.
+
+Communication through USB
+=========================
+
+.. note::
+     Communication through USB is available for nRF52840 SoC.
+
+To change the communication channel from the default UART to nRF USB CDC ACM ``cdc_acm_uart0``, use the :file:`prj_usb.conf` configuration file and add the ``-DFILE_SUFFIX=usb`` flag to the build command.
+When using the nRF52840 Dongle, please add the ``-DFILE_SUFFIX=dongle`` flag to the build command instead.
+See `Providing CMake options`_ for instructions on how to add these flags to your build.
+For example, when building from the command line, use the following commands:
+
+.. code-block:: console
+
+   west build samples/zigbee/ncp -b nrf52840dk/nrf52840 -- -DFILE_SUFFIX=usb
+
+.. code-block:: console
+
+   west build samples/zigbee/ncp -b nrf52840dongle/nrf52840 -- -DFILE_SUFFIX=dongle
+
+The USB device VID and PID are configured by the sample's Kconfig file.
+
+.. note::
+   USB is used as the default NCP communication channel when using the nRF52840 Dongle.
+
+When you change the communication channel to nRF USB using either :file:`prj_usb.conf` or :file:`prj_dongle.conf` and select any of the :file:`<board>_usb.overlay` or :file:`<board>_dongle.overlay` files, respectively, :ref:`Zigbee stack logs <zigbee_ug_logging_stack_logs>` are printed by default using ``uart1``.
+This is configured in the project file with the following settings:
+
+* ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` - To enable binary format.
+* ``CONFIG_ZBOSS_TRACE_UART_LOGGING`` - To select the UART serial over the nRF USB serial.
+  This option is set by default when the binary format is enabled.
+
+And, in the overlay file like this:
 
 .. code-block:: devicetree
 
    chosen {
-       ncs,zigbee-uart = &uart20;
+       ncs,zboss-trace-uart = &uart1;
    };
 
-By default, Zephyr's logger uses ``uart20`` and the NCP sample communicates through the UART serialization using ``uart21``.
-The DTS overlay file configures ``uart21`` to be connected to the on-board J-Link instead of ``uart20``.
-As the result, Zephyr's logger ``uart20`` is available only through GPIO pins (**P1.08** and **P1.09**).
+Alternatively, you can configure :ref:`Zigbee stack logs <zigbee_ug_logging_stack_logs>` to be printed in binary format using an independent CDC ACM device of the same nRF USB.
+Complete the following steps:
 
-The ``uart20`` pins are configured by devicetree overlay files for each supported development kit in the :file:`boards` directory.
+1. Set the following Kconfig options:
+
+   * ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` - This option enables the binary format.
+   * ``CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING`` - This option selects nRF USB serial over UART serial.
+
+#. Create two instances of USB CDC ACM for the application:
+
+   a. Create two entries in the DTS overlay file :file:`<board>_usb.overlay` or :file:`<board>_dongle.overlay` for the selected board, one for each USB CDC ACM instance.
+      See `CDC ACM`_ for more information.
+   #. Extend the ``zephyr_udc0`` node in the DTS overlay file to also configure the second USB CDC ACM instance ``"cdc_acm_uart1"``:
+
+      .. code-block:: devicetree
+
+         &zephyr_udc0 {
+            cdc_acm_uart0: cdc_acm_uart0 {
+               compatible = "zephyr,cdc-acm-uart";
+            };
+
+            cdc_acm_uart1: cdc_acm_uart1 {
+               compatible = "zephyr,cdc-acm-uart";
+            };
+         };
+
+#. Configure the chosen tracing UART device like this:
+
+   .. code-block:: devicetree
+
+      chosen {
+          ncs,zboss-trace-uart = &cdc_acm_uart1;
+      };
+
+#. Enable the composite USB device driver using the ``CONFIG_USB_COMPOSITE_DEVICE`` Kconfig option.
+
+With this configuration, you have two serial ports created by the NCP sample.
+Use the first one for NCP communication.
+Use the second serial port for collecting Zigbee stack logs.
+
+You can also check the :file:`prj_usb.conf` file that contains the complete Kconfig configuration of Zigbee stack logs over nRF USB serial commented out.
+For more configuration options, see :ref:`Zigbee stack logs <zigbee_ug_logging_stack_logs>`.
 
 ..
   Bootloader support
@@ -178,7 +282,14 @@ Once you complete these steps and configure the vendor-specific commands on the 
 User interface
 **************
 
-All the NCP sample's interactions with the application are automatically handled using serial communication.
+.. tabs::
+
+   .. group-tab:: nRF54L15 DK
+
+	  All the NCP sample's interactions with the application are automatically handled using serial communication.
+   .. group-tab:: nRF52840 DK
+
+	  All the NCP sample’s interactions with the application are automatically handled using serial or USB communication.
 
 Building and running
 ********************
@@ -196,26 +307,54 @@ Testing
 
 After building the sample and programming it to your development kit, complete the following steps to test it:
 
-1. Download and extract the `ZBOSS NCP Host`_ package.
+.. tabs::
 
-   .. note::
-      If you are using a Linux distribution different than the 64-bit Ubuntu 22.04, make sure to rebuild the package libraries and applications.
-      Follow the instructions in the `Rebuilding the ZBOSS libraries for host`_ section in the `NCP Host documentation`_.
+   .. group-tab:: nRF54L15 DK
 
-#. Get the kit’s serial port name (for example, ``/dev/ttyACM0``).
-#. Turn on the development kit that runs the Light bulb sample.
-#. To start the simple gateway application, run the following command with *serial_port_name* replaced with the serial port name used for communication with the NCP sample:
+	  1. Download and extract the `ZBOSS NCP Host`_ package.
 
-   .. parsed-literal::
-      :class: highlight
+   	     .. note::
+              If you are using a Linux distribution different than the 64-bit Ubuntu |ubuntu_version|, make sure to rebuild the package libraries and applications.
+              Follow the instructions in the `Rebuilding the ZBOSS libraries for host`_ section in the `NCP Host documentation`_.
 
-      NCP_SLAVE_PTY=*serial_port_name* ./application/simple_gw/simple_gw
+	  #. Get the kit’s serial port name (for example, ``/dev/ttyACM0``).
+	  #. Turn on the development kit that runs the Light bulb sample.
+	  #. To start the simple gateway application, run the following command with *serial_port_name* replaced with the serial port name used for communication with the NCP sample:
 
-The simple gateway device forms the Zigbee network and opens the network for 180 seconds for new devices to join.
-When the light bulb joins the network, the **LED 2** on the light bulb device turns on to indicate that it is connected to the simple gateway.
-The gateway then starts discovering the On/Off cluster.
-When it is found, the simple gateway configures bindings and reporting for the device.
-It then starts sending On/Off toggle commands with a 15-second interval that toggle the **LED 1** on the light bulb on and off.
+   	    .. parsed-literal::
+	          :class: highlight
+
+	          NCP_SLAVE_PTY=*serial_port_name* ./application/simple_gw/simple_gw
+	  
+	  The simple gateway device forms the Zigbee network and opens the network for 180 seconds for new devices to join.
+	  When the light bulb joins the network, the **LED 2** on the light bulb device turns on to indicate that it is connected to the simple gateway.
+	  The gateway then starts discovering the On/Off cluster.
+	  When it is found, the simple gateway configures bindings and reporting for the device.
+	  It then starts sending On/Off toggle commands with a 15-second interval that toggle the **LED 1** on the light bulb on and off.
+
+   .. group-tab:: nRF52840 DK
+
+	  1. Download and extract the `ZBOSS NCP Host`_ package.
+
+   	     .. note::
+              If you are using a Linux distribution different than the 64-bit Ubuntu |ubuntu_version|, make sure to rebuild the package libraries and applications.
+              Follow the instructions in the `Rebuilding the ZBOSS libraries for host`_ section in the `NCP Host documentation`_.
+
+	  #. If you are using `Communication through USB`_, connect the nRF USB port of the NCP sample’s development kit to the PC USB port with a USB cable.
+	  #. Get the kit’s serial port name (for example, ``/dev/ttyACM0``). If you are communicating through the nRF USB, get the nRF USB serial port name.
+	  #. Turn on the development kit that runs the Light bulb sample.
+	  #. To start the simple gateway application, run the following command with *serial_port_name* replaced with the serial port name used for communication with the NCP sample:
+
+   	    .. parsed-literal::
+	          :class: highlight
+
+	          NCP_SLAVE_PTY=*serial_port_name* ./application/simple_gw/simple_gw
+	  
+	  The simple gateway device forms the Zigbee network and opens the network for 180 seconds for new devices to join.
+	  When the light bulb joins the network, the **LED 3** on the light bulb device turns on to indicate that it is connected to the simple gateway.
+	  The gateway then starts discovering the On/Off cluster.
+	  When it is found, the simple gateway configures bindings and reporting for the device.
+	  It then starts sending On/Off toggle commands with a 15-second interval that toggle the **LED 4** on the light bulb on and off.
 
 Dependencies
 ************

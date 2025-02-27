@@ -19,7 +19,7 @@ Requirements
 
 The sample supports the following development kits:
 
-.. include:: /includes/device_table_single_multi.txt
+.. include:: /includes/device_table_shell.txt
 
 ..
   You can use one or more of the development kits listed above and mix different development kits.
@@ -57,25 +57,48 @@ These interfaces are completely independent one from another and can be used sim
 For information about setup, see `Testing and optimization`_.
 
 The Zigbee Shell sample uses UART as the default shell backend.
+To change the shell backend from the default UART to the nRF USB CDC ACM, use the :file:`prj_usb.conf` configuration file and add the ``-DFILE_SUFFIX=usb`` flag when building the sample. 
+With such configuration, Zephyr logs are printed only to the backend that the shell is using.
 
-.. 
-  To change the shell backend from the default UART to the nRF USB CDC ACM, use the :file:`prj_usb.conf` configuration file and add the ``-DFILE_SUFFIX=usb`` flag when building the sample. 
-  With such configuration, Zephyr logs are printed only to the backend that the shell is using.
-
+.. note::
+   USB interface is only available for nRF52840 SoC.
+   
 You can enable the UART backend for the logger, so that Zephyr logs are printed to both the shell backend and the UART.
-To do this, enable the ``CONFIG_LOG_BACKEND_UART`` Kconfig option.
+To do this, enable the ``CONFIG_LOG_BACKEND_UART`` Kconfig option. 
+If the sample is built for `nrf52840dongle`_, the nRF USB CDC ACM is the default backend for shell.
 
 User interface
 **************
 
-LED 2:
-    Turns on when the device joins the network.
+.. tabs::
 
-LED 3:
-    Blinks to indicate that the identification mode is on.
+   .. group-tab:: nRF54L15 DK
 
-Button 3:
-    Starts or cancels the Identify mode.
+      LED 2:
+          Turns on when the device joins the network.
+
+      LED 3:
+          Blinks to indicate that the identification mode is on.
+
+      Button 3:
+          Starts or cancels the Identify mode.
+   .. group-tab:: nRF52840 DK
+
+      LED 3:
+          Turns on when the device joins the network.
+
+      LED 4:
+          Blinks to indicate that the identification mode is on.
+
+      Button 4:
+          Starts or cancels the Identify mode.
+   .. group-tab:: nRF52840 Dongle
+
+      LED 1:
+          Blinks green to indicate that the identification mode is on.
+
+      Button 1:
+          Starts or cancels the Identify mode.
 
 All other interactions with the application can be handled using serial communication.
 See :ref:`zigbee_shell_reference` for available serial commands.
