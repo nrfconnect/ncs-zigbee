@@ -23,6 +23,8 @@ You can mix different development kits.
 Software requirements
 *********************
 
+For libraries and code for |addon|, see the `ncs-zigbee repository <Zigbee R23 add-on_>`_.
+
 To work with the |addon|, you need to install the |NCS|, including all its prerequisites and the |NCS| toolchain.
 Follow the `Installing the nRF Connect SDK`_ instructions, with the following exception:
 
