@@ -164,7 +164,7 @@ static void ncp_vendor_specific_init(void)
 
 int main(void)
 {
-	LOG_INF("Starting Zigbee Network Co-processor sample");
+	LOG_INF("Starting Zigbee R23 Network Co-processor sample");
 
 #ifdef CONFIG_USB_DEVICE_STACK
 	/* Enable USB device. */
@@ -216,7 +216,7 @@ int main(void)
 	/* Start Zigbee default thread */
 	zigbee_enable();
 
-	LOG_INF("Zigbee Network Co-processor sample started");
+	LOG_INF("Zigbee R23 Network Co-processor sample started");
 
 	return 0;
 }

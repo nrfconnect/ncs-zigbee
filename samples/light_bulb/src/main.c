@@ -524,7 +524,7 @@ int main(void)
 	int blink_status = 0;
 	int err;
 
-	LOG_INF("Starting ZBOSS Light Bulb example");
+	LOG_INF("Starting Zigbee R23 Light Bulb example");
 
 	/* Initialize */
 	configure_gpio();
@@ -558,7 +558,7 @@ int main(void)
 	/* Start Zigbee default thread */
 	zigbee_enable();
 
-	LOG_INF("ZBOSS Light Bulb example started");
+	LOG_INF("Zigbee R23 Light Bulb example started");
 
 	while (1) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);

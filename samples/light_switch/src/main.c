@@ -811,7 +811,7 @@ void set_tx_power(void)
 
 int main(void)
 {
-	LOG_INF("Starting ZBOSS Light Switch example");
+	LOG_INF("Starting Zigbee R23 Light Switch example");
 
 	/* Initialize. */
 	configure_gpio();
@@ -874,7 +874,7 @@ int main(void)
 	nus_cmd_init(on_nus_connect, on_nus_disconnect, commands);
 #endif /* CONFIG_BT_NUS */
 
-	LOG_INF("ZBOSS Light Switch example started");
+	LOG_INF("Zigbee R23 Light Switch example started");
 
 	while (1) {
 		k_sleep(K_FOREVER);
