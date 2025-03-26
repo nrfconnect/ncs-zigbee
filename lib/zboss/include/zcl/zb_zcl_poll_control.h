@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -424,11 +424,11 @@ zb_zcl_poll_control_check_in_cli_param_t;
   {                                                                         \
     zb_zcl_device_callback_param_t *user_app_data =                         \
       ZB_BUF_GET_PARAM((_buffer), zb_zcl_device_callback_param_t);          \
-    zb_zcl_poll_control_check_in_cli_param_t *value =                       \
-        &(user_app_data->cb_param.checkin_cli_param);                       \
-    value->fast_poll_timeout = (_fast_poll_timeout);                        \
-    value->short_addr = (_short_addr);                                      \
-    value->ep = (_ep);                                                      \
+    zb_zcl_poll_control_check_in_cli_param_t temp_value;                    \
+    temp_value.fast_poll_timeout = (_fast_poll_timeout);                    \
+    temp_value.short_addr = (_short_addr);                                  \
+    temp_value.ep = (_ep);                                                  \
+    user_app_data->cb_param.checkin_cli_param = temp_value;                 \
     user_app_data->device_cb_id = ZB_ZCL_POLL_CONTROL_CHECK_IN_CLI_CB_ID;   \
     user_app_data->endpoint = (_ep);                                        \
     user_app_data->status = RET_OK;                                         \

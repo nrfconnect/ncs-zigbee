@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2021 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -46,7 +46,7 @@
 
 #if defined ZB_HA_DEFINE_DEVICE_TEST_DEVICE || defined DOXYGEN
 
-/** @cond (DOXYGEN_HA_SECTION && internals_doc) */
+/** @cond (DOXYGEN_HA_SECTION && internals_doc)*/
 
 /** @addtogroup ha_api
  * @{
@@ -57,10 +57,10 @@
 
 /**< Control for test */
 
-/** Input clusters number. */
+/**< Input clusters number. */
 #define ZB_HA_TEST_DEVICE_IN_CLUSTER_NUM  2
 
-/** Output clusters number. */
+/**< Output clusters number. */
 #define ZB_HA_TEST_DEVICE_OUT_CLUSTER_NUM 5
 
 /**
@@ -172,11 +172,10 @@
   ZBOSS_DECLARE_DEVICE_CTX_1_EP(device_ctx, ep_name)
 
 
+#endif /* defined ZB_HA_DEFINE_DEVICE_TEST_DEVICE || defined DOXYGEN */
 
 /** @} */ /* ha_api */
 
 /** @endcond */ /* DOXYGEN_HA_SECTION */
-
-#endif /* defined ZB_HA_DEFINE_DEVICE_TEST_DEVICE || defined DOXYGEN */
 
 #endif /* ZB_TEST_DEVICE_H */

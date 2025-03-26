@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -2061,6 +2061,8 @@ typedef ZB_PACKED_PRE struct zb_zll_commissioning_endpoint_information_s
     (data_ptr)->version = src_ptr->version;                                        \
   }                                                                                \
 }
+
+/*! @} */ /* Touchlink Commissioning cluster commands */
 
 /*! @} */ /* Touchlink Commissioning cluster */
 

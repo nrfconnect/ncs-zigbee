@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -409,7 +409,7 @@ typedef enum zb_zcl_security_use_option_e
 #define ZB_ZCL_STATUS_ABORT                 0x95U /*!< Abort */
 #define ZB_ZCL_STATUS_INVALID_IMAGE         0x96U /*!< Invalid OTA upgrade image */
 #define ZB_ZCL_STATUS_WAIT_FOR_DATA         0x97U /*!< Server does not have data block available yet */
-/** No OTA upgrade image available for a particular client. */
+/**< No OTA upgrade image available for a particular client. */
 #define ZB_ZCL_STATUS_NO_IMAGE_AVAILABLE    0x98U
 /** The client still requires more OTA upgrade image files in order to successfully upgrade. */
 #define ZB_ZCL_STATUS_REQUIRE_MORE_IMAGE    0x99U
@@ -1556,7 +1556,7 @@ void *zb_zcl_start_command_header(zb_bufid_t zbbuf, zb_uint8_t frame_ctl, zb_uin
     Types and macros shared fill Fill ZCL packet.
     @{
       @par Example
-      @snippet HA_samples/write_attr_test/sample_zed.c ZB_ZCL_PACKET
+      @snippet HA/write_attr_test/sample_zed.c ZB_ZCL_PACKET
       @par
 */
 
@@ -1951,7 +1951,7 @@ zb_single_t zb_zcl_attr_getsingle(zb_uint8_t *value);
 #define ZB_ZCL_INVALID_STRING_VALUE 0xFFU
 #define ZB_ZCL_INVALID_ARRAY_VALUE 0xFFFFU
 
-/** @endcond */ /* internals_doc */
+/** @endcond */
 
 /*! @} */ /* ZCL common types and definitions */
 
@@ -2000,7 +2000,7 @@ typedef struct zcl_cb_hash_ent_s
 }
 zcl_cb_hash_ent_t;
 
-/** @endcond */ /*internals_doc */
+/** @endcond */
 
 /** Command send status structure */
 typedef struct zb_zcl_command_send_status_s
@@ -2344,15 +2344,13 @@ zb_uint8_t zb_get_current_endpoint_id(void);
     @param pcmd_info - pointer of cmd_info (see @ref zb_zcl_parsed_hdr_s)
     @param status - status of operation (see @ref zb_zcl_status_t)
 */
-void zb_zcl_process_command_finish(zb_bufid_t buffer, zb_zcl_parsed_hdr_t *pcmd_info, zb_uint8_t status);
+void zb_zcl_process_command_finish(zb_bufid_t buffer, const zb_zcl_parsed_hdr_t *pcmd_info, zb_uint8_t status);
 #define ZB_ZCL_PROCESS_COMMAND_FINISH(buffer, pcmd_info, status)        \
   zb_zcl_process_command_finish(buffer, pcmd_info, status)
 
 void zb_zcl_process_command_finish_new(zb_bufid_t buffer, zb_zcl_parsed_hdr_t *pcmd_info, zb_uint8_t status);
 #define ZB_ZCL_PROCESS_COMMAND_FINISH_NEW(buffer, pcmd_info, status)        \
   zb_zcl_process_command_finish_new(buffer, pcmd_info, status)
-
-/** @endcond */ /* DOXYGEN_INTERNAL_DOC */
 
 /** @brief Declare for change attribute for User Application
  *
@@ -2444,7 +2442,7 @@ typedef struct zb_zcl_set_attr_value_param_s
   }                                                                            \
 }
 
-/** @endcond */ /* internals_doc */
+/** @endcond */
 
 /**
  * @brief Set ZCL backward compatibility modes
@@ -2530,7 +2528,6 @@ zb_zcl_status_t zb_zcl_set_attr_val_manuf_internal(zb_uint8_t ep,
                                                    zb_uint8_t *value,
                                                    zb_bool_t check_access,
                                                    zb_bool_t check_attr_writable);
-
 
 /**
  * @brief Map return code to ZCL status code

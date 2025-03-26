@@ -162,6 +162,7 @@ extern zb_uint_t g_trace_inside_intr;
 #define TRACE_SUBSYSTEM_USB       0x200000U  /**< USB subsystem */
 #define TRACE_SUBSYSTEM_SPI       0x400000U  /**< SPI subsystem */
 #define TRACE_SUBSYSTEM_UART      0x800000U  /**< UART subsystem */
+#define TRACE_SUBSYSTEM_PTA       0x1000000U /**< PTA subsystem */
 #define TRACE_SUBSYSTEM_JSON      0x1000000U /**< JSON subsystem */
 #define TRACE_SUBSYSTEM_HTTP      0x2000000U /**< HTTP subsystem */
 #define TRACE_SUBSYSTEM_CLOUD     0x4000000U /**< Interface to the Cloud */
@@ -637,7 +638,7 @@ typedef struct zb_byte128_struct_s
 #endif
 
 #else  /* IAR & GCC - 32-bit */
-/* IAR for Cortex passes 1-byte abd 2-bytes arguments as 4-bytes to vararg functions.
+/* IAR for Cortex passes 1-byte and 2-bytes arguments as 4-bytes to vararg functions.
  * Pointers are 4-bytes. */
 
 #if defined ZB_BINARY_TRACE && !defined ZB_TRACE_TO_SYSLOG
@@ -1277,6 +1278,12 @@ typedef struct zb_byte128_struct_s
 #define TRACE_TEST2 TRACE_SUBSYSTEM_TEST, 2U
 #define TRACE_TEST3 TRACE_SUBSYSTEM_TEST, 3U
 #define TRACE_TEST4 TRACE_SUBSYSTEM_TEST, 4U
+
+#define TRACE_PTA1 TRACE_SUBSYSTEM_PTA, 1U
+#define TRACE_PTA2 TRACE_SUBSYSTEM_PTA, 2U
+#define TRACE_PTA3 TRACE_SUBSYSTEM_PTA, 3U
+#define TRACE_PTA4 TRACE_SUBSYSTEM_PTA, 4U
+
 #endif /* DOXYGEN */
 
 #ifndef ZB_SET_TRACE_LEVEL

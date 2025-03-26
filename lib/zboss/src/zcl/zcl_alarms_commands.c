@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -91,35 +91,6 @@ void zb_zcl_alarms_init_client()
                               (zb_zcl_cluster_check_value_t)NULL,
                               (zb_zcl_cluster_write_attr_hook_t)NULL,
                               zb_zcl_process_alarms_specific_commands_cli);
-}
-
-static zb_zcl_status_t zb_zcl_alarms_map_ret_code_to_zcl_status(zb_ret_t ret_code)
-{
-  zb_zcl_status_t status;
-
-  ZB_ASSERT(ret_code != RET_BUSY);
-
-  switch (ret_code)
-  {
-    case RET_OK:
-      status = ZB_ZCL_STATUS_SUCCESS;
-      break;
-    case RET_INVALID_PARAMETER_1:
-      status = ZB_ZCL_STATUS_INVALID_FIELD;
-      break;
-    case RET_INVALID_PARAMETER:
-      status = ZB_ZCL_STATUS_INVALID_VALUE;
-      break;
-    case RET_ERROR:
-      status = (zb_zcl_get_backward_compatible_statuses_mode() == ZB_ZCL_STATUSES_ZCL8_MODE) ?
-                ZB_ZCL_STATUS_FAIL : ZB_ZCL_STATUS_HW_FAIL;
-      break;
-    default:
-      status = ZB_ZCL_STATUS_FAIL;
-      break;
-  }
-
-  return status;
 }
 
 static zb_ret_t zb_zcl_alarms_reset_alarm_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
@@ -256,7 +227,7 @@ zb_bool_t zb_zcl_process_alarms_specific_commands_srv(zb_uint8_t param)
   if (processed && ret != RET_BUSY)
   {
     zb_zcl_send_default_handler(param, &cmd_info,
-                                zb_zcl_alarms_map_ret_code_to_zcl_status(ret));
+                                zb_zcl_map_ret_code_to_zcl_status(ret));
   }
 
   TRACE_MSG(TRACE_ZCL1,
@@ -302,7 +273,7 @@ zb_bool_t zb_zcl_process_alarms_specific_commands_cli(zb_uint8_t param)
   if (processed && ret != RET_BUSY)
   {
     zb_zcl_send_default_handler(param, &cmd_info,
-                                zb_zcl_alarms_map_ret_code_to_zcl_status(ret));
+                                zb_zcl_map_ret_code_to_zcl_status(ret));
   }
 
     TRACE_MSG(TRACE_ZCL1,

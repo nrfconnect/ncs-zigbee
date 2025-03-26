@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -306,19 +306,22 @@ static zb_bool_t zb_zcl_daily_schedule_process_get_schedule(zb_uint8_t param,
   }
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
-    ZB_ZCL_DAILY_SCHEDULE_GET_SCHEDULE_CB_ID, RET_NOT_FOUND, cmd_info, &pl_in, &pl_out);
+    ZB_ZCL_DAILY_SCHEDULE_GET_SCHEDULE_CB_ID, RET_NOT_IMPLEMENTED, cmd_info, &pl_in, &pl_out);
   if (ZCL_CTX().device_cb)
   {
     (ZCL_CTX().device_cb)(param);
   }
 
-  if (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) == RET_OK)
+  switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
   {
-    zb_buf_free(param);
-  }
-  else
-  {
-    zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_NOT_FOUND);
+    case RET_OK:
+      zb_buf_free(param);
+      break;
+    case RET_NOT_IMPLEMENTED:
+      zb_zcl_send_default_handler(param, cmd_info,  ZB_ZCL_STATUS_UNSUP_CMD);
+      break;
+    default:
+      zb_zcl_send_default_handler(param, cmd_info,  ZB_ZCL_STATUS_NOT_FOUND);
   }
 
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_daily_schedule_process_get_schedule", (FMT__0));
@@ -343,20 +346,23 @@ static zb_bool_t zb_zcl_daily_schedule_process_get_day_profile(zb_uint8_t param,
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
                                     ZB_ZCL_DAILY_SCHEDULE_GET_DAY_PROFILE_CB_ID,
-                                    RET_NOT_FOUND, cmd_info, &pl_in, &pl_out);
+                                    RET_NOT_IMPLEMENTED, cmd_info, &pl_in, &pl_out);
 
   if (ZCL_CTX().device_cb)
   {
     (ZCL_CTX().device_cb)(param);
   }
 
-  if (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) == RET_OK)
+  switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
   {
-    ZB_ZCL_DAILY_SCHEDULE_SEND_CMD_HELPER(zb_zcl_daily_schedule_send_cmd_publish_day_profile, param, cmd_info, &pl_out, NULL);
-  }
-  else
-  {
-    zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_NOT_FOUND);
+    case RET_OK:
+      ZB_ZCL_DAILY_SCHEDULE_SEND_CMD_HELPER(zb_zcl_daily_schedule_send_cmd_publish_day_profile, param, cmd_info, &pl_out, NULL);
+      break;
+    case RET_NOT_IMPLEMENTED:
+      zb_zcl_send_default_handler(param, cmd_info,  ZB_ZCL_STATUS_UNSUP_CMD);
+      break;
+    default:
+      zb_zcl_send_default_handler(param, cmd_info,  ZB_ZCL_STATUS_NOT_FOUND);
   }
 
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_daily_schedule_process_get_day_profile", (FMT__0));
@@ -373,29 +379,32 @@ static zb_bool_t zb_zcl_daily_schedule_process_get_schedule_cancellation(zb_uint
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
                                     ZB_ZCL_DAILY_SCHEDULE_GET_SCHEDULE_CANCELLATION_CB_ID,
-                                    RET_NOT_FOUND, cmd_info, NULL, &pl_out);
+                                    RET_NOT_IMPLEMENTED, cmd_info, NULL, &pl_out);
 
   if (ZCL_CTX().device_cb)
   {
     (ZCL_CTX().device_cb)(param);
   }
 
-  if (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) == RET_OK)
+switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
   {
+    case RET_OK:
 #ifndef ZB_ZCL_DAILY_SCHEDULE_CANCEL_ALL_SCHEDULE
-    ZB_ZCL_DAILY_SCHEDULE_SEND_CMD_HELPER(zb_zcl_daily_schedule_send_cmd_cancel_schedule, param, cmd_info, &pl_out, NULL);
+      ZB_ZCL_DAILY_SCHEDULE_SEND_CMD_HELPER(zb_zcl_daily_schedule_send_cmd_cancel_schedule, param, cmd_info, &pl_out, NULL);
 #else
-    zb_zcl_daily_schedule_send_cmd_cancel_all_schedules(param,
+      zb_zcl_daily_schedule_send_cmd_cancel_all_schedules(param,
                                                         (zb_addr_u *) &ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source,
                                                         ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
                                                         ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
                                                         ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
                                                         NULL);
 #endif
-  }
-  else
-  {
-    zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_NOT_FOUND);
+      break;
+    case RET_NOT_IMPLEMENTED:
+      zb_zcl_send_default_handler(param, cmd_info,  ZB_ZCL_STATUS_UNSUP_CMD);
+      break;
+    default:
+      zb_zcl_send_default_handler(param, cmd_info,  ZB_ZCL_STATUS_NOT_FOUND);
   }
 
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_daily_schedule_process_get_schedule_cancellation", (FMT__0));

@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -207,17 +207,7 @@ static void add_group_send_default_resp(zb_uint8_t param, zb_zcl_parsed_hdr_t *c
 
   if (ZB_ZCL_CHECK_IF_SEND_DEFAULT_RESP(*cmd_info, status))
   {
-    ZB_ZCL_SEND_DEFAULT_RESP(
-      param,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
-      ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
-      cmd_info->profile_id,
-      cmd_info->cluster_id,
-      cmd_info->seq_number,
-      cmd_info->cmd_id,
-      status);
+    ZB_ZCL_PROCESS_COMMAND_FINISH(param, cmd_info, status);
   }
   else
   {
@@ -732,17 +722,7 @@ static void remove_all_groups_cb_send_default_resp(zb_uint8_t param)
   TRACE_MSG(TRACE_ZCL2, "disable_default_response %hd", (FMT__H, cmd_info.disable_default_response));
   if (!cmd_info.disable_default_response)
   {
-    ZB_ZCL_SEND_DEFAULT_RESP(
-      param,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).source.u.short_addr,
-      ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).src_endpoint,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint,
-      cmd_info.profile_id,
-      cmd_info.cluster_id,
-      cmd_info.seq_number,
-      cmd_info.cmd_id,
-      status);
+    ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, status);
   }
   else
   {
@@ -975,17 +955,7 @@ zb_bool_t zb_zcl_process_groups_commands_cli(zb_uint8_t param)
         /* Do nothing, just send default response if necessary */
         if (!cmd_info.disable_default_response)
         {
-          ZB_ZCL_SEND_DEFAULT_RESP(
-            param,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).source.u.short_addr,
-            ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).src_endpoint,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint,
-            cmd_info.profile_id,
-            cmd_info.cluster_id,
-            cmd_info.seq_number,
-            cmd_info.cmd_id,
-            ZB_ZCL_STATUS_SUCCESS);
+          ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, ZB_ZCL_STATUS_SUCCESS);
         }
         else
         {

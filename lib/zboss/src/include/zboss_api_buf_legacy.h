@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -93,7 +93,6 @@
 
 #define zb_buf_t zb_leg_buf_t
 
-/** @cond internals_doc */
 
 /**
    BIG Packet buffer header.

@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -66,17 +66,17 @@
 
     - Declaring clusters:
 
-        @snippet HA_samples/common/zcl_basic_attr_list.h BASIC_CLUSTER_COMMON
-        @snippet HA_samples/mains_power_outlet/sample_zc.c COMMON_DECLARATION
+        @snippet HA/common/zcl_basic_attr_list.h BASIC_CLUSTER_COMMON
+        @snippet HA/mains_power_outlet/sample_zc.c COMMON_DECLARATION
 
     - Registering device list:
 
-        @snippet HA_samples/mains_power_outlet/sample_zc.c REGISTER
+        @snippet HA/mains_power_outlet/sample_zc.c REGISTER
 
     - Example of command handler:
 
-        @snippet HA_samples/mains_power_outlet/sample_zc.c COMMAND_HANDLER
-        @snippet HA_samples/mains_power_outlet/sample_zc.c ZCL_COMMAND_HANDLER
+        @snippet HA/mains_power_outlet/sample_zc.c COMMAND_HANDLER
+        @snippet HA/mains_power_outlet/sample_zc.c ZCL_COMMAND_HANDLER
 
     @par
 */

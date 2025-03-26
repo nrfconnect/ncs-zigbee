@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -225,25 +225,28 @@ static zb_ret_t zbd_configure_interface_req_handler(zb_uint8_t param, zb_zcl_par
       else
       {
         ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
-          ZB_ZCL_DIRECT_CONFIGURATION_CONFIGURE_INTERFACE_CB_ID, RET_OK, cmd_info, &zbd_req, NULL);
+          ZB_ZCL_DIRECT_CONFIGURATION_CONFIGURE_INTERFACE_CB_ID, RET_NOT_IMPLEMENTED, cmd_info, &zbd_req, NULL);
 
         (ZCL_CTX().device_cb)(param);
 
-        if (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) == RET_OK)
+        switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
         {
-          resp_status = ZB_ZCL_STATUS_SUCCESS;
+          case RET_OK:
+            resp_status = ZB_ZCL_STATUS_SUCCESS;
 
-          ZB_ZCL_DIRECT_CONFIGURATION_INTERFACE_STATE_SET_CURRENT_STATE(interface_state_bitfield, zbd_req.interface_state);
-          ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(attr_interface_state, interface_state_bitfield);
+            ZB_ZCL_DIRECT_CONFIGURATION_INTERFACE_STATE_SET_CURRENT_STATE(interface_state_bitfield, zbd_req.interface_state);
+            ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(attr_interface_state, interface_state_bitfield);
 
 #ifdef ZB_USE_NVRAM
-          /* If we fail, trace is given and assertion is triggered */
-          (void)zb_nvram_write_dataset(ZB_NVRAM_DATASET_ZB_DIRECT);
+            /* If we fail, trace is given and assertion is triggered */
+            (void)zb_nvram_write_dataset(ZB_NVRAM_DATASET_ZB_DIRECT);
 #endif
-        }
-        else
-        {
-          resp_status = ZB_ZCL_STATUS_FAIL;
+            break;
+          case RET_NOT_IMPLEMENTED:
+            resp_status = ZB_ZCL_STATUS_UNSUP_CMD;
+            break;
+          default:
+            resp_status = ZB_ZCL_STATUS_FAIL;
         }
       }
     }

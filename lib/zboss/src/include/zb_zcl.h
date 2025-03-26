@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2021 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -102,8 +102,8 @@ zb_zcl_cluster_handler_t zb_zcl_get_cluster_handler_internal(zb_uint8_t endpoint
 zb_zcl_cluster_check_value_t zb_zcl_internal_get_cluster_check_value(zb_uint8_t endpoint, zb_uint16_t cluster_id, zb_uint8_t cluster_role);
 zb_zcl_cluster_write_attr_hook_t zb_zcl_internal_get_cluster_write_attr_hook(zb_uint8_t endpoint, zb_uint16_t cluster_id, zb_uint8_t cluster_role);
 
-/*! @} */ /* zcl_api */
-
 /** @endcond */ /* internals_doc */
+
+/*! @} */ /* zcl_api */
 
 #endif /* ZB_ZCL_H */

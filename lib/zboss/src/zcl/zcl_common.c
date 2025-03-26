@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -129,7 +129,7 @@ void zb_zcl_register_device_ctx(zb_af_device_ctx_t *device_ctx)
 
 /* The purpose of this variable is to provide an access to endpoint ID
  * that is under initialization at the moment for cluster initialization functions
- * The best soultion is to add ep_id as an input parameter to
+ * The best solution is to add ep_id as an input parameter to
  * void (*zb_zcl_cluster_init_t)(void)
  */
 
@@ -499,6 +499,9 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
     }
 
     case ZB_ZCL_ATTR_TYPE_64BIT:
+    case ZB_ZCL_ATTR_TYPE_64BITMAP:
+    case ZB_ZCL_ATTR_TYPE_U64:
+    case ZB_ZCL_ATTR_TYPE_S64:
     case ZB_ZCL_ATTR_TYPE_IEEE_ADDR:
       ZB_ZCL_PACKET_PUT_DATA64(cmd_ptr, attr_value);
       break;
@@ -573,11 +576,13 @@ zb_bool_t zb_zcl_is_analog_data_type(zb_uint8_t attr_type)
     case ZB_ZCL_ATTR_TYPE_U24:
     case ZB_ZCL_ATTR_TYPE_U32:
     case ZB_ZCL_ATTR_TYPE_U48:
+    case ZB_ZCL_ATTR_TYPE_U64:
     case ZB_ZCL_ATTR_TYPE_S8:
     case ZB_ZCL_ATTR_TYPE_S16:
     case ZB_ZCL_ATTR_TYPE_S24:
     case ZB_ZCL_ATTR_TYPE_S32:
     case ZB_ZCL_ATTR_TYPE_S48:
+    case ZB_ZCL_ATTR_TYPE_S64:
     case ZB_ZCL_ATTR_TYPE_UTC_TIME:
       ret = ZB_TRUE;
       break;
@@ -845,7 +850,7 @@ void zb_zcl_fix_endian(zb_uint8_t *data_ptr, zb_uint8_t data_type)
 
 /* Check, if attribute value maybe set to a new value
  * Note: check_access specifies if it is needed to perform read-only
- * check: end-user application may chanage read-only attributes
+ * check: end-user application may change read-only attributes
 */
 zb_uint8_t zb_zcl_check_attribute_writable(
     zb_zcl_attr_t* attr_desc,
@@ -903,7 +908,7 @@ zb_uint8_t zb_zcl_check_attribute_writable(
       }
       else if (ret == RET_UNAUTHORIZED)
       {
-        TRACE_MSG(TRACE_ZCL1, "unathorized value", (FMT__0));
+        TRACE_MSG(TRACE_ZCL1, "unauthorized value", (FMT__0));
         status = ZB_ZCL_STATUS_NOT_AUTHORIZED;
       }
       else
@@ -922,7 +927,7 @@ zb_uint8_t zb_zcl_check_attribute_writable(
 }
 
 /* Sets attribute value, for other endpoint of singleton attribute
- * check: end-user application may chanage read-only attributes
+ * check: end-user application may change read-only attributes
 */
 static void zb_zcl_conform_singleton(zb_uint8_t ep_first, zb_uint16_t cluster_id, zb_uint8_t cluster_role, zb_uint16_t attr_id, zb_uint8_t *value, zb_uint16_t manuf_code)
 {
@@ -981,7 +986,7 @@ static void zb_zcl_conform_singleton(zb_uint8_t ep_first, zb_uint16_t cluster_id
 /* Sets attribute value, perform all needed checks before and after
  * setting new value
  * Note: access_check specifies if it is needed to perform read-only
- * check: end-user application may chanage read-only attributes
+ * check: end-user application may change read-only attributes
 */
 zb_zcl_status_t zb_zcl_set_attr_val_manuf_internal(zb_uint8_t ep,
                                                    zb_uint16_t cluster_id,

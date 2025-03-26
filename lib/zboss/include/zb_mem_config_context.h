@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -48,7 +48,7 @@
 /*! @{ */
 
 /**
-   @defgroup configurable_mem_internals Configurable internal memory
+   @defgroup configurable_mem_internals
    @{
    @details
    Design of configurable ZBOSS internal memory provides an ability to

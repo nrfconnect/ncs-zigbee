@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -141,52 +141,23 @@ static zb_ret_t check_value_window_covering_server(zb_uint16_t attr_id, zb_uint8
   return ret;
 }
 
-static zb_zcl_status_t zb_zcl_window_covering_map_ret_code_to_zcl_status(zb_ret_t ret_code)
-{
-  zb_zcl_status_t status;
-
-  ZB_ASSERT(ret_code != RET_BUSY);
-
-  switch (ret_code)
-  {
-    case RET_OK:
-      status = ZB_ZCL_STATUS_SUCCESS;
-      break;
-    case RET_INVALID_PARAMETER_1:
-      status = ZB_ZCL_STATUS_INVALID_FIELD;
-      break;
-    case RET_INVALID_PARAMETER:
-      status = ZB_ZCL_STATUS_INVALID_VALUE;
-      break;
-    case RET_ERROR:
-      status = (zb_zcl_get_backward_compatible_statuses_mode() == ZB_ZCL_STATUSES_ZCL8_MODE) ?
-                ZB_ZCL_STATUS_FAIL : ZB_ZCL_STATUS_HW_FAIL;
-      break;
-    default:
-      status = ZB_ZCL_STATUS_FAIL;
-      break;
-  }
-
-  return status;
-}
-
 static zb_ret_t zb_zcl_window_covering_invoke_user_app(zb_uint8_t param,
                                                        const zb_zcl_parsed_hdr_t *cmd_info,
                                                        zb_zcl_device_callback_id_t user_cb_id,
                                                        void *payload)
-      {
+{
   zb_ret_t ret = RET_OK;
 
   TRACE_MSG(TRACE_ZCL1, "> zb_zcl_window_covering_invoke_user_app cb_id %d", (FMT__D, user_cb_id));
 
-  ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param, user_cb_id, RET_OK, cmd_info, payload, NULL);
+  ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param, user_cb_id, RET_NOT_IMPLEMENTED, cmd_info, payload, NULL);
 
   if (ZCL_CTX().device_cb != NULL)
   {
     (ZCL_CTX().device_cb)(param);
-      }
+  }
 
-  ret = (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) == RET_OK ? RET_OK : RET_ERROR);
+  ret = ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param);
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_window_covering_invoke_user_app ret %d", (FMT__D, ret));
 
@@ -359,8 +330,7 @@ static zb_bool_t zb_zcl_process_window_covering_specific_commands(zb_uint8_t par
 
   if (processed && ret != RET_BUSY)
   {
-    zb_zcl_send_default_handler(param, &cmd_info,
-                                zb_zcl_window_covering_map_ret_code_to_zcl_status(ret));
+    zb_zcl_send_default_handler(param, &cmd_info, zb_zcl_map_ret_code_to_zcl_status(ret));
 }
 
   TRACE_MSG(TRACE_ZCL1,

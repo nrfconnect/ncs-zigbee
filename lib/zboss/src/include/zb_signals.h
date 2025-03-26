@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2021 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -57,15 +57,12 @@ typedef struct zb_signals_globals_s
 } zb_signals_globals_t;
 
 /**
- * @brief Signal dispathcher.
- *
+ * @brief Signal dispathcher. 
+ * 
  * Shall be called by ZBOSS internally in order to propagate any signal to consumers.
- *
+ * 
  * @param param - reference to the buffer which contains signal. See @ref zb_get_app_signal.
  */
 void zb_signal_dispatch(zb_uint8_t param);
-
-/*! }@ */ /* ZB_SIGNALS */
-/*! @endcond */ /* internals_doc */
 
 #endif /* ZB_SIGNALS_H */

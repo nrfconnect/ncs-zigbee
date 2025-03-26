@@ -51,9 +51,9 @@
 /* to be able to limit addr_ref size to 1 byte, limit address translation table
  * size to 255  */
 #ifndef ZB_CONFIGURABLE_MEM
-ZB_ASSERT_COMPILE_DECL(ZB_IEEE_ADDR_TABLE_SIZE < 255);
+ZB_ASSERT_COMPILE_DECL(ZB_IEEE_ADDR_TABLE_SIZE < ZB_UINT8_MAX);
 #endif
-ZB_ASSERT_COMPILE_DECL(ZB_NWK_ROUTER_AGE_LIMIT < 4);
+ZB_ASSERT_COMPILE_DECL(ZB_NWK_ROUTER_AGE_LIMIT < 4); /* Check if fits in 2 bits */
 
 #ifdef ZB_ROUTER_ROLE
 #define ZB_MAX_CHILDREN ZB_NEIGHBOR_TABLE_SIZE

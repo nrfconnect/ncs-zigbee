@@ -68,7 +68,7 @@
 /**
    Max total number of devices in Zigbee network.
 
-   From 2 to 200.
+   From 2 to 128.
  */
 #ifdef ZB_CONFIG_OVERALL_NETWORK_SIZE
 #undef ZB_CONFIG_OVERALL_NETWORK_SIZE

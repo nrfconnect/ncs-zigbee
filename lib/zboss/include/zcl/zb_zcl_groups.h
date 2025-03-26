@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -165,7 +165,7 @@ enum zb_zcl_groups_cmd_resp_e
  *    @par Examples
  *
  *    Filling and sending Add Group request:
- *    @snippet HA_samples/door_lock/sample_zed.c send_add_group_req
+ *    @snippet HA/door_lock/sample_zed.c send_add_group_req
  *
  *
  */
@@ -282,7 +282,7 @@ zb_zcl_groups_add_group_res_t;
  *
  *    @par Examples
  *    View Group request command can be formed as:
- *    @snippet HA_samples/door_lock/sample_zed.c view_group_req
+ *    @snippet HA/door_lock/sample_zed.c view_group_req
  *
  */
 
@@ -392,7 +392,7 @@ zb_zcl_groups_view_group_res_t;
  *
  *    @par Examples
  *    Get Group Membership request can be filled in as:
- *    @snippet HA_samples/door_lock/sample_zed.c send_get_group_membership_req
+ *    @snippet HA/door_lock/sample_zed.c send_get_group_membership_req
  *
  *
  */
@@ -546,7 +546,7 @@ zb_zcl_groups_get_group_membership_res_t;
  *
  *    @par Examples
  *    Remove Group request sending:
- *    @snippet HA_samples/door_lock/sample_zed.c send_remove_group_req
+ *    @snippet HA/door_lock/sample_zed.c send_remove_group_req
  *
  *
  */
@@ -658,7 +658,7 @@ zb_zcl_groups_remove_group_res_t;
  *
  *    @par Example
  *    Remove All Groups command sending:
- *    @snippet HA_samples/door_lock/sample_zed.c send_remove_all_groups_req
+ *    @snippet HA/door_lock/sample_zed.c send_remove_all_groups_req
  *    @par
  *
  */
@@ -697,7 +697,7 @@ zb_zcl_groups_remove_group_res_t;
  *
  *    @b Example:
  *    Add Group if Identifying send:
- *    @snippet HA_samples/door_lock/sample_zed.c add_group_if_ident_req
+ *    @snippet HA/door_lock/sample_zed.c add_group_if_ident_req
  *
  */
 

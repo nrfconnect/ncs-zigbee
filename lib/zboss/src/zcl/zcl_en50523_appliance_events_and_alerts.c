@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -95,35 +95,6 @@ void zb_zcl_en50523_appliance_events_and_alerts_init_client()
                               zb_zcl_process_en50523_appliance_events_and_alerts_cli);
 }
 
-static zb_zcl_status_t zb_zcl_en50523_appliance_events_and_alerts_map_ret_code_to_zcl_status(zb_ret_t ret_code)
-{
-  zb_zcl_status_t status;
-
-  ZB_ASSERT(ret_code != RET_BUSY);
-
-  switch (ret_code)
-  {
-    case RET_OK:
-      status = ZB_ZCL_STATUS_SUCCESS;
-      break;
-    case RET_INVALID_PARAMETER_1:
-      status = ZB_ZCL_STATUS_INVALID_FIELD;
-      break;
-    case RET_INVALID_PARAMETER:
-      status = ZB_ZCL_STATUS_INVALID_VALUE;
-      break;
-    case RET_ERROR:
-      status = (zb_zcl_get_backward_compatible_statuses_mode() == ZB_ZCL_STATUSES_ZCL8_MODE) ?
-                ZB_ZCL_STATUS_FAIL : ZB_ZCL_STATUS_HW_FAIL;
-      break;
-    default:
-      status = ZB_ZCL_STATUS_FAIL;
-      break;
-  }
-
-  return status;
-}
-
 static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_get_alerts_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t    ret = RET_OK;
@@ -136,7 +107,7 @@ static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_get_alerts_handler(zb
   ZB_BZERO(&pl_out, sizeof(pl_out));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
-    ZB_ZCL_EN50523_APPL_EV_AND_ALERTS_GET_ALERTS_CB_ID, RET_OK, cmd_info, NULL, &pl_out);
+    ZB_ZCL_EN50523_APPL_EV_AND_ALERTS_GET_ALERTS_CB_ID, RET_NOT_IMPLEMENTED, cmd_info, NULL, &pl_out);
 
   if (ZCL_CTX().device_cb != NULL)
   {
@@ -162,7 +133,7 @@ static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_get_alerts_handler(zb
 
     ret = RET_BUSY;
   }
-  else
+  else if (ret != RET_NOT_IMPLEMENTED)
   {
     ret = RET_ERROR;
   }
@@ -314,7 +285,7 @@ zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_srv(zb_uint8_t para
   if (processed && ret != RET_BUSY)
   {
     zb_zcl_send_default_handler(param, &cmd_info,
-                                zb_zcl_en50523_appliance_events_and_alerts_map_ret_code_to_zcl_status(ret));
+                                zb_zcl_map_ret_code_to_zcl_status(ret));
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_process_en50523_appliance_events_and_alerts_srv: processed %d",
@@ -363,7 +334,7 @@ zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_cli(zb_uint8_t para
   if (processed && ret != RET_BUSY)
   {
     zb_zcl_send_default_handler(param, &cmd_info,
-                                zb_zcl_en50523_appliance_events_and_alerts_map_ret_code_to_zcl_status(ret));
+                                zb_zcl_map_ret_code_to_zcl_status(ret));
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_process_en50523_appliance_events_and_alerts_cli: processed %d",

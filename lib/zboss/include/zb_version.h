@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -52,11 +52,11 @@
 */
 
 #ifndef ZBOSS_MAJOR
-#define ZBOSS_MAJOR 3U
+#define ZBOSS_MAJOR 4U
 #endif
 
 #ifndef ZBOSS_MINOR
-#define ZBOSS_MINOR 15U
+#define ZBOSS_MINOR 1U
 #endif
 
 #endif /* ZB_VERSION_H */

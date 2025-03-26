@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -432,7 +432,7 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_4_0_s
   zb_bitfield_t   rx_on:1;            /*!< rx-on-when-idle for ZED  */
   zb_bitfield_t   tc_swapped:1;     /*!< TC swapout is in progress for ZC (not
                                      * all known devices came back) / Joiner
-                                     * detected TC swapout, not all precessing
+                                     * detected TC swapout, not all processing
                                      * completed. */
   zb_bitfield_t   reserved:5;
 #if ZB_NWK_MAC_IFACE_TBL_SIZE == 1
@@ -489,7 +489,7 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_5_0_s
   zb_bitfield_t   rx_on:1;            /*!< rx-on-when-idle for ZED  */
   zb_bitfield_t   tc_swapped:1;     /*!< TC swapout is in progress for ZC (not
                                      * all known devices came back) / Joiner
-                                     * detected TC swapout, not all precessing
+                                     * detected TC swapout, not all processing
                                      * completed. */
   zb_bitfield_t   configuration_mode:1; /*!< If 1, device is in configuration mode (== !restricted mode */
   zb_bitfield_t   reserved:4;
@@ -717,9 +717,22 @@ typedef ZB_PACKED_PRE struct zb_aps_bind_dst_table_old_s
   zb_bitfield_t         src_table_index:5; /*!< index from zb_asp_src_table_t */
 } ZB_PACKED_STRUCT zb_aps_bind_dst_table_old_t;
 
+
+
+/**
+   Global binding table - source part
+*/
+typedef ZB_PACKED_PRE struct zb_aps_bind_src_table_nv_s
+{
+  zb_uint8_t            reserved;   /* was src addr ref, now not used. Keep it to avoid nvram migration  */
+  zb_uint8_t            src_end;    /*!< source endpoint */
+  zb_uint16_t           cluster_id; /*!< cluster id */
+} ZB_PACKED_STRUCT zb_aps_bind_src_table_nv_t;
+
+
 typedef ZB_PACKED_PRE struct zb_aps_binding_table_old_s
 {
-  zb_aps_bind_src_table_t src_table[ZB_APS_SRC_BINDING_TABLE_SIZE_OLD]; /*!< Source table */
+  zb_aps_bind_src_table_nv_t src_table[ZB_APS_SRC_BINDING_TABLE_SIZE_OLD]; /*!< Source table */
   zb_aps_bind_dst_table_old_t dst_table[ZB_APS_DST_BINDING_TABLE_SIZE_OLD]; /*!< Destination table */
   zb_uint8_t              src_n_elements;                               /*!< Count elements in source table */
   zb_uint8_t              dst_n_elements;                               /*!< Count elements in destination table */

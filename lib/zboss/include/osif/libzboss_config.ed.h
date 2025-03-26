@@ -587,4 +587,14 @@
  */
 /* #undef CONFIG_ZB_SCHEDULER_Q_SIZE */
 
+/**
+ * API for regression tests
+ */
+/* #undef CONFIG_ZB_STACK_REGRESSION_TESTING_API */
+
+/**
+ * MAC only stack
+ */
+/* #undef CONFIG_ZB_MAC_ONLY_STACK */
+
 #endif /* LIBZBOSS_CONFIG_ED_H__ */

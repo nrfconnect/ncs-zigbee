@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -224,7 +224,7 @@ static zb_ret_t zb_zcl_call_on_off_attr_device_cb(zb_uint8_t param, zb_uint8_t d
   user_app_invoke_data->cb_param.set_attr_value_param.cluster_id = ZB_ZCL_CLUSTER_ID_ON_OFF;
   user_app_invoke_data->cb_param.set_attr_value_param.attr_id = ZB_ZCL_ATTR_ON_OFF_ON_OFF_ID;
   user_app_invoke_data->cb_param.set_attr_value_param.values.data8 = value;
-  user_app_invoke_data->status = RET_OK;
+  user_app_invoke_data->status = RET_NOT_IMPLEMENTED;
 
   ZB_ASSERT(ZCL_CTX().device_cb != NULL);
   (ZCL_CTX().device_cb)(param);
@@ -888,29 +888,11 @@ zb_bool_t  zb_zcl_process_on_off_specific_commands(zb_uint8_t param)
                                              * zb_zcl_process_on_off_on_with_recall_global_scene_handler
                                              */
     {
-      ZB_ZCL_SEND_DEFAULT_RESP(param,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).source.u.short_addr,
-          ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).src_endpoint,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint,
-          cmd_info.profile_id,
-          ZB_ZCL_CLUSTER_ID_ON_OFF,
-          cmd_info.seq_number,
-          cmd_info.cmd_id,
-          ZB_ZCL_STATUS_UNSUP_CMD);
+      ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, ZB_ZCL_STATUS_UNSUP_CMD);
     }
     else if (status != RET_BUSY)
     {
-      ZB_ZCL_SEND_DEFAULT_RESP(param,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).source.u.short_addr,
-          ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).src_endpoint,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint,
-          cmd_info.profile_id,
-          ZB_ZCL_CLUSTER_ID_ON_OFF,
-          cmd_info.seq_number,
-          cmd_info.cmd_id,
-          status==RET_OK ? ZB_ZCL_STATUS_SUCCESS : ZB_ZCL_STATUS_INVALID_FIELD);
+      ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, status==RET_OK ? ZB_ZCL_STATUS_SUCCESS : ZB_ZCL_STATUS_INVALID_FIELD);
     }
   }
 
@@ -981,7 +963,7 @@ void zb_zcl_on_off_invoke_user_app(zb_uint8_t param)
                        &on_off,
                        ZB_FALSE);
 
-  if(is_run_timer)
+  if(is_run_timer && result == RET_OK)
   {
     ZB_MEMCPY(ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), &cmd_info, sizeof(cmd_info));
     ZB_SCHEDULE_ALARM(zb_zcl_on_off_timer_handler, param, ZB_ZCL_ON_OFF_TIMER_BEACON_INTERVAL);
@@ -993,9 +975,7 @@ void zb_zcl_on_off_invoke_user_app(zb_uint8_t param)
   }
   else
   {
-    ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, result==RET_OK ? ZB_ZCL_STATUS_SUCCESS :
-                                  (zb_zcl_get_backward_compatible_statuses_mode() == ZB_ZCL_STATUSES_ZCL8_MODE) ?
-                                  ZB_ZCL_STATUS_FAIL : ZB_ZCL_STATUS_HW_FAIL);
+    ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, zb_zcl_map_ret_code_to_zcl_status(result));
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_on_off_invoke_user_app", (FMT__0));

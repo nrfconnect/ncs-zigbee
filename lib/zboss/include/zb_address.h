@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -115,7 +115,8 @@ typedef ZB_PACKED_PRE struct zb_address_map_s
                                                       *   Cleared when conflict is resolved:
                                                       *   - Device that discovers conflict sending  Network Status
                                                       *   - or another Network Status with identical payload was received  */
-  zb_bitfield_t              padding:2; /*!< Explicit padding bits  */
+  zb_bitfield_t              padding:1; /*!< Explicit padding bits  */
+  zb_bitfield_t              ieee_req_in_progr:1; /*!< ieee request for that arrdess is in progress */
   zb_bitfield_t              clock:1;    /*!< clock value for the clock usage algorithm  */
   zb_bitfield_t              redirect_type:2; /*!< redirect type @ref addr_redirect_type */
   zb_bitfield_t              pending_for_delete:1;    /*!< record is pending for deletion  */
@@ -348,6 +349,15 @@ zb_bool_t zb_address_cmp_pan_id_by_ref(zb_address_pan_id_ref_t pan_id_ref, zb_ex
  */
 zb_ret_t zb_address_update(zb_ieee_addr_t ieee_address, zb_uint16_t short_address, zb_bool_t lock, zb_address_ieee_ref_t *ref_p);
 
+/**
+   Update address pair if one or oth of its component were unknown.
+
+   @param ieee_address - long address
+   @param short_address - short address
+   @return RET_OK or error code
+ */
+zb_ret_t zb_address_update_if_absent(zb_ieee_addr_t ieee_address, zb_uint16_t short_address);
+
 void zb_long_address_update_by_ref(zb_ieee_addr_t ieee_address, zb_address_ieee_ref_t ref);
 
 /**
@@ -444,6 +454,36 @@ void zb_address_short_by_ref(zb_uint16_t *short_address_p, zb_address_ieee_ref_t
 zb_ret_t zb_address_by_ieee(const zb_ieee_addr_t ieee, zb_bool_t create, zb_bool_t lock, zb_address_ieee_ref_t *ref_p);
 
 
+
+/**
+   Get address ref by long address, do not lock.
+
+   This is a read-only version of zb_address_by_ieee(). Always use it if address not need to be created.
+   @param ieee - IEEE device address
+   @param ref_p - (out) address reference
+
+   @note: never call zb_address_by_ieee() with empty (zero) ieee_address
+
+   @return RET_OK or RET_NOT_FOUND
+*/
+zb_ret_t zb_address_get_by_ieee(const zb_ieee_addr_t ieee, zb_address_ieee_ref_t *ref_p);
+
+
+
+/**
+   Get address ref by long address, lock the address
+
+   This is a read-only version of zb_address_by_ieee(). Always use it if address not need to be created.
+   @param ieee - IEEE device address
+   @param ref_p - (out) address reference
+
+   @note: never call zb_address_by_ieee() with empty (zero) ieee_address
+
+   @return RET_OK or RET_NOT_FOUND
+*/
+zb_ret_t zb_address_get_by_ieee_lk(const zb_ieee_addr_t ieee, zb_address_ieee_ref_t *ref_p);
+
+
 /**
    Get short address by IEEE address (long).
 
@@ -476,7 +516,7 @@ zb_ret_t zb_address_ieee_by_short(zb_uint16_t short_addr, zb_ieee_addr_t ieee_ad
 
 
 /**
-   Get address reference with long address. Create the reference if it does not exist.
+   Get address reference by short address. Create the reference if it does not exist.
    Optionally, lock the address. Update address alive time if not locked.
    @param short_address - 16bit device address
    @param create - if TRUE, create address entry if it does not exist
@@ -492,6 +532,38 @@ zb_ret_t zb_address_ieee_by_short(zb_uint16_t short_addr, zb_ieee_addr_t ieee_ad
 
  */
 zb_ret_t zb_address_by_short(zb_uint16_t short_address, zb_bool_t create, zb_bool_t lock, zb_address_ieee_ref_t *ref_p);
+
+
+
+/**
+   Get address reference by short address, do not lock.
+
+   This is a read-only version of zb_address_by_short().
+   @param short_address - 16bit device address
+   @param ref_p - (out) address reference
+
+   @note Never call zb_address_by_short() with empty (-1) short_address
+
+   @return RET_OK or RET_NOT_FOUND
+
+ */
+
+zb_ret_t zb_address_get_by_short(zb_uint16_t short_address, zb_address_ieee_ref_t *ref_p);
+
+/**
+   Get address reference by short address, lock address
+
+   This is a read-only version of zb_address_by_short() adding an address lock.
+   @param short_address - 16bit device address
+   @param ref_p - (out) address reference
+
+   @note Never call zb_address_by_short() with empty (-1) short_address
+
+   @return RET_OK or RET_NOT_FOUND
+
+ */
+
+zb_ret_t zb_address_get_by_short_lk(zb_uint16_t short_address, zb_address_ieee_ref_t *ref_p);
 
 
 /*! @cond internals_doc */
@@ -642,6 +714,16 @@ zb_bool_t zb_address_in_use(zb_address_ieee_ref_t ref);
  */
 zb_bool_t zb_address_check_mem_for_new_addr(const zb_ieee_addr_t new_addr);
 /*! @endcond */
+
+zb_bool_t zb_address_setup_ieee_disc(zb_uint16_t short_addr);
+
+void zb_address_done_ieee_disc(zb_uint16_t short_addr);
+
+zb_bool_t zb_address_setup_short_disc(zb_address_ieee_ref_t ref);
+
+void zb_address_done_short_disc(zb_address_ieee_ref_t ref);
+
+void zb_address_dump_redirs(void);
 
 /*! @} */
 

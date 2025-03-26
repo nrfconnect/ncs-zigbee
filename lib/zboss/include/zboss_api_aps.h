@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -205,6 +205,24 @@ typedef zb_uint8_t zb_aps_aib_attr_id_t;
 
 /*! @} */ /* aps_ib */
 /** @endcond */ /* internals_doc */
+
+/**
+ * @name APS frame delivery mode values
+ * @anchor aps_frame_delivery_mode
+ *
+ * Note: These values were members of `enum zb_aps_frame_delivery_mode_e` type but were converted to
+ * a set of macros due to MISRA violations.
+ */
+/** @{ */
+#define ZB_APS_DELIVERY_UNICAST   0U /*!< Unicast frame delivery. */
+  /*! Reserved value, see Zigbee spec, subclause 2.2.5.1.1.2 */
+#define ZB_APS_DELIVERY_RESERVED  1U
+#define ZB_APS_DELIVERY_BROADCAST 2U /*!< Broadcast frame delivery. */
+#define ZB_APS_DELIVERY_GROUP     3U /*!< Group frame delivery. */
+/** @} */
+
+/** \par Macro for APS FC parse-compose */
+#define ZB_APS_FC_GET_DELIVERY_MODE(fc) (((fc)>>2U) & 3U)
 
 /** @addtogroup aps_api
  * @{

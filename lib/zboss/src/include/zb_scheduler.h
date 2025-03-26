@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -73,12 +73,12 @@
 #endif /* ZB_INTERRUPT_SAFE_CALLBACKS */
 
 /* When running in multithreaded environment, is it possible
-when a callback is scheduled from another thread.
-The scheduler itself if thread-safe, so, this is possible.
-However, if scheduler is sleeping in a main ZBOSS thread now,
+when a callback is scheduled from another thread. 
+The scheduler itself if thread-safe, so, this is possible. 
+However, if scheduler is sleeping in a main ZBOSS thread now, 
 it should be signalled somehow.
 In this case there is a zb_scheduler_wakeup() routine shall be defined.
-Since it is a platform-specific item, it shall be defined in OSIF */
+Since it is a platform-specific item, it shall be defined in OSIF */ 
 #if defined(ZB_THREADS) && !defined(ZB_SCHEDULER_NO_AUTOWAKEUP)
 #define ZB_SCHEDULER_WAKEUP() zb_scheduler_wakeup()
 #else
@@ -109,7 +109,7 @@ typedef zb_bool_t (ZB_CODE * zb_callback_compare_t)(zb_uint8_t param, void* para
    Callback is function planned to execute by another function.
    @note The callback must be declared as reentrant for dscc.
 
-   @param ieee_addr - callback parameter equals schedule record param fields
+   @param param - callback parameter equals schedule record param fields
    @return short address for joining device, or -1 (0xFFFF) which means using the internal mechanisms of addresses assignment
  */
 typedef zb_uint16_t (ZB_CODE * zb_addr_assignment_cb_t)(zb_ieee_addr_t ieee_addr);

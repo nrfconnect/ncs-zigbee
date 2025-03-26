@@ -100,12 +100,15 @@ typedef ZB_PACKED_PRE struct zb_aps_binding_table_s
 #ifdef SNCP_MODE
   zb_uint8_t              remote_bind_offset;                           /*!< Offset to attribute id's to remote binding requests */
 #else
-  /* FIXME: why align here? */
   zb_uint8_t              align[1];
 #endif
 #ifndef ZB_CONFIGURABLE_MEM
   zb_uint8_t              trans_table[ZB_APS_BIND_TRANS_TABLE_SIZE];    /*!< Buffers for simultaneous sendings */
   zb_aps_bind_src_table_t src_table[ZB_APS_SRC_BINDING_TABLE_SIZE];     /*!< Source table */
+  /* sizeof(zb_aps_bind_src_table_t) is now 3. Can't use sizeof() in ifdefs, so hard-code 3  */
+#if (ZB_APS_SRC_BINDING_TABLE_SIZE * 3) % 4 != 0
+  zb_uint8_t              align2[4 - (ZB_APS_SRC_BINDING_TABLE_SIZE * 3) % 4];
+#endif
   zb_aps_bind_dst_table_t dst_table[ZB_APS_DST_BINDING_TABLE_SIZE];     /*!< Destination table */
 #else
   zb_uint8_t              *trans_table;
@@ -226,6 +229,14 @@ typedef struct zb_tc_policy_s
   zb_bitbool_t allow_provisional_key_as_tclk:1; /*!< if 1, allow joining to trust centers that claim revision r21 or higher
                                                  *   but sends provisional key as a trust center link key */
 #endif /* ZB_ALLOW_PROVISIONAL_KEY_AS_TCLK */
+#ifdef ZB_TCPOL_ENABLE_UNSECURE_TC_REJOIN_POLICY_OVERRIDE
+  zb_ieee_addr_t allowed_unsecure_tc_rejoin_addrs[ZB_SECUR_UNSECURE_TC_REJOIN_TABLE_SIZE];
+#endif
+#ifndef ZB_COORDINATOR_ONLY
+  zb_bitfield_t legacy_dev_tlv_panic_workaround:1; /*!< if 1, the workaround is enabled.
+                                                    * Device will avoid TLVs in ZDO frames until it is sure that the dest device has r23+ revision.
+                                                    * Because some buggy legacy devices drop the frames with TLVs. WARNING it may violate the spec! */
+#endif /* !ZB_COORDINATOR_ONLY */
 }
 zb_tc_policy_t;
 

@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -158,7 +158,7 @@ constants etc.
 #define ZB_ZGP_TBL_MAX_CLUSTERS 5U
 #endif  /* ZB_ZGP_SINK_SUPPORT_LEGACY_MATCH_INFO */
 
-#endif /* (defined ZB_ENABLE_ZGP_COMBO || defined ZB_ENABLE_ZGP_TARGET || defined ZB_ENABLE_ZGP_TARGET_PLUS || defined ZGP_COMMISSIONING_TOOL) */
+#endif
 
 /** Sink table size */
 #ifndef ZB_ZGP_SINK_TBL_SIZE
@@ -552,7 +552,7 @@ Ideally should rework the whole zb_config.h to suit better for that new concept.
 #endif  /* ZB_MACSPLIT */
 
 
-/* MAC transport in Linux, line NSNG, uart/macsplit etc */
+/* MAC transport in Linux, line NSNG, uart/MAC-Split etc */
 #ifdef MAC_TRANSPORT_USES_SELECT
 /* Since we are waiting for event inside select() call in the same
  * thread as main loop runs, we have no radio which can wake up MCU, so
@@ -779,7 +779,7 @@ In general, define ZB_COORDINATOR_ROLE to compile ZC-only build, ZB_ROUTER_ROLE 
 /*! Define Zigbee end device functionality */
 #define ZB_ED_FUNC
 #endif
-#endif /* !defined ZB_ED_ROLE && !defined ZB_ZGPD_ROLE && !defined ZB_COORDINATOR_ROLE && !defined ZB_ROUTER_ROLE */
+#endif
 
 #if defined ZB_ED_ROLE || defined ZB_ROUTER_ROLE
 /*! Define joiner client functionality */
@@ -811,6 +811,7 @@ ZB_ED_RX_OFF_WHEN_IDLE
  */
 
 #if defined ZB_COORDINATOR_ROLE || (defined ZB_ROUTER_ROLE && defined ZB_DISTRIBUTED_SECURITY_ON)
+
 /*! Formation is supported by ZC or ZR in Distributed mode */
 #define ZB_FORMATION
 #endif
@@ -1030,7 +1031,7 @@ ZB_ED_RX_OFF_WHEN_IDLE
  * of devices in the network, not neighbor table size */
 #define ZB_N_APS_KEY_PAIR_ARR_MAX_SIZE            ZB_NEIGHBOR_TABLE_SIZE
 #endif
-#endif /* ZB_N_APS_KEY_PAIR_ARR_MAX_SIZE */
+#endif
 
 /**
    If the joining device does not receive any of
@@ -1201,6 +1202,7 @@ ZB_ED_RX_OFF_WHEN_IDLE
 #else
 #define ZB_CHANNEL_PAGES_NUM 1u
 #endif  /* !ZB_SUBGHZ_BAND_ENABLED */
+/** @endcond */
 
 /*! @cond DOXYGEN_INTERNAL_DOC */
 /**
@@ -1247,18 +1249,15 @@ exponent.
 #endif /* ZB_NWK_NEIGHBOUR_PATH_COST_RSSI_BASED */
 
 /*! Reserved space for routing on a parent when a device in ZED role.
- *
- * ZED doesn't have information about routing, so we need to reserve
- * some space in a packet during APSDE data request processing.
- * In this case our parent will be able to use at least 7 hops.
- *
- * If destination is not ZC, it is possible that packet
- * can be routed via ZC, and ZC will use source routing.
- *
- * Use that 24 bytes for either long addresses in nwk hdr with 3 hops
- * or 11 hops of source routing.
+ * 
+ * According to R22 specification 3.6.3.3 and 3.6.3.3.1:
+ * Source route info is added when a data frame is received from the NEXT HIGHER LAYER
+ * Since Source Route is only added on ZC, this case only happens when ZC is the one 
+ * creating the frame.
+ * When a ZED sends a packet that is routed through ZC, Source Route is not added
+ * to the packet, thus we do not have to reserve space for that in ZED.
 */
-#define ZB_NWK_RESERVED_SPACE_FOR_PARENT_ROUTING 24U
+#define ZB_NWK_RESERVED_SPACE_FOR_PARENT_ROUTING 0U
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
 
 /***********************************************************************/
@@ -1299,6 +1298,7 @@ exponent.
    @internal Be sure keep it multiple of 4 to exclude alignment problems at ARM
 */
 #ifndef ZB_IO_BUF_SIZE
+
 /* Set the ZBOSS buffer size according to the set of enabled MAC features. */
 #ifdef ZB_MAC_SECURITY
 #define ZB_IO_BUF_SIZE 164U
@@ -1314,6 +1314,9 @@ exponent.
  */
 #define ZB_BUF_ALLOC_ALIGN (4U)
 
+#if (ZB_IO_BUF_SIZE % ZB_BUF_ALLOC_ALIGN) > 0U
+#error ZB_IO_BUF_SIZE must be multiple of ZB_BUF_ALLOC_ALIGN
+#endif
 
 /**
    Number of fragmented packets which ZBOSS can receive in parallel
@@ -2300,7 +2303,7 @@ exponent.
 #endif /*ZB_PRODUCTION_CONFIG*/
 /*! @} */
 
-/* Note: MAC split SoC doesn't sleep on hardware, but can sleep on Linux platform */
+/* Note: MAC-Split SoC doesn't sleep on hardware, but can sleep on Linux platform */
 #if defined USE_ZB_WATCHDOG || (defined(ZB_MACSPLIT_DEVICE) && !defined(ZB_PLATFORM_LINUX))
 #define ZB_NEVER_STOP_TIMER
 #endif
@@ -2373,5 +2376,9 @@ exponent.
 #if !defined ZB_NO_COUNT_CHILDREN && !defined ZB_COUNT_CHILDREN
 #define ZB_COUNT_CHILDREN
 #endif
+
+#if !defined(ZB_DIAG_CORE_WATCHDOG_TMO_MS)
+#define ZB_DIAG_CORE_WATCHDOG_TMO_MS 1000U
+#endif /* !ZB_DIAG_CORE_WATCHDOG_TMO_MS */
 
 #endif /* ZB_CONFIG_H */

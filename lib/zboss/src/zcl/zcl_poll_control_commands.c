@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -355,16 +355,7 @@ static void poll_control_send_default_response(zb_bufid_t param,
   else
   {
     TRACE_MSG(TRACE_ZCL2, "Send DefaultResponse, status %xd", (FMT__D, status));
-    ZB_ZCL_SEND_DEFAULT_RESP(param,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
-                             ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
-                             cmd_info->profile_id,
-                             ZB_ZCL_CLUSTER_ID_POLL_CONTROL,
-                             cmd_info->seq_number,
-                             cmd_info->cmd_id,
-                             status);
+    ZB_ZCL_PROCESS_COMMAND_FINISH(param, cmd_info, status);
   }
 }
 
@@ -464,6 +455,7 @@ static void check_in_res_handler_check_binding_response_cb(zb_bufid_t param)
     */
     ZB_SCHEDULE_ALARM_CANCEL(zb_zcl_poll_control_check_in_non_response, endpoint);
 
+#ifdef ZB_ED_FUNC
     if(payload.is_start)
     {
       zb_zcl_attr_t *attr_desc = zb_zcl_get_attr_desc_a(endpoint,
@@ -483,6 +475,7 @@ static void check_in_res_handler_check_binding_response_cb(zb_bufid_t param)
     {
       zb_zdo_pim_stop_fast_poll(0);
     }
+#endif /* ZB_ED_FUNC */
 
 #ifdef ZB_ZCL_ENABLE_WWAH_SERVER
     zb_zcl_wwah_bad_parent_recovery_signal(ZB_ZCL_WWAH_BAD_PARENT_RECOVERY_POLL_CONTROL_CHECK_IN_OK);
@@ -539,7 +532,7 @@ static zb_ret_t check_in_res_handler(zb_uint8_t param)
   return ret;
 }
 
-
+#ifdef ZB_ED_FUNC
 static void fast_poll_stop_handler_send_default_response(zb_uint8_t param)
 {
   /* ZCL8: Table 2-12. Enumerated Command Status Values:
@@ -558,6 +551,7 @@ static void fast_poll_stop_handler_send_default_response(zb_uint8_t param)
   cmd_info = (zb_zcl_parsed_hdr_t*)zb_buf_begin(param);
   poll_control_send_default_response(param, cmd_info, status);
 }
+#endif /* ZB_ED_FUNC */
 
 
 static void fast_poll_stop_handler_check_binding_response_cb(zb_bufid_t param)
@@ -583,8 +577,9 @@ static void fast_poll_stop_handler_check_binding_response_cb(zb_bufid_t param)
       and then recheck if we are still in fast poll and send
       FAILURE in such case
     */
-
+#ifdef ZB_ED_FUNC
     zb_zdo_pim_stop_fast_poll_extended_req(param, fast_poll_stop_handler_send_default_response);
+#endif /* ZB_ED_FUNC */
   }
   else
   {

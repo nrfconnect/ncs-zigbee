@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -112,9 +112,9 @@ enum zb_zcl_device_temp_config_attr_e
 #define ZB_ZCL_DEVICE_TEMP_CONFIG_OVER_TEMP_TOTAL_DWELL_MAX_VALUE (0xffff)
 
 /** @brief Minimum value for DeviceTempAlarmMask attribute */
-#define ZB_ZCL_DEVICE_TEMP_CONFIG_DEVICE_TEMP_ALARM_MASK_MIN_VALUE (0b00000000)
+#define ZB_ZCL_DEVICE_TEMP_CONFIG_DEVICE_TEMP_ALARM_MASK_MIN_VALUE (0x00) // (0b00000000)
 /** @brief Maximum value for DeviceTempAlarmMask attribute */
-#define ZB_ZCL_DEVICE_TEMP_CONFIG_DEVICE_TEMP_ALARM_MASK_MAX_VALUE (0b00000011)
+#define ZB_ZCL_DEVICE_TEMP_CONFIG_DEVICE_TEMP_ALARM_MASK_MAX_VALUE (0x03) // (0b00000011)
 
 /** @brief Minimum value for LowTempThreshold attribute */
 #define ZB_ZCL_DEVICE_TEMP_CONFIG_LOW_TEMP_THRESHOLD_MIN_VALUE  (-200)

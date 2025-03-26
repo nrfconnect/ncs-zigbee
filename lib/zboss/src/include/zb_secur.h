@@ -1242,10 +1242,12 @@ void secur_nwk_generate_keys(void);
  */
 void secur_authenticate_child(zb_uint8_t param);
 
+#ifdef ZB_ROUTER_ROLE
 /**
    Remove from NBT unauthenticated device
  */
 void secur_forget_unauth_dev(zb_uint8_t addr_ref);
+#endif /* ZB_ROUTER_ROLE */
 
 
 /**
@@ -1587,6 +1589,7 @@ typedef struct zb_zdo_secur_start_key_negotiation_rsp_send_param_s
   zb_uint8_t tsn;         /* request TSN */
   zb_uint8_t status;      /* status for the response */
   zb_uint8_t use_relay;
+  zb_uint8_t aps_security;
   zb_ieee_addr_t joiner_ieee;
 } zb_zdo_secur_start_key_negotiation_rsp_send_param_t;
 
@@ -1918,20 +1921,6 @@ zb_ret_t zb_secur_parse_key_neg_method(zb_uint8_t key_neg_method,
 zb_bool_t secur_key_is_cbke(zb_aps_device_key_pair_set_t *pair);
 
 zb_bool_t zb_zdo_secur_cbke_key_exists(zb_uint16_t addr);
-
-
-#ifdef DEBUG
-/**
-   Broadcast a key using non-standard NWK report (command id 6).
-
-   To be used for debug purposes only.
-
-   @param peer_addr - address of remote device, or NULL
-   @param key - APS or NWK key
- */
-void zb_debug_bcast_key(zb_uint8_t *peer_addr, zb_uint8_t key[ZB_CCM_KEY_SIZE]);
-#endif /* DEBUG */
-
 
 #ifdef ZB_DIRECT_ENABLED
 /**

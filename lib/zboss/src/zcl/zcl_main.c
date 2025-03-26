@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -803,19 +803,9 @@ zb_bool_t zb_zcl_send_default_handler(zb_uint8_t param,
       ret = ZB_FALSE;
       break;
     }
-
-    ZB_ZCL_SEND_DEFAULT_RESP_DIRECTION(
-      param,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
-      ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
-      cmd_info->profile_id,
-      cmd_info->cluster_id,
-      cmd_info->seq_number,
-      cmd_info->cmd_id,
-      status,
-      ZB_ZCL_REVERT_DIRECTION(cmd_info->cmd_direction));
+    ZB_ZCL_PROCESS_COMMAND_FINISH(param,
+                                  cmd_info,
+                                  status);
 
     param = 0;
     ret = ZB_TRUE;
@@ -830,7 +820,7 @@ zb_bool_t zb_zcl_send_default_handler(zb_uint8_t param,
   return ret;
 }
 
-void zb_zcl_process_command_finish(zb_bufid_t buffer, zb_zcl_parsed_hdr_t *pcmd_info, zb_uint8_t status)
+void zb_zcl_process_command_finish(zb_bufid_t buffer, const zb_zcl_parsed_hdr_t *pcmd_info, zb_uint8_t status)
 {
   if (ZB_ZCL_CHECK_IF_SEND_DEFAULT_RESP(*(pcmd_info), status))
   {
@@ -917,6 +907,36 @@ void zb_zcl_send_default_resp_ext(zb_uint8_t param,
   {
     zb_buf_free(param);
   }
+}
+
+zb_zcl_status_t zb_zcl_map_ret_code_to_zcl_status(zb_ret_t ret_code)
+{
+  zb_zcl_status_t status;
+
+  ZB_ASSERT(ret_code != RET_BUSY);
+
+  switch (ret_code)
+  {
+    case RET_OK:
+      status = ZB_ZCL_STATUS_SUCCESS;
+      break;
+    case RET_INVALID_PARAMETER_1:
+      status = ZB_ZCL_STATUS_INVALID_FIELD;
+      break;
+    case RET_INVALID_PARAMETER:
+      status = ZB_ZCL_STATUS_INVALID_VALUE;
+      break;
+    case RET_NOT_IMPLEMENTED:
+      status = ZB_ZCL_STATUS_UNSUP_CMD;
+      break;
+    case RET_ERROR:
+    default:
+      status = (zb_zcl_get_backward_compatible_statuses_mode() == ZB_ZCL_STATUSES_ZCL8_MODE) ?
+                ZB_ZCL_STATUS_FAIL : ZB_ZCL_STATUS_HW_FAIL;
+      break;
+  }
+
+  return status;
 }
 
 #endif /* defined (ZB_ENABLE_ZCL) */

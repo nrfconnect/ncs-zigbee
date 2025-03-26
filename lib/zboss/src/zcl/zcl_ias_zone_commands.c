@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -598,19 +598,9 @@ zb_bool_t zb_zcl_process_ias_zone_specific_commands(zb_uint8_t param)
         default:
           break;
       }
-      ZB_ZCL_SEND_DEFAULT_RESP_DIRECTION( param,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).source.u.short_addr,
-          ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).src_endpoint,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint,
-          cmd_info.profile_id,
-          ZB_ZCL_CLUSTER_ID_IAS_ZONE,
-          cmd_info.seq_number,
-          cmd_info.cmd_id,
-          zcl_status,
-          cmd_info.cmd_direction==ZB_ZCL_FRAME_DIRECTION_TO_SRV
-            ? ZB_ZCL_FRAME_DIRECTION_TO_CLI
-            : ZB_ZCL_FRAME_DIRECTION_TO_SRV);
+      ZB_ZCL_PROCESS_COMMAND_FINISH(param,
+                                    &cmd_info,
+                                    zcl_status);
     }
   }
 

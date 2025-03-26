@@ -400,6 +400,13 @@
 #define ZB_TEST_GROUP_ALL_TH
 #endif
 
+#ifdef CONFIG_ZB_STACK_REGRESSION_TESTING_API
+#define ZB_STACK_REGRESSION_TESTING_API CONFIG_ZB_STACK_REGRESSION_TESTING_API
+#endif
+
+#ifdef CONFIG_ZB_MAC_ONLY_STACK
+#define ZB_MAC_ONLY_STACK CONFIG_ZB_MAC_ONLY_STACK
+#endif
 
 /* Set the ZBOSS buffer size according to the set of enabled MAC features. */
 #ifdef ZB_MAC_SECURITY

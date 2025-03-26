@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -229,7 +229,7 @@ enum zb_zcl_set_block_threshold_e
   ZB_ZCL_ATTR_PRICE_SRV_BLOCK_THRESHOLD_COUNT,
 
   /** Attributes Tier1Block1Threshold through Tier15Block15Threshold represent
-   *  the block threshold values applicable to a specific TOU tier for a given
+   *  the block threshold values applicable to a specific Time of Use tier for a given
    *  period (typically the billing cycle).
    */
   ZB_ZCL_ATTR_PRICE_SRV_TIER1_BLOCK1_THRESHOLD,
@@ -791,7 +791,7 @@ enum zb_zcl_price_set_block_price_information_e
   /** Attributes PriceNoTierBlock1 through PriceTier15Block16 represent the
    *  price of Energy, Gas, or Water delivered to the premises (i.e. delivered
    *  to the customer from the utility) at a specific price tier as defined by
-   *  a TOU schedule, Block Threshold or a real time pricing period.
+   *  a Time of Use schedule, Block Threshold or a real time pricing period.
    */
   ZB_ZCL_ATTR_PRICE_SRV_NO_TIER_BLOCK1_PRICE = ZB_ZCL_ATTR_SET_WITH_ATTR_ID(ZB_ZCL_PRICE_SET_BLOCK_PRICE_INFORMATION, 0x00),
   ZB_ZCL_ATTR_PRICE_SRV_NO_TIER_BLOCK2_PRICE,
@@ -1096,8 +1096,8 @@ enum zb_zcl_price_set_block_price_information_e
 /** @defgroup ZB_ZCL_PRICE_SET_EXTENDED_PRICE_INFORMATION_GROUP Extended Price Information
  *  @{
  *    @details
- *    In case of TOU charging only, the price server allows support for up to 48
- *    TOU rates. To reduce the number of attributes, Tier1Block1Price through
+ *    In case of Time of Use charging only, the price server allows support for up to 48
+ *    Time of Use rates. To reduce the number of attributes, Tier1Block1Price through
  *    Tier15Block1Price attributes are reused to represent rates for tiers 1 to 15.
  *    Rates for tiers 16 to 48 are provided in the extended price information set.
  */
@@ -1219,7 +1219,7 @@ enum zb_zcl_price_set_tariff_information_e
    */
   ZB_ZCL_ATTR_PRICE_SRV_NUMBER_OF_BLOCK_THRESHOLDS_IN_USE,
 
-  /** An 8-bit enumeration indicating how the mixed TOU / Block charging is to
+  /** An 8-bit enumeration indicating how the mixed Time of Use / Block charging is to
    *  be applied.
    */
   ZB_ZCL_ATTR_PRICE_SRV_TIER_BLOCK_MODE,
@@ -2211,7 +2211,7 @@ enum zb_zcl_price_set_received_block_price_information_e
 /** @defgroup ZB_ZCL_PRICE_SET_RECEIVED_EXTENDED_PRICE_INFORMATION_GROUP Received Extended Price Information
  *  @{
  *    @details
- *    In case of TOU charging only, the price server shall support up to 48 TOU
+ *    In case of Time of Use charging only, the price server shall support up to 48 Time of Use
  *    rates. To reduce the number of attributes, RxTierNBlock1Price attributes
  *    are reused to represent rates for tiers 1 to 15. Rates for tiers 16 to 48
  *    are provided in the Received Extended Price Information Set.
@@ -3214,7 +3214,7 @@ typedef ZB_PACKED_PRE struct zb_zcl_price_ack_payload_s
 typedef ZB_PACKED_PRE struct zb_zcl_price_get_current_price_payload_s
 {
   /** @e CommandOptions field is 8 Bits in length
-   * @note Zero bit is Requestor Rx On When Idle, others are reserved.
+   * @note Zero bit is Requester Rx On When Idle, others are reserved.
    */
   zb_uint8_t command_options;
 } ZB_PACKED_STRUCT zb_zcl_price_get_current_price_payload_t;
@@ -3677,10 +3677,10 @@ typedef enum zb_zcl_price_tariff_type_e
  */
 typedef enum zb_zcl_price_tariff_charging_scheme_e
 {
-  ZB_ZCL_PRICE_TOU_TARIFF = 0x00,            /**< TOU Tariff */
+  ZB_ZCL_PRICE_TOU_TARIFF = 0x00,            /**< Time of Use Tariff */
   ZB_ZCL_PRICE_BLOCK_TARIFF,                 /**< Block Tariff */
-  ZB_ZCL_PRICE_BLOCK_TOU_TARIFF_COMMON,      /**< Block/TOU Tariff with common thresholds */
-  ZB_ZCL_PRICE_BLOCK_TOU_TARIFF_INDIVIDUAL,  /**< Block/TOU Tariff with individual thresholds per tier */
+  ZB_ZCL_PRICE_BLOCK_TOU_TARIFF_COMMON,      /**< Block/Time of Use Tariff with common thresholds */
+  ZB_ZCL_PRICE_BLOCK_TOU_TARIFF_INDIVIDUAL,  /**< Block/Time of Use Tariff with individual thresholds per tier */
 } zb_zcl_price_tariff_charging_scheme_t;
 
 
@@ -3794,10 +3794,10 @@ enum zb_zcl_price_sub_payload_control_bitmap_e
 typedef enum zb_zcl_price_publish_matrix_type_e
 {
   ZB_ZCL_PRICE_BLOCK_TOU_BASED_INFORMATION = 0x00,  /**< The information stored in the
-                                                     * sub payload is Block only or Block/TOU based
+                                                     * sub payload is Block only or Block/Time of Use based
                                                      */
   ZB_ZCL_PRICE_TOU_BASED_INFORMATION       = 0x01,  /**< The information stored in the sub
-                                                     * payload is TOU based.
+                                                     * payload is Time of Use based.
                                                      */
 } zb_zcl_price_publish_matrix_type_t;
 
@@ -3807,12 +3807,12 @@ typedef enum zb_zcl_price_publish_matrix_type_e
  */
 typedef ZB_PACKED_PRE struct zb_zcl_price_price_matrix_sub_payload_s
 {
-  /** The @e Tier/Block ID specifies the TOU Tier or the TOU Tier and Block that
+  /** The @e Tier/Block ID specifies the Time of Use Tier or the Time of Use Tier and Block that
    * the subsequent @e Price field in the command applies to
    */
   zb_uint8_t tier_block_id;  /* (M) */
 
-  /** This field holds the price information for the Block/TOU or TOU identified
+  /** This field holds the price information for the Block/Time of Use or Time of Use identified
    * by the previous @e Tier/Block @e ID field.
    */
   zb_uint32_t price;         /* (M) */
@@ -3873,12 +3873,12 @@ typedef ZB_PACKED_PRE struct zb_zcl_price_publish_price_matrix_payload_s
 typedef enum zb_zcl_price_publish_block_thresholds_type_e
 {
   ZB_ZCL_PRICE_SPECIFIC_TOU_TIER = 0x00,  /**< Block Thresholds supplied
-                                                                                              * apply to a specific TOU tier
-                                                                                              */
+                                           * apply to a specific Time of Use tier
+                                           */
   ZB_ZCL_PRICE_ALL_TOU_TIER      = 0X01,  /**< Block Thresholds supplied apply to
-                                                                                              * all TOU tiers or  when Block Only charging
-                                                                                              * is in operation
-                                                                                              */
+                                           * all Time of Use tiers or  when Block Only charging
+                                           * is in operation
+                                           */
 } zb_zcl_price_publish_block_thresholds_type_t;
 
 
@@ -4385,17 +4385,17 @@ typedef ZB_PACKED_PRE struct zb_zcl_price_cancel_tariff_payload_s
 
 
 /** @cond internals_doc */
-/** @def ZB_ZCL_PRICE_GET_REQUESTOR_RX_ON_WHEN_IDLE
- *  @brief Macro for getting Requestor RX on When Idle state.
+/** @def ZB_ZCL_PRICE_GET_REQUESTER_RX_ON_WHEN_IDLE
+ *  @brief Macro for getting Requester RX on When Idle state.
  *  @param x - zb_zcl_price_get_current_price_payload_t value.
  */
-#define ZB_ZCL_PRICE_GET_REQUESTOR_RX_ON_WHEN_IDLE(x)  ZB_CHECK_BIT_IN_BIT_VECTOR(x, 0)
+#define ZB_ZCL_PRICE_GET_REQUESTER_RX_ON_WHEN_IDLE(x)  ZB_CHECK_BIT_IN_BIT_VECTOR(x, 0)
 
-/** @def ZB_ZCL_PRICE_SET_REQUESTOR_RX_ON_WHEN_IDLE
- *  @brief Macro for setting Requestor RX on When Idle state.
+/** @def ZB_ZCL_PRICE_SET_REQUESTER_RX_ON_WHEN_IDLE
+ *  @brief Macro for setting Requester RX on When Idle state.
  *  @param x - zb_zcl_price_get_current_price_payload_t value.
  */
-#define ZB_ZCL_PRICE_SET_REQUESTOR_RX_ON_WHEN_IDLE(x)  ZB_SET_BIT_IN_BIT_VECTOR(x, 0)
+#define ZB_ZCL_PRICE_SET_REQUESTER_RX_ON_WHEN_IDLE(x)  ZB_SET_BIT_IN_BIT_VECTOR(x, 0)
 /** @endcond */ /* internals_doc */
 
 /** @def ZB_ZCL_PRICE_SEND_CMD_GET_CURRENT_PRICE

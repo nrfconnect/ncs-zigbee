@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -141,19 +141,17 @@ void zb_zcl_identify_effect_invoke_user_app(zb_uint8_t param)
         sizeof(zb_zcl_identify_effect_value_param_t));
     user_app_data->device_cb_id = ZB_ZCL_IDENTIFY_EFFECT_CB_ID;
     user_app_data->endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint;
-    user_app_data->status = RET_OK;
+    user_app_data->status = RET_NOT_IMPLEMENTED;
     (ZCL_CTX().device_cb)(param);
     result = user_app_data->status;
     /* TODO: check - free buffer after a call? */
   }
   else
   {
-    result = RET_ERROR;
+    result = RET_NOT_IMPLEMENTED;
   }
 
-  ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, result==RET_OK ? ZB_ZCL_STATUS_SUCCESS :
-                               (zb_zcl_get_backward_compatible_statuses_mode() == ZB_ZCL_STATUSES_ZCL8_MODE) ?
-                                ZB_ZCL_STATUS_FAIL : ZB_ZCL_STATUS_HW_FAIL);
+  ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, zb_zcl_map_ret_code_to_zcl_status(result));
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_on_off_effect_invoke_user_app param", (FMT__0));
 }
@@ -243,17 +241,7 @@ zb_bool_t zb_zcl_process_identify_specific_commands(zb_uint8_t param)
       {
         TRACE_MSG(TRACE_ERROR, "Got erroneous payload length %hd != 2",
             (FMT__H, zb_buf_len(param)));
-        ZB_ZCL_SEND_DEFAULT_RESP(
-            param,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).source.u.short_addr,
-            ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).src_endpoint,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint,
-            cmd_info.profile_id,
-            ZB_ZCL_CLUSTER_ID_IDENTIFY,
-            cmd_info.seq_number,
-            ZB_ZCL_CMD_IDENTIFY_TRIGGER_EFFECT_ID,
-            ZB_ZCL_STATUS_MALFORMED_CMD);
+        ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, ZB_ZCL_STATUS_MALFORMED_CMD);
       }
       else
       {

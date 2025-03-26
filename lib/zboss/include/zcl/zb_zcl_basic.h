@@ -366,7 +366,7 @@ typedef struct zb_zcl_basic_disable_local_conf_s
     @param zcl_version - pointer to variable to store zcl version  attribute value
     @param power_source - pointer to variable to store power source attribute value
 
-    @snippet lighting/dimmable_light_tl/light_device_zr.c BASIC_CLUSTER_DECLARE
+    @snippet func/dimmable_light_tl/light_device_zr.c BASIC_CLUSTER_DECLARE
 */
 #define ZB_ZCL_DECLARE_BASIC_ATTRIB_LIST(attr_list, zcl_version, power_source) \
     ZB_ZCL_START_DECLARE_ATTRIB_LIST_CLUSTER_REVISION(attr_list, ZB_ZCL_BASIC) \

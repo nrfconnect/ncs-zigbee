@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -253,7 +253,8 @@ Finding & binding: 0 = Do not attempt finding & binding 1 = Attempt finding & bi
   zb_bitfield_t bdb_tc_rejoin_after_reboot:1;   /* Is TC rejoin started when reboot signal is scheduled */
   zb_bitfield_t bdb_tc_rejoin_active:1;         /* Is TC rejoin active */
   zb_bitfield_t bdb_op_cancelled:1;   /* if the BDB operation (steering or formation) is cancelled */
-  } ZB_PACKED_STRUCT zb_bdb_comm_ctx_t;
+  zb_bitfield_t bdb_leave_initiated:1;   /* if leave was initiated, prevent comm signals */
+} ZB_PACKED_STRUCT zb_bdb_comm_ctx_t;
 /** @endcond */ /* internals_doc */
 
 extern zb_bdb_comm_ctx_t g_bdb_ctx;
@@ -297,6 +298,11 @@ zb_bool_t bdb_joined(void);
 void bdb_force_link(void);
 
 zb_uint8_t bdb_get_scan_duration(void);
+
+#ifdef ZB_BDB_PREINST_NWK_JOINING
+zb_ret_t zb_bdb_preinst_nwk_on_factory_new(zb_uint8_t param);
+void zb_bdb_preinst_nwk_on_join_confirm(void);
+#endif /* ZB_BDB_PREINST_NWK_JOINING */
 
 #endif /* ZB_BDB_MODE && !BDB_OLD */
 

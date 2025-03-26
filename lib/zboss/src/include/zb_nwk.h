@@ -1116,6 +1116,16 @@ typedef ZB_PACKED_PRE struct zb_nlme_send_status_s
 zb_nlme_send_status_t;
 
 
+/**
+ * @name Non-standard Network command status codes
+ * @anchor nwk_command_status_nonstandard
+ */
+/** @{ */
+#define ZB_NWK_COMMAND_STATUS_CUSTOM_OOM                  0xdbU /**< ZBOSS OOM indication */
+#define ZB_NWK_COMMAND_STATUS_CUSTOM_REDIR                0xdcU /**< ZBOSS redirect record state */
+#define ZB_NWK_COMMAND_STATUS_FIRST_CUSTOM                ZB_NWK_COMMAND_STATUS_CUSTOM_OOM
+/** @} */
+
 /** @brief Send status indication primitive.
   *
   * Send status to the remote device.
@@ -1136,6 +1146,14 @@ zb_nlme_send_status_t;
   * @endcode
  */
 void zb_nlme_send_status(zb_uint8_t param);
+
+/**
+   Send info about address redirects using Network Status command with non-standard code
+
+   @param param - buffer id or 0
+   @param redir_cnt - nuymber of redirects in the address table
+ */
+void zb_nlme_send_redirect_ref_status(zb_uint8_t param, zb_uint16_t redir_cnt);
 
 /** @endcond */ /* internals_doc */
 
@@ -1169,7 +1187,7 @@ void zb_nlme_send_status(zb_uint8_t param);
 #define ZB_NWK_LS_GET_FIRST_FRAME(_a) (((_a) & ZB_NWK_LS_FIRST_FRAME_MASK) >> ZB_NWK_LS_FIRST_FRAME_BIT)
 
 #define ZB_NWK_LS_SET_LAST_FRAME(_a, _b) (*(_a)) |= (((*(_a)) & (~ZB_NWK_LS_LAST_FRAME_MASK)) | ((_b)<<ZB_NWK_LS_LAST_FRAME_BIT))
-#define ZB_NWK_LS_GET_LAST_FRAME(_a) (((_a) & ZB_NWK_LS_FIRST_FRAME_MASK) >> ZB_NWK_LS_FIRST_FRAME_BIT)
+#define ZB_NWK_LS_GET_LAST_FRAME(_a) (((_a) & ZB_NWK_LS_LAST_FRAME_MASK) >> ZB_NWK_LS_LAST_FRAME_BIT)
 
 #define ZB_NWK_IS_ZC_OR_ZR(device_type) ( (device_type) == ZB_NWK_DEVICE_TYPE_COORDINATOR ||  (device_type) == ZB_NWK_DEVICE_TYPE_ROUTER )
 
@@ -1179,6 +1197,30 @@ void zb_nlme_send_status(zb_uint8_t param);
 /** @cond internals_doc */
 /** \addtogroup ZB_NWK */
 /** @{ */
+
+/* This handler is used to data transmission with call nlde-data-confirm */
+#define ZB_NWK_NON_INTERNAL_NSDU_HANDLE                      0x00U
+/* This handles are used to transfer service nwk data. No confirm should be called
+ * under NWK layer */
+#define ZB_NWK_INTERNAL_NSDU_HANDLE         0xFFU
+#define ZB_NWK_INTERNAL_REJOIN_CMD_HANDLE   0xFAU
+#define ZB_NWK_INTERNAL_REJOIN_CMD_RESPONSE 0xFDU
+/*!< When got data.confirm, do actual leave, then call leave.indication and, maybe, rejoin  */
+#define ZB_NWK_INTERNAL_LEAVE_IND_AT_DATA_CONFIRM_HANDLE     0xFCU
+/*!< When got data.confirm, send response to mgmt_leave command. Maybe, leave later  */
+#define ZB_NWK_INTERNAL_LEAVE_CONFIRM_AT_DATA_CONFIRM_HANDLE   0xFBU
+#define ZB_NWK_INTERNAL_ZED_LEAVE_CONFIRM_AT_DATA_CONFIRM_HANDLE   0xFEU
+/* This handle is used to transfer OMM status. */
+#define ZB_NWK_INTERNAL_OMM_STATUS_CONFIRM_HANDLE            0xF9U
+/* Detect delivery status of relayed frames */
+#define ZB_NWK_INTERNAL_RELAYED_UNICAST_FRAME_CONFIRM_HANDLE 0xF8U
+/* Detect delivery of NWK End Device Timeout Request frame */
+#define ZB_NWK_INTERNAL_ED_TIMEOUT_REQ_FRAME_COFIRM_HANDLE   0xF7U
+
+#define ZB_NWK_INTERNAL_COMMISSIONING_CMD_HANDLE 0xF6U
+#define ZB_NWK_INTERNAL_COMMISSIONING_CMD_RESPONSE_HANDLE 0xF5U
+
+#define ZB_NWK_MINIMAL_INTERNAL_HANDLE ZB_NWK_INTERNAL_COMMISSIONING_CMD_RESPONSE_HANDLE
 
 /** @brief Initialize NWK stack layer. */
 void zb_nwk_init(void);
@@ -1709,6 +1751,24 @@ typedef ZB_PACKED_PRE struct zb_nwk_cmd_rrep_s
 zb_nwk_cmd_rrep_t;
 
 /**
+   Get Route Reply Originator IEEE address bit in the options field
+*/
+#define ZB_NWK_GET_RREP_HAS_ORIG_IEEE_ADDR(opt)            (((opt) >> 4u) & 1u)
+/**
+   Get Route Reply Originator IEEE address bit in the options field
+*/
+#define ZB_NWK_GET_RREP_HAS_RESP_IEEE_ADDR(opt)            (((opt) >> 5u) & 1u)
+/**
+   Set Route Reply Originator IEEE address bit in the options field
+*/
+#define ZB_NWK_SET_RREP_HAS_ORIG_IEEE_ADDR(opt)            ((opt) |= (1u << 4u))
+/**
+   Set Route Reply Originator IEEE address bit in the options field
+*/
+#define ZB_NWK_SET_RREP_HAS_RESP_IEEE_ADDR(opt)            ((opt) |= (1u << 5u))
+
+
+/**
    Rejoin request command
 */
 typedef ZB_PACKED_PRE struct zb_nwk_rejoin_request_s
@@ -1996,6 +2056,21 @@ void zb_nwk_pib_set(zb_uint8_t param, zb_uint8_t iface_id, zb_uint8_t attr, void
   @param cb - callback for run after
  */
 void zb_nwk_pib_get(zb_uint8_t param, zb_uint8_t iface_id, zb_uint8_t attr, zb_callback_t cb);
+
+/*
+  Alloc and fill nwk hdr, return pointer to the allocated hdr
+*/
+zb_nwk_hdr_t *nwk_alloc_and_fill_hdr(zb_bufid_t buf,
+                                     zb_uint16_t src_addr,
+                                     zb_uint16_t dst_addr,
+                                     zb_bool_t is_multicast, zb_bool_t is_secured,
+                                     zb_bool_t is_cmd_frame, zb_bool_t force_long);
+
+/**
+  Alloc and fill place for nwk command, return pointer to the command payload.
+  'cmd' is a value from @ref nwk_cmd.
+*/
+void *nwk_alloc_and_fill_cmd(zb_bufid_t buf, zb_uint8_t cmd, zb_uint8_t cmd_size);
 
 /** @} */
 /** @endcond */

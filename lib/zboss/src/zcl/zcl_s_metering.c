@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -696,7 +696,7 @@ static zb_bool_t zb_zcl_metering_process_request_fast_poll_mode(zb_uint8_t param
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_metering_process_request_fast_poll_mode", (FMT__0));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param, ZB_ZCL_METERING_REQUEST_FAST_POLL_MODE_CB_ID,
-                                    RET_ERROR, cmd_info, &pl_in, &pl_out);
+                                    RET_NOT_IMPLEMENTED, cmd_info, &pl_in, &pl_out);
 
   if (!zb_zcl_metering_request_fast_poll_mode_parse_payload(&pl_in, param))
   {
@@ -719,6 +719,9 @@ static zb_bool_t zb_zcl_metering_process_request_fast_poll_mode(zb_uint8_t param
     case RET_OK:
       ZB_ZCL_METERING_SEND_CMD_HELPER(zb_zcl_metering_send_cmd_request_fast_poll_mode_response,
                                       param, cmd_info, &pl_out, 0, NULL);
+      break;
+    case RET_NOT_IMPLEMENTED:
+      zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_UNSUP_CMD);
       break;
     case RET_ERROR:
       TRACE_MSG(TRACE_ZCL1,
@@ -744,7 +747,7 @@ static zb_bool_t zb_zcl_metering_process_get_snapshot(zb_uint8_t param,
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_metering_process_get_snapshot", (FMT__0));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param, ZB_ZCL_METERING_GET_SNAPSHOT_CB_ID,
-                                    RET_NOT_FOUND, cmd_info, &pl_in, NULL);
+                                    RET_NOT_IMPLEMENTED, cmd_info, &pl_in, NULL);
 
   if (!zb_zcl_metering_get_snapshot_data_parse_payload(&pl_in, param))
   {
@@ -773,6 +776,9 @@ static zb_bool_t zb_zcl_metering_process_get_snapshot(zb_uint8_t param,
     case RET_NOT_FOUND:
       zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_NOT_FOUND);
       break;
+    case RET_NOT_IMPLEMENTED:
+      zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_UNSUP_CMD);
+      break;
     case RET_ERROR:
       TRACE_MSG(TRACE_ZCL1,
                 "ERROR during command processing:  User callback failed with err=%d.",
@@ -798,7 +804,7 @@ static zb_bool_t zb_zcl_metering_process_get_sampled_data(zb_uint8_t param,
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_metering_process_get_sampled_data", (FMT__0));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param, ZB_ZCL_METERING_GET_SAMPLED_DATA_CB_ID,
-                                    RET_NOT_FOUND, cmd_info, &pl_in, &pl_out);
+                                    RET_NOT_IMPLEMENTED, cmd_info, &pl_in, &pl_out);
 
   if (!zb_zcl_metering_get_sampled_data_parse_payload(&pl_in, param))
   {
@@ -825,6 +831,9 @@ static zb_bool_t zb_zcl_metering_process_get_sampled_data(zb_uint8_t param,
     case RET_NOT_FOUND:
       zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_NOT_FOUND);
       break;
+    case RET_NOT_IMPLEMENTED:
+      zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_UNSUP_CMD);
+      break;
     case RET_ERROR:
       TRACE_MSG(TRACE_ZCL1,
                 "ERROR during command processing: User callback failed with err=%d.",
@@ -850,7 +859,7 @@ static zb_bool_t zb_zcl_metering_process_get_profile(zb_uint8_t param,
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_metering_process_get_profile", (FMT__0));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param, ZB_ZCL_METERING_GET_PROFILE_CB_ID,
-                                    RET_ERROR, cmd_info, &pl_in, &pl_out);
+                                    RET_NOT_IMPLEMENTED, cmd_info, &pl_in, &pl_out);
 
   if (!zb_zcl_metering_get_profile_parse_payload(&pl_in, param))
   {
@@ -873,6 +882,9 @@ static zb_bool_t zb_zcl_metering_process_get_profile(zb_uint8_t param,
     case RET_OK:
       ZB_ZCL_METERING_SEND_CMD_HELPER(zb_zcl_metering_send_cmd_get_profile_response,
                                       param, cmd_info, &pl_out, 0, NULL);
+      break;
+    case RET_NOT_IMPLEMENTED:
+      zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_UNSUP_CMD);
       break;
     case RET_ERROR:
       TRACE_MSG(TRACE_ZCL1,

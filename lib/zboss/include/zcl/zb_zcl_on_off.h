@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -56,8 +56,8 @@
  *
  *    @par Example
  *    On command sending:
- *    @snippet HA_samples/on_off_output/sample_zed.c onoff_server_send_on_req_param
- *    @snippet HA_samples/on_off_output/sample_zed.c onoff_server_send_on_req_command
+ *    @snippet HA/on_off_output/sample_zed.c onoff_server_send_on_req_param
+ *    @snippet HA/on_off_output/sample_zed.c onoff_server_send_on_req_command
  *    @par
  *
  *    Other two commands can be sent in the same way using appropriate macros.

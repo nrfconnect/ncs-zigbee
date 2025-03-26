@@ -425,6 +425,14 @@ static void zdo_classic_handle_leave_with_rejoin_signal(zb_bufid_t param)
   COMM_CTX().application_signal = ZB_BDB_SIGNAL_DEVICE_REBOOT;
 }
 
+static void zdo_classic_handle_leave_local_ind_signal(zb_bufid_t param)
+{
+  if (param != ZB_BUF_INVALID)
+  {
+    zb_buf_free(param);
+  }
+}
+
 #endif /* ZB_JOIN_CLIENT */
 
 #ifdef ZB_COORDINATOR_ROLE
@@ -439,7 +447,7 @@ static void zdo_classic_handle_secured_rejoin_signal(zb_bufid_t param)
       It's needed to remove possibility of
       'bdb_link_key_refresh_alarm' duplication
   */
-  if (zb_address_by_ieee(req->dest_address.addr_long, ZB_FALSE, ZB_FALSE, &ref_to_addr) == RET_OK)
+  if (zb_address_get_by_ieee(req->dest_address.addr_long, &ref_to_addr) == RET_OK)
   {
     bdb_cancel_link_key_refresh_alarm(bdb_link_key_refresh_alarm, ref_to_addr, ZB_TRUE);
   }
@@ -552,6 +560,9 @@ static void zdo_classic_handle_comm_signal(zb_commissioning_signal_t signal, zb_
       break;
     case ZB_COMM_SIGNAL_LEAVE_WITH_REJOIN:
       zdo_classic_handle_leave_with_rejoin_signal(param);
+      break;
+    case ZB_COMM_SIGNAL_LEAVE_LOCAL_IND:
+      zdo_classic_handle_leave_local_ind_signal(param);
       break;
 #endif /* ZB_JOIN_CLIENT */
 

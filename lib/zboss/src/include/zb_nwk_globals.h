@@ -99,13 +99,16 @@ zb_uint_t zb_calc_non_zero_bits_in_bit_vector(zb_uint8_t *vector, zb_uint_t size
 #define ZB_NLME_STATE_PIB_LOAD_SRC_MATCH_TBL    24U
 #define ZB_NLME_STATE_PIB_LOAD_BEACON_JITTER    25U
 
+#define ZB_NLME_STATE_PIB_PTA_PRIO              26U
+#define ZB_NLME_STATE_PIB_PTA_OPT               27U
 
 /*!< State to execute the 'Survey Beacon' procedure */
-#define ZB_NLME_STATE_SURVEY_BEACON             25U
+#define ZB_NLME_STATE_SURVEY_BEACON             28U
 /* Specific case after NLME-LEAVE.request cmd has been received,
     but NWK hasn't sent leave yet.
    Device doesn't handle any pkt on NWK layer if this state is set. */
-#define ZB_NLME_STATE_LEAVE_IN_PROCESS          26U
+#define ZB_NLME_STATE_LEAVE_IN_PROCESS          29U
+
 /** @} */
 
 /* Broadcast transaction record */
@@ -261,6 +264,12 @@ typedef struct zb_nwk_handle_s  /* do not pac for IAR */
       zb_uint8_t unsecured_rejoin;
       zb_uint8_t poll_attempts;
       zb_uint8_t poll_req;
+      /* @anchor ZBOSS_NWK_NO_MAC_ACK_JOIN_RESP_DEDUP_LOGIC_DATA
+       * @{
+       * Variables, used for @ref ZBOSS_NWK_NO_MAC_ACK_JOIN_RESP_DEDUP_LOGIC */
+      zb_uint8_t rejoin_confirmed; /*!< flag on mac confirm for rejoin/nwk comm req */
+      zb_uint8_t pending_resp_buf; /*!< buffer with latest rejoin/nwk comm response */
+      /* @} */
       zb_callback_t cb;
     } rejoin;
 #ifdef ZB_FORMATION
@@ -341,6 +350,7 @@ typedef struct zb_nwk_handle_s  /* do not pac for IAR */
   zb_bitbool_t router_started:1;                             /*!< True if the device is a router and it is started */
 
   zb_bitbool_t poll_in_progress:1;                           /*!< */
+  zb_bitbool_t poll_pending:1;                               /*!< */
   zb_bitbool_t joined_restart:1;                             /*!< True if the device started
                                     * with NWK parameters from NVRAM */
   zb_bitbool_t rejoin_capability_alloc_address:1;            /*!< True if address is selected by the
@@ -500,8 +510,14 @@ typedef struct zb_nwk_globals_s
     zb_mac_interface_t mac_interfaces[ZB_NWK_MAC_IFACE_TBL_SIZE];
 #endif /* ZB_MAC_INTERFACE_SINGLE */
 
+  zb_uint8_t pta_prio_at_start;
+  zb_uint32_t pta_opt_at_start;
+
   zb_bitbool_t is_nwk_started:1;        /*!< nwk started flag           */
   zb_bitbool_t pta_state_at_start:1;    /*!< set pta state at nwk start */
+  zb_bitbool_t pta_state_set:1;         /*!< PTA state is to be set at NWK start  */
+  zb_bitbool_t pta_prio_set:1;          /*!< PTA priority is to be set at NWK start */
+  zb_bitbool_t pta_opt_set:1;           /*!< PTA options are to be set at NWK start */
   zb_bitbool_t postpone_data_processing:1; /*!< postpone data processing until joining finish */
 } zb_nwk_globals_t;
 

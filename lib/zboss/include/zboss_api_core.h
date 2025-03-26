@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -463,6 +463,7 @@ zb_ret_t zb_schedule_get_alarm_time(zb_callback_t func, zb_uint8_t param, zb_tim
    @return ZB_TRUE in case of scheduler is stopped or ZB_FALSE otherwise
  */
 zb_bool_t zb_scheduler_is_stop(void);
+/** @endcond */ /* internals_doc */
 
 /**
    Is scheduler stop - Is scheduler running now

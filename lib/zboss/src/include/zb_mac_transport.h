@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -67,8 +67,8 @@ typedef enum zb_mac_transport_type_e
   ZB_MAC_TRANSPORT_TYPE_DUMP  = 0x01, /*!< Dump packet type */
   ZB_MAC_TRANSPORT_TYPE_TRACE = 0x02, /*!< Trace packet type */
   ZB_MAC_TRANSPORT_TYPE_CRASH_DATA = 0x03, /*!< Crash dump */
-  ZB_MAC_TRANSPORT_TYPE_MAC_SPLIT_DATA = 0x04, /*!< MAC split data */
-  ZB_MAC_TRANSPORT_TYPE_OTA_PROTOCOL = 0x05, /*!< OTA protocol used over MACSPLIT */
+  ZB_MAC_TRANSPORT_TYPE_MAC_SPLIT_DATA = 0x04, /*!< MAC-Split data */
+  ZB_MAC_TRANSPORT_TYPE_OTA_PROTOCOL = 0x05, /*!< OTA protocol used over MAC-Split */
   ZBNCP_TRANSPORT_TYPE_DUMP = 0x06, /* NCP dump packet type */
   ZB_MAC_TRANSPORT_TYPE_NUM
 }

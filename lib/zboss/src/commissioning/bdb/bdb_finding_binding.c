@@ -388,7 +388,7 @@ static zb_ret_t zb_bdb_find_respondent(zb_uint16_t nwk_addr, zb_uint8_t *resp_in
 
   TRACE_MSG(TRACE_ZCL1, "> zb_bdb_find_respondent by addr %d", (FMT__D, nwk_addr));
 
-  if (zb_address_by_short(nwk_addr, ZB_FALSE, ZB_FALSE, &addr_ref) == RET_OK)
+  if (zb_address_get_by_short(nwk_addr, &addr_ref) == RET_OK)
   {
     for (i = 0 ; i < BDB_COMM_CTX().respondent_number ; i++)
     {
@@ -946,7 +946,7 @@ static void zb_bdb_add_ep_to_respondent(zb_uint8_t param, zb_uint16_t nwk_addr, 
 
     if (is_new_respondent)
     {
-      status = zb_address_by_short(nwk_addr, ZB_FALSE, ZB_FALSE, &addr_ref);
+      status = zb_address_get_by_short(nwk_addr, &addr_ref);
 
       if (status == RET_OK)
       {
@@ -1154,7 +1154,7 @@ void zb_bdb_fb_send_active_ep_req(zb_uint8_t param, zb_uint16_t src_addr)
     zb_address_ieee_ref_t addr_ref = 0;
     respondent = &BDB_COMM_CTX().respondent[resp_idx];
 
-    if (zb_address_by_short(src_addr, ZB_FALSE, ZB_FALSE, &addr_ref) == RET_OK)
+    if (zb_address_get_by_short(src_addr, &addr_ref) == RET_OK)
     {
       respondent->addr_ref = addr_ref;
       req = zb_buf_initial_alloc(param, sizeof(zb_zdo_active_ep_req_t));

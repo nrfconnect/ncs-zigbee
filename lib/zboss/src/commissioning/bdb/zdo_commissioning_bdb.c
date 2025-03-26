@@ -71,6 +71,7 @@ static void bdb_network_formation_machine(zb_uint8_t param);
 #if defined(ZB_BDB_ENABLE_FINDING_BINDING)
 static void bdb_finding_n_binding_machine(zb_uint8_t param);
 #endif
+
 void bdb_initialization_procedure(zb_uint8_t param);
 static void bdb_precomm_rejoin_over_all_channels(zb_uint8_t param, zb_uint16_t secure);
 void bdb_network_steering_on_network(zb_uint8_t param);
@@ -93,6 +94,7 @@ static void nwk_cancel_network_discovery_response(zb_bufid_t buf);
 static void bdb_handle_leave_done_signal(zb_bufid_t param);
 static zb_ret_t bdb_try_initiate_rejoin(zb_uint8_t param);
 static void bdb_initialization_procedure_for_nfn_devices(zb_uint8_t param);
+static void bdb_handle_leave_local_ind_signal(zb_uint8_t param);
 
 zb_bool_t bdb_not_ever_joined()
 {
@@ -154,6 +156,8 @@ static void bdb_initiate_commissioning(zb_uint8_t param)
   else
 #endif
   {
+    /* It seems to be a duplicate with BDB_COMM_SIGNAL_INIT_START signal handling
+     * Maybe related to ZBS-1404 */
     ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_IN_PROGRESS;
     ZB_BDB().v_do_primary_scan = ZB_BDB_JOIN_MACHINE_PRIMARY_SCAN;
     ZB_BDB().v_scan_channels = 0; /* Will be set from scan routines. */
@@ -466,17 +470,36 @@ static void bdb_initialization_procedure_for_nfn_devices(zb_uint8_t param)
   else
 #endif /* ZB_DIRECT_ENABLED */
 
-#if defined ZB_ROUTER_ROLE
-  /* by BDB specification ZR should continue without rejoin, only ZED can perform rejoin */
-  if (ZB_IS_DEVICE_ZR()
-      && !ZB_BDB().bdb_force_router_rejoin)
+
+  if (!(ZB_IS_DEVICE_ZED() && !ZB_PIBCACHE_RX_ON_WHEN_IDLE())
+        && !ZB_U2B(ZB_BDB().bdb_force_router_rejoin)
+#if !defined(NCP_MODE_HOST) && defined(ZB_JOIN_CLIENT)
+        && !ZB_U2B(ZB_NIB().disable_silent_rejoin)
+#endif /* !NCP_MODE_HOST */
+      )
   {
-    TRACE_MSG(TRACE_ZDO2, "Start ZR without rejoin", (FMT__0));
+#if defined ZB_ROUTER_ROLE
+    if (ZB_IS_DEVICE_ZR())
+    {
+      TRACE_MSG(TRACE_ZDO2, "Start ZR without rejoin", (FMT__0));
       ZB_SCHEDULE_CALLBACK(zb_zdo_start_router, param);
-    ret = RET_OK;
+      ret = RET_OK;
+    }
+    else
+#endif
+    if (ZB_IS_DEVICE_ZED() && ZB_PIBCACHE_RX_ON_WHEN_IDLE())
+    {
+      TRACE_MSG(TRACE_ZDO2, "Start non-sleepy ZED without rejoin", (FMT__0));
+      ZB_SET_JOINED_STATUS(ZB_TRUE);
+      ret = RET_OK;
+    }
+    else
+    {
+      /* Wrong device type*/
+      ret = RET_ERROR;
+    }
   }
   else
-#endif /* ZB_ROUTER_ROLE */
   {
     /* Now we can try to initiate rejoin.
      * Device ether ZED or ZR with `bdb_force_router_rejoin` set to `true` */
@@ -509,7 +532,7 @@ static void bdb_initialization_procedure_for_nfn_devices(zb_uint8_t param)
    BDB Initialization procedure according to 7.1 Initialization procedure
  */
 void bdb_initialization_procedure(zb_uint8_t param)
-  {
+{
   bdb_preinit();
 
   if (bdb_not_ever_joined())
@@ -659,7 +682,10 @@ void bdb_commissioning_machine(zb_uint8_t param)
       else
       {
         TRACE_MSG(TRACE_ZDO1, "commissioning is not in progress, ignore", (FMT__0));
-        zb_buf_free(param);
+        if (param)
+        {
+          zb_buf_free(param);
+        }
       }
       break;
 
@@ -751,7 +777,7 @@ static void bdb_initialization_machine(zb_uint8_t param)
 #endif
       {
         TRACE_MSG(TRACE_ZDO1, "Can't find network", (FMT__0));
-      ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_NO_NETWORK;
+        ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_NO_NETWORK;
         ZB_BDB().bdb_tc_rejoin_active = ZB_FALSE_U;
 
       bdb_commissioning_signal(BDB_COMM_SIGNAL_INIT_FINISH, param);
@@ -1144,6 +1170,12 @@ void bdb_network_steering_start(zb_uint8_t param)
         ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_NO_NETWORK;
         bdb_commissioning_signal(BDB_COMM_SIGNAL_NETWORK_STEERING_FINISH, param);
       }
+#ifdef ZB_BDB_PREINST_NWK_JOINING
+      if (zb_bdb_preinst_nwk_on_factory_new(param) == RET_OK)
+      {
+        TRACE_MSG(TRACE_INFO1, "Pre-installed network joining started", (FMT__0));
+      }
+#endif
       else
       {
         TRACE_MSG(TRACE_ZDO1, "Start BDB network steering when NOT on network", (FMT__0));
@@ -1801,7 +1833,7 @@ static void bdb_restore_saved_rr(zb_uint8_t param)
   else
   {
     /* Restore ZG->nwk.handle.parent from BDB_COMM_CTX().rejoin.rr_sv_parent_long */
-    zb_address_by_ieee(BDB_COMM_CTX().rejoin.rr_sv_parent_long, ZB_FALSE, ZB_FALSE, &ZG->nwk.handle.parent);
+    zb_address_get_by_ieee(BDB_COMM_CTX().rejoin.rr_sv_parent_long, &ZG->nwk.handle.parent);
   }
 
   {
@@ -2243,6 +2275,7 @@ static void bdb_force_rejoin_if_not_in_progress(zb_bufid_t param)
   {
     zdo_rejoin_clear_prev_join();
 
+    /* These settings doesn't seem to work, since top_level will rewrite them */
     ZB_BDB().bdb_commissioning_step = ZB_BDB_COMMISSIONING_STOP;
     ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_CANCELLED;
     BDB_COMM_CTX().signal = BDB_COMM_SIGNAL_FINISH;
@@ -2308,6 +2341,14 @@ static void bdb_handle_dev_annce_sent_signal(zb_bufid_t param)
   }
 }
 
+static void bdb_handle_leave_local_ind_signal(zb_uint8_t param)
+{
+  BDB_COMM_CTX().bdb_leave_initiated = ZB_TRUE;
+  if(param != ZB_BUF_INVALID)
+  {
+    zb_buf_free(param);
+  }
+}
 
 static void bdb_handle_leave_done_signal(zb_bufid_t param)
 {
@@ -2440,6 +2481,20 @@ static void bdb_handle_leave_with_rejoin_signal(zb_bufid_t param)
   }
 #endif /* NCP_MODE_HOST */
 
+#ifndef NCP_MODE_HOST
+  /* Set rejoin in progress to false. *
+   * Yet it is strange to do so right before doing rejoin.
+   * But because the rejoin is caused by leave,
+   * There is no way to have multiple leaves with rejoins without entering a network. */
+  /* [VS] Here we try to replicate "finished BDB procedure" without entering ZB_BDB_COMMISSIONING_STOP,
+   * which seems to be the convergence point for all BDB steps.
+   * I think it is desired to have minimal places where variable state can change,
+   * and there is a better way to handle leave with rejoin */
+  /* TODO: Make it work in NCP
+   * Originated by ZOI-4116, maybe related to ZBS-1405*/
+  ZG->zdo.handle.rejoin = ZB_FALSE;
+#endif /* !NCP_MODE_HOST */
+
   zdo_inform_app_leave(ZB_NWK_LEAVE_TYPE_REJOIN);
 
 #ifndef NCP_MODE_HOST
@@ -2489,7 +2544,7 @@ static void bdb_handle_secured_rejoin_signal(zb_bufid_t param)
        It's needed to remove possibility of
          'bdb_link_key_refresh_alarm' duplication
     */
-    if (zb_address_by_ieee(req->dest_address.addr_long, ZB_FALSE, ZB_FALSE, &ref_to_addr) == RET_OK)
+    if (zb_address_get_by_ieee(req->dest_address.addr_long, &ref_to_addr) == RET_OK)
     {
       bdb_cancel_link_key_refresh_alarm(bdb_link_key_refresh_alarm, ref_to_addr, ZB_TRUE);
     }
@@ -2550,8 +2605,36 @@ static void bdb_handle_formation_failed_signal(zb_bufid_t param)
 
 static void bdb_handle_comm_signal(zb_commissioning_signal_t signal, zb_bufid_t param)
 {
-  TRACE_MSG(TRACE_ZDO1, ">> bdb_handle_comm_signal, signal %d, param %d",
-            (FMT__D_D, signal, param));
+  TRACE_MSG(TRACE_ZDO1, ">> bdb_handle_comm_signal, signal %hd, param %hd",
+            (FMT__H_H, signal, param));
+
+  /* FIXME: Wasn't tested on NCP, thus disabled */
+  /* Shall be checked in ZBS-2011 */
+#ifndef NCP_MODE_HOST
+  /* When Leave is in progress, BDB should not perform any actions.
+   * Only react to Leave finishing & Commissioning init/start
+   * NOTE: What is to be done if none of these signals never come? */
+  if(BDB_COMM_CTX().bdb_leave_initiated)
+  {
+    if(signal == ZB_COMM_SIGNAL_LEAVE_DONE
+        || signal == ZB_COMM_SIGNAL_LEAVE_WITH_REJOIN
+        || signal == ZB_COMM_SIGNAL_INIT
+        || signal == ZB_COMM_SIGNAL_START)
+    {
+      TRACE_MSG(TRACE_ZDO1, "Received unblocking signal %hd", (FMT__H, signal));
+      BDB_COMM_CTX().bdb_leave_initiated = ZB_FALSE;
+    }
+    else
+    {
+      TRACE_MSG(TRACE_ZDO1, "Skip this signal. Leave is ongoing", (FMT__0));
+      if (param != ZB_BUF_INVALID)
+      {
+        zb_buf_free(param);
+      }
+      goto handle_comm_signal_done;
+    }
+  }
+#endif /* !NCP_MODE_HOST */
 
   switch(signal)
   {
@@ -2590,8 +2673,14 @@ static void bdb_handle_comm_signal(zb_commissioning_signal_t signal, zb_bufid_t 
     case ZB_COMM_SIGNAL_TCLK_UPDATE_FAILED:
       bdb_commissioning_signal(BDB_COMM_SIGNAL_NETWORK_STEERING_TCLK_EX_FAILURE, param);
       break;
+    case ZB_COMM_SIGNAL_LEAVE_LOCAL_IND:
+      bdb_handle_leave_local_ind_signal(param);
+      break;
     case ZB_COMM_SIGNAL_LEAVE_DONE:
       bdb_handle_leave_done_signal(param);
+      break;
+    case ZB_COMM_SIGNAL_LEAVE_WITH_REJOIN:
+      bdb_handle_leave_with_rejoin_signal(param);
       break;
 
 #ifndef NCP_MODE_HOST
@@ -2605,10 +2694,6 @@ static void bdb_handle_comm_signal(zb_commissioning_signal_t signal, zb_bufid_t 
       bdb_handle_rejoin_after_secur_failed_signal(param);
       break;
 #endif /* !NCP_MODE_HOST */
-
-    case ZB_COMM_SIGNAL_LEAVE_WITH_REJOIN:
-      bdb_handle_leave_with_rejoin_signal(param);
-      break;
 #endif /* ZB_JOIN_CLIENT */
 
 #ifndef NCP_MODE_HOST
@@ -2651,6 +2736,13 @@ static void bdb_handle_comm_signal(zb_commissioning_signal_t signal, zb_bufid_t 
         zb_buf_free(param);
       }
   }
+
+  /* FIXME: Wasn't tested on NCP, thus disabled */
+  /* Shall be checked in ZBS-2011 */
+#ifndef NCP_MODE_HOST
+  /* This jump is only for trace print */
+handle_comm_signal_done:
+#endif /* !NCP_MODE_HOST */
 
   TRACE_MSG(TRACE_ZDO1, "<< bdb_handle_comm_signal", (FMT__0));
 }

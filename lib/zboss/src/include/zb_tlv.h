@@ -290,8 +290,8 @@ void zb_tlv_put_value_device_capability_extension(zb_uint8_t param, zb_uint16_t 
  */
 void zb_tlv_put_value_selected_key_neg_method(zb_uint8_t param,
                                               zb_ieee_addr_t ieee_addr,
-                                              zb_uint8_t *selected_key_neg_method,
-                                              zb_uint8_t *selected_psk_secret);
+                                              zb_uint8_t selected_key_neg_method,
+                                              zb_uint8_t selected_psk_secret);
 
 
 #if defined ZB_COORDINATOR_ROLE || defined ZB_ROUTER_ROLE

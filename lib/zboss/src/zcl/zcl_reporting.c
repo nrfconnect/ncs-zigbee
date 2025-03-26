@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -447,7 +447,8 @@ zb_ret_t zb_zcl_put_reporting_info_from_req(zb_zcl_configure_reporting_req_t *co
     rep_info->dst.short_addr = attr_addr_info->dst_short_addr;
     rep_info->dst.endpoint = attr_addr_info->dst_ep;
     rep_info->dst.profile_id = attr_addr_info->profile_id;
-
+    rep_info->manuf_code = attr_addr_info->manuf_code;
+    
     TRACE_MSG(TRACE_ZCL3, "direction %hd", (FMT__H, rep_info->direction));
     if (rep_info->direction == ZB_ZCL_CONFIGURE_REPORTING_SEND_REPORT)
     {
@@ -747,7 +748,7 @@ void zb_zcl_reporting_timer_handler(zb_uint8_t param)
           {
             /* Minimal interval expired - mark attribute as allowed to
              * be reported */
-            TRACE_MSG(TRACE_ZCL1, "min_interval expired rep_info %p", (FMT__P));
+            TRACE_MSG(TRACE_ZCL1, "min_interval expired rep_info %p", (FMT__P, rep_info));
 
             ZB_ZCL_SET_REPORTING_FLAG(rep_info, ZB_ZCL_REPORT_IS_ALLOWED);
 
@@ -782,7 +783,7 @@ void zb_zcl_reporting_timer_handler(zb_uint8_t param)
           else
           {
             /* Maximum interval expired - mark attribute to be reported */
-            TRACE_MSG(TRACE_ZCL1, "max_interval expired rep_info %p", (FMT__P));
+            TRACE_MSG(TRACE_ZCL1, "max_interval expired rep_info %p", (FMT__P, rep_info));
 
             ZB_ZCL_SET_REPORTING_FLAG(rep_info, ZB_ZCL_REPORT_ATTR);
             ZB_ZCL_CLR_REPORTING_FLAG(rep_info, ZB_ZCL_REPORT_TIMER_STARTED);
@@ -1661,16 +1662,7 @@ void zb_zcl_report_attr_cmd_handler(zb_uint8_t param)
 
   if (!cmd_info.disable_default_response)
   {
-    ZB_ZCL_SEND_DEFAULT_RESP(param,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).source.u.short_addr,
-                             ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).src_endpoint,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint,
-                             cmd_info.profile_id,
-                             cmd_info.cluster_id,
-                             cmd_info.seq_number,
-                             cmd_info.cmd_id,
-                             ZB_ZCL_STATUS_SUCCESS);
+    ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, ZB_ZCL_STATUS_SUCCESS);
   }
   else
   {

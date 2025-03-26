@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -392,8 +392,7 @@ void zb_aps_init(void);
 #define APS_CMD_RELAY_MESSAGE_UPSTREAM   0x12U
 /** @} */
 
-zb_uint8_t aps_find_src_ref(
-  zb_address_ieee_ref_t src_addr_ref, zb_uint8_t src_end, zb_uint16_t cluster_id);
+zb_uint8_t aps_find_src_ref(zb_uint8_t src_end, zb_uint16_t cluster_id);
 
 #ifdef ZB_COORDINATOR_ROLE
 /** @brief APSME-UPDATE-DEVICE.indication primitive.
@@ -427,7 +426,6 @@ zb_ret_t zb_aps_command_confirm(zb_uint8_t param);
 #define ZB_APS_FC_GET_FRAME_TYPE(fc)  ((fc) & 3U)
 #define ZB_APS_FC_SET_FRAME_TYPE(fc, t)  ((fc) |= (t))
 
-#define ZB_APS_FC_GET_DELIVERY_MODE(fc) (((fc)>>2U) & 3U)
 #define ZB_APS_FC_SET_DELIVERY_MODE(fc, m) ((fc) |= (m) << 2U)
 
 #define ZB_APS_FC_GET_ACK_FORMAT(fc) (((fc)>>4U) & 1U)
@@ -471,22 +469,6 @@ zb_ret_t zb_aps_command_confirm(zb_uint8_t param);
 #define ZB_APS_FRAME_COMMAND 1U
 #define ZB_APS_FRAME_ACK     2U
 /** @} */
-
-/**
- * @name APS frame delivery mode values
- * @anchor aps_frame_delivery_mode
- *
- * Note: These values were members of `enum zb_aps_frame_delivery_mode_e` type but were converted to
- * a set of macros due to MISRA violations.
- */
-/** @{ */
-#define ZB_APS_DELIVERY_UNICAST   0U /*!< Unicast frame delivery. */
-  /*! Reserved value, see Zigbee spec, subclause 2.2.5.1.1.2 */
-#define ZB_APS_DELIVERY_RESERVED  1U
-#define ZB_APS_DELIVERY_BROADCAST 2U /*!< Broadcast frame delivery. */
-#define ZB_APS_DELIVERY_GROUP     3U /*!< Group frame delivery. */
-/** @} */
-
 
 /** @brief Ger APS header size (not include AUX security hdr). */
 zb_uint8_t zb_aps_hdr_size(zb_uint8_t fc);

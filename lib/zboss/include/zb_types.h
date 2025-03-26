@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -433,9 +433,11 @@ typedef bool zb_bitbool_t;
 
 #elif defined ZB_16BIT_WORD
 
-#define ZB_SHORT_MIN       ZB_INT8_MIN
-#define ZB_SHORT_MAX       ZB_INT8_MAX
-#define ZB_USHORT_MAX      ZB_UINT8_MAX
+/* According to definition of zb_short_t and zb_int_t for 16bit word machine,
+ * they are the same (int). Thus they have same range. */
+#define ZB_SHORT_MIN       ZB_INT16_MIN
+#define ZB_SHORT_MAX       ZB_INT16_MAX
+#define ZB_USHORT_MAX      ZB_UINT16_MAX
 
 #define ZB_INT_MIN       ZB_INT16_MIN
 #define ZB_INT_MAX       ZB_INT16_MAX

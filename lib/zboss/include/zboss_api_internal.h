@@ -346,7 +346,6 @@ typedef ZB_PACKED_PRE struct zb_aps_dup_tbl_ent_s
 */
 typedef ZB_PACKED_PRE struct zb_aps_bind_src_table_s
 {
-  zb_address_ieee_ref_t src_addr;   /*!< source address as ref from nwkAddressMap */
   zb_uint8_t            src_end;    /*!< source endpoint */
   zb_uint16_t           cluster_id; /*!< cluster id */
 } ZB_PACKED_STRUCT zb_aps_bind_src_table_t;

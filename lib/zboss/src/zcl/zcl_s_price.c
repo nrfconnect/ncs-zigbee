@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -245,7 +245,7 @@ void zb_zcl_price_send_cmd_get_current_price(
 
   if (rx_on_when_idle)
   {
-    ZB_ZCL_PRICE_SET_REQUESTOR_RX_ON_WHEN_IDLE(&payload.command_options);
+    ZB_ZCL_PRICE_SET_REQUESTER_RX_ON_WHEN_IDLE(&payload.command_options);
   }
 
   zb_zcl_send_cmd(param,
@@ -411,6 +411,7 @@ static zb_bool_t zb_zcl_price_process_price_ack(zb_uint8_t param,
 {
   zb_zcl_price_ack_payload_t  pl_in = ZB_ZCL_PRICE_ACK_PAYLOAD_INIT;
   zb_bool_t                   processed = ZB_FALSE;
+  zb_ret_t status;
 
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_price_process_price_ack", (FMT__0));
 
@@ -424,31 +425,32 @@ static zb_bool_t zb_zcl_price_process_price_ack(zb_uint8_t param,
   (void) zb_zcl_price_ack_get_payload_from_data(&pl_in, zb_buf_begin(param));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
-    ZB_ZCL_PRICE_PRICE_ACK_CB_ID, RET_ERROR, cmd_info, &pl_in, NULL);
+    ZB_ZCL_PRICE_PRICE_ACK_CB_ID, RET_NOT_IMPLEMENTED, cmd_info, &pl_in, NULL);
 
   if (ZCL_CTX().device_cb)
   {
     TRACE_MSG(TRACE_ZCL1, "Attempt to get price param from user app", (FMT__0));
 
     (ZCL_CTX().device_cb)(param);
-
-    processed = (zb_bool_t) (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) == RET_OK);
-
-    if (!processed)
-    {
-      TRACE_MSG(TRACE_ZCL1, "ERROR: "
-                "Unable to get price_ack params from user app, err=%d.",
-                (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
-    }
   }
   else
   {
     TRACE_MSG(TRACE_ZCL1, "User app callback isn't defined.", (FMT__0));
   }
 
-  if (processed)
+  status = ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param);
+  processed = status == RET_OK || status == RET_NOT_IMPLEMENTED;
+
+  if (!processed)
   {
-    zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_SUCCESS);
+    TRACE_MSG(TRACE_ZCL1, "ERROR: "
+              "Unable to get price_ack params from user app, err=%d.",
+              (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
+  }
+  else
+  {
+    zb_zcl_send_default_handler(param, cmd_info, status == RET_OK ?
+      ZB_ZCL_STATUS_SUCCESS : ZB_ZCL_STATUS_UNSUP_CMD);
   }
 
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_price_process_price_ack", (FMT__0));
@@ -460,7 +462,7 @@ static zb_bool_t zb_zcl_price_process_get_scheduled_prices(zb_uint8_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_price_get_scheduled_prices_payload_t pl_in = ZB_ZCL_PRICE_GET_SCHEDULED_PRICES_PAYLOAD_INIT;
-  zb_bool_t                                   processed = ZB_FALSE;
+  zb_ret_t status;
 
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_price_process_get_scheduled_prices", (FMT__0));
 
@@ -483,17 +485,18 @@ static zb_bool_t zb_zcl_price_process_get_scheduled_prices(zb_uint8_t param,
             (FMT__H_D, pl_in.number_of_events, pl_in.start_time));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param, ZB_ZCL_PRICE_GET_SCHEDULED_PRICES_CB_ID,
-                                    RET_NOT_FOUND, cmd_info, &pl_in, NULL);
+                                    RET_NOT_IMPLEMENTED, cmd_info, &pl_in, NULL);
 
   if (ZCL_CTX().device_cb)
   {
     ZCL_CTX().device_cb(param);
-    processed = (zb_bool_t)(ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) == RET_OK);
   }
+  status = ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param);
 
-  if (!processed)
+  if (status != RET_OK)
   {
-    zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_NOT_FOUND);
+    zb_zcl_send_default_handler(param, cmd_info, status == RET_NOT_IMPLEMENTED ?
+       ZB_ZCL_STATUS_UNSUP_CMD : ZB_ZCL_STATUS_NOT_FOUND);
   }
   else
   {
@@ -527,7 +530,7 @@ static zb_bool_t zb_zcl_price_process_get_tier_labels(zb_uint8_t param,
   }
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param, ZB_ZCL_PRICE_GET_TIER_LABELS_CB_ID,
-                                    RET_NOT_FOUND, cmd_info, &pl_in, NULL);
+                                    RET_NOT_IMPLEMENTED, cmd_info, &pl_in, NULL);
 
   if (ZCL_CTX().device_cb)
   {
@@ -544,6 +547,9 @@ static zb_bool_t zb_zcl_price_process_get_tier_labels(zb_uint8_t param,
       return ZB_TRUE;
     case RET_NOT_FOUND:
       zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_NOT_FOUND);
+      break;
+    case RET_NOT_IMPLEMENTED:
+      zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_UNSUP_CMD);
       break;
     case RET_ERROR:
       /* FALLTHRU */

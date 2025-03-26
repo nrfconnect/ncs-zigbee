@@ -211,16 +211,7 @@ zb_bool_t zb_zcl_process_basic_specific_commands_srv(zb_uint8_t param)
     {
       ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
-      ZB_ZCL_SEND_DEFAULT_RESP( param,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).source.u.short_addr,
-          ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).src_endpoint,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint,
-          cmd_info.profile_id,
-          ZB_ZCL_CLUSTER_ID_BASIC,
-          cmd_info.seq_number,
-          cmd_info.cmd_id,
-          status==RET_OK ? ZB_ZCL_STATUS_SUCCESS : ZB_ZCL_STATUS_INVALID_FIELD);
+      ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, (status == RET_OK ? ZB_ZCL_STATUS_SUCCESS : ZB_ZCL_STATUS_INVALID_FIELD));
     }
   }
 

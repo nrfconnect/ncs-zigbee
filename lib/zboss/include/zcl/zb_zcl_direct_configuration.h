@@ -152,11 +152,9 @@ typedef zb_uint24_t zb_zcl_direct_configuration_anonymous_join_timeout_attr_t;
             value_u32);                                                                            \
   } while (ZB_FALSE)
 
-/** @cond internals_doc */
-/*! @internal @name Zigbee Direct Configuration cluster internals
-    Internal structures for attribute representation in cluster definitions.
-    @{
-*/
+/** @internal
+ *  @endinternal
+ */
 #define ZB_SET_ATTR_DESCR_WITH_ZB_ZCL_ATTR_DIRECT_CONFIGURATION_INTERFACE_STATE_ID(data_ptr) \
 {                                                               \
   ZB_ZCL_ATTR_DIRECT_CONFIGURATION_INTERFACE_STATE_ID,          \
@@ -166,6 +164,9 @@ typedef zb_uint24_t zb_zcl_direct_configuration_anonymous_join_timeout_attr_t;
   (void*) data_ptr                                              \
 }
 
+/** @internal
+ *  @endinternal
+ */
 #define ZB_SET_ATTR_DESCR_WITH_ZB_ZCL_ATTR_DIRECT_CONFIGURATION_ANONYMOUS_JOIN_TIMEOUT_ID(data_ptr) \
 {                                                               \
   ZB_ZCL_ATTR_DIRECT_CONFIGURATION_ANONYMOUS_JOIN_TIMEOUT_ID,   \
@@ -175,17 +176,12 @@ typedef zb_uint24_t zb_zcl_direct_configuration_anonymous_join_timeout_attr_t;
   (void*) data_ptr                                              \
 }
 
-/*! @internal Number of attributes mandatory for reporting in Zigbee Direct Configuration cluster */
+/** @internal
+ *  Number of attributes mandatory for reporting in Zigbee Direct Configuration cluster
+ *  @endinternal
+ */
 #define ZB_ZCL_DIRECT_CONFIGURATION_REPORT_ATTR_COUNT 0
 
-/*! @} */ /* Zigbee Direct Configuration cluster internals */
-/*! @endcond */ /* internals_doc */
-
-/** @cond internals_doc */
-/*! @internal @name Zigbee Direct Configuration cluster attributes
-    Internal attributes.
-    @{
-*/
 /** @brief Declare attribute list for Zigbee Direct Configuration cluster - server side (Information Attribute set)
     @param attr_list - attribute list name
     @param interface_state        - pointer to variable to store Interface State attribute
@@ -198,7 +194,6 @@ typedef zb_uint24_t zb_zcl_direct_configuration_anonymous_join_timeout_attr_t;
   ZB_ZCL_FINISH_DECLARE_ATTRIB_LIST
 
 /*! @} */ /* Zigbee Direct Configuration cluster attributes */
-/*! @endcond */ /* internals_doc */
 
 /*! @name Zigbee Direct Configuration cluster commands
     @{
@@ -224,13 +219,17 @@ enum zb_zcl_direct_configuration_cmd_resp_e
   ZB_ZCL_CMD_DIRECT_CONFIGURATION_CONFIGURE_ZBD_INTERFACE_RESP_ID = 0x00,
 };
 
-/** @cond internals_doc */
-/*! @{ */
-/* Scenes cluster commands list : only for information - do not modify */
+/** @internal
+ *  Scenes cluster commands list : only for information - do not modify
+ *  @endinternal
+ */
 #define ZB_ZCL_CLUSTER_ID_DIRECT_CONFIGURATION_SERVER_ROLE_GENERATED_CMD_LIST \
                                       ZB_ZCL_CMD_DIRECT_CONFIGURATION_CONFIGURE_ZBD_INTERFACE_RESP_ID
 
 
+/** @internal
+ *  @endinternal
+ */
 #define ZB_ZCL_CLUSTER_ID_DIRECT_CONFIGURATION_CLIENT_ROLE_RECEIVED_CMD_LIST \
   ZB_ZCL_CLUSTER_ID_DIRECT_CONFIGURATION_SERVER_ROLE_GENERATED_CMD_LIST
 
@@ -238,23 +237,22 @@ enum zb_zcl_direct_configuration_cmd_resp_e
                                       ZB_ZCL_CMD_DIRECT_CONFIGURATION_CONFIGURE_ZBD_INTERFACE_ID, \
                                       ZB_ZCL_CMD_DIRECT_CONFIGURATION_CONFIGURE_ZBD_ANONYMOUS_TIMEOUT_JOIN_ID
 
+/** @internal
+ *  @endinternal
+ */
 #define ZB_ZCL_CLUSTER_ID_DIRECT_CONFIGURATION_SERVER_ROLE_RECEIVED_CMD_LIST \
   ZB_ZCL_CLUSTER_ID_DIRECT_CONFIGURATION_CLIENT_ROLE_GENERATED_CMD_LIST
 
-/*! @} */
-/**  @endcond */ /* internals_doc */
-
-/** @cond DOXYGEN_ZCL_SECTION */
-
-/**
- * @name Interface State Field
- * @see ZB Direct spec B.3.5.4.2.2
- * @anchor zb_zcl_direct_configuration_interface_state
+/** @brief Disable BLE interface
+ *  @see ZB Direct spec B.3.5.4.2.2
+ *  @anchor zb_zcl_direct_configuration_interface_state
  */
-/** @{ */
-#define ZB_ZCL_DIRECT_CONFIGURATION_INTERFACE_STATE_OFF      0u /*!< Disable BLE interface  */
-#define ZB_ZCL_DIRECT_CONFIGURATION_INTERFACE_STATE_ON       1u /*!< Enable BLE interface   */
-/** @} */
+#define ZB_ZCL_DIRECT_CONFIGURATION_INTERFACE_STATE_OFF 0u
+
+/** @brief Enable BLE interface
+ *  @see ZB Direct spec B.3.5.4.2.2
+ */
+#define ZB_ZCL_DIRECT_CONFIGURATION_INTERFACE_STATE_ON  1u
 
 /**
  * @brief Configure Interface Request parameters
@@ -276,8 +274,6 @@ typedef ZB_PACKED_PRE struct zb_zcl_direct_configuration_configure_interface_res
   /** Current Interface State, @see zb_zcl_direct_configuration_interface_state */
   zb_uint8_t interface_state;
 } ZB_PACKED_STRUCT zb_zcl_direct_configuration_configure_interface_resp_t;
-
-/** @endcond */ /* internals_doc */
 
 /**
  * @brief Configure Anonymous Join Timeout Request parameters
@@ -518,6 +514,8 @@ zb_bool_t zb_zcl_direct_configuration_is_client_authorized(zb_uint16_t client_sh
 
 /*! @} */ /* Zigbee Direct Configuration cluster commands */
 
-/** @endcond */ /* DOXYGEN_ZCL_SECTION && DOXYGEN_DIRECT_FEATURE */
+/*! @} */ /* addtogroup ZB_ZCL_DIRECT_CONFIGURATION */
+
+/** @endcond */ /* DOXYGEN_ZB_DIRECT_SECTION */
 
 #endif /* ZB_ZCL_DIRECT_CONFIGURATION_H */

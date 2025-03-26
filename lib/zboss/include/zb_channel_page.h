@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -328,7 +328,7 @@ zb_ret_t zb_channel_page_list_get_page_idx(zb_uint8_t page, zb_uint8_t *idx);
  * @brief Gets page number by channel page index.
  *
  * @param idx  - index of the channel page in channel lists
- * @param page [out] - channel page
+ * @param page[out] - channel page
  *
  * @return RET_OK or RET_NOT_FOUND.
  */

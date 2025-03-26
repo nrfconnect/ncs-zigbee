@@ -111,15 +111,16 @@ APPLICATION_SIMPLE / APPLICATION_MODERATE / APPLICATION_COMPLEX
 #ifndef ZB_CONFIG_OVERALL_NETWORK_SIZE
 #error Define ZB_CONFIG_OVERALL_NETWORK_SIZE!
 #elif ZB_CONFIG_OVERALL_NETWORK_SIZE < 2U || ZB_CONFIG_OVERALL_NETWORK_SIZE > ZB_NWK_CONFIGURABLE_MEM_MAX_NETWORK_SIZE
-#error ZB_CONFIG_OVERALL_NETWORK_SIZE must be between 2 and 200!
+#error ZB_CONFIG_OVERALL_NETWORK_SIZE must be between 2 and ZB_NWK_CONFIGURABLE_MEM_MAX_NETWORK_SIZE!
 #else
 /* Derive constands from the network size */
 
 #endif  /* ZB_CONFIG_OVERALL_NETWORK_SIZE */
 
+#define ZB_ADDR_TABLE_SIZE_QUAD(n) ((n + 15U)/16U * 4U)
  /* Reserve in address translation table for aliases: 1/4, at least
   * 4. Table size must be < 255, so let's limit net size to 200 */
-#define ZB_IEEE_ADDR_TABLE_SIZE_RESERVE(n) ((n + 15U)/16U * 4U)
+#define ZB_IEEE_ADDR_TABLE_SIZE_RESERVE(n) ((ZB_ADDR_TABLE_SIZE_QUAD(n) + (n) < 255u) ? ZB_ADDR_TABLE_SIZE_QUAD(n) : (255u - (n)))
 
 /*
   Device role

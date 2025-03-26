@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -77,6 +77,7 @@ typedef zb_bool_t (*zb_commissioning_is_in_tc_rejoin_func_t)(void);
 #define ZB_COMM_SIGNAL_TCLK_VERIFIED_REMOTE 19u
 #define ZB_COMM_SIGNAL_DEVICE_LEFT 20u
 #define ZB_COMM_SIGNAL_INIT 21u
+#define ZB_COMM_SIGNAL_LEAVE_LOCAL_IND 22u
 
 
 typedef struct zb_formation_func_selector_s
@@ -194,6 +195,7 @@ void zdo_commissioning_tclk_upd_failed(zb_uint8_t param);
 void zdo_commissioning_authenticated(zb_uint8_t param);
 void zdo_commissioning_dev_annce_sent(zb_uint8_t param);
 void zdo_commissioning_secur_failed(zb_uint8_t param);
+void zdo_commissioning_leave_local_ind(zb_uint8_t param);
 void zdo_commissioning_leave_done(zb_uint8_t param);
 void zdo_inform_app_leave(zb_uint8_t leave_type);
 #endif

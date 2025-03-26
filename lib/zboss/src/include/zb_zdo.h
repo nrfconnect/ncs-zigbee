@@ -140,6 +140,9 @@
 /*! @} */
 /*! @endcond */
 
+#define ZB_SET_TLV_PANIC_WORKAROUND(val) (ZB_TCPOL().legacy_dev_tlv_panic_workaround = (val))
+#define ZB_TLV_PANIC_WORKAROUND_ENABLED() (ZB_U2B(ZB_TCPOL().legacy_dev_tlv_panic_workaround))
+
 /*! \addtogroup zdo_base */
 /*! @{ */
 
@@ -312,7 +315,7 @@ void zb_zdo_device_reboot_int_delayed(zb_uint8_t param, zb_uint16_t user_param);
 /*! @{ */
 
 /**
-   Send Device annonce command for custom params
+   Send Device announce command for custom params
  */
 void zdo_send_device_annce_ex(zb_uint8_t             param,
                               zb_zdo_device_annce_t *dev_annce
@@ -322,7 +325,7 @@ void zdo_send_device_annce_ex(zb_uint8_t             param,
   );
 
 /**
-   Actually send Device annonce command
+   Actually send Device announce command
  */
 void zdo_send_device_annce(zb_uint8_t param);
 
@@ -1086,18 +1089,6 @@ void zb_set_zdo_descriptor(void);
 
 void zdo_rejoin_clear_prev_join(void);
 
-typedef enum zb_zdo_tsn_policy_e
-{
-  ZDO_TSN_POLICY_FULL_RANGE,       /*!< ZBOSS is allowed to manage full the range of ZDO TSN */
-  ZDO_TSN_POLICY_RANGE_128_254,    /*!< ZBOSS TSN pool is reduced to the range of ZDO TSN from 128 to 254
-                                        (it is assumed that APP is in charge to manage ZDO TSN range from 0 to 127) */
-} zb_zdo_tsn_policy_t;
-
-/**
-   set the policy to update ZDO TSN value
- */
-void zdo_tsn_policy_set(zb_zdo_tsn_policy_t policy, zb_callback_t lock_cb);
-
 /**
    predict (not really increment) ZDO TSN value according to the policy
 
@@ -1118,43 +1109,6 @@ zb_uint8_t zdo_tsn_inc(void);
    @return ZDO TSN current value
  */
 zb_uint8_t zdo_tsn_get(void);
-
-#ifdef ZBOSS_ZDO_APP_TSN_ENABLE
-/* Yes, it is not so good solution.
-   But it allows an application to generate its own ZDO requests
-   with custom ZDO sequence numbers.
-   Unfortunately, some of application requires such a behaviour.
-
-   The main idea is to assign a ZDO sequence number with buffer ID of the request,
-   so zdo_send_req function can use this sequence number instead of internal counter.
-   Unfortunately, we can't pass the ZDO sequence number in the same buffer
-   as a parameter due to the different implementations of ZDO interface functions.
-   These parameters sometime are passed as buffer param, but sometime in the beginning
-   of the buffer as a data ready to be used for the low level apsde data request interface.
-  */
-typedef struct zdo_app_tsn_entry_s
-{
-  zb_bufid_t buf_ref;
-  zb_uint8_t app_tsn;
-} zdo_app_tsn_entry_t;
-
-/**
-   allocate an entry of ZDO APP TSN
-
-   @return ZDO APP TSN entry or NULL in case there's no available slot in the table
- */
-zdo_app_tsn_entry_t * zdo_app_tsn_allocate(zb_bufid_t buf_ref);
-
-/**
-   release an entry of ZDO APP TSN
- */
-void zdo_app_tsn_release(zb_bufid_t buf_ref);
-
-/**
-   get an entry of ZDO APP TSN by buffer id
- */
-zdo_app_tsn_entry_t * zdo_app_tsn_get_by_buf_ref(zb_bufid_t buf_ref);
-#endif  /* ZBOSS_ZDO_APP_TSN_ENABLE */
 
 /**
    ZBOSS commissioning type
@@ -1910,5 +1864,9 @@ void zb_zdo_enable_tx_fail_debug(zb_bool_t enable);
 zb_ret_t zb_check_next_panid(zb_uint16_t panid);
 
 zb_ret_t zb_check_next_channel(zb_channel_page_t channel_page);
+
+void zdo_maybe_discover_ieee(zb_uint16_t short_addr);
+
+void zdo_maybe_discover_short(zb_address_ieee_ref_t ref);
 
 #endif /* ZB_ZDO_H */

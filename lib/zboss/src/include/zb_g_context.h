@@ -238,13 +238,13 @@ extern zb_intr_globals_t g_izb;
 #include "zb_mac.h"
 
 #if defined ZB_MACSPLIT
-/* Host side of out MAC split - for zb_io_ctx_t */
+/* Host side of out MAC-Split - for zb_io_ctx_t */
 #include "zb_macsplit_transport.h"
 #endif /* defined ZB_MACSPLIT */
 
-/* Alien MAC connected via some serial protocol: not our MAC split,
+/* Alien MAC connected via some serial protocol: not our MAC-Split,
  * but similar concept. In Linux it shares some i/o logic with our
- * macsplit. Need it here for for zb_io_ctx_t. */
+ * MAC-Split. Need it here for for zb_io_ctx_t. */
 #if defined ZB_ALIEN_SERIAL_MAC
 #include "zb_alien_mac_transport.h"
 #endif
@@ -535,9 +535,15 @@ typedef struct zb_cert_hacks_s
   zb_bitfield_t set_empty_beacon_payload:1;              /* set empty beacon payload (check pan id conflict) */
   zb_bitfield_t zdo_mgmt_nwk_update_force_scan_count:1; /*!< If set to 1, scan_count field will always
                                                          * be appended to Mgmt_NWK_Update_req packet */
-  zb_bitfield_t disable_addr_conflict_check_on_update_device:1; /* Disable check for address conflict
-                                                                 * upon reception of Update device - refer to
-                                                                 * TP/PRO/BV-17 SECURED network */
+  zb_bitfield_t disable_addr_conflict_scheduling_on_update_device:1; /* Disable scheduling of address conflict
+                                                                      * upon reception of Update device
+                                                                      * yet updates addr map on no conflict
+                                                                      * refer to TP/PRO/BV-17 SECURED network */
+  zb_bitfield_t disable_addr_conflict_scheduling:1;     /* If set to 1, disables addr conflict
+                                                           scheduling in zb_nwk_is_conflict_addr.
+                                                           Used by disable_addr_conflict_scheduling_on_update_device*/
+  zb_bitfield_t aps_disable_addr_update_on_update_device:1; /*!< Disable updating nwkAddressMap with
+                                                             64bit address received via UPDATE-DEVICE. */
   zb_bitfield_t delayed_rejoin_resp:1;                  /* Send rejoin resp after nwk status pkt
                                                            during address conflict resolution */
   zb_bitfield_t disable_beacon_send:1;                  /* Disabled responding with a beacon TP/PRO/BV-17 */
@@ -551,8 +557,6 @@ typedef struct zb_cert_hacks_s
 							 *   @see TP/R22/SGMB-9*/
   zb_bitfield_t extended_beacon_send_jitter:1;          /*!< If set to 1, a larger jitter will be
                                                          *    used when handling a beacon request. */
-  zb_bitfield_t aps_disable_addr_update_on_update_device:1; /*!< Disable updating nwkAddressMap with
-                                                             64bit address received via UPDATE-DEVICE. */
   zb_bitfield_t nwk_disable_passive_acks:1;              /*!< If set to 1, the device will not keep track of
                                                               received passive acks */
   zb_uint8_t frag_block_size;                            /*!< If set to a nonzero value, APS will use it
@@ -654,6 +658,8 @@ typedef struct zb_cert_hacks_s
   zb_bitfield_t keep_provisional_key_for_16_3:1; /*!< Don't delete provisional key in zb_legacy_device_auth_signal_alarm */
   zb_uint8_t    zbd_outgoing_fc; /*!< Specified outgoing frame counter for BLE packets from ZDD */
   zb_bitfield_t disable_link_power_negotiation:1; /*!< Disable power negotiation */
+  zb_bitfield_t disable_rejoin_after_key_switch_fail:1; /*!< Disable rejoin if key switch command was not proceeded */
+  zb_bitfield_t disable_aps_sec_for_start_kn_req:1; /*!< Disable rejoin if key switch command was not proceeded */
 } zb_cert_hacks_t;
 
 #define ZB_CERT_HACKS() ZG->cert_hacks
@@ -710,6 +716,8 @@ typedef struct zb_reg_api_s
                                                          *   IEEE address */
   zb_bool_t ignore_nwk_key;                             /*!< The flag to enable ignoring network key
                                                          *   from Trust Center */
+  zb_bool_t disable_pjoin_n_cap_check_on_parent_sel;    /*!< Disable pjoin and capacity flags check
+                                                         *   on parent selection */
   zb_bool_t disable_aps_acknowledgements;               /*!< Disable APS ACKs for incoming
                                                          *   APS packets. */
   zb_bool_t disable_auto_security_for_zbd_conf_cluster; /*!< Disable automatic APS encryption requirement
@@ -730,6 +738,11 @@ typedef struct zb_reg_api_s
                                                           *   MAC data packets. */
   zb_bool_t disable_mac_ack_for_data_packets_after_confirm_key; /*!< Disable MAC ACKs for incoming
                                                                  *   MAC data packets after Confirm key command. */
+  zb_callback_t disable_mac_ack_for_data_packets_cb;    /*!< To notify an app when a MAC ack was skipped */
+#if defined(ZB_MAC_MONOLITHIC)
+  zb_bool_t disable_mac_ack_for_data_packets_and_pass_up; /*!< When MAC ACKs disabled for incoming
+                                                           *   Data packets pass them up anyway */
+#endif
   zb_bool_t check_cluster_list_always_success;           /*!< zb_zcl_check_cluster_list will always return ZB_TRUE */
 
   zb_bool_t fail_mcps_data_request;                      /*!< Do not send packet in fail_mcps_data_request
@@ -738,6 +751,25 @@ typedef struct zb_reg_api_s
                                                          *   and it will be incremented on each send */
   zb_bool_t beacon_association_permit_always_true;       /*!< Send every beacon with association permit set to true*/
   zb_uint32_t postpone_nwk_data_processing_delay_ms;    /*!< NWK data processing will be postponed once */
+  zb_bool_t do_not_poll_after_rejoin_req;               /*!< Allows to ignore rejoin resp after rejoin req */
+  zb_bool_t mac_do_not_filter_packet_during_scan;       /*!< disables RX and TX packets filtering on MAC layer during scan */
+  zb_bool_t call_poll_during_scan_start;                 /*!< Performs poll attempt during scan */
+  zb_uint32_t skip_n_polls;                             /*!< Do not poll parent for N times */
+
+#if defined(ZB_MAC_MONOLITHIC)
+  struct
+  {
+    /* What about disabling it? using some counter, etc */
+    zb_uint8_t n_series; /* number of series */
+    zb_uint8_t n_skips; /* number of skips in one series */
+    zb_uint8_t cur_skips_cnt; /* number of skips in current series */
+    zb_uint8_t nwk_cmd_id; /* nwk cmd to skip acks */
+    zb_uint8_t param_to_catch_dsn; /* param used by NWK to notify MAC on when to store dsn */
+    zb_uint_t dsn; /* dsn of expected mac ack. Larger than zb_uint8_t in order to store ZB_MAC_INVALID_DSN */
+  } skip_mac_ack_on_nwk_cmd;
+#endif
+
+  zb_bool_t is_rejoin_failure;                          /*!< Set a rejoining status for a test, and should be reset from a test */
 } zb_reg_api_t;
 
 #define ZB_REGRESSION_TESTS_API() ZG->reg_api
@@ -867,7 +899,7 @@ struct zb_intr_globals_s
 #ifdef ZB_HAVE_IOCTX
   zb_io_ctx_t             ioctx;
 #endif
-/* Note: MAC split I/O context is not used on hardware, but it's used on Linux platform */
+/* Note: MAC-Split I/O context is not used on hardware, but it's used on Linux platform */
 #if defined(ZB_MACSPLIT_HOST) || (defined(ZB_MACSPLIT_DEVICE) && defined(ZB_PLATFORM_LINUX))
   zb_macsplit_io_ctx_t    macsplit_ioctx;
 #endif
@@ -875,7 +907,7 @@ struct zb_intr_globals_s
   zb_usbc_ctx_t           usbctx; /*!< USB imitator IO context. */
 #endif /* defined( ENABLE_USB_SERIAL_IMITATOR ) */
   zb_timer_t              time;
-  
+
 #ifdef ZB_COMPILE_MAC_MONOLITHIC
 #ifndef ZB_CONFIGURABLE_MEM
   zb_mac_pending_data_t pending_data_queue[ZB_MAC_PENDING_QUEUE_SIZE];

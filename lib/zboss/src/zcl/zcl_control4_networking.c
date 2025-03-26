@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -253,34 +253,6 @@ void zb_zcl_control4_networking_write_attr_hook_server(zb_uint8_t endpoint, zb_u
   }
 }
 
-static zb_zcl_status_t zb_zcl_control4_networking_map_ret_code_to_zcl_status(zb_ret_t ret_code)
-{
-  zb_zcl_status_t status;
-
-  ZB_ASSERT(ret_code != RET_BUSY);
-
-  switch (ret_code)
-  {
-    case RET_OK:
-      status = ZB_ZCL_STATUS_SUCCESS;
-      break;
-    case RET_INVALID_PARAMETER_1:
-      status = ZB_ZCL_STATUS_INVALID_FIELD;
-      break;
-    case RET_INVALID_PARAMETER:
-      status = ZB_ZCL_STATUS_INVALID_VALUE;
-      break;
-    case RET_ERROR:
-      status = ZB_ZCL_STATUS_FAIL;
-      break;
-    default:
-      status = ZB_ZCL_STATUS_FAIL;
-      break;
-  }
-
-  return status;
-}
-
 static zb_ret_t zb_zcl_process_control4_networking_immediate_announce_handler(zb_uint8_t param)
 {
   zb_uint8_t *ptr;
@@ -358,7 +330,7 @@ zb_bool_t zb_zcl_process_control4_networking_specific_commands(zb_uint8_t param)
   if (processed && ret != RET_BUSY)
   {
     zb_zcl_send_default_handler(param, &cmd_info,
-                                zb_zcl_control4_networking_map_ret_code_to_zcl_status(ret));
+                                zb_zcl_map_ret_code_to_zcl_status(ret));
   }
 
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_process_control4_networking_specific_commands: processed %hd", (FMT__H, processed));

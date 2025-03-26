@@ -65,6 +65,8 @@
 #ifdef ZB_ENABLE_ZGP
 #include "zboss_api_zgp.h"
 #endif
+#include "zb_diag.h"
+#include "zb_diag_init.h"
 
 /** @cond (!DOXYGEN_ERL_SECTION) */
 /*! @cond DOXYGEN_SECUR_SECTION */
@@ -127,6 +129,25 @@ void zb_secur_set_ignore_tc_rejoin(zb_bool_t enable);
  *  @param enable - whether to enable or disable unsecured TC Rejoin.
  */
 void zb_secur_set_unsecure_tc_rejoin_enabled(zb_bool_t enable);
+
+#ifdef ZB_TCPOL_ENABLE_UNSECURE_TC_REJOIN_POLICY_OVERRIDE
+/**
+ * Allow unsecure tc rejoin for specified device.
+ *
+ * @param dev - long address of the device for which unsecured rejoin should be allowed
+ * @return RET_OK - success,
+ *         RET_ALREADY_EXIST - rejoin already allowed for device
+ *         RET_TABLE_FULL - no space left in table to allow rejoin for device
+ */
+zb_ret_t zb_secur_allow_unsecure_tc_rejoin(zb_ieee_addr_t dev);
+
+/**
+ * Disallow unsecure tc rejoin for specified device.
+ *
+ * @param dev - long address of the device to disallow unsecure rejoin for
+ */
+void zb_secur_disallow_unsecure_tc_rejoin(zb_ieee_addr_t dev);
+#endif /* ZB_TCPOL_ENABLE_UNSECURE_TC_REJOIN_POLICY_OVERRIDE */
 
 /** @} */ /* secur_tc_rejoin */
 
@@ -522,6 +543,7 @@ void since_you_got_that_symbol_unresolved_you_probably_forget_use_ZB_ED_ROLE_pre
 {                                            \
   ZB_CHECK_LIBRARY();                        \
   zb_init((zb_char_t *)trace_comment);       \
+  zb_diag_init();                            \
 }
 /** @cond DOXYGEN_INTERNAL_DOC */
 /** @brief Global stack initialization.
@@ -549,6 +571,7 @@ void zb_init(zb_char_t *trace_comment);
 {                                            \
   ZB_CHECK_LIBRARY();                        \
   zb_init();                                 \
+  zb_diag_init();                            \
 }
 void zb_init(void);
 #endif  /* ZB_INIT_HAS_ARGS || defined DOXYGEN */
@@ -704,6 +727,147 @@ const zb_char_t ZB_IAR_CODE *zb_get_version(void);
  *  @returns (MAJOR << 24 | MINOR << 16 | REVISION)
  */
 zb_uint32_t zboss_version_get(void);
+
+/**
+   This feature is not used in regular deliveries and not supported by ZOI official platforms.
+   In case of this feature is required for usage need to define additional
+   structure zb_version_ext_platform_t and function zb_get_version_ext_platform() in platform.
+
+   During SDK build, the template file zb_sdk_version.h constants all fields of the
+   zb_version_ext_*_s structure. The template file zb_sdk_version.h should be in the
+   platform, copied to stack/include/ and edited there.
+*/
+#ifdef ZB_EXTENDED_VERSION_INFO
+
+/**
+ * @name ZBOSS Architectures types
+ * @anchor zboss_arch_types
+ */
+/** @{ */
+#define ZB_STACK_ARCH_MONOLITHIC  1U
+#define ZB_STACK_ARCH_MACSPLIT    2U
+#define ZB_STACK_ARCH_NCP         3U
+/** @} */
+
+/**
+ * @name ZBOSS stack profiles
+ * @anchor zboss_profiles
+ */
+/** @{ */
+#define ZB_STACK_PROFILE_ZB30  1U
+#define ZB_STACK_PROFILE_SE14  2U
+/** @} */
+
+/** @brief ZBOSS stack extended version info.
+ */
+typedef ZB_PACKED_PRE struct zb_version_ext_stack_s
+{
+  zb_uint8_t stack_major;      /*!< ZBOSS stack version MAJOR */
+  zb_uint8_t stack_minor;      /*!< ZBOSS stack version MINOR */
+  zb_uint8_t stack_revision;   /*!< ZBOSS stack version REVISION */
+  zb_uint8_t stack_branch_rev; /*!< ZBOSS stack version BRANCH REVISION */
+  zb_uint8_t stack_arch;       /*!< Current stack architecture @ref zboss_arch_types */
+  zb_uint8_t stack_profile;    /*!< Supported profile @ref zboss_profiles */
+}
+ZB_PACKED_STRUCT
+zb_version_ext_stack_t;
+
+/** @brief Get ZBOSS platform extended version information.
+  *
+  * @note The zb_version_ext_platform_t type must be defined in platform
+  *
+  * @param ext_ver_platform - pointer to the variable of zb_version_ext_platform_t type
+  *
+  * @return RET_OK on success
+  * @return RET_INVALID_PARAMETER if a NULL pointer passed
+  * @return RET_NOT_IMPLEMENTED if getting extended platform version information is not implemented
+  */
+zb_ret_t zb_get_version_ext_platform(zb_version_ext_platform_t *ext_ver_platform);
+
+/** @brief Get ZBOSS stack extended version information.
+  *
+  * @param ext_ver_zboss - pointer to the variable of @ref zb_version_ext_stack_t type
+  *
+  * @return RET_OK on success
+  * @return RET_INVALID_PARAMETER if a NULL pointer passed
+  * @return RET_NOT_IMPLEMENTED if getting extended stack version information is not implemented
+  *
+  @b Example:
+@code
+  zb_ret_t ret;
+  zb_version_ext_stack_t stack_ver;
+  // The zb_version_ext_platform_t type is declared in the platform
+  zb_version_ext_platform_t plat_ver;
+
+  ret = zb_get_version_ext_zboss(&stack_ver);
+
+  if (ret == RET_OK)
+  {
+    TRACE_MSG(TRACE_APP1, "Stack version: %hu.%hu.%hu.%hu arch %hu profile %hu",
+              (FMT__H_H_H_H_H_H, stack_ver.stack_major, stack_ver.stack_minor, stack_ver.stack_revision,
+               stack_ver.stack_branch_rev, stack_ver.stack_arch, stack_ver.stack_profile));
+  }
+  else
+  {
+    TRACE_MSG(TRACE_ERROR, "Error getting the Stack version: %d", (FMT__D, ret));
+  }
+
+  // The function zb_get_version_ext_platform() is declared in the platform
+  ret = zb_get_version_ext_platform(&plat_ver);
+
+  if (ret == RET_OK)
+  {
+    TRACE_MSG(TRACE_APP1, "Platform version: %hu.%hu.%hu",
+              (FMT__H_H_H, plat_ver.platform_major, plat_ver.platform_minor, plat_ver.platform_revision));
+  }
+  else
+  {
+    TRACE_MSG(TRACE_ERROR, "Error getting the Platform version: %d", (FMT__D, ret));
+  }
+@endcode
+  *
+  */
+zb_ret_t zb_get_version_ext_zboss(zb_version_ext_stack_t *ext_ver_zboss);
+
+#endif /* ZB_EXTENDED_VERSION_INFO */
+
+#if defined ZB_COORDINATOR_ROLE && defined ZB_TC_DEVICES_LIST
+
+/** @brief Trust Center known devices list iterator.
+  */
+typedef struct zb_tc_dev_list_iterator_s
+{
+  zb_uint_t idx;                /*!< Starting index of the APS keypair array */
+} ZB_PACKED_STRUCT
+zb_tc_dev_list_iterator_t;
+
+/** @brief Trust Center known device structure.
+*/
+typedef struct zb_tc_dev_list_ent_s
+{
+  zb_ieee_addr_t ieee_address;        /*!< IEEE address */
+  zb_uint8_t     initial_join_auth;   /*!< Join authentication method */
+} ZB_PACKED_STRUCT
+zb_tc_dev_list_ent_t;
+
+/** @brief Initialize TC device list iterator.
+  *
+  *  @param iter - pointer to TC device list iterator.
+  */
+void zb_tc_dev_list_iterator_init(zb_tc_dev_list_iterator_t *iter);
+
+/** Get next device known by TC.
+  *
+  * @param iter - pointer to TC device list iterator @ref zb_tc_dev_list_iterator_t
+  * @param ent  - pointer to list entry @ref zb_tc_dev_list_ent_t.
+  *
+  * @return RET_OK if next device is found
+  * @return RET_END_OF_LIST if end of the list
+  */
+zb_ret_t zb_tc_dev_list_iterator_next(zb_tc_dev_list_iterator_t *iter,
+                                      zb_tc_dev_list_ent_t *ent);
+#endif  /* ZB_COORDINATOR_ROLE && ZB_TC_DEVICES_LIST */
+
 /*! @} */ /* zb_general_get */
 
 /*! @addtogroup zb_general_start */
@@ -715,6 +879,9 @@ zb_uint32_t zboss_version_get(void);
    This function initializes scheduler and buffers pool, but not MAC and upper layers.
    Typically zboss_start_no_autostart() is used when application wants to do something before
    starting joining the network.
+
+   ZB_ZDO_SIGNAL_SKIP_STARTUP can then be used to detect when ZBOSS framework has started, to proceed
+   with join/rejoin/formation/BDB initialization
 
    For example, you can use this function if it is needed to enable leds, timers
    or any other devices on periphery to work with them before starting working in a network. It's
@@ -752,10 +919,10 @@ void zboss_start_continue(void);
    ZBOSS shutdown with pseudo reset as well as zboss_start_shut is meaningful for Linux platform where it is necessary to stop
    or restart ZBOSS without stopping the current process.
 
-   It is used when it is impossible to reset MAC layer on MACSPLIT architecture and resets only host.
+   It is used when it is impossible to reset MAC layer on MAC-Split architecture and resets only host.
 
    That function must be called after application received @ref ZB_SIGNAL_READY_TO_SHUT signal.
-   It then must call @ref zboss_complete_shut() and must not use ZBOSS afterwords.
+   It then must call @ref zboss_complete_shut() and must not use ZBOSS afterwards.
 
  */
 void zboss_shut_with_host_reset(zb_bufid_t param);
@@ -780,7 +947,7 @@ void zboss_abort(void);
    or restart ZBOSS without stopping the current process.
 
    When ZBOSS is ready to be shut, application receives @ref ZB_SIGNAL_READY_TO_SHUT signal.
-   It then must call @ref zboss_complete_shut() and must not use ZBOSS afterwords.
+   It then must call @ref zboss_complete_shut() and must not use ZBOSS afterwards.
  */
 void zboss_start_shut(zb_bufid_t param);
 
@@ -965,6 +1132,32 @@ zb_uint8_t zb_get_current_page(void);
 zb_uint8_t zb_get_current_channel(void);
 
 #ifdef ZB_ENABLE_PTA
+
+/* Some defines for PTA options to be compatible with the old efr32 PTA implementation */
+
+/**
+ * @name PTA priority
+ * @anchor pta_prio
+ *
+ */
+/** @{ */
+#define ZB_PTA_PRI_RX_HIGH   0
+#define ZB_PTA_PRI_BOTH_HIGH 1
+#define ZB_PTA_PRI_OFF       2
+/** @} */
+
+/**
+ * @name PTA options
+ * @anchor pta_opt
+ *
+ */
+/** @{ */
+#define ZB_PTA_OPT_TX_PRI            (1u << 10)
+#define ZB_PTA_OPT_RX_PRI            (1u << 11)
+#define ZB_PTA_OPT_RX_PRI_ESCAL      (1u << 12)
+#define ZB_PTA_OPT_CCA_FAIL_ESCAL    (0x7u << 20)
+/** @} */
+
 /**
    Enable or disable PTA
 
@@ -982,6 +1175,24 @@ zb_uint8_t zb_get_current_channel(void);
    @param state: 0 - disable PTA, 1 - enable PTA
 */
 void zb_enable_pta(zb_uint8_t state);
+
+/**
+   Set PTA priority
+
+   Configure PRI line usage for 3-wire PTA setup.
+
+   @param prio - priority code @ref pta_prio
+ */
+void zb_set_pta_prio(zb_uint8_t prio);
+
+/**
+   Set PTA options
+
+   Note: PTA priority can be configured by both that call and zb_set_pta_prio().
+
+   @param opt - options bitmask @ref pta_opt
+ */
+void zb_set_pta_opt(zb_uint32_t opt);
 #endif
 
 /*! @} */ /* zb_general_get */
@@ -1368,7 +1579,7 @@ void zb_set_keepalive_mode(nwk_keepalive_supported_method_t mode);
 #ifndef ZB_USE_INTERNAL_HEADERS
 
 /**
-   Legacy ZBOSS application signal handler.
+   ZBOSS application signal handler.
 
    If implemented by a ZBOSS application, it will be called for every signal.
    See @ref zdo_app_signal_type.
@@ -2179,6 +2390,16 @@ void zb_allow_provisional_key_as_tclk(void);
  */
 void zb_disallow_provisional_key_as_tclk(void);
 #endif /* ZB_ALLOW_PROVISIONAL_KEY_AS_TCLK */
+
+#ifndef ZB_COORDINATOR_ONLY
+/**
+ * Device will avoid TLVs in ZDO frames to ZC until it is sure that the coordinator has r23+ revision.
+ * The reason is that some legacy devices drop frames with TLVs instead of ignoring TLVs.
+ *
+ * @note Disabled by default. Warning, enabling this function may violate the specification.
+ */
+void zb_compatibility_workaround_enabled(zb_bool_t val);
+#endif /* !ZB_COORDINATOR_ONLY */
 
 #ifdef ZB_DIRECT_ENABLED
 #include "zboss_api_direct.h"

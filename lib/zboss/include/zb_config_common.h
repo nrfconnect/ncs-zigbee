@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -273,7 +273,7 @@ key. They use same algorithm.
 */
 #ifdef ZB_SLEEPY_ACK_WAIT_DURATION_INCREASE
 /*
-Motivation of increasing wait dueration: be able to retry send when ZED polling not so fast, else it all will be expired in MAC.
+Motivation of increasing wait duration: be able to retry send when ZED polling not so fast, else it all will be expired in MAC.
  */
   #define ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY (10U*ZB_TIME_ONE_SECOND)
 #else
@@ -605,7 +605,7 @@ At the worst case our NWK can skip long address at tx: 8 bytes of reserve.
  Maximum number of nodes on network in build
  with configurable memory feature enabled shouldn't be greater than this value.
 */
-#define ZB_NWK_CONFIGURABLE_MEM_MAX_NETWORK_SIZE 200U
+#define ZB_NWK_CONFIGURABLE_MEM_MAX_NETWORK_SIZE 250u
 
 /*!
  Define maximum number of routers per node.
@@ -790,10 +790,21 @@ nwkMaxBroadcastRetries
 /*!
  Maximum number of rejoin requests in progress
 */
+#ifndef ZB_NWK_REJOIN_REQUEST_TABLE_SIZE
 #define ZB_NWK_REJOIN_REQUEST_TABLE_SIZE 1U
+#endif
 /** @endcond */ /* internals_doc */
 /*! Rejoin timeout length */
 #define ZB_NWK_REJOIN_TIMEOUT (ZB_TIME_ONE_SECOND * 5U)
+
+#ifndef ZB_NWK_IMMEDIATE_REJOIN_DELAY_MS
+/* @brief Delay NWK Rejoin / Commissioning Request transmission that
+ *        immediately follows corresponding response to previous request.
+ * @details should be defined with no type (zb_time_t), for preprocessor to work
+ * @see ZBOSS_NWK_DELAY_IMMEDIATE_JOIN_LOGIC
+ */
+#define ZB_NWK_IMMEDIATE_REJOIN_DELAY_MS (1000U)
+#endif
 
 /*!
 *  The rejoining sleeping end-device shall not poll before the response timeout (500ms), such that
@@ -1741,12 +1752,17 @@ request command frame.
 #define ZB_ZGP_MAX_PAIRED_ENDPOINTS 2U
 /*! Maximum number of paired Green Power devices commands */
 #ifndef ZB_ZGP_MAX_PAIRED_CONF_GPD_COMMANDS
-#define ZB_ZGP_MAX_PAIRED_CONF_GPD_COMMANDS 6U
+#define ZB_ZGP_MAX_PAIRED_CONF_GPD_COMMANDS 16U
 #endif /* ZB_ZGP_MAX_PAIRED_CONF_GPD_COMMANDS */
 /*! Maximum number of paired configuration clusters */
-#ifndef ZB_ZGP_MAX_PAIRED_CONF_CLUSTERS
-#define ZB_ZGP_MAX_PAIRED_CONF_CLUSTERS 2U
+#ifndef ZB_ZGP_MAX_PAIRED_SRV_CONF_CLUSTERS
+#define ZB_ZGP_MAX_PAIRED_SRV_CONF_CLUSTERS 15U
 #endif /* ZB_ZGP_MAX_PAIRED_CONF_CLUSTERS */
+
+#ifndef ZB_ZGP_MAX_PAIRED_CLI_CONF_CLUSTERS
+#define ZB_ZGP_MAX_PAIRED_CLI_CONF_CLUSTERS 15U
+#endif /* ZB_ZGP_MAX_PAIRED_CONF_CLUSTERS */
+
 /** @endcond */ /* DOXYGEN_ZGP_SECTION */
 /*! @} */
 

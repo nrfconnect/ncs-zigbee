@@ -157,14 +157,14 @@ void zb_zcl_wwah_init_server(void)
     WWAH_CTX().time_server_endpoint = 0;
 
     ZB_ASSERT(ZB_ZCL_WWAH_APS_ACK_EXEMPT_TABLE_SIZE > 0 &&
-              ZB_ZCL_WWAH_APS_ACK_EXEMPT_TABLE_SIZE <= 0xFF);
+              ZB_ZCL_WWAH_APS_ACK_EXEMPT_TABLE_SIZE <= ZB_UINT8_MAX); /* Check if fits in zb_uint8_t */
 
     ZB_MEMSET(WWAH_CTX().aps_ack_exempt_table, (zb_uint8_t)ZB_ZCL_WWAH_CLUSTER_ID_FREE_RECORD,
               sizeof(WWAH_CTX().aps_ack_exempt_table));
     WWAH_CTX().aps_ack_exempt_table_cnt = 0;
 
     ZB_ASSERT(ZB_ZCL_WWAH_APS_LINK_KEY_AUTHORIZATION_TABLE_SIZE > 0 &&
-              ZB_ZCL_WWAH_APS_LINK_KEY_AUTHORIZATION_TABLE_SIZE <= 0xFF);
+              ZB_ZCL_WWAH_APS_LINK_KEY_AUTHORIZATION_TABLE_SIZE <= ZB_UINT8_MAX); /* Check if fits in zb_uint8_t */
 
     ZB_MEMSET(WWAH_CTX().aps_link_key_authorization_table, (zb_uint8_t)ZB_ZCL_WWAH_CLUSTER_ID_FREE_RECORD,
               sizeof(WWAH_CTX().aps_link_key_authorization_table));
@@ -742,6 +742,7 @@ zb_ret_t zb_zcl_wwah_disable_wwah_app_event_retry_algorithm_handler(zb_uint8_t p
   zb_bool_t disable_bool = ZB_FALSE;
   zb_zcl_parsed_hdr_t cmd_info;
   TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_wwah_app_event_retry_algorithm_handler %hd", (FMT__H, param));
+  ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   ZB_ZCL_SET_ATTRIBUTE(wwah_endpoint,
                        ZB_ZCL_CLUSTER_ID_WWAH,
@@ -1405,8 +1406,7 @@ zb_ret_t zb_zcl_wwah_survey_beacons_handler(zb_uint8_t param)
     ret = RET_BUSY;
     zb_buf_free(param);
   }
-
-  if (ZB_IS_DEVICE_ZR())
+  else if (ZB_IS_DEVICE_ZR())
   {
     ret = RET_IGNORE;
   }

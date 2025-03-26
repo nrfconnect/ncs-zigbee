@@ -18,6 +18,7 @@ zephyr_library_include_directories(
 zephyr_library_sources(commissioning/legacy/zdo_commissioning_classic.c)
 
 zephyr_library_sources(commissioning/bdb/bdb_finding_binding.c)
+zephyr_library_sources(commissioning/bdb/bdb_preinst_nwk.c)
 zephyr_library_sources(commissioning/bdb/zdo_commissioning_bdb.c)
 zephyr_library_sources(commissioning/bdb/zdo_commissioning_bdb_formation.c)
 

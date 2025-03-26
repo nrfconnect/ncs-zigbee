@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -51,7 +51,6 @@
 #include "zb_zcl.h"
 #include "zcl/zb_zcl_scenes.h"
 #include "zb_zdo.h"
-#include "zb_aps.h"
 
 zb_uint8_t gs_scenes_client_received_commands[] =
 {
@@ -301,6 +300,9 @@ static void zb_zcl_scenes_process_store_scene_command(zb_uint8_t param, const zb
   zb_zcl_status_t store_scene_status = ZB_ZCL_STATUS_SUCCESS;
   zb_zcl_attr_t* scene_valid_desc;
   zb_bool_t set_scene_valid = ZB_FALSE;
+  /* ZCL8 Section 3.7.2.4.1 only send response for unicast commands */
+  zb_bool_t send_response = 
+    (zb_bool_t) ZB_APS_FC_GET_DELIVERY_MODE(cmd_info->addr_data.common_data.fc) == ZB_APS_DELIVERY_UNICAST;
 
   TRACE_MSG(
       TRACE_ZCL1,
@@ -325,65 +327,86 @@ static void zb_zcl_scenes_process_store_scene_command(zb_uint8_t param, const zb
   ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(scene_valid_desc, ZB_FALSE);
 
   ZB_MEMCPY(&req_copy, req, sizeof(zb_zcl_scenes_store_scene_req_t));
-  store_scene_status = (zb_zcl_status_t) zb_zcl_scenes_process_store_scene(param, &req_copy, cmd_info);
 
-  switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
+  /* ZCL8 3.7.2.4.7.2 The device verifies that the Group ID field contains a valid group identifier 
+    in the range 0x0000 – 0xfff7 else status is INVALID VALUE */ 
+  if (req->group_id > ZB_ZCL_ATTR_SCENES_CURRENT_GROUP_MAX_VALUE)
   {
-    case RET_OK:
-    {
-      zb_zcl_attr_t* scene_count_desc;
-      if (store_scene_status == ZB_ZCL_STATUS_SUCCESS)
-      {
-        scene_count_desc = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
-                                                  ZB_ZCL_CLUSTER_ID_SCENES,
-                                                  ZB_ZCL_CLUSTER_SERVER_ROLE,
-                                                  ZB_ZCL_ATTR_SCENES_SCENE_COUNT_ID);
-        if (scene_count_desc && scene_count_desc->data_p)
-        {
-          scene_count = ZB_ZCL_GET_ATTRIBUTE_VAL_8(scene_count_desc);
-          TRACE_MSG(TRACE_ZCL1,
-                    "increase scene count: %hd -> %hd",
-                    (FMT__H_H, scene_count, scene_count + 1));
-          ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(scene_count_desc, scene_count + 1);
-        }
-        set_scene_valid = ZB_TRUE;
-      }
-    }
-    /* FALLTHRU */
-    case RET_ALREADY_EXISTS:
-    {
-      /* prevent to send response on ZGP command */
-      if (!ZB_ZCL_ADDR_TYPE_IS_GPD(cmd_info->addr_data.common_data.source.addr_type))
-      {
-        ZB_ZCL_SCENES_SEND_STORE_SCENE_RES(
-          param,
-          cmd_info->seq_number,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
-          ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
-          cmd_info->profile_id,
-          NULL,
-          store_scene_status,
-          req_copy.group_id,
-          req_copy.scene_id);
-          set_scene_valid = ZB_TRUE;
-      }
-      else
-      {
-        zb_buf_free(param);
-      }
-    }
-    break;
-
-    case RET_ERROR:
-      TRACE_MSG(TRACE_ZCL1, "ERROR during command processing: "
-                "User callback failed with err=%d.",
-                (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
-      /* FALLTHRU */
-    default:
-      zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_FAIL);
-      break;
+    ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) = ZB_ZCL_STATUS_INVALID_VALUE;
+    store_scene_status = ZB_ZCL_STATUS_INVALID_VALUE;
   }
+  else
+  {
+    store_scene_status = (zb_zcl_status_t) zb_zcl_scenes_process_store_scene(param, &req_copy, cmd_info);
+  }
+
+  if (send_response)
+  {
+    switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
+    {
+      case RET_OK:
+      {
+        zb_zcl_attr_t* scene_count_desc;
+        if (store_scene_status == ZB_ZCL_STATUS_SUCCESS)
+        {
+          scene_count_desc = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
+                                                    ZB_ZCL_CLUSTER_ID_SCENES,
+                                                    ZB_ZCL_CLUSTER_SERVER_ROLE,
+                                                    ZB_ZCL_ATTR_SCENES_SCENE_COUNT_ID);
+          if (scene_count_desc && scene_count_desc->data_p)
+          {
+            scene_count = ZB_ZCL_GET_ATTRIBUTE_VAL_8(scene_count_desc);
+            TRACE_MSG(TRACE_ZCL1,
+                      "increase scene count: %hd -> %hd",
+                      (FMT__H_H, scene_count, scene_count + 1));
+            ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(scene_count_desc, scene_count + 1);
+          }
+          set_scene_valid = ZB_TRUE;
+        }
+      }
+      /* FALLTHRU */
+      case ZB_ZCL_STATUS_INVALID_VALUE:
+      /* FALLTHRU */
+      case RET_ALREADY_EXISTS:
+      {
+        /* prevent to send response on ZGP command */
+        if (!ZB_ZCL_ADDR_TYPE_IS_GPD(cmd_info->addr_data.common_data.source.addr_type))
+        {
+          ZB_ZCL_SCENES_SEND_STORE_SCENE_RES(
+            param,
+            cmd_info->seq_number,
+            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
+            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
+            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
+            cmd_info->profile_id,
+            NULL,
+            store_scene_status,
+            req_copy.group_id,
+            req_copy.scene_id);
+            set_scene_valid = ZB_TRUE;
+        }
+        else
+        {
+          zb_buf_free(param);
+        }
+      }
+      break;
+
+      case RET_ERROR:
+        TRACE_MSG(TRACE_ZCL1, "ERROR during command processing: "
+                  "User callback failed with err=%d.",
+                  (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
+        /* FALLTHRU */
+      default:
+        zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_FAIL);
+        break;
+    }
+  }
+  else
+  {
+    zb_buf_free(param);
+  }
+
   if (set_scene_valid)
   {
     TRACE_MSG(TRACE_ZCL1, "Update SceneValid: TRUE", (FMT__0));
@@ -398,6 +421,9 @@ static void zb_zcl_scenes_process_add_scene_command(zb_uint8_t param, const zb_z
   zb_zcl_scenes_add_scene_req_t* req;
   zb_zcl_scenes_add_scene_req_t req_copy;
   zb_uint8_t add_scene_status = ZB_ZCL_STATUS_SUCCESS;
+  /* ZCL8 Section 3.7.2.4.1 only send response for unicast commands */ 
+  zb_bool_t send_response = 
+    (zb_bool_t) ZB_APS_FC_GET_DELIVERY_MODE(cmd_info->addr_data.common_data.fc) == ZB_APS_DELIVERY_UNICAST;
 
   /* Initialize with invalid IDs */
   req_copy.group_id = 0xFF;
@@ -419,9 +445,18 @@ static void zb_zcl_scenes_process_add_scene_command(zb_uint8_t param, const zb_z
     zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_INVALID_FIELD);
     return;
   }
+  
+  ZB_MEMCPY(&req_copy, req, sizeof(zb_zcl_scenes_add_scene_req_t));
+
+  /* ZCL8 3.7.2.4.2.2 The device verifies that the Group ID field contains a valid group identifier 
+     in the range 0x0000 – 0xfff7 else status is INVALID VALUE */ 
+  if (req->group_id > ZB_ZCL_ATTR_SCENES_CURRENT_GROUP_MAX_VALUE)
+  {
+    ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) = ZB_ZCL_STATUS_INVALID_VALUE;
+    add_scene_status = ZB_ZCL_STATUS_INVALID_VALUE;
+  }
   else if (ZCL_CTX().device_cb)
   {
-    ZB_MEMCPY(&req_copy, req, sizeof(zb_zcl_scenes_add_scene_req_t));
     ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(
       param,
 #ifndef ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED
@@ -429,90 +464,102 @@ static void zb_zcl_scenes_process_add_scene_command(zb_uint8_t param, const zb_z
 #else
       ZB_ZCL_SCENES_ADD_SCENE_CB_ID,
 #endif /* !ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED */
-      RET_ERROR,
+      RET_NOT_IMPLEMENTED,
       cmd_info,
       &req_copy,
       &add_scene_status);
     (ZCL_CTX().device_cb)(param);
   }
-
-  switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
+  
+  if (send_response)
   {
-    case RET_OK:
+    switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
     {
-      zb_zcl_attr_t* scene_count_desc;
-      if (add_scene_status == ZB_ZCL_STATUS_SUCCESS)
+      case RET_OK:
       {
-        zb_uint8_t scene_count;
-
-        scene_count_desc = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
-                                                  ZB_ZCL_CLUSTER_ID_SCENES,
-                                                  ZB_ZCL_CLUSTER_SERVER_ROLE,
-                                                  ZB_ZCL_ATTR_SCENES_SCENE_COUNT_ID);
-        if (scene_count_desc && scene_count_desc->data_p)
+        zb_zcl_attr_t* scene_count_desc;
+        if (add_scene_status == ZB_ZCL_STATUS_SUCCESS)
         {
-          scene_count = ZB_ZCL_GET_ATTRIBUTE_VAL_8(scene_count_desc);
-          TRACE_MSG(TRACE_ZCL1,
-            "increase scene count: %hd -> %hd",
-                    (FMT__H_H, scene_count, scene_count + 1));
-          ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(scene_count_desc, scene_count + 1);
+          zb_uint8_t scene_count;
+
+          scene_count_desc = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
+                                                    ZB_ZCL_CLUSTER_ID_SCENES,
+                                                    ZB_ZCL_CLUSTER_SERVER_ROLE,
+                                                    ZB_ZCL_ATTR_SCENES_SCENE_COUNT_ID);
+          if (scene_count_desc && scene_count_desc->data_p)
+          {
+            scene_count = ZB_ZCL_GET_ATTRIBUTE_VAL_8(scene_count_desc);
+            TRACE_MSG(TRACE_ZCL1,
+              "increase scene count: %hd -> %hd",
+                      (FMT__H_H, scene_count, scene_count + 1));
+            ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(scene_count_desc, scene_count + 1);
+          }
         }
       }
-    }
-    /* FALLTHRU */
-    case RET_ALREADY_EXISTS:
-    {
-      /* prevent to send response on ZGP command */
-      if (!ZB_ZCL_ADDR_TYPE_IS_GPD(cmd_info->addr_data.common_data.source.addr_type))
+      /* FALLTHRU */
+      case ZB_ZCL_STATUS_INVALID_VALUE:
+      /* FALLTHRU */
+      case RET_ALREADY_EXISTS:
       {
-#ifdef ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED
-        ZVUNUSED(is_enhanced);
-#else
-        if (is_enhanced)
+        /* prevent to send response on ZGP command */
+        if (!ZB_ZCL_ADDR_TYPE_IS_GPD(cmd_info->addr_data.common_data.source.addr_type))
         {
-          ZB_ZCL_SCENES_SEND_ENHANCED_ADD_SCENE_RES(
-            param,
-            cmd_info->seq_number,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
-            cmd_info->profile_id,
-            NULL,
-            add_scene_status,
-            req_copy.group_id,
-            req_copy.scene_id);
+  #ifdef ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED
+          ZVUNUSED(is_enhanced);
+  #else
+          if (is_enhanced)
+          {
+            ZB_ZCL_SCENES_SEND_ENHANCED_ADD_SCENE_RES(
+              param,
+              cmd_info->seq_number,
+              ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
+              ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
+              ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
+              cmd_info->profile_id,
+              NULL,
+              add_scene_status,
+              req_copy.group_id,
+              req_copy.scene_id);
+          }
+          else
+  #endif /* ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED */
+          {
+            ZB_ZCL_SCENES_SEND_ADD_SCENE_RES(
+              param,
+              cmd_info->seq_number,
+              ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
+              ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
+              ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
+              cmd_info->profile_id,
+              NULL,
+              add_scene_status,
+              req_copy.group_id,
+              req_copy.scene_id);
+          }
         }
         else
-#endif /* ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED */
         {
-          ZB_ZCL_SCENES_SEND_ADD_SCENE_RES(
-            param,
-            cmd_info->seq_number,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
-            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
-            cmd_info->profile_id,
-            NULL,
-            add_scene_status,
-            req_copy.group_id,
-            req_copy.scene_id);
+          zb_buf_free(param);
         }
       }
-      else
-      {
-        zb_buf_free(param);
-      }
-    }
-    break;
-
-    case RET_ERROR:
-      TRACE_MSG(TRACE_ZCL1, "ERROR during command processing: "
-                "User callback failed with err=%d.",
-                (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
-      /* FALLTHRU */
-    default:
-      zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_FAIL);
       break;
+    case RET_NOT_IMPLEMENTED:
+        zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_UNSUP_CMD);
+        break;
+
+      case RET_ERROR:
+        TRACE_MSG(TRACE_ZCL1, "ERROR during command processing: "
+                  "User callback failed with err=%d.",
+                  (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
+        /* FALLTHRU */
+      default:
+        zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_FAIL);
+        break;
+    }
+  }
+  else
+  {
+    zb_buf_free(param);
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_scenes_process_add_scene_command", (FMT__0));
@@ -522,6 +569,10 @@ static void zb_zcl_scenes_process_view_scene_command(zb_uint8_t param, const zb_
 {
   zb_zcl_scenes_view_scene_req_t* req;
   zb_zcl_scenes_view_scene_req_t req_copy;
+  zb_uint8_t *payload_ptr;
+  /* ZCL8 Section 3.7.2.4.1 only send response for unicast commands */ 
+  zb_bool_t send_response = 
+    (zb_bool_t) ZB_APS_FC_GET_DELIVERY_MODE(cmd_info->addr_data.common_data.fc) == ZB_APS_DELIVERY_UNICAST;
 
   TRACE_MSG(
       TRACE_ZCL1,
@@ -539,40 +590,83 @@ static void zb_zcl_scenes_process_view_scene_command(zb_uint8_t param, const zb_
     zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_INVALID_FIELD);
     return;
   }
+
+  ZB_MEMCPY(&req_copy, req, sizeof(zb_zcl_scenes_view_scene_req_t));
+
+  payload_ptr = ZB_ZCL_START_PACKET(param);
+
+  ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(
+    param,
+#ifndef ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED
+    (is_enhanced) ? (ZB_ZCL_SCENES_ENHANCED_VIEW_SCENE_CB_ID) : (ZB_ZCL_SCENES_VIEW_SCENE_CB_ID),
+#else
+    ZB_ZCL_SCENES_VIEW_SCENE_CB_ID,
+#endif /* !ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED */
+    RET_NOT_IMPLEMENTED,
+    cmd_info,
+    &req_copy,
+    NULL);
+
+  /* ZCL8 3.7.2.4.3.2 The device verifies that the Group ID field contains a valid group identifier 
+     in the range 0x0000 – 0xfff7 else status is INVALID VALUE */ 
+  if (req->group_id > ZB_ZCL_ATTR_SCENES_CURRENT_GROUP_MAX_VALUE)
+  {
+    ZB_ZCL_SCENES_INIT_VIEW_SCENE_RES(
+      param,
+      payload_ptr,
+      cmd_info->seq_number,
+      ZB_ZCL_STATUS_INVALID_VALUE,
+      req->group_id,
+      req->scene_id);
+  }
   else if (ZCL_CTX().device_cb)
   {
-    ZB_MEMCPY(&req_copy, req, sizeof(zb_zcl_scenes_view_scene_req_t));
-    ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(
-      param,
-#ifndef ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED
-      (is_enhanced) ? (ZB_ZCL_SCENES_ENHANCED_VIEW_SCENE_CB_ID) : (ZB_ZCL_SCENES_VIEW_SCENE_CB_ID),
-#else
-      ZB_ZCL_SCENES_VIEW_SCENE_CB_ID,
-#endif /* !ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED */
-      RET_ERROR,
-      cmd_info,
-      &req_copy,
-      NULL);
     (ZCL_CTX().device_cb)(param);
   }
-
-  switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
+  else
   {
-    case RET_OK:
-      /*We don't send a View Scene Resp command. Application must send reply
-       * for this command.
-       */
-      zb_buf_free(param);
-      break;
+    ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) = RET_ERROR;
+  }
 
-    case RET_ERROR:
-      TRACE_MSG(TRACE_ZCL1, "ERROR during command processing: "
-                "User callback failed with err=%d.",
-                (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
-      /* FALLTHRU */
-    default:
-      zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_FAIL);
-      break;
+  if (send_response)
+  {
+    switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
+    {
+      case RET_OK:
+        /*We don't send a View Scene Resp command. Application must send reply
+        * for this command.
+        */
+        zb_buf_free(param);
+        break;
+      
+      case ZB_ZCL_STATUS_INVALID_VALUE:
+        ZB_ZCL_SCENES_SEND_VIEW_SCENE_RES(
+          param,
+          payload_ptr,
+          ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
+          ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
+          ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
+          cmd_info->profile_id,
+          NULL);
+        break;
+
+    case RET_NOT_IMPLEMENTED:
+        zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_UNSUP_CMD);
+        break;
+
+      case RET_ERROR:
+        TRACE_MSG(TRACE_ZCL1, "ERROR during command processing: "
+                  "User callback failed with err=%d.",
+                  (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
+        /* FALLTHRU */
+      default:
+        zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_FAIL);
+        break;
+    }
+  }
+  else
+  {
+    zb_buf_free(param);
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_scenes_process_view_scene_command", (FMT__0));
@@ -582,6 +676,9 @@ static void zb_zcl_scenes_process_remove_scene_command(zb_uint8_t param, const z
 {
   zb_zcl_scenes_remove_scene_req_t* req;
   zb_zcl_scenes_remove_scene_req_t req_copy;
+  /* ZCL8 Section 3.7.2.4.1 only send response for unicast commands */ 
+  zb_bool_t send_response = 
+    (zb_bool_t) ZB_APS_FC_GET_DELIVERY_MODE(cmd_info->addr_data.common_data.fc) == ZB_APS_DELIVERY_UNICAST;
 
   zb_uint8_t remove_scene_status = ZB_ZCL_STATUS_SUCCESS;
   zb_zcl_attr_t* scene_count_desc;
@@ -606,37 +703,64 @@ static void zb_zcl_scenes_process_remove_scene_command(zb_uint8_t param, const z
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
           ZB_ZCL_SCENES_REMOVE_SCENE_CB_ID, RET_ERROR, cmd_info, &req_copy, &remove_scene_status);
 
-  if (ZCL_CTX().device_cb)
+  /* ZCL8 3.7.2.4.4.2 The device verifies that the Group ID field contains a valid group identifier 
+     in the range 0x0000 – 0xfff7 else status is INVALID VALUE */ 
+  if (req->group_id > ZB_ZCL_ATTR_SCENES_CURRENT_GROUP_MAX_VALUE)
+  {
+    ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) = ZB_ZCL_STATUS_INVALID_VALUE;
+  }
+  else if (ZCL_CTX().device_cb)
   {
     (ZCL_CTX().device_cb)(param);
   }
 
-  switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
+  if (send_response)
   {
-    case RET_OK:
+    switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
     {
-      if (remove_scene_status == ZB_ZCL_STATUS_SUCCESS)
+      case RET_OK:
       {
-        zb_uint8_t scene_count;
-
-        scene_count_desc = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
-                                                  ZB_ZCL_CLUSTER_ID_SCENES,
-                                                  ZB_ZCL_CLUSTER_SERVER_ROLE,
-                                                  ZB_ZCL_ATTR_SCENES_SCENE_COUNT_ID);
-        if (scene_count_desc && scene_count_desc->data_p)
+        if (remove_scene_status == ZB_ZCL_STATUS_SUCCESS)
         {
-          /* This attribute is not reportable, so may set attribute value directly */
-          scene_count = ZB_ZCL_GET_ATTRIBUTE_VAL_8(scene_count_desc);
-          TRACE_MSG(TRACE_ZCL1,
-                    "decrease scene count: %hd -> %hd",
-                    (FMT__H_H, scene_count, scene_count - 1));
-          ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(scene_count_desc, scene_count - 1);
+          zb_uint8_t scene_count;
+
+          scene_count_desc = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
+                                                    ZB_ZCL_CLUSTER_ID_SCENES,
+                                                    ZB_ZCL_CLUSTER_SERVER_ROLE,
+                                                    ZB_ZCL_ATTR_SCENES_SCENE_COUNT_ID);
+          if (scene_count_desc && scene_count_desc->data_p)
+          {
+            /* This attribute is not reportable, so may set attribute value directly */
+            scene_count = ZB_ZCL_GET_ATTRIBUTE_VAL_8(scene_count_desc);
+            TRACE_MSG(TRACE_ZCL1,
+                      "decrease scene count: %hd -> %hd",
+                      (FMT__H_H, scene_count, scene_count - 1));
+            ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(scene_count_desc, scene_count - 1);
+          }
+        }
+
+        /* prevent to send response on ZGP command */
+        if (!ZB_ZCL_ADDR_TYPE_IS_GPD(cmd_info->addr_data.common_data.source.addr_type))
+        {
+          ZB_ZCL_SCENES_SEND_REMOVE_SCENE_RES(
+            param,
+            cmd_info->seq_number,
+            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
+            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
+            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
+            cmd_info->profile_id,
+            NULL,
+            remove_scene_status,
+            req_copy.group_id,
+            req_copy.scene_id);
+        }
+        else
+        {
+          zb_buf_free(param);
         }
       }
-
-      /* prevent to send response on ZGP command */
-      if (!ZB_ZCL_ADDR_TYPE_IS_GPD(cmd_info->addr_data.common_data.source.addr_type))
-      {
+      break;
+      case ZB_ZCL_STATUS_INVALID_VALUE:
         ZB_ZCL_SCENES_SEND_REMOVE_SCENE_RES(
           param,
           cmd_info->seq_number,
@@ -645,25 +769,23 @@ static void zb_zcl_scenes_process_remove_scene_command(zb_uint8_t param, const z
           ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
           cmd_info->profile_id,
           NULL,
-          remove_scene_status,
+          ZB_ZCL_STATUS_INVALID_VALUE,
           req_copy.group_id,
           req_copy.scene_id);
-      }
-      else
-      {
-        zb_buf_free(param);
-      }
+        break;
+      case RET_ERROR:
+        TRACE_MSG(TRACE_ZCL1, "ERROR during command processing: "
+                  "User callback failed with err=%d.",
+                  (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
+        /* FALLTHRU */
+      default:
+        zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_FAIL);
+        break;
     }
-    break;
-
-    case RET_ERROR:
-      TRACE_MSG(TRACE_ZCL1, "ERROR during command processing: "
-                "User callback failed with err=%d.",
-                (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
-      /* FALLTHRU */
-    default:
-      zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_FAIL);
-      break;
+  }
+  else
+  {
+    zb_buf_free(param);
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_scenes_process_remove_scene_command", (FMT__0));
@@ -690,6 +812,9 @@ static void zb_zcl_scenes_process_remove_all_scenes_command(zb_uint8_t param, co
   zb_zcl_scenes_remove_all_scenes_req_t req_copy;
   zb_uint8_t remove_all_scenes_status = ZB_ZCL_STATUS_SUCCESS;
   zb_zcl_attr_t* scene_count_desc;
+  /* ZCL8 Section 3.7.2.4.1 only send response for unicast commands */ 
+  zb_bool_t send_response = 
+    (zb_bool_t) ZB_APS_FC_GET_DELIVERY_MODE(cmd_info->addr_data.common_data.fc) == ZB_APS_DELIVERY_UNICAST;
 
   TRACE_MSG(
       TRACE_ZCL1,
@@ -705,28 +830,59 @@ static void zb_zcl_scenes_process_remove_all_scenes_command(zb_uint8_t param, co
   }
 
   ZB_MEMCPY(&req_copy, req, sizeof(zb_zcl_scenes_remove_all_scenes_req_t));
-  remove_all_scenes_status = zb_zcl_scenes_process_remove_all_scenes(param, &req_copy, cmd_info);
-
-  switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
+  /* ZCL8 3.7.2.4.5.2 The device verifies that the Group ID field contains a valid group identifier 
+    in the range 0x0000 – 0xfff7 else status is INVALID VALUE */ 
+  if (req->group_id > ZB_ZCL_ATTR_SCENES_CURRENT_GROUP_MAX_VALUE)
   {
-    case RET_OK:
+    ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) = ZB_ZCL_STATUS_INVALID_VALUE;
+    remove_all_scenes_status = ZB_ZCL_STATUS_INVALID_VALUE;
+  }
+  else
+  {
+    remove_all_scenes_status = zb_zcl_scenes_process_remove_all_scenes(param, &req_copy, cmd_info);
+  }
+
+  if (send_response)
+  {
+    switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
     {
-      if (remove_all_scenes_status == ZB_ZCL_STATUS_SUCCESS)
+      case RET_OK:
       {
-        scene_count_desc = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
-                                                  ZB_ZCL_CLUSTER_ID_SCENES,
-                                                  ZB_ZCL_CLUSTER_SERVER_ROLE,
-                                                  ZB_ZCL_ATTR_SCENES_SCENE_COUNT_ID);
-        if (scene_count_desc && scene_count_desc->data_p)
+        if (remove_all_scenes_status == ZB_ZCL_STATUS_SUCCESS)
         {
-          /* This attribute is not reportable, so may set attribute value directly */
-          ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(scene_count_desc, 0);
+          scene_count_desc = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
+                                                    ZB_ZCL_CLUSTER_ID_SCENES,
+                                                    ZB_ZCL_CLUSTER_SERVER_ROLE,
+                                                    ZB_ZCL_ATTR_SCENES_SCENE_COUNT_ID);
+          if (scene_count_desc && scene_count_desc->data_p)
+          {
+            /* This attribute is not reportable, so may set attribute value directly */
+            ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(scene_count_desc, 0);
+          }
+        }
+
+        /* prevent to send response on ZGP command */
+        if (!ZB_ZCL_ADDR_TYPE_IS_GPD(cmd_info->addr_data.common_data.source.addr_type))
+        {
+          ZB_ZCL_SCENES_SEND_REMOVE_ALL_SCENES_RES(
+            param,
+            cmd_info->seq_number,
+            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr,
+            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint,
+            ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
+            cmd_info->profile_id,
+            NULL,
+            remove_all_scenes_status,
+            req_copy.group_id);
+        }
+        else
+        {
+          zb_buf_free(param);
         }
       }
+      break;
 
-      /* prevent to send response on ZGP command */
-      if (!ZB_ZCL_ADDR_TYPE_IS_GPD(cmd_info->addr_data.common_data.source.addr_type))
-      {
+      case ZB_ZCL_STATUS_INVALID_VALUE:
         ZB_ZCL_SCENES_SEND_REMOVE_ALL_SCENES_RES(
           param,
           cmd_info->seq_number,
@@ -737,22 +893,21 @@ static void zb_zcl_scenes_process_remove_all_scenes_command(zb_uint8_t param, co
           NULL,
           remove_all_scenes_status,
           req_copy.group_id);
-      }
-      else
-      {
-        zb_buf_free(param);
-      }
-    }
-    break;
+        break;
 
-    case RET_ERROR:
-      TRACE_MSG(TRACE_ZCL1, "ERROR during command processing: "
-                "User callback failed with err=%d.",
-                (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
-      /* FALLTHRU */
-    default:
-      zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_FAIL);
-      break;
+      case RET_ERROR:
+        TRACE_MSG(TRACE_ZCL1, "ERROR during command processing: "
+                  "User callback failed with err=%d.",
+                  (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
+        /* FALLTHRU */
+      default:
+        zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_FAIL);
+        break;
+    }
+  }
+  else
+  {
+    zb_buf_free(param);
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_scenes_process_remove_all_scenes_command", (FMT__0));
@@ -826,8 +981,9 @@ zb_uint8_t zb_zcl_scenes_process_recall_scene(zb_uint8_t param, zb_zcl_scenes_re
 static void zb_zcl_scenes_process_recall_scene_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_scenes_recall_scene_req_t* req;
-  zb_zcl_scenes_recall_scene_req_t req_copy;
-  zb_zcl_status_t recall_scene_status = ZB_ZCL_STATUS_SUCCESS;
+  /* Initialize req_copy to fix 'uninitialized value' warning */
+  zb_zcl_scenes_recall_scene_req_t req_copy = {0};
+  zb_zcl_status_t recall_scene_status = ZB_ZCL_STATUS_FAIL;
   zb_uint8_t req_len;
 
   TRACE_MSG( TRACE_ZCL1, "> zb_zcl_scenes_process_recall_scene_command param %hd", (FMT__H, param));
@@ -836,8 +992,15 @@ static void zb_zcl_scenes_process_recall_scene_command(zb_uint8_t param, const z
 
   if (!req)
   {
-    zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_INVALID_FIELD);
-    return;
+    ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) = ZB_ZCL_STATUS_INVALID_FIELD;
+    recall_scene_status = ZB_ZCL_STATUS_INVALID_FIELD;
+  }
+  /* ZCL8 3.7.2.4.7.2 The device verifies that the Group ID field contains a valid group identifier 
+    in the range 0x0000 – 0xfff7 else status is INVALID VALUE */ 
+  else if (req->group_id > ZB_ZCL_ATTR_SCENES_CURRENT_GROUP_MAX_VALUE)
+  {
+    ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param) = ZB_ZCL_STATUS_INVALID_VALUE;
+    recall_scene_status = ZB_ZCL_STATUS_INVALID_VALUE;
   }
   else
   {
@@ -889,8 +1052,15 @@ static void zb_zcl_scenes_process_recall_scene_command(zb_uint8_t param, const z
                 "User callback failed with err=%d.",
                 (FMT__D, ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param)));
       /* FALLTHRU */
+
+    case ZB_ZCL_STATUS_INVALID_FIELD:
+      /* FALLTHRU */
+
+    case ZB_ZCL_STATUS_INVALID_VALUE:
+      /* FALLTHRU */
+
     default:
-      zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_FAIL);
+      zb_zcl_send_default_handler(param, cmd_info, recall_scene_status);
       break;
   }
 
@@ -1139,7 +1309,7 @@ static void zb_zcl_scenes_process_copy_scene(zb_uint8_t param, const zb_zcl_pars
     ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(
       param,
       ZB_ZCL_SCENES_COPY_SCENE_CB_ID,
-      RET_ERROR,
+      RET_NOT_IMPLEMENTED,
       cmd_info,
       &req_copy,
       &num_copied_scenes);
@@ -1185,6 +1355,10 @@ static void zb_zcl_scenes_process_copy_scene(zb_uint8_t param, const zb_zcl_pars
        */
       zb_buf_free(param);
       break;
+
+    case RET_NOT_IMPLEMENTED:
+        zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_UNSUP_CMD);
+        break;
 
     case RET_ERROR:
       TRACE_MSG(TRACE_ZCL1, "ERROR during command processing: "

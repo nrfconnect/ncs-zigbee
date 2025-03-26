@@ -726,6 +726,8 @@ typedef struct zb_nib_s
                                                                             capable of maintaining
                                                                             an active and alternate
                                                                             network key.  */
+  zb_uint8_t              secur_material_set_valid_bitmask; /*!< Bitmask for valid network key entries in
+                                                               secur_material_set */
   zb_uint8_t              active_key_seq_number; /*!< The sequence number of
                                                    the active network key in
                                                    nwkSecurityMaterialSet.  */
@@ -832,6 +834,9 @@ typedef struct zb_nib_s
   zb_bitfield_t r22_gu_behavior_enabled:1; /*!< if 1, this device ignores all r23 features*/
   zb_bitfield_t nwk_disable_tlvs_in_beacon:1;      /*!< TLV presence in beacons */
   zb_bitfield_t nwk_use_r22_joining:1;      /*!< Use R22 joining instead nwk_commis_req */
+#ifdef ZB_JOIN_CLIENT
+  zb_bitfield_t disable_silent_rejoin:1;      /*!< Disable silent rejoin for ZR */
+#endif /* ZB_JOIN_CLIENT */
 
   zb_tx_stat_window_t tx_stat;  /*!< TX/TX fail counters  */
   zb_uint8_t nwk_keepalive_modes;

@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -1342,9 +1342,10 @@ zb_bool_t zb_zcl_process_thermostat_specific_commands(zb_uint8_t param)
 
       case ZB_ZCL_CMD_THERMOSTAT_GET_RELAY_STATUS_LOG:
         // TODO command not release because have not info about Relay Status Log
-        ret = RET_IGNORE;
 #ifdef SUPPORT_RELAY_LOG
         ret = zb_zcl_thermostat_get_relay_status_log_handler(param);
+#else
+        ret = RET_NOT_IMPLEMENTED;
 #endif
         TRACE_MSG(TRACE_ZCL3, "Processed GET_RELAY_STATUS_LOG command", (FMT__0));
         break;
@@ -1380,6 +1381,7 @@ zb_bool_t zb_zcl_process_thermostat_specific_commands(zb_uint8_t param)
       status_code = ZB_ZCL_STATUS_INVALID_VALUE;
       break;
     case RET_IGNORE:
+    case RET_NOT_IMPLEMENTED:
       /* ZCL8: CCB 2477: use UNSUP_COMMAND instead of any other Unsupported command status */
       status_code = ZB_ZCL_STATUS_UNSUP_CMD;
       break;
@@ -1387,29 +1389,11 @@ zb_bool_t zb_zcl_process_thermostat_specific_commands(zb_uint8_t param)
       status_code = ZB_ZCL_STATUS_FAIL;
       break;
     }
-    ZB_ZCL_SEND_DEFAULT_RESP(param,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).source.u.short_addr,
-                             ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).src_endpoint,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint,
-                             cmd_info.profile_id,
-                             ZB_ZCL_CLUSTER_ID_THERMOSTAT,
-                             cmd_info.seq_number,
-                             cmd_info.cmd_id,
-                             status_code);
+    ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, status_code);
   }
   else if (!(cmd_info.disable_default_response))
   {
-    ZB_ZCL_SEND_DEFAULT_RESP(param,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).source.u.short_addr,
-                             ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).src_endpoint,
-                             ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint,
-                             cmd_info.profile_id,
-                             ZB_ZCL_CLUSTER_ID_THERMOSTAT,
-                             cmd_info.seq_number,
-                             cmd_info.cmd_id,
-                             processed == ZB_TRUE ? ZB_ZCL_STATUS_SUCCESS : ZB_ZCL_STATUS_FAIL);
+    ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, processed == ZB_TRUE ? ZB_ZCL_STATUS_SUCCESS : ZB_ZCL_STATUS_FAIL);
   }
   else
   {
