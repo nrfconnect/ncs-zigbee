@@ -390,8 +390,7 @@ DT_CHOSEN_NCS_ZIGBEE_TIMER := ncs,zigbee-timer
 
 choice ZIGBEE_TIME_SOURCE
 	prompt "ZBOSS time source"
-	default ZIGBEE_TIME_COUNTER if ZIGBEE_LIBRARY_PRODUCTION && \
-		$(dt_chosen_enabled,$(DT_CHOSEN_NCS_ZIGBEE_TIMER))
+	default ZIGBEE_TIME_COUNTER if $(dt_chosen_enabled,$(DT_CHOSEN_NCS_ZIGBEE_TIMER))
 
 config ZIGBEE_TIME_COUNTER
 	bool "Dedicated timer-based counter"
