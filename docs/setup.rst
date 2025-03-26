@@ -38,7 +38,7 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
    .. group-tab:: command line
 
-      In the **Get the nRF Connect "SDK code** part of the install instructions:
+      In the **Get the nRF Connect SDK code** part of the install instructions:
 
       In Step 4, use the following command to initialize west with |addon| v\ |addon_version|, which also initializes |NCS| v\ |ncs_version|:
 

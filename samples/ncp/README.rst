@@ -116,9 +116,6 @@ For example, when building from the command line, use the following commands:
 
 The USB device VID and PID are configured by the sample's Kconfig file.
 
-.. note::
-   USB is used as the default NCP communication channel when using the nRF52840 Dongle.
-
 When you change the communication channel to nRF USB using either :file:`prj_usb.conf` or :file:`prj_dongle.conf` and select any of the :file:`<board>_usb.overlay` or :file:`<board>_dongle.overlay` files, respectively, :ref:`Zigbee stack logs <zigbee_ug_logging_stack_logs>` are printed by default using ``uart1``.
 This is configured in the project file with the following settings:
 

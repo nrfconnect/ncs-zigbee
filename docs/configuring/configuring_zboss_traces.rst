@@ -42,7 +42,7 @@ Switch to ZBOSS libraries with compiled-in trace logs
 Set the Kconfig option ``CONFIG_ZIGBEE_ENABLE_TRACES`` to switch to ZBOSS libraries with compiled-in trace logs.
 
 The ZBOSS stack comes in a precompiled form and trace logs are not compiled-in by default.
-An additional set of ZBOSS libraries are available in nrfxlib, which does have trace logs compiled-in.
+An additional set of ZBOSS libraries are available in the :file:`lib` folder, which does have trace logs compiled-in.
 
 
 .. rst-class:: numbered-step
