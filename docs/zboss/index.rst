@@ -9,7 +9,7 @@ The |addon| for the |NCS| uses ZBOSS – a portable, high-performance Zigbee sof
    .. include:: /includes/experimental_note.txt
 
 The |addon| repository contains a version of the latest stable ZBOSS libraries.
-The library is enabled with the ``CONFIG_ZIGBEE_LIBRARY_PRODUCTION`` Kconfig option and its files are located in the :file:`lib/zboss/production/` directory.
+The library files are located in the :file:`lib/zboss/` directory.
 The libraries conform to the certification, but they are not necessarily certified.
 
 For information about additional configuration of these libraries and their certification status, see :ref:`zboss_configuration`.

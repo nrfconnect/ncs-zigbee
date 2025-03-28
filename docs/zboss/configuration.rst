@@ -24,9 +24,6 @@ For a complete list of the ZBOSS configuration options, see the following files:
 * :file:`zboss/production/include/osif/libzboss_config.h` - Library for Coordinators and Routers
 * :file:`zboss/production/include/osif/libzboss_config.ed.h` - Library for End Devices
 
-The ZBOSS production library version is enabled by default with the ``CONFIG_ZIGBEE_LIBRARY_PRODUCTION`` Kconfig option.
-|kconfig_search|
-
 Configuration options
 *********************
 
