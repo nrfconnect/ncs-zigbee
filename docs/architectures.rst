@@ -10,7 +10,7 @@ Architectures
 .. note::
    .. include:: /includes/experimental_note.txt
 
-This page describes the platform designs that are possible with the Zigbee stack on the nRF54L15 development kit.
+This page describes the platform designs that are possible with the Zigbee stack on Nordic Semiconductor devices.
 
 The designs are described from the least to the most complex, that is from simple applications that consist of a single chip running single or multiple protocols to scenarios in which the nRF SoC acts as a network co-processor when the application is running on a much more powerful host processor.
 
@@ -44,15 +44,9 @@ The application uses the :ref:`zigbee_zboss` APIs directly.
 This is the design most commonly used for End Devices and Routers.
 
 .. figure:: images/zigbee_platform_design_soc.svg
-   :alt: Zigbee-only architecture (nRF54L Series devices)
+   :alt: Zigbee-only architecture (nRF54L Series and nRF52840 devices)
 
-   Zigbee-only architecture on nRF54L Series devices
-
-..
-  .. figure:: images/zigbee_platform_design_nRF53.svg
-     :alt: Zigbee-only architecture (nRF53 Series devices)
-
-     Zigbee-only architecture on nRF53 Series devices
+   Zigbee-only architecture on nRF54L Series and nRF52840 devices
 
 This platform design is suitable for the following development kits:
 
@@ -72,15 +66,9 @@ It also has the following disadvantages:
 * Bluetooth LE activity can degradate the connectivity on Zigbee if not implemented with efficiency in mind.
 
 .. figure:: images/zigbee_platform_design_multi.svg
-   :alt: Multiprotocol Zigbee and Bluetooth LE architecture (nRF54L Series devices)
+   :alt: Multiprotocol Zigbee and Bluetooth LE architecture (nRF54L Series and nRF52840 devices)
 
-   Multiprotocol Zigbee and Bluetooth LE architecture on nRF54L Series devices
-
-..
-  .. figure:: images/zigbee_platform_design_nRF5340_multi.svg
-     :alt: Multiprotocol Zigbee and Bluetooth LE architecture (nRF53 Series devices)
-
-     Multiprotocol Zigbee and Bluetooth LE architecture on nRF53 Series devices
+   Multiprotocol Zigbee and Bluetooth LE architecture on nRF54L Series and nRF52840 devices
 
 For more information, see `Multiprotocol support`_ in the |NCS| documentation and :ref:`zigbee_light_switch_sample_nus`.
 

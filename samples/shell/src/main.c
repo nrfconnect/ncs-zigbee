@@ -235,7 +235,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
 
 int main(void)
 {
-	LOG_INF("Starting Zigbee shell application");
+	LOG_INF("Starting Zigbee R23 shell application");
 
 	/* Initialize */
 	configure_gpio();
@@ -248,7 +248,7 @@ int main(void)
 	/* Register handlers to identify notifications */
 	ZB_AF_SET_IDENTIFY_NOTIFICATION_HANDLER(APP_ZIGBEE_ENDPOINT, identify_cb);
 
-	LOG_INF("Zigbee shell application started");
+	LOG_INF("Zigbee R23 shell application started");
 
 	return 0;
 }

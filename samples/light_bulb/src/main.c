@@ -82,10 +82,10 @@
 /* Use onboard led4 to act as a light bulb.
  * The app.overlay file has this at node label "pwm_led3" in /pwmleds.
  */
-#define PWM_DK_LED4_NODE                DT_NODELABEL(pwm_led3)
+#define PWM_DK_LED_NODE                DT_NODELABEL(pwm_led3)
 
-#if DT_NODE_HAS_STATUS(PWM_DK_LED4_NODE, okay)
-static const struct pwm_dt_spec led_pwm = PWM_DT_SPEC_GET(PWM_DK_LED4_NODE);
+#if DT_NODE_HAS_STATUS(PWM_DK_LED_NODE, okay)
+static const struct pwm_dt_spec led_pwm = PWM_DT_SPEC_GET(PWM_DK_LED_NODE);
 #else
 #error "Choose supported PWM driver"
 #endif
@@ -524,7 +524,7 @@ int main(void)
 	int blink_status = 0;
 	int err;
 
-	LOG_INF("Starting ZBOSS Light Bulb example");
+	LOG_INF("Starting Zigbee R23 Light Bulb example");
 
 	/* Initialize */
 	configure_gpio();
@@ -558,7 +558,7 @@ int main(void)
 	/* Start Zigbee default thread */
 	zigbee_enable();
 
-	LOG_INF("ZBOSS Light Bulb example started");
+	LOG_INF("Zigbee R23 Light Bulb example started");
 
 	while (1) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);

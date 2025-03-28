@@ -45,7 +45,7 @@ After enabling the Zigbee application utilities library, you can use this compon
 Configuring Zigbee error handler
 ********************************
 
-The Zigbee error handler library provides a set of macros that can be used to assert on nrfxlib's Zigbee ZBOSS stack API return codes.
+The Zigbee error handler library provides a set of macros that can be used to assert on Zigbee ZBOSS stack API return codes.
 
 To use this library, include its :file:`zigbee_error_handler.h` header in your application and pass the error code that should be checked using its macros.
 

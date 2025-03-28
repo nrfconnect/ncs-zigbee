@@ -663,7 +663,7 @@ Issue a ping-style shell command to another Shell node with the given 16-bit des
 The command is sent and received on endpoints with the same ID.
 
 This shell command uses a custom ZCL frame, which is constructed as a ZCL frame of a custom ping ZCL cluster with the cluster ID ``0xBEEF``.
-For details, see the implementation of :c:func:`ping_request_send` in :file:`subsys/zigbee/lib/zigbee_shell/src/zigbee_shell_cmd_ping.c`.
+For details, see the implementation of :c:func:`ping_request_send` in :file:`subsys/lib/zigbee_shell/src/zigbee_shell_cmd_ping.c`.
 
 The command measures the time needed for a Zigbee frame to travel between two nodes in the network (there and back again).
 The shell command sends a ping request ZCL command, which is followed by a ping reply ZCL command.

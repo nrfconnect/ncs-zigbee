@@ -1,0 +1,24 @@
+.. list-table::
+   :widths: auto
+   :header-rows: 1
+
+   * - Hardware platforms
+     - PCA
+     - Board name
+     - Board target
+   * - `nRF54L15 DK <Developing with nRF54L Series_>`_
+     - PCA10156
+     - `nrf54l15dk`_
+     - ``nrf54l15dk/nrf54l15/cpuapp``
+   * - `nRF54L10 emulation on the nRF54L15 DK <Developing with nRF54L Series_>`_
+     - PCA10156
+     - `nrf54l15dk`_
+     - ``nrf54l15dk/nrf54l10/cpuapp``
+   * - `nRF52840 DK <Developing with nRF52 Series_>`_
+     - PCA10056
+     - `nrf52840dk`_
+     - ``nrf52840dk/nrf52840``
+   * - `nRF52840 Dongle <Developing with nRF52 Series_>`_
+     - PCA10059
+     - `nrf52840dongle`_
+     - ``nrf52840dongle/nrf52840``

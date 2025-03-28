@@ -57,7 +57,15 @@ Sleepy End Device behavior
 
 The light switch supports the :ref:`zigbee_ug_sed` that enables the sleepy behavior for the end device, for a significant conservation of energy.
 
-To enable the sleepy behavior, press **Button 2** while the light switch sample is booting.
+.. tabs::
+
+   .. group-tab:: nRF54L15 DK
+
+      To enable the sleepy behavior, press **Button 2** while the light switch sample is booting.
+   .. group-tab:: nRF52840 DK
+
+      To enable the sleepy behavior, press **Button 3** while the light switch sample is booting.
+
 This is required only when device is joining the network for the first time.
 After restarting the device, it will boot with the sleepy behavior enabled.
 
@@ -160,28 +168,56 @@ Similar consideration applies to the ``ZB_CONFIG_IOBUF_POOL_SIZE`` and ``ZB_CONF
 User interface
 **************
 
-LED 2:
-    Lit and solid when the device is connected to a Zigbee network.
+.. tabs::
 
-LED 3:
-    Lit and solid when the light switch has found a light bulb to control.
+   .. group-tab:: nRF54L15 DK
 
-Button 0:
-    Turn on the light bulb connected to the network (light bulb's **LED 1**).
-    This option is available after the successful commissioning (light switch's **LED 2** turned on).
+      LED 2:
+          Lit and solid when the device is connected to a Zigbee network.
 
-    Pressing this button for a longer period of time increases the brightness of the **LED 1** of the connected light bulb.
+      LED 3:
+          Lit and solid when the light switch has found a light bulb to control.
 
-Button 1:
-    Turn off the light bulb connected to the network (light bulb's **LED 1**).
-    This option is available after the successful commissioning (light switch's **LED 2** turned on).
+      Button 0:
+          Turn on the light bulb connected to the network (light bulb's **LED 1**).
+          This option is available after the successful commissioning (light switch's **LED 2** turned on).
 
-    Pressing this button for a longer period of time decreases the brightness of the **LED 1** of the connected light bulb.
+          Pressing this button for a longer period of time increases the brightness of the **LED 1** of the connected light bulb.
 
-Button 3:
-    When pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
-    The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
-    Releasing the button within this time does not trigger the factory reset procedure.
+      Button 1:
+          Turn off the light bulb connected to the network (light bulb's **LED 1**).
+          This option is available after the successful commissioning (light switch's **LED 2** turned on).
+
+          Pressing this button for a longer period of time decreases the brightness of the **LED 1** of the connected light bulb.
+
+      Button 3:
+          When pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
+          The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+          Releasing the button within this time does not trigger the factory reset procedure.
+   .. group-tab:: nRF52840 DK
+
+      LED 3:
+          Lit and solid when the device is connected to a Zigbee network.
+
+      LED 4:
+          Lit and solid when the light switch has found a light bulb to control.
+
+      Button 1:
+          Turn on the light bulb connected to the network (light bulb's **LED 4**).
+          This option is available after the successful commissioning (light switch's **LED 3** turned on).
+
+          Pressing this button for a longer period of time increases the brightness of the **LED 4** of the connected light bulb.
+
+      Button 2:
+          Turn off the light bulb connected to the network (light bulb's **LED 4**).
+          This option is available after the successful commissioning (light switch's **LED 3** turned on).
+
+          Pressing this button for a longer period of time decreases the brightness of the **LED 4** of the connected light bulb.
+
+      Button 4:
+          When pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
+          The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+          Releasing the button within this time does not trigger the factory reset procedure.
 
 .. note::
     If the brightness level is at the minimum level, you may not notice the effect of turning on the light bulb.
@@ -197,15 +233,33 @@ Button 3:
 Sleepy End Device behavior assignments
 ======================================
 
-Button 2:
-    When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
+.. tabs::
+
+   .. group-tab:: nRF54L15 DK
+
+      Button 2:
+          When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
+   .. group-tab:: nRF52840 DK
+
+      Button 3:
+          When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
 
 Multiprotocol Bluetooth LE extension assignments
 ================================================
 
-LED 0:
-    Lit and solid when a Bluetooth LE Central is connected to the NUS service.
-    Available when using `Nordic UART Service (NUS)`_ in the multiprotocol configuration.
+.. tabs::
+
+   .. group-tab:: nRF54L15 DK
+
+      LED 0:
+          Lit and solid when a Bluetooth LE Central is connected to the NUS service.
+          Available when using `Nordic UART Service (NUS)`_ in the multiprotocol configuration.
+
+   .. group-tab:: nRF52840 DK
+
+      LED 1:
+          Lit and solid when a Bluetooth LE Central is connected to the NUS service.
+          Available when using `Nordic UART Service (NUS)`_ in the multiprotocol configuration.
 
 UART command assignments:
     The following command assignments are configured and used in nRF Toolbox when :ref:`zigbee_light_switch_testing_ble`:
@@ -235,24 +289,48 @@ Testing
 
 After programming the sample to your development kits, complete the following steps to test it:
 
-1. Turn on the development kit that runs the Network coordinator sample.
+.. tabs::
 
-   When **LED 2** turns on, this development kit has become the Coordinator of the Zigbee network.
+   .. group-tab:: nRF54L15 DK
 
-#. Turn on the development kit that runs the Light bulb sample.
+      1. Turn on the development kit that runs the Network coordinator sample.
 
-   When **LED 2** turns on, the light bulb has become a Router inside the network.
+         When **LED 2** turns on, this development kit has become the Coordinator of the Zigbee network.
 
-   .. note::
-        If **LED 2** does not turn on, press **Button 0** on the Coordinator to reopen the network.
+      #. Turn on the development kit that runs the Light bulb sample.
 
-#. Turn on the development kit that runs the Light switch sample.
+         When **LED 2** turns on, the light bulb has become a Router inside the network.
 
-   When **LED 2** turns on, the light switch has become an End Device, connected directly to the Coordinator.
+         .. note::
+              If **LED 2** does not turn on, press **Button 0** on the Coordinator to reopen the network.
 
-#. Wait until **LED 3** on the light switch node turns on.
+      #. Turn on the development kit that runs the Light switch sample.
 
-   This LED indicates that the light switch found a light bulb to control.
+         When **LED 2** turns on, the light switch has become an End Device, connected directly to the Coordinator.
+
+      #. Wait until **LED 3** on the light switch node turns on.
+
+         This LED indicates that the light switch found a light bulb to control.
+   .. group-tab:: nRF52840 DK
+
+      1. Turn on the development kit that runs the Network coordinator sample.
+
+         When **LED 3** turns on, this development kit has become the Coordinator of the Zigbee network.
+
+      #. Turn on the development kit that runs the Light bulb sample.
+
+         When **LED 3** turns on, the light bulb has become a Router inside the network.
+
+         .. note::
+              If **LED 3** does not turn on, press **Button 1** on the Coordinator to reopen the network.
+
+      #. Turn on the development kit that runs the Light switch sample.
+
+         When **LED 3** turns on, the light switch has become an End Device, connected directly to the Coordinator.
+
+      #. Wait until **LED 4** on the light switch node turns on.
+
+         This LED indicates that the light switch found a light bulb to control.
 
 You can now use buttons on the development kit to control the light bulb, as described in :ref:`zigbee_light_switch_user_interface`.
 
@@ -304,7 +382,15 @@ Set up nRF Toolbox by completing the following steps:
 
       The UART application of nRF Toolbox after establishing the connection
 
-   Observe that **LED 0** on the light switch node is solid.
+
+   .. tabs::
+      .. group-tab:: nRF54L15 DK
+	  
+         Observe that **LED 0** on the light switch node is solid.
+      .. group-tab:: nRF52840 DK
+	  
+         Observe that **LED 1** on the light switch node is solid.   
+
    This indicates that the Bluetooth LE connection is established.
 
 In nRF Toolbox, tap the buttons you assigned to perform the test:
