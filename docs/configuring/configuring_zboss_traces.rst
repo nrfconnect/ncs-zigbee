@@ -54,7 +54,7 @@ Complete the following steps:
 
 1. Select from which subsystems you would like to receive logs by configuring the ZBOSS trace mask with the Kconfig option ``CONFIG_ZBOSS_TRACE_MASK``.
    Trace masks can be created by adding up masks of subsystems to receive the trace logs from.
-   For available subsystems, see :file:`nrfxlib/zboss/production/include/zb_trace.h`.
+   For available subsystems, see :file:`lib/zboss/include/zb_trace.h`.
 
 #. Select the level of logs you want to receive.
    Configure ZBOSS trace level by selecting one of the following levels with the corresponding Kconfig option:

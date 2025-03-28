@@ -104,7 +104,7 @@ zephyr_library_link_libraries(zboss)
 # Use the CONFIG_ZBOSS_SOURCES_AVAILABLE Kconfig option is defined in ZBOSS
 # platform module to check if user uses ZOI repositories for building
 # application.
-# If so, the user still may select libraries from nrfxlib to link with
+# If so, the user still may select libraries from libraries folder to link with
 # verified state of ZBOSS (CONFIG_ZBOSS_LIBRARY_PRECOMPILED symbol).
 if ((NOT DEFINED CONFIG_ZBOSS_SOURCES_AVAILABLE) OR
     (CONFIG_ZBOSS_LIBRARY_PRECOMPILED))
@@ -122,7 +122,7 @@ if ((NOT DEFINED CONFIG_ZBOSS_SOURCES_AVAILABLE) OR
                     "(${ZBOSS_LIB_PATH} doesn't exist.)")
   endif()
 
-  # Extend ZBOSS interface libraries by headers placed in nrfxlib.
+  # Extend ZBOSS interface libraries by headers placed in libraries folder.
   target_include_directories(zboss INTERFACE
     include
     include/zcl

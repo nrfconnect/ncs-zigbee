@@ -66,7 +66,7 @@ API documentation
 *****************
 
 | Header file: :file:`include/zigbee/zigbee_zcl_scenes.h`
-| Source file: :file:`subsys/zigbee/lib/zigbee_scenes/zigbee_zcl_scenes.c`
+| Source file: :file:`subsys/lib/zigbee_scenes/zigbee_zcl_scenes.c`
 
 .. doxygengroup:: zigbee_scenes
    :members:

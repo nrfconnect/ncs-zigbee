@@ -490,7 +490,7 @@ API documentation
 *****************
 
 | Header file: :file:`include/zigbee/zigbee_app_utils.h`
-| Source file: :file:`subsys/zigbee/lib/zigbee_app_utils/zigbee_app_utils.c`
+| Source file: :file:`subsys/lib/zigbee_app_utils/zigbee_app_utils.c`
 
 .. doxygengroup:: zigbee_app_utils
    :members:

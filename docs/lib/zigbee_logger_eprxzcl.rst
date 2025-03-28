@@ -82,7 +82,7 @@ API documentation
 *****************
 
 | Header file: :file:`include/zigbee/zigbee_logger_eprxzcl.h`
-| Source file: :file:`subsys/zigbee/lib/zigbee_logger_ep/zigbee_logger_eprxzcl.c`
+| Source file: :file:`subsys/lib/zigbee_logger_ep/zigbee_logger_eprxzcl.c`
 
 .. doxygengroup:: zigbee_logger_ep
    :members:
