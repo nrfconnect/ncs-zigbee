@@ -137,7 +137,7 @@ This sample uses the following |NCS| libraries:
 
 * `DK Buttons and LEDs`_
 
-It uses the following `sdk-nrfxlib`_ libraries:
+It uses the following libraries:
 
 * :ref:`zigbee_zboss` |zboss_version| (`API documentation`_)
 

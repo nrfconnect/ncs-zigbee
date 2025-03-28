@@ -8,7 +8,7 @@ The Zigbee R23 add-on for the nRF Connect SDK provides support for developing Zi
 To get started with Zigbee R23 add-on for nRF Connect SDK, follow [documentation](https://nrfconnect.github.io/ncs-zigbee/).
 
 ## Documentation
-Pre-build documentation is available [here](https://nrfconnect.github.io/ncs-zigbee).
+Pre-built documentation is available [here](https://nrfconnect.github.io/ncs-zigbee).
 
 A minimal documentation setup is provided for Sphinx. To build the
 documentation first change to the ``docs`` folder:

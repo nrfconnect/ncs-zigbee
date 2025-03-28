@@ -21,8 +21,8 @@ OSIF implements a series of functions used by ZBOSS and is included in the Zigbe
 
 For a complete list of the ZBOSS configuration options, see the following files:
 
-* :file:`zboss/production/include/osif/libzboss_config.h` - Library for Coordinators and Routers
-* :file:`zboss/production/include/osif/libzboss_config.ed.h` - Library for End Devices
+* :file:`zboss/include/osif/libzboss_config.h` - Library for Coordinators and Routers
+* :file:`zboss/include/osif/libzboss_config.ed.h` - Library for End Devices
 
 Configuration options
 *********************
