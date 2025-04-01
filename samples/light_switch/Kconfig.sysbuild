@@ -8,3 +8,16 @@ source "${ZEPHYR_BASE}/share/sysbuild/Kconfig"
 
 config NRF_DEFAULT_IPC_RADIO
 	default y
+
+if BOOTLOADER_MCUBOOT
+
+#### DFU multi-image support
+config DFU_MULTI_IMAGE_PACKAGE_BUILD
+	default y
+
+config DFU_MULTI_IMAGE_PACKAGE_APP
+	default y
+
+endif # BOOTLOADER_MCUBOOT
+
+source "${ZEPHYR_BASE}/share/sysbuild/Kconfig"
