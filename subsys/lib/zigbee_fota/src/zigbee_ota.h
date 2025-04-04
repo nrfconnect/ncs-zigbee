@@ -7,6 +7,8 @@
 #ifndef ZIGBEE_OTA_H__
 #define ZIGBEE_OTA_H__
 
+#include "zb_types.h"
+
 #define ZB_HA_DEVICE_VER_OTA_UPGRADE_CLIENT        0
 #define ZB_HA_OTA_UPGRADE_CLIENT_DEVICE_ID         0xfff0
 
@@ -14,6 +16,13 @@
 #define ZB_HA_OTA_UPGRADE_CLIENT_IN_CLUSTER_NUM    1
 /* OTA Upgrade client test output clusters number. */
 #define ZB_HA_OTA_UPGRADE_CLIENT_OUT_CLUSTER_NUM   1
+
+/*! @brief Structure representation of OTA File Sub-element header */
+typedef ZB_PACKED_PRE struct zb_zcl_ota_upgrade_sub_element_hdr_s
+{
+  zb_uint16_t tag_id;     /** Tag ID*/
+  zb_uint32_t length;     /** length */
+} ZB_PACKED_STRUCT zb_zcl_ota_upgrade_sub_element_hdr_t;
 
 
 /**
