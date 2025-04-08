@@ -5,7 +5,7 @@
 #
 
 # Usage:
-#   nrfxlib_calculate_lib_path(<dir> [SOC_MODE] [BASE_DIR <dir> [SOFT_FLOAT_FALLBACK]])
+#   zigbee_calculate_lib_path(<dir> [SOC_MODE] [BASE_DIR <dir> [SOFT_FLOAT_FALLBACK]])
 #
 # Calculate a library path based on current SoC architecture or SoC name and
 # FPU ABI mode.
@@ -29,7 +29,7 @@
 #                      and no 'softfp-float' is found.
 #                      This flag requires 'BASE_DIR'
 #
-function(nrfxlib_calculate_lib_path lib_path)
+function(zigbee_calculate_lib_path lib_path)
   cmake_parse_arguments(CALC_LIB_PATH "NS_PROVIDED" "BASE_DIR" "" ${ARGN})
 
   # Add Arch type
@@ -109,7 +109,7 @@ zephyr_library_link_libraries(zboss)
 if ((NOT DEFINED CONFIG_ZBOSS_SOURCES_AVAILABLE) OR
     (CONFIG_ZBOSS_LIBRARY_PRECOMPILED))
 
-  nrfxlib_calculate_lib_path(lib_path)
+  zigbee_calculate_lib_path(lib_path)
   if (CONFIG_ZIGBEE_ENABLE_TRACES)
     set(ZBOSS_LIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/trace/${lib_path})
     set(ZBOSS_LIB_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/trace/include)
