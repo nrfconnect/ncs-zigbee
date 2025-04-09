@@ -108,11 +108,11 @@ For example, when building from the command line, use the following commands:
 
 .. code-block:: console
 
-   west build samples/zigbee/ncp -b nrf52840dk/nrf52840 -- -DFILE_SUFFIX=usb
+   west build samples/ncp -b nrf52840dk/nrf52840 -- -DFILE_SUFFIX=usb
 
 .. code-block:: console
 
-   west build samples/zigbee/ncp -b nrf52840dongle/nrf52840 -- -DFILE_SUFFIX=dongle
+   west build samples/ncp -b nrf52840dongle/nrf52840 -- -DFILE_SUFFIX=dongle
 
 The USB device VID and PID are configured by the sample's Kconfig file.
 

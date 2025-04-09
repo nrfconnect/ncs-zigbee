@@ -12,11 +12,8 @@ You can use the this Light switch sample to change the state of light sources on
 You can use it together with the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` and the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` samples to set up a basic Zigbee network.
 
 This sample supports the optional `Sleepy End Device behavior`_ and :ref:`zigbee_light_switch_sample_nus`.
+It also supports :ref:`lib_zigbee_fota` for nRF52840 SoC.
 See :ref:`zigbee_light_switch_activating_variants` for details about how to enable these variants.
-
-..
-  It also supports :ref:`lib_zigbee_fota`.
-  Add sentence between Lines 14 and 15 when restoring.
 
 Requirements
 ************
@@ -25,8 +22,7 @@ The sample supports the following development kits:
 
 .. include:: /includes/device_table_single_multi.txt
 
-..
-  You can use one or more of the development kits listed above and mix different development kits.
+You can use one or more of the development kits listed above and mix different development kits.
 
 To test this sample, you also need to program the following samples:
 
@@ -112,33 +108,31 @@ Configuration files for sample extensions
 =========================================
 
 The sample provides predefined configuration files for optional extensions.
-You can find the configuration files in the :file:`samples/zigbee/light_switch` directory.
+You can find the configuration files in the :file:`samples/light_switch` directory.
 
 Activating optional extensions
 ------------------------------
 
-..
-  To activate the :ref:`lib_zigbee_fota`, use the :file:`prj_fota.conf` configuration file.
-  For example, when building from the command line, use the following command:
+To activate the :ref:`lib_zigbee_fota`, use the :file:`prj_fota.conf` configuration file.
+For example, when building from the command line, use the following command:
 
-  .. code-block:: console
+.. code-block:: console
 
-     west build samples/zigbee/light_switch -b nrf52840dk/nrf52840 -- -DFILE_SUFFIX=fota
+   west build samples/light_switch -b nrf52840dk/nrf52840 -- -DFILE_SUFFIX=fota
 
-  Alternatively, you can :ref:`configure Zigbee FOTA manually <ug_zigbee_configuring_components_ota>`.
+Alternatively, you can :ref:`configure Zigbee FOTA manually <ug_zigbee_configuring_components_ota>`.
 
-  .. note::
-     You can use the :file:`prj_fota.conf` file only with a development kit that contains the nRF52840 or nRF5340 SoC.
+.. note::
+   You can use the :file:`prj_fota.conf` file only with a development kit that contains the nRF52840 SoC.
 
 To activate the Multiprotocol Bluetooth LE extension, set :makevar:`EXTRA_CONF_FILE` to the :file:`overlay-multiprotocol_ble.conf`.
 For example, when building from the command line, use the following command:
 
 .. code-block:: console
 
-   west build samples/zigbee/light_switch -b nrf54l15dk/nrfnrf54l15/cpuapp -- -DEXTRA_CONF_FILE='overlay-multiprotocol_ble.conf'
+   west build samples/light_switch -b nrf54l15dk/nrfnrf54l15/cpuapp -- -DEXTRA_CONF_FILE='overlay-multiprotocol_ble.conf'
 
-..
-  For the board name to use instead of the ``nrf52840dk/nrf52840``, see :ref:`programming_board_names`.
+For the board name to use instead of the ``nrf54l15dk/nrfnrf54l15/cpuapp``, see `Programming board names`_.
 
 See `Providing CMake options`_ in the |NCS| documentation for instructions on how to add flags to your build.
 For more information about configuration files in the |NCS|, see `Build and configuration system`_ in the |NCS| documentation.
@@ -194,6 +188,7 @@ User interface
           When pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
           The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
           Releasing the button within this time does not trigger the factory reset procedure.
+
    .. group-tab:: nRF52840 DK
 
       LED 3:
@@ -222,13 +217,16 @@ User interface
 .. note::
     If the brightness level is at the minimum level, you may not notice the effect of turning on the light bulb.
 
-..
-  FOTA behavior assignments
-  =========================
+FOTA behavior assignments
+=========================
 
-  LED 1:
-      Indicates the OTA activity.
-      Used only if the FOTA support is enabled.
+.. tabs::
+
+   .. group-tab:: nRF52840 DK
+
+      LED 2:
+         Indicates the OTA activity.
+         Used only if the FOTA support is enabled.
 
 Sleepy End Device behavior assignments
 ======================================
@@ -239,6 +237,7 @@ Sleepy End Device behavior assignments
 
       Button 2:
           When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
+
    .. group-tab:: nRF52840 DK
 
       Button 3:
@@ -311,6 +310,7 @@ After programming the sample to your development kits, complete the following st
       #. Wait until **LED 3** on the light switch node turns on.
 
          This LED indicates that the light switch found a light bulb to control.
+
    .. group-tab:: nRF52840 DK
 
       1. Turn on the development kit that runs the Network coordinator sample.
@@ -387,6 +387,7 @@ Set up nRF Toolbox by completing the following steps:
       .. group-tab:: nRF54L15 DK
 	  
          Observe that **LED 0** on the light switch node is solid.
+
       .. group-tab:: nRF52840 DK
 	  
          Observe that **LED 1** on the light switch node is solid.   

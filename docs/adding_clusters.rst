@@ -54,8 +54,8 @@ Use the :ref:`Zigbee template <zigbee_template_sample>` sample as the base for a
 
 1. Make sure that you meet the requirements for building the sample.
 #. Build and test the sample as described on its documentation page.
-#. Copy the contents of the :file:`samples/zigbee/template` directory to a new directory meant for your custom application.
-   For example, :file:`samples/zigbee/sensor`.
+#. Copy the contents of the :file:`samples/template` directory to a new directory meant for your custom application.
+   For example, :file:`samples/sensor`.
 
 .. _ug_zigee_adding_clusters_adding_clusters:
 
@@ -372,18 +372,18 @@ Further expanding the custom application
 
 You can further expand the application with more features.
 
-..
-  .. _ug_zigee_adding_clusters_ota:
 
-  Adding OTA
-  ==========
+.. _ug_zigee_adding_clusters_ota:
 
-  To extend the sample with OTA support, we would have to complete steps similar to :ref:`adding On/Off Switch and Temperature Sensor functionalities <ug_zigee_adding_clusters_adding_clusters>`.
-  Then, we would have to implement the ZCL device callback to control the process of collecting chunks of new firmware.
-  This is described more broadly in the following sections.
+Adding OTA
+==========
 
-  Fortunately, we can use the :ref:`lib_zigbee_fota` library to handle the majority of these implementation steps.
-  To add OTA support to the extended application, follow the steps in :ref:`ug_zigbee_configuring_components_ota`.
+To extend the sample with OTA support, you must complete steps similar to :ref:`adding On/Off Switch and Temperature Sensor functionalities <ug_zigee_adding_clusters_adding_clusters>`.
+Then, you need to implement the ZCL device callback to control the process of collecting chunks of new firmware.
+For details, see the following sections.
+
+You can simplify this process by using the :ref:`lib_zigbee_fota` library, which covers most of the implementation steps.
+To integrate OTA support into your extended application, follow the steps in the :ref:`ug_zigbee_configuring_components_ota` page.
 
 
 .. _ug_zigee_adding_clusters_passing_events:

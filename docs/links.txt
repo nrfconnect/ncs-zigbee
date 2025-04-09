@@ -17,6 +17,7 @@
 .. _`Programming an application`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/programming.html
 .. _`Secure bootloader chain`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/bootloaders_dfu/mcuboot_nsib/bootloader.html
 .. _`Configuring devicetree`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/hardware/index.html
+.. _`Programming board names`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/board_support/board_names.html#programming-board-names
 
 .. _`Developing with nRF52 Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf52/index.html
 .. _`Developing with nRF54L Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf54l/index.html

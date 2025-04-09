@@ -93,6 +93,13 @@ The following table lists variants and extensions available for each Zigbee samp
       -
       - `*** <Multiprotocol support_>`_
       - `*** <Multiprotocol support_>`_
+    * - Zigbee FOTA
+      - :ref:`** <ug_zigbee_configuring_components_ota>`
+      - ✔
+      - :ref:`** <ug_zigbee_configuring_components_ota>`
+      -
+      - :ref:`** <ug_zigbee_configuring_components_ota>`
+      - :ref:`** <ug_zigbee_configuring_components_ota>`
     * - Endpoint logger
       - :ref:`** <ug_zigbee_configuring_components_logger_ep>`
       - :ref:`** <ug_zigbee_configuring_components_logger_ep>`

@@ -219,13 +219,13 @@ Reduced power consumption
 You can reduce the amount of power used by your device by enabling the `RAM power-down`_ library.
 This library is also used for `Power saving during sleep`_.
 
-..
-  .. _zigbee_ug_static_partition:
 
-  Upgrading Zigbee application
-  ****************************
+.. _zigbee_ug_static_partition:
 
-  When upgrading the Zigbee application, use the `Static and dynamic configuration`_ of the Partition Manager to ensure that ZBOSS' NVRAM is placed in the same area of flash.
-  This is because enabling additional features (for example, Zephyr's `Non-Volatile Storage (NVS)`_) can change the placement of the partition in the flash and the ZBOSS settings can be lost, as the application is not able to find the partition.
+Upgrading Zigbee application
+****************************
 
-  The static configuration is required regardless of the application version and the upgrading method (:ref:`lib_zigbee_fota` or `Secure bootloader chain`).
+When upgrading the Zigbee application, use the `Static and dynamic configuration`_ of the Partition Manager to ensure that ZBOSS' NVRAM is placed in the same area of flash.
+This is because enabling additional features (for example, Zephyr's `Non-Volatile Storage (NVS)`_) can change the placement of the partition in the flash and the ZBOSS settings can be lost, as the application is not able to find the partition.
+
+The static configuration is required regardless of the application version and the upgrading method (:ref:`lib_zigbee_fota` or `Secure bootloader chain`).
