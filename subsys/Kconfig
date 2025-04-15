@@ -138,6 +138,14 @@ choice ZBOSS_ASSERT_HANDLER
 
 endchoice
 
+config ZIGBEE_EXPOSE_KEYS
+	bool "Broadcast keys for testing purposes"
+	default y
+	help
+	  Broadcast keys so that Wirshark can decode the Zigbee traffic.
+	  This option is used for testing purposes only.
+	  It should not be used in production code.
+
 menu "Zigbee Log configuration"
 
 config ZBOSS_ERROR_PRINT_TO_LOG

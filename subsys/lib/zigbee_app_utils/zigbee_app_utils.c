@@ -705,6 +705,15 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 		 * Fall-through to the default case if Trust Center Rejoin is disabled
 		 */
 
+#if defined CONFIG_ZIGBEE_EXPOSE_KEYS
+		case ZB_DEBUG_SIGNAL_TCLK_READY: {
+			zb_debug_signal_tclk_ready_params_t *params;
+			params = ZB_ZDO_SIGNAL_GET_PARAMS(sig_hndler, zb_debug_signal_tclk_ready_params_t);
+			zb_debug_broadcast_aps_key(params->long_addr);
+		}
+		break;
+#endif
+
 	default:
 		/* Unimplemented signal. For more information,
 		 * see: zb_zdo_app_signal_type_e and zb_ret_e.
