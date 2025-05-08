@@ -307,9 +307,24 @@ static zb_uint8_t ota_process_firmware(zb_uint32_t offset, zb_uint8_t *data, uin
 	return ZB_ZCL_OTA_UPGRADE_STATUS_OK;
 }
 
+/* Internal type. A way to ensure that the "packed" attribute is respected when
+ * accessing the parameter structure.
+ */
+typedef ZB_PACKED_PRE union ota_callback_packed_param_s
+{
+	zb_zcl_ota_upgrade_value_param_t pp;        /* Packed parameter. */
+	uint8_t                          bytes[1];
+} ZB_PACKED_STRUCT ota_callback_packed_param_t;
+
+/* Type casting helper. Expects (zb_zcl_ota_upgrade_value_param_t*) as argument. */
+static inline ota_callback_packed_param_t * ota_callback_param_assume_packed(void *p)
+{
+	return (ota_callback_packed_param_t *)p;
+}
+
 /** @brief Code to process the incoming Zigbee OTA frame
  *
- *  @param ota   Pointer to the zb_zcl_ota_upgrade_value_param_t structure,
+ *  @param ota   Pointer to the ota_callback_packed_param_t structure,
  *               passed from the handler
  *  @param bufid ZBOSS buffer id
  *
@@ -317,7 +332,7 @@ static zb_uint8_t ota_process_firmware(zb_uint32_t offset, zb_uint8_t *data, uin
  *          ZB_ZCL_OTA_UPGRADE_STATUS_OK otherwise
  */
 static zb_uint8_t ota_process_chunk(
-	const zb_zcl_ota_upgrade_value_param_t *ota, zb_bufid_t bufid)
+	const ota_callback_packed_param_t *ota, zb_bufid_t bufid)
 {
 	uint8_t ret = ZB_ZCL_OTA_UPGRADE_STATUS_OK;
 	uint32_t bytes_consumed = 0;
@@ -332,18 +347,18 @@ static zb_uint8_t ota_process_chunk(
 		current_offset += dfu_multi_image_offset();
 	}
 
-	if (ota->upgrade.receive.file_offset != current_offset) {
+	if (ota->pp.upgrade.receive.file_offset != current_offset) {
 		LOG_WRN("Unaligned OTA transfer. Expected: %d, received: %d",
 			current_offset,
-			ota->upgrade.receive.file_offset);
+			ota->pp.upgrade.receive.file_offset);
 		return ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;
 	}
 
 	/* Process image header and save it in the memory. */
 	if (!ota_ctx.mandatory_header_finished) {
 		ret = ota_process_mandatory_header(
-			&ota->upgrade.receive.block_data[bytes_consumed],
-			ota->upgrade.receive.data_length - bytes_consumed,
+			&ota->pp.upgrade.receive.block_data[bytes_consumed],
+			ota->pp.upgrade.receive.data_length - bytes_consumed,
 			&bytes_copied);
 		bytes_consumed += bytes_copied;
 	}
@@ -353,20 +368,20 @@ static zb_uint8_t ota_process_chunk(
 	 */
 	if (ota_ctx.process_optional_header) {
 		ret = ota_process_optional_header(
-			&ota->upgrade.receive.block_data[bytes_consumed],
-			ota->upgrade.receive.data_length - bytes_consumed,
+			&ota->pp.upgrade.receive.block_data[bytes_consumed],
+			ota->pp.upgrade.receive.data_length - bytes_consumed,
 			&bytes_copied);
 		bytes_consumed += bytes_copied;
 	}
 
-	while ((ota->upgrade.receive.data_length - bytes_consumed) > 0) {
+	while ((ota->pp.upgrade.receive.data_length - bytes_consumed) > 0) {
 		bytes_copied = 0;
 
 		/* Parse the OTA image subelement header. */
 		if (ota_ctx.process_subelement_header) {
 			ret = ota_process_subelement_header(
-				&ota->upgrade.receive.block_data[bytes_consumed],
-				ota->upgrade.receive.data_length - bytes_consumed,
+				&ota->pp.upgrade.receive.block_data[bytes_consumed],
+				ota->pp.upgrade.receive.data_length - bytes_consumed,
 				&bytes_copied);
 			bytes_consumed += bytes_copied;
 		}
@@ -374,10 +389,10 @@ static zb_uint8_t ota_process_chunk(
 		/* Pass the image to the DFU multi image module. */
 		if (ota_ctx.process_bin_image) {
 			ret = ota_process_firmware(
-				ota->upgrade.receive.file_offset + bytes_consumed
+				ota->pp.upgrade.receive.file_offset + bytes_consumed
 				   - (ota_ctx.ota_header_fill_level + ota_ctx.ota_image_processed),
-				&ota->upgrade.receive.block_data[bytes_consumed],
-				ota->upgrade.receive.data_length - bytes_consumed,
+				&ota->pp.upgrade.receive.block_data[bytes_consumed],
+				ota->pp.upgrade.receive.data_length - bytes_consumed,
 				&bytes_copied);
 			bytes_consumed += bytes_copied;
 		}
@@ -503,18 +518,19 @@ void zigbee_fota_zcl_cb(zb_bufid_t bufid)
 	}
 
 	device_cb_param->status = RET_OK;
-	zb_zcl_ota_upgrade_value_param_t *ota_upgrade_value =
-		&(device_cb_param->cb_param.ota_value_param);
+	ota_callback_packed_param_t *ota_upgrade_value =
+		ota_callback_param_assume_packed(
+			&(device_cb_param->cb_param.ota_value_param));
 
-	switch (ota_upgrade_value->upgrade_status) {
+	switch (ota_upgrade_value->pp.upgrade_status) {
 	case ZB_ZCL_OTA_UPGRADE_STATUS_START:
 		LOG_INF("New OTA image available:");
 		LOG_INF("\tManufacturer: 0x%04x",
-			ota_upgrade_value->upgrade.start.manufacturer);
+			ota_upgrade_value->pp.upgrade.start.manufacturer);
 		LOG_INF("\tType: 0x%04x",
-			ota_upgrade_value->upgrade.start.image_type);
+			ota_upgrade_value->pp.upgrade.start.image_type);
 		LOG_INF("\tVersion: 0x%08x",
-			ota_upgrade_value->upgrade.start.file_version);
+			ota_upgrade_value->pp.upgrade.start.file_version);
 
 		/* Check if OTA client is in the middle of image
 		 * download. If so, silently ignore the second
@@ -524,28 +540,28 @@ void zigbee_fota_zcl_cb(zb_bufid_t bufid)
 			device_cb_param->endpoint) !=
 			ZB_ZCL_OTA_UPGRADE_IMAGE_STATUS_NORMAL) {
 
-			ota_upgrade_value->upgrade_status =
+			ota_upgrade_value->pp.upgrade_status =
 				ZB_ZCL_OTA_UPGRADE_STATUS_BUSY;
 
 		/* Check if we're not downgrading.
 		 * If we do, let's politely say no since we do not
 		 * support that.
 		 */
-		} else if (ota_upgrade_value->upgrade.start.file_version
+		} else if (ota_upgrade_value->pp.upgrade.start.file_version
 			 > dev_ctx.ota_attr.file_version) {
 			ota_dfu_reset();
-			ota_upgrade_value->upgrade_status =
+			ota_upgrade_value->pp.upgrade_status =
 				ZB_ZCL_OTA_UPGRADE_STATUS_OK;
 		} else {
 			LOG_DBG("ZB_ZCL_OTA_UPGRADE_STATUS_ABORT");
-			ota_upgrade_value->upgrade_status =
+			ota_upgrade_value->pp.upgrade_status =
 				ZB_ZCL_OTA_UPGRADE_STATUS_ABORT;
 		}
 		break;
 
 	case ZB_ZCL_OTA_UPGRADE_STATUS_RECEIVE:
 		/* Process image block. */
-		ota_upgrade_value->upgrade_status =
+		ota_upgrade_value->pp.upgrade_status =
 			ota_process_chunk(ota_upgrade_value, bufid);
 		break;
 
@@ -553,17 +569,17 @@ void zigbee_fota_zcl_cb(zb_bufid_t bufid)
 		LOG_INF("New OTA image downloaded.");
 		if (dfu_multi_image_done(true)) {
 			LOG_ERR("Unable to verify the update");
-			ota_upgrade_value->upgrade_status =
+			ota_upgrade_value->pp.upgrade_status =
 				ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;
 		} else {
-			ota_upgrade_value->upgrade_status =
+			ota_upgrade_value->pp.upgrade_status =
 				ZB_ZCL_OTA_UPGRADE_STATUS_OK;
 		}
 		break;
 
 	case ZB_ZCL_OTA_UPGRADE_STATUS_APPLY:
 		LOG_INF("Mark OTA image as downloaded.");
-		ota_upgrade_value->upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_OK;
+		ota_upgrade_value->pp.upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_OK;
 		send_progress(ZIGBEE_FOTA_EVT_DL_COMPLETE_VAL);
 		break;
 
@@ -571,12 +587,12 @@ void zigbee_fota_zcl_cb(zb_bufid_t bufid)
 		LOG_INF("Mark OTA image as ready to be installed.");
 		if (dfu_multi_target_schedule_update()) {
 			LOG_ERR("Unable to schedule the update");
-			ota_upgrade_value->upgrade_status =
+			ota_upgrade_value->pp.upgrade_status =
 				ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;
 			zigbee_fota_abort();
 		} else {
 			LOG_INF("Zigbee DFU completed. Reboot the application.");
-			ota_upgrade_value->upgrade_status =
+			ota_upgrade_value->pp.upgrade_status =
 				ZB_ZCL_OTA_UPGRADE_STATUS_OK;
 			/* It is time to upgrade FW.
 			 * We use callback so the stack can have time to i.e.
@@ -591,7 +607,7 @@ void zigbee_fota_zcl_cb(zb_bufid_t bufid)
 
 	case ZB_ZCL_OTA_UPGRADE_STATUS_ABORT:
 		LOG_INF("Zigbee DFU Aborted");
-		ota_upgrade_value->upgrade_status =
+		ota_upgrade_value->pp.upgrade_status =
 			ZB_ZCL_OTA_UPGRADE_STATUS_ABORT;
 		zigbee_fota_abort();
 		send_evt(ZIGBEE_FOTA_EVT_ERROR);
