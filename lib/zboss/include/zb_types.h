@@ -599,7 +599,7 @@ zb_addr_u;
 #define ZB_INT32_C(c)  c ## L
 #define ZB_UINT32_C(c) c ## UL
 
-#if (defined __GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
+#if ((defined __GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) || defined __clang__)
 #define ZB_OFFSETOF(t, f) __builtin_offsetof(t,f)
 #else
 #define ZB_OFFSETOF(t, f) ((zb_size_t)(&((t *)NULL)->f))
