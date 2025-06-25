@@ -12,7 +12,7 @@ You can use the this Light switch sample to change the state of light sources on
 You can use it together with the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` and the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` samples to set up a basic Zigbee network.
 
 This sample supports the optional `Sleepy End Device behavior`_ and :ref:`zigbee_light_switch_sample_nus`.
-It also supports :ref:`lib_zigbee_fota` for nRF52840 SoC.
+It also supports :ref:`lib_zigbee_fota` for nRF52840 and nRF54L15 SoCs.
 See :ref:`zigbee_light_switch_activating_variants` for details about how to enable these variants.
 
 Requirements
@@ -116,23 +116,25 @@ Activating optional extensions
 To activate the :ref:`lib_zigbee_fota`, use the :file:`prj_fota.conf` configuration file.
 For example, when building from the command line, use the following command:
 
-.. code-block:: console
+.. parsed-literal::
+   :class: highlight
 
-   west build samples/light_switch -b nrf52840dk/nrf52840 -- -DFILE_SUFFIX=fota
+   west build samples/light_switch -b  *board_target* -- -DFILE_SUFFIX=fota
 
 Alternatively, you can :ref:`configure Zigbee FOTA manually <ug_zigbee_configuring_components_ota>`.
 
 .. note::
-   You can use the :file:`prj_fota.conf` file only with a development kit that contains the nRF52840 SoC.
+   You can use the :file:`prj_fota.conf` file only with a development kit that contains the nRF52840 or nRF54L15 SoC.
 
 To activate the Multiprotocol Bluetooth LE extension, set :makevar:`EXTRA_CONF_FILE` to the :file:`overlay-multiprotocol_ble.conf`.
 For example, when building from the command line, use the following command:
 
-.. code-block:: console
+.. parsed-literal::
+   :class: highlight
 
-   west build samples/light_switch -b nrf54l15dk/nrfnrf54l15/cpuapp -- -DEXTRA_CONF_FILE='overlay-multiprotocol_ble.conf'
+   west build samples/light_switch -b *board_target* -- -DEXTRA_CONF_FILE='overlay-multiprotocol_ble.conf'
 
-For the board name to use instead of the ``nrf54l15dk/nrfnrf54l15/cpuapp``, see `Programming board names`_.
+For the board name to use instead of the ``board_target``, see `Programming board names`_.
 
 See `Providing CMake options`_ in the |NCS| documentation for instructions on how to add flags to your build.
 For more information about configuration files in the |NCS|, see `Build and configuration system`_ in the |NCS| documentation.
@@ -221,6 +223,12 @@ FOTA behavior assignments
 =========================
 
 .. tabs::
+
+   .. group-tab:: nRF54L15 DK
+
+      LED 1:
+         Indicates the OTA activity.
+         Used only if the FOTA support is enabled.
 
    .. group-tab:: nRF52840 DK
 
