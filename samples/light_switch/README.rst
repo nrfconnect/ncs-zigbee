@@ -12,7 +12,7 @@ You can use the this Light switch sample to change the state of light sources on
 You can use it together with the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` and the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` samples to set up a basic Zigbee network.
 
 This sample supports the optional `Sleepy End Device behavior`_ and :ref:`zigbee_light_switch_sample_nus`.
-It also supports :ref:`lib_zigbee_fota` for nRF52840 and nRF54L15 SoCs.
+It also supports :ref:`lib_zigbee_fota` for nRF52840, nRF54L15 and nRF54L10 SoCs.
 See :ref:`zigbee_light_switch_activating_variants` for details about how to enable these variants.
 
 Requirements
@@ -124,7 +124,7 @@ For example, when building from the command line, use the following command:
 Alternatively, you can :ref:`configure Zigbee FOTA manually <ug_zigbee_configuring_components_ota>`.
 
 .. note::
-   You can use the :file:`prj_fota.conf` file only with a development kit that contains the nRF52840 or nRF54L15 SoC.
+   You can use the :file:`prj_fota.conf` file only with a development kit that contains the nRF52840, nRF54L15 or nRF54L10 SoC.
 
 To activate the Multiprotocol Bluetooth LE extension, set :makevar:`EXTRA_CONF_FILE` to the :file:`overlay-multiprotocol_ble.conf`.
 For example, when building from the command line, use the following command:
