@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -1523,6 +1523,7 @@ zb_ret_t zb_zcl_wwah_set_leave_without_rejoin(zb_bool_t n_enabled)
   attr_desc = zb_zcl_get_attr_desc_a(wwah_endpoint, ZB_ZCL_CLUSTER_ID_WWAH,
                                      ZB_ZCL_CLUSTER_SERVER_ROLE,
                                      ZB_ZCL_ATTR_WWAH_MGMT_LEAVE_WITHOUT_REJOIN_ENABLED_ID);
+  ZB_ASSERT(attr_desc);
   o_enabled = ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc);
   TRACE_MSG(TRACE_ZCL1, "zb_zcl_wwah_set_leave_without_rejoin o_enabled %d n_enabled %d",
             (FMT__D_D, o_enabled, n_enabled));

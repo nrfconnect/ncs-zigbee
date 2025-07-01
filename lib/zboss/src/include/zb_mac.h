@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -48,6 +48,42 @@
 #include "zb_debug.h"
 #include "zb_bufpool.h"
 #include "zb_config_common.h"
+
+/* rx_queue declaration was moved here from zb_mac_globals.h
+    in order to add pointer for it in multipan. */
+/* Receive queue routines */
+#ifdef ZB_MAC_RX_QUEUE_CAP
+
+/* main ring buffer, that contains whole packets itself */
+ZB_RING_BUFFER_DECLARE(zb_rx_queue, zb_bufid_t, ZB_MAC_RX_QUEUE_CAP);
+
+#endif  /* ZB_USE_RX_QUEUE */
+
+/**
+ *  \addtogroup PHY common constants and types.
+ *  @{
+ */
+
+/**
+ *  @brief PHY enumerations descriptions
+ */
+typedef enum zb_phy_status_e
+{
+  PHY_BUSY                  = 0x00,
+  PHY_BUSY_RX               = 0x01,
+  PHY_BUSY_TX               = 0x02,
+  PHY_FORCE_TRX_OFF         = 0x03,
+  PHY_IDLE                  = 0x04,
+  PHY_INVALID_PARAMETER     = 0x05,
+  PHY_RX_ON                 = 0x06,
+  PHY_SUCCESS               = 0x07,
+  PHY_TRX_OFF               = 0x08,
+  PHY_TX_ON                 = 0x09,
+  PHY_UNSUPPORTED_ATTRIBUTE = 0x0a,
+  PHY_READ_ONLY             = 0x0b
+} zb_phy_status_t;
+
+/** @} */ /* PHY common constants and types */
 
 /* Include platform-specific MAC stuff from the separate repo */
 #ifndef ZB_EXTMAC
@@ -1453,6 +1489,7 @@ zb_mac_scan_confirm_t;
 #define ZB_PIB_ATTRIBUTE_PTA_OPTIONS                    0x91U
 #define ZB_PIB_ATTRIBUTE_PTA_STATE                      0x92U
 #define ZB_PIB_ATTRIBUTE_PTA_PRIORITY                   0x93U
+
 #define ZB_PIB_ATTRIBUTE_COEX_SHUTDOWN_DURATION         0x94U /*!< Coexistence shutdown duration */
 
 /** Set/Clear ZB Temp Channel
@@ -1467,6 +1504,8 @@ zb_mac_scan_confirm_t;
 #define ZB_PIB_ATTRIBUTE_MAC_VERSION                    0x97U
 
 #define ZB_PIB_ATTRIBUTE_TRAFF_DUMP_STATE               0x98U
+#define ZB_PIB_ATTRIBUTE_RESET_TO_BOOTLOADER            0x99U
+
 /** @} */
 
 /**
@@ -1571,25 +1610,6 @@ typedef zb_uint8_t zb_mac_capability_info_t;
  */
 typedef zb_uint8_t zb_mac_status_t;
 
-
-/**
- *  @brief PHY enumerations descriptions
- */
-typedef enum zb_phy_status_e
-{
-  PHY_BUSY                  = 0x00,
-  PHY_BUSY_RX               = 0x01,
-  PHY_BUSY_TX               = 0x02,
-  PHY_FORCE_TRX_OFF         = 0x03,
-  PHY_IDLE                  = 0x04,
-  PHY_INVALID_PARAMETER     = 0x05,
-  PHY_RX_ON                 = 0x06,
-  PHY_SUCCESS               = 0x07,
-  PHY_TRX_OFF               = 0x08,
-  PHY_TX_ON                 = 0x09,
-  PHY_UNSUPPORTED_ATTRIBUTE = 0x0a,
-  PHY_READ_ONLY             = 0x0b
-} zb_phy_status_t;
 
 /**
  *  @name Address Modes
@@ -2956,10 +2976,6 @@ zb_time_t osif_sub_trans_timer(zb_time_t t2, zb_time_t t1);
 #define ZB_TRANSCEIVER_TIME_SUBTRACT osif_sub_trans_timer
 
 #endif
-
-#ifdef ZB_ENABLE_ZGP
-void zb_gp_mcps_data_indication(zb_uint8_t param);
-#endif /* ZB_ENABLE_ZGP */
 
 #ifdef ZB_MAC_CONFIGURABLE_TX_POWER
 

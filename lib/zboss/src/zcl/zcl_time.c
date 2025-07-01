@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -304,6 +304,8 @@ zb_ret_t check_value_time_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_ui
                                             ZB_ZCL_CLUSTER_ID_TIME,
                                             ZB_ZCL_CLUSTER_SERVER_ROLE,
                                             ZB_ZCL_ATTR_TIME_TIME_STATUS_ID);
+
+  ZB_ASSERT(time_status_desc);
 
   if (ZB_ZCL_ATTR_TIME_TIME_ID == attr_id)
   {

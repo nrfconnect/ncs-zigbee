@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -498,11 +498,6 @@ zb_nlme_status_indication_t;
                                               ZB_PAGE0_2_4_GHZ_START_CHANNEL_NUMBER  + 1U)
 /** @cond DOXYGEN_SE_SECTION */
 /**
-   Maximal number of ed scan channels for all pages
-*/
-#define ZB_ED_SCAN_MAX_CHANNELS_COUNT                                   \
-  ((ZB_IO_BUF_SIZE - sizeof(zb_uint8_t)) / sizeof(zb_energy_detect_channel_info_t))
-/**
    Max # of network descriptors which can fit into a single buffer.
 */
 #define ZB_ACTIVE_SCAN_MAX_NETWORK_COUNT                                   \
@@ -800,6 +795,30 @@ void zb_nwk_set_ieee_policy(zb_bool_t put_always);
 
 #if defined ZB_COORDINATOR_ROLE || defined DOXYGEN
 /**
+   @brief Route record for public API usage
+  */
+typedef struct zb_route_record_s
+{
+  zb_uint8_t  count; /*!< Count hops */
+  zb_uint16_t addr;  /*!< Destination short address */
+  zb_uint16_t path[ZB_NWK_MAX_PATH_LENGTH]; /*!< Full source route path */
+} ZB_PACKED_STRUCT zb_route_record_t;
+
+/**
+   Search the local source route table for a route to the device.
+   @warning This function will NOT trigger MTORR.
+
+   @param p_route_record - pointer to the structure to be filled with the route record
+   @param short_dst_addr  - short address of the device to search route to
+
+   @return RET_OK        on success, this is the only case when p_route_record will be filled with valid data. \n
+   RET_INVALID_PARAMETER if NULL pointer provided. \n
+   RET_NOT_IMPLEMENTED   if Concentrator role is not enabled for the device. \n
+   RET_NOT_FOUND         if route record for the short_dst_addr is not found in local source route table.
+ */
+zb_ret_t zb_get_source_route(zb_route_record_t *p_route_record, zb_uint16_t short_dst_addr);
+
+/**
    Enable Concentrator mode for the device (disabled by default).
    It's possible to call this function to send MTORR immediately, e.g. after a new device joined the network.
    It does affect only for Coordinator role.
@@ -978,6 +997,31 @@ zb_uint8_t zb_nwk_get_max_ed_capacity(void);
 zb_uint8_t zb_nwk_get_total_capacity(void);
 
 #endif /* ZB_ROUTER_ROLE */
+
+#ifdef ZB_MULTIPAN_ENABLE_CHANNEL_CHANGE_BLOCKING_WHILE_JOINED
+/**
+ * @brief Enables or disables channel changing (except for temporary channel changes) while device is on network
+ *        regardless of device's role. It may be ZC that formed the network or ZR/ZED that joined it.
+ *
+ * @note This feature active only in Multipan builds (host side).
+ * @note This feature has a side-effect: it disables Mgmt_NWK_Update_req command processing
+ *        if such command requires channel change.
+ *        i.e. device sends error code as a response for such requests if ScanDuration set to 0xfe in request.
+ *
+ * @param allow ZB_TRUE - allow channel changing after network joining/formation.
+ *              ZB_FALSE (default value) - disallow channel changing after network joining/formation.
+ */
+void zb_nwk_mutlipan_allow_channel_change_while_joined(zb_bool_t allow);
+
+/**
+ * @brief Get policy value that allows or disallows channel change after network joining/formation.
+ *        See zb_nwk_mutlipan_allow_channel_change_while_joined description for more info.
+ *
+ * @return zb_bool_t ZB_TRUE - channel changing after network joining/formation allowed.
+ *                   ZB_FALSE - channel changing after network joining/formation disallowed
+ */
+zb_bool_t zb_nwk_mutlipan_get_channel_change_after_join_enabled(void);
+#endif /* ZB_MULTIPAN_ENABLE_CHANNEL_CHANGE_BLOCKING_WHILE_JOINED */
 /** @} */ /* nwk_api */
 
 #endif /*#ifndef ZB_ZBOSS_API_NWK_H*/

@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -205,6 +205,7 @@ static zb_ret_t zbd_configure_interface_req_handler(zb_uint8_t param, zb_zcl_par
   {
     attr_interface_state = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
       ZB_ZCL_CLUSTER_ID_DIRECT_CONFIGURATION, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_DIRECT_CONFIGURATION_INTERFACE_STATE_ID);
+    ZB_ASSERT(attr_interface_state);
     interface_state_bitfield = ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_interface_state);
 
     if (zbd_req.interface_state == ZB_ZCL_DIRECT_CONFIGURATION_INTERFACE_STATE_GET_CURRENT_STATE(interface_state_bitfield))

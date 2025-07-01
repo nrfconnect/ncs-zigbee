@@ -1906,7 +1906,7 @@ typedef struct zb_zcl_device_cmd_generic_param_s
  *  This structure has receive to User application callback (see @ref zb_callback_t).
  *  @hideinitializer
  * */
-typedef ZB_PACKED_PRE struct zb_zcl_device_callback_param_s
+typedef struct zb_zcl_device_callback_param_s
 {
   /** Type of device callback (see @ref zb_zcl_device_callback_id_e) */
   zb_zcl_device_callback_id_t device_cb_id;
@@ -1976,7 +1976,7 @@ typedef ZB_PACKED_PRE struct zb_zcl_device_callback_param_s
     zb_zcl_device_cmd_generic_param_t gnr;
   }
   cb_param;
-} ZB_PACKED_STRUCT zb_zcl_device_callback_param_t;
+} zb_zcl_device_callback_param_t;
 
 
 /** @cond internals_doc */
@@ -2191,21 +2191,26 @@ typedef enum zb_bdb_commissioning_mode_mask_e
 } zb_bdb_commissioning_mode_mask_t;
 
 /**
- * @brief Start device commissioning procedure specified step.
+ * @brief Starts the specified device commissioning steps.
  *
- * @details Performs steering and network formation if appropriate for the device type.
- * @details Finding and binding is not performed by this function (see note at @ref ZB_BDB_FINDING_N_BINDING)
- * @details When the selected commissioning procedure finishes one of the following ZBOSS signals is generated:
+ * @details This function performs steering and network formation if it is appropriate for the device type.
+ * @details Finding and binding is not performed by this function (see note for @ref ZB_BDB_FINDING_N_BINDING).
+ * @details When the selected commissioning procedure finishes, one of the following ZBOSS signals is generated:
  *          - @ref ZB_BDB_SIGNAL_STEERING
  *          - @ref ZB_BDB_SIGNAL_FORMATION
  *
- * @param[in] mode_mask - bitmask of commissioning steps to perform, see @ref zb_bdb_commissioning_mode_mask_e
+ * @note
+ * DO NOT call this function from a callback after local leave using @ref zdo_mgmt_leave_req(),
+ * because internal contexts will not be cleared correctly in such case!
+ * Wait for the @ref ZB_ZDO_SIGNAL_LEAVE signal to restart top level commissioning, if necessary.
+ *
+ * @param[in] mode_mask - bitmask of commissioning steps to be performed, see @ref zb_bdb_commissioning_mode_mask_t()
  *
  * @retval ZB_TRUE - in case the device starts successfully
- * @retval ZB_FALSE - in case an error occurred (for example: the device has already been running)
+ * @retval ZB_FALSE - in case an error occurred (for example, the device has already been running)
  *
  * @par Example
- * Starting BDB top level commissioning on startup signals
+ * Starting BDB top level commissioning on startup signals:
  * @snippet linky_sample/erl_gw/erl_gw.c bdb_start_top_level_commissioning_snippet
 */
 zb_bool_t bdb_start_top_level_commissioning(zb_uint8_t mode_mask);
@@ -2213,50 +2218,50 @@ zb_bool_t bdb_start_top_level_commissioning(zb_uint8_t mode_mask);
 #if defined ZB_BDB_MODE && !defined BDB_OLD
 
 /**
- * @brief Cancel Network Steering procedure for a node not on a network
+ * @brief Cancels Network Steering procedure for a node not on the network.
  *
- * @param[in] buf - a ZBOSS buffer
+ * @param[in] buf - ZBOSS buffer
  *
- * @note The ZBOSS signal @ref ZB_BDB_SIGNAL_STEERING_CANCELLED with the status of this operation will be
+ * @note The ZBOSS @ref ZB_BDB_SIGNAL_STEERING_CANCELLED signal with the status of this operation will be
  *       raised.
  *       Possible statuses:
  *       - @b RET_ILLEGAL_REQUEST (device is a ZC)
- *       - @b RET_INVALID_STATE (steering for a node not a network is not in progress)
+ *       - @b RET_INVALID_STATE (steering for a node not on the network is not in progress)
  *       - @b RET_PENDING (it is too late to cancel a steering, it will be completed soon)
  *       - @b RET_IGNORE (cancellation was already requested)
  *       - @b RET_OK (steering is cancelled successfully)
  *
- * @note If the steering is cancelled the signal @ref ZB_BDB_SIGNAL_STEERING with the status
- *       @b ZB_BDB_STATUS_CANCELLED will be raised as well.
+ * @note If the steering is cancelled, the @ref ZB_BDB_SIGNAL_STEERING signal with the
+ *       @b ZB_BDB_STATUS_CANCELLED status will be raised as well.
 */
 void bdb_cancel_joining(zb_bufid_t buf);
 
 #endif /* ZB_BDB_MODE && !BDB_OLD */
 
 /**
- * @brief Cancel Network Formation procedure
+ * @brief Cancels Network Formation procedure.
  *
- * @param buf - a ZBOSS buffer
+ * @param buf - ZBOSS buffer
  *
- * @note The ZBOSS signal ZB_BDB_SIGNAL_FORMATION_CANCELLED with the status of the operation will be raised.
+ * @note The ZBOSS @b ZB_BDB_SIGNAL_FORMATION_CANCELLED signal with the status of this operation will be raised.
  *       Possible statuses:
  *       - @b RET_INVALID_STATE (formation is not in progress)
- *       - @b RET_PENDING (it is too late to cancel a formation, it will be completed soon)
+ *       - @b RET_PENDING (it is too late to cancel the formation, it will be completed soon)
  *       - @b RET_IGNORE (cancellation was already requested)
  *       - @b RET_OK (formation is cancelled successfully)
  *
- * @note If the formation is cancelled the signal @ref ZB_BDB_SIGNAL_FORMATION with the status
- *       @b ZB_BDB_STATUS_FORMATION will be raised as well.
+ * @note If the formation is cancelled, the @ref ZB_BDB_SIGNAL_FORMATION signal with the
+ *       @b ZB_BDB_STATUS_FORMATION status will be raised as well.
 */
 void bdb_cancel_formation(zb_bufid_t buf);
 
 
 /**
- * @brief Set scan duration for ED and Active scan
+ * @brief Sets scan duration for Energy Detection and Active scan.
  *
- * @param[in] duration - scan duration
+ * @param[in] duration - scan duration. Scan time is <tt>(@b aBaseSuperframeDuration * ((1<<@p duration) + 1))</tt>
  * @parblock
- * Scan time is <tt>(@b aBaseSuperframeDuration * ((1<<@p duration) + 1))</tt>
+ *
  *
  *
  * Duration to seconds Table:
@@ -2270,7 +2275,7 @@ void bdb_cancel_formation(zb_bufid_t buf);
  *
  * @cond DOCS_DEV_NOTES
  * In seconds - <tt>((@c 1l << @p duration) + 1) * 15360 / 1000000</tt>
- * 
+ *
  * I am not sure about this formula ^^^
  * @endcond
  *
@@ -2279,34 +2284,34 @@ void bdb_cancel_formation(zb_bufid_t buf);
 void bdb_set_scan_duration(zb_uint8_t duration);
 
 /**
- * @brief Close the network
+ * @brief Closes the network.
  *
- * @details Implements BDB 3.0.1 - 8.1.1 "Local disabling of Network Steering."
- * @details Will broadcast a @b Mgmt_Permit_Joining_req with @b PermitDuration of 0
+ * @details This function implements BDB 3.0.1 - 8.1.1 "Local disabling of Network Steering."
+ * @details It will broadcast a @b Mgmt_Permit_Joining_req with @b PermitDuration of 0.
  *
- * @details In case it is a router or coordinator it will also issue @b NLME-PERMIT-JOINING.request primitive with @b PermitDuration of 0
- * @details The ZBOSS signal @ref ZB_NWK_SIGNAL_PERMIT_JOIN_STATUS will be raised with @ref zb_zdo_mgmt_permit_joining_req_param_t.permit_duration of 0
+ * @details In case it is a router or a coordinator, the function will also issue @b NLME-PERMIT-JOINING.request primitive with @b PermitDuration of 0.
+ * @details The ZBOSS signal @ref ZB_NWK_SIGNAL_PERMIT_JOIN_STATUS will be raised with @ref zb_zdo_mgmt_permit_joining_req_param_t.permit_duration of 0.
  *
- * @param[in] buf - a ZBOSS buffer, if zero is passed, a new buffer will be allocated
+ * @param[in] buf - ZBOSS buffer; if zero is passed, a new buffer will be allocated.
  *
  * @retval RET_OK - broadcast was successful
  * @retval RET_NO_MEMORY - buffer allocation failed
  * @retval RET_ERROR - any error occurred
  *
  * @par Example
- * Application closing network
+ * Application closing the network:
  * @snippet thermostat/thermostat_zr/thermostat_zr.c close_network_example
  */
 zb_ret_t zb_bdb_close_network(zb_bufid_t buf);
 
 /**
- * @brief Check if device is factory new
+ * @brief Checks if the device is factory new.
  *
  * @retval ZB_TRUE - device is factory new
  * @retval ZB_FALSE - device is not factory new
  *
- * @par Example:
- * Starting secure rejoin backoff if device is not factory new
+ * @par Example
+ * Starting secure rejoin backoff if the device is not factory new:
  * @code
  *  if (!zb_bdb_is_factory_new())
  *  {
@@ -2325,38 +2330,38 @@ zb_bool_t zb_bdb_is_factory_new(void);
    @{
  */
 /**
- * @brief Start EZ-Mode Finding and binding mechanism at the target's endpoint.
+ * @brief Starts EZ-Mode finding and binding procedure on the target's endpoint.
  *
- * @details Put device into identifying mode.
+ * @details This function puts the device into the identifying mode.
  *          Default duration is 3 minutes.
  *
  * @param[in] endpoint - target endpoint
  *
  * @retval RET_OK - on success
- * @retval RET_INVALID_PARAMETER_1 - target endpoint not registered
- * @retval RET_INVALID_STATE - <b>Finding and Binding</b> has already started or device is not joined
+ * @retval RET_INVALID_PARAMETER_1 - target endpoint is not registered
+ * @retval RET_INVALID_STATE - finding and binding has already started or the device is not joined
  *
- * @note @p endpoint should be registered on target
+ * @note @p endpoint should be registered on the target.
  *
  * @par Example
- * Starting F&B target on @ref ZB_BDB_SIGNAL_STEERING
+ * Starts finding and binding target procedure upon @ref ZB_BDB_SIGNAL_STEERING
  * @snippet onoff_server/on_off_output_zc.c zb_bdb_finding_binding_target_usage
  *
  * @see <b>Finding & binding procedure for a target endpoint</b> 8.4 (BDB 3.0.1)
- * @see @ref zb_bdb_finding_binding_target_ext
+ * @see @ref zb_bdb_finding_binding_target_ext()
  */
 zb_ret_t zb_bdb_finding_binding_target(zb_uint8_t endpoint);
 
 /**
- * @brief Starts EZ-Mode Finding and binding mechanism at the target's endpoint with a given timeout
+ * @brief Starts EZ-Mode finding and binding procedure on the target's endpoint with a given timeout.
  *
  * @param[in] endpoint - target endpoint
- * @param[in] commissioning_time_secs - time interval for device to be in identifying mode in seconds. Can't be less than 3 minutes
+ * @param[in] commissioning_time_secs - time interval for the device to be in the identifying mode, in seconds. Can't be less than 3 minutes.
  *
  * @retval RET_OK - on success
- * @retval RET_INVALID_PARAMETER_1 - target endpoint not registered
- * @retval RET_INVALID_PARAMETER_2 - commissioning_time_secs is less than ZB_BDBC_MIN_COMMISSIONING_TIME_S
- * @retval RET_INVALID_STATE - <b>Finding and Binding</b> already started or device is not joined
+ * @retval RET_INVALID_PARAMETER_1 - target endpoint is not registered
+ * @retval RET_INVALID_PARAMETER_2 - @p commissioning_time_secs is less than @b ZB_BDBC_MIN_COMMISSIONING_TIME_S
+ * @retval RET_INVALID_STATE - finding and binding procedure has already started or the device is not joined
  *
  * @see <b>Finding & binding procedure for a target endpoint</b> 8.4 (BDB 3.0.1)
  */
@@ -2387,7 +2392,8 @@ typedef enum zb_bdb_comm_binding_cb_state_e
  * @param[in] ep - endpoint of a device to bind
  * @param[in] cluster - cluster ID to bind
  *
- * @return boolean - agree or disagree
+ * @retval ZB_TRUE - create a binding entry for the cluster
+ * @retval ZB_FALSE - ignore the cluster and do not create a binding entry
  *
  * @par Example
  * Callback that prints its parameters and always allows binding
@@ -2397,19 +2403,19 @@ typedef zb_bool_t (ZB_CODE * zb_bdb_comm_binding_callback_t)(
   zb_int16_t status, zb_ieee_addr_t addr, zb_uint8_t ep, zb_uint16_t cluster);
 
 /**
- * @brief Start BDB finding and binding procedure on initiator.
+ * @brief Starts BDB finding and binding procedure on the initiator.
  *
- * @details Finding and binding as initiator
- * @details To report procedure status, user callback is called.
- *          It may be called several times with Success status and only once with error status. @n
+ * @details This function calls the provided user callback to report the procedure status and to allow
+ *          the application to skip binding of some clusters. @n
+ *          It may be called several times with Success status and only once with Error status. @n
  *          If any error appears, finding and binding stops.
  *
  * @param[in] endpoint - initiator endpoint
- * @param[in] user_binding_cb - user callback, see @ref zb_bdb_comm_binding_callback_t
+ * @param[in] user_binding_cb - user callback, see @ref zb_bdb_comm_binding_callback_t()
  *
  * @retval RET_OK - on success
  * @retval RET_INVALID_PARAMETER_1 - @p endpoint is not registered
- * @retval RET_INVALID_STATE - device is not joined to network
+ * @retval RET_INVALID_STATE - device is not joined to the network
  * @retval RET_BUSY - commissioning is in progress
  *
  * @par Example
@@ -2424,16 +2430,16 @@ typedef zb_bool_t (ZB_CODE * zb_bdb_comm_binding_callback_t)(
 zb_ret_t zb_bdb_finding_binding_initiator(zb_uint8_t endpoint, zb_bdb_comm_binding_callback_t user_binding_cb);
 
 /**
- * @brief Cancel previously started finding and binding procedure on all target endpoints
+ * @brief Cancels previously started finding and binding procedure on all target endpoints.
  *
- * @see zb_bdb_finding_binding_target_cancel_ep
+ * @see zb_bdb_finding_binding_target_cancel_ep()
  */
 void zb_bdb_finding_binding_target_cancel(void);
 
 /**
- * @brief  Cancel previously started finding and binding procedure on particular target endpoint
+ * @brief  Cancels previously started finding and binding procedure on the particular target endpoint.
  *
- * @param[in] endpoint - target endpoint. The @ref ZB_ZCL_BROADCAST_ENDPOINT value is treated as cancel on all target endpoints
+ * @param[in] endpoint - target endpoint. The @ref ZB_ZCL_BROADCAST_ENDPOINT value is treated as cancel on all target endpoints.
  */
 void zb_bdb_finding_binding_target_cancel_ep(zb_uint8_t endpoint);
 
@@ -2454,22 +2460,22 @@ void zb_bdb_finding_binding_initiator_cancel(void);
    @{
 */
 /**
- * @brief Set the primary channel set for the BDB energy scan
- * @details Network scan will be performed on these channels
+ * @brief Sets primary channel set for the BDB energy scan.
+ * @details Network scan will be performed on these channels.
  *
- * @param[in] channel_mask - Channel mask, can be formatted using
+ * @param[in] channel_mask - channel mask, can be formatted using
  * @parblock
- * @li @b ZB_CHANNEL_PAGE_SET_PAGE()
- * @li @b ZB_CHANNEL_PAGE_SET_MASK()
+ * @li @b ZB_CHANNEL_PAGE_SET_PAGE
+ * @li @b ZB_CHANNEL_PAGE_SET_MASK
  * @endparblock
  *
- * @note Used in
- *       @li Network Steering for a node not on a network
- *       @li Network Formation
- * @note Channel set is reset to zero after changing network role of the device
+ * @note This function is used in:
+ *       @li Network Steering for a node not on the network;
+ *       @li Network Formation.
+ * @note Channel set is reset to zero after changing the network role of the device.
  *
  * @see @e @b bdbPrimaryChannelSet 5.3.8 (BDB 3.0.1)
- * @see @ref zb_get_bdb_primary_channel_set
+ * @see @ref zb_get_bdb_primary_channel_set()
  *
  * @cond DOCS_DEV_NOTES
  * link to zb_channel_page.h won't be generated.
@@ -2479,9 +2485,9 @@ void zb_bdb_finding_binding_initiator_cancel(void);
 */
 void zb_set_bdb_primary_channel_set(zb_uint32_t channel_mask);
 /**
- * @brief Get the primary channel set for the BDB energy scan
+ * @brief Retrieves primary channel set for the BDB energy scan.
  *
- * @return Channel mask
+ * @return @p channel_mask - channel mask
  *
  * @cond DOCS_DEV_NOTES
  * Note is repeated.
@@ -2489,46 +2495,46 @@ void zb_set_bdb_primary_channel_set(zb_uint32_t channel_mask);
  * @copydetails copies not only @details (@param's as well)
  * @endcond
  *
- * @note Channel set is reset to zero after changing network role of the device
+ * @note Channel set is reset to zero after changing the network role of the device.
  *
- * @see @ref zb_set_bdb_primary_channel_set
+ * @see @ref zb_set_bdb_primary_channel_set()
 */
 zb_uint32_t zb_get_bdb_primary_channel_set(void);
 
 /**
- * @brief Set the secondary channel set for the BDB energy scan.
- * @details Network scan will be performed on these channels if no network found after energy
- * scan on the primary channels (@ref zb_set_bdb_primary_channel_set).
+ * @brief Sets secondary channel set for the BDB energy scan.
+ * @details Network scan will be performed on these channels if no network is found after the energy
+ * scan on the primary channels (@ref zb_set_bdb_primary_channel_set()).
  *
- * @param[in] channel_mask - Channel mask, can be formatted using
+ * @param[in] channel_mask - channel mask, can be formatted using
  * @parblock
- * @li @b ZB_CHANNEL_PAGE_SET_PAGE()
- * @li @b ZB_CHANNEL_PAGE_SET_MASK()
+ * @li @b ZB_CHANNEL_PAGE_SET_PAGE
+ * @li @b ZB_CHANNEL_PAGE_SET_MASK
  * @endparblock
  *
- * @note Used in
- *       @li Network Steering for a node not on a network
- *       @li Network Formation
+ * @note This function is used in:
+ *       @li Network Steering for a node not on the network;
+ *       @li Network Formation.
  *
  * @see @e @b bdbSecondaryChannelSet 5.3.10 (BDB 3.0.1)
- * @see @ref zb_get_bdb_secondary_channel_set
+ * @see @ref zb_get_bdb_secondary_channel_set()
 */
 void zb_set_bdb_secondary_channel_set(zb_uint32_t channel_mask);
 
 /**
-   Get the secondary channel set for the BDB energy scan.
-   @return channel_mask - Channel mask.
+   Retrieves secondary channel set for the BDB energy scan.
+   @return @p channel_mask - channel mask
 */
 zb_uint32_t zb_get_bdb_secondary_channel_set(void);
 
 /**
- * @brief Enable Zigbee PRO complaint commissioning support
- * @details Turns off link key exchange thus supporting legacy devices (<ZB3.0)
+ * @brief Enables Zigbee PRO complaint commissioning support.
+ * @details This function turns off link key exchange thus supporting legacy devices (<ZB3.0).
  *
  * @param[in] state - controls requirement of trust center key exchange
  * @parblock
- * @arg @b 1 - to disable trust center require key exchange;
- * @arg @b 0 - to enable trust center require key exchange;
+ * @arg @b 1 - to disable trust center requirement for the key exchange
+ * @arg @b 0 - to enable trust center requirement for the key exchange
  * @endparblock
 */
 void zb_bdb_set_legacy_device_support(zb_uint8_t state);
@@ -2540,10 +2546,10 @@ void zb_bdb_set_legacy_device_support(zb_uint8_t state);
    @{
 */
 /**
-  * @brief Set BDB commissioning mode
-  * @details Controls which commissioning procedures will execute
+  * @brief Sets BDB commissioning mode.
+  * @details This function controls the commissioning procedures to be executed.
   *
-  * @param[in] commissioning_mode - @b bdbCommissioningMode bitmask of @ref zb_bdb_commissioning_mode_mask_t.
+  * @param[in] commissioning_mode - @b bdbCommissioningMode bitmask of @ref zb_bdb_commissioning_mode_mask_t().
   *
   * @see @b bdbCommissioningMode 5.3.2 (BDB 1.0)
   * @see <b>Top level commissioning procedure</b> 5.3.2 (BDB 1.0)
@@ -2712,6 +2718,12 @@ typedef struct zb_zcl_globals_s
   /* Control4 Network cluster specific handlers. Server and Client cluster roles */
   zcl_cluster_handlers_t control4_zcl_handlers[2];
 #endif /* ZB_CONTROL4_NETWORK_SUPPORT */
+#ifdef ZB_ZCL_ALLOW_DYNAMIC_MANUFACTURER_SPECIFIC_PROFILE
+  zb_uint16_t dyn_msp[ZB_MAX_EP_NUMBER];
+#endif
+#ifdef ZB_ZCL_ALLOW_FRAGMENTATION_ON_MANUFACTURER_SPECIFIC_CLUSTER
+  zb_uint16_t frag_on_msc[ZB_MAX_EP_NUMBER];
+#endif
   zb_uint8_t zcl_handlers_cnt;
   zb_discover_cmd_list_t *zb_zcl_cluster_cmd_list;
 #ifdef ZB_ZCL_SUPPORT_CLUSTER_SUBGHZ

@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -485,6 +485,7 @@ void zb_zcl_ota_upgrade_send_image_block_response(zb_zcl_parsed_hdr_t *zcl_heade
 static zb_ret_t image_block_handler(zb_uint8_t param)
 {
   zb_ret_t ret = RET_OK;
+  zb_uint8_t max_data_size = ZB_ZCL_OTA_UPGRADE_QUERY_IMAGE_BLOCK_DATA_SIZE_MAX;
   zb_zcl_ota_upgrade_image_block_t payload;
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -493,6 +494,20 @@ static zb_ret_t image_block_handler(zb_uint8_t param)
   TRACE_MSG(TRACE_ZCL1, "> image_block_handler %hx", (FMT__H, param));
 
   ZB_MEMCPY(&cmd_info, cmd_info_p, sizeof(zb_zcl_parsed_hdr_t));
+
+#ifndef NCP_MODE_HOST
+  /* Dynamically reduce BLOCK_DATA_SIZE_MAX based on NWK Source Route overhead */
+  if (cmd_info.addr_data.common_data.source.addr_type == ZB_ZCL_ADDR_TYPE_IEEE)
+  {
+    zb_uint16_t short_addr = zb_address_short_by_ieee(cmd_info.addr_data.common_data.source.u.ieee_addr);
+
+    max_data_size -= (short_addr != ZB_UNKNOWN_SHORT_ADDR) ? nwk_get_extra_src_routing_size(short_addr) : 0U;
+  }
+  else if (cmd_info.addr_data.common_data.source.addr_type == ZB_ZCL_ADDR_TYPE_SHORT)
+  {
+    max_data_size -= nwk_get_extra_src_routing_size(cmd_info.addr_data.common_data.source.u.short_addr);
+  }
+#endif
 
   ZB_ZCL_OTA_UPGRADE_GET_IMAGE_BLOCK_REQ(&payload, param, status);
   if (status != ZB_ZCL_PARSE_STATUS_SUCCESS)
@@ -519,10 +534,7 @@ static zb_ret_t image_block_handler(zb_uint8_t param)
           if( payload.file_offset < total_image_size)
           {
             zb_uint8_t *data = NULL;
-            zb_uint8_t  data_size =
-                (payload.data_size_max <= ZB_ZCL_OTA_UPGRADE_QUERY_IMAGE_BLOCK_DATA_SIZE_MAX) ?
-                payload.data_size_max :
-                ZB_ZCL_OTA_UPGRADE_QUERY_IMAGE_BLOCK_DATA_SIZE_MAX;
+            zb_uint8_t  data_size = (payload.data_size_max <= max_data_size) ? payload.data_size_max : max_data_size;
 
             if(data_size > total_image_size - payload.file_offset)
             {

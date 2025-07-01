@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -314,6 +314,8 @@ zb_zcl_cluster_write_attr_hook_t zb_zcl_get_control4_cluster_write_attr_hook(zb_
   /** @endcond */ /* touchlink */
 
   /************** Manufacturer specific clusters ****************/
+/** Manufacturer Specific Cluster initial ID - ZCL8 2.6.1.3 */
+#define ZB_MSC_INITIAL_CLUSTER_ID    0xFC00U
 
 #define ZB_ZCL_CLUSTER_ID_TUNNEL     0xfc00U /*!< Manufacturer specific Tunnel cluster */
 #define ZB_ZCL_CLUSTER_ID_IR_BLASTER 0xfc01U /*!< Manufacturer specific IR Blaster cluster */
@@ -2211,6 +2213,38 @@ zb_uint16_t get_profile_id_by_endpoint(zb_uint8_t endpoint_id);
 zb_af_endpoint_desc_t *get_endpoint_by_cluster_with_role(
     zb_uint16_t cluster_id,
     zb_uint8_t cluster_role);
+
+#ifdef ZB_ZCL_ALLOW_DYNAMIC_MANUFACTURER_SPECIFIC_PROFILE
+/**
+ * Register custom Manufacturer Specific ProfileId, assuming it has been registered to the CSA
+ *
+ * @param profile_id - Manufacturer Specific Profile ID
+ * @param index - index of the MSP, max ZB_MAX_EP_NUMBER
+ *
+ * @return RET_OK if data value is valid, some error code otherwise
+ */
+zb_ret_t zb_zcl_register_custom_msp(zb_uint16_t profile_id, zb_uint8_t index);
+
+zb_bool_t zb_zcl_is_custom_msp(zb_uint16_t profile_id);
+#endif
+
+#ifdef ZB_ZCL_ALLOW_FRAGMENTATION_ON_MANUFACTURER_SPECIFIC_CLUSTER
+/**
+ * Register private cluster id and configure APS Fragmentation.
+ *
+ * ZCL8 2.4.1.5 General Frame Format - Fragmentation will be used where available.
+ * ZCL Specs do not specify if MSC should allow fragmentation or not, in this case
+ * application can define if it can be fragmented.
+ *
+ * @param cluster_id - Private Cluster ID
+ * @param index - index of the PCl, max ZB_MAX_EP_NUMBER
+ *
+ * @return RET_OK if data value is valid, some error code otherwise
+ */
+zb_ret_t zb_zcl_register_custom_msc(zb_uint16_t cluster_id, zb_uint8_t index, zb_bool_t enable_fragmentation);
+
+zb_bool_t zb_zcl_is_msc_allows_frag(zb_uint16_t cluster_id);
+#endif
 
 /**
  * Find attribute descriptor by given endpoint number, cluster ID and attribute ID

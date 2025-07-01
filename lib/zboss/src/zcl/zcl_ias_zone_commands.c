@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -145,6 +145,7 @@ zb_ret_t check_value_ias_zone_server(zb_uint16_t attr_id, zb_uint8_t endpoint, z
       {
         attr_desc = zb_zcl_get_attr_desc_a(endpoint,
           ZB_ZCL_CLUSTER_ID_IAS_ZONE, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_IAS_ZONE_IAS_CIE_ADDRESS_ID);
+        ZB_ASSERT(attr_desc);
         if (ZB_MEMCMP(attr_desc->data_p, value, zb_zcl_get_attribute_size(attr_desc->type, value)) != 0)
         {
           ret = RET_UNAUTHORIZED;
@@ -819,6 +820,7 @@ void zb_zcl_ias_zone_send_status_change_not(zb_uint8_t param)
       ZB_ZCL_CLUSTER_ID_IAS_ZONE,
       ZB_ZCL_CLUSTER_SERVER_ROLE,
       ZB_ZCL_ATTR_IAS_ZONE_ZONEID_ID);
+    ZB_ASSERT(attr_desc);
     zone_id = ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc);
 
     attr_desc = zb_zcl_get_attr_desc_a(
@@ -826,6 +828,7 @@ void zb_zcl_ias_zone_send_status_change_not(zb_uint8_t param)
       ZB_ZCL_CLUSTER_ID_IAS_ZONE,
       ZB_ZCL_CLUSTER_SERVER_ROLE,
       ZB_ZCL_ATTR_CUSTOM_CIE_EP);
+    ZB_ASSERT(attr_desc);
     cie_ep = ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc);
 
     attr_desc = zb_zcl_get_attr_desc_a(
@@ -833,6 +836,7 @@ void zb_zcl_ias_zone_send_status_change_not(zb_uint8_t param)
       ZB_ZCL_CLUSTER_ID_IAS_ZONE,
       ZB_ZCL_CLUSTER_SERVER_ROLE,
       ZB_ZCL_ATTR_CUSTOM_CIE_SHORT_ADDR);
+    ZB_ASSERT(attr_desc);
     cie_addr = ZB_ZCL_GET_ATTRIBUTE_VAL_16(attr_desc);
 
     TRACE_MSG(TRACE_ZCL1, "send notification cie addr %d, ep %hd", (FMT__D_H, cie_addr, cie_ep));
@@ -1007,6 +1011,7 @@ void zb_zcl_ias_set_attr_val_post_process(zb_zcl_parsed_hdr_t *cmd_info, zb_uint
 
     attr_desc = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
                                        cmd_info->cluster_id, ZB_ZCL_CLUSTER_SERVER_ROLE, attr_id);
+    ZB_ASSERT(attr_desc);
 
     zdo_bind_req = (zb_zdo_bind_req_param_t *)zb_buf_initial_alloc(buf, sizeof(*zdo_bind_req));
 
@@ -1067,10 +1072,12 @@ void zb_zcl_ias_set_attr_val_post_process(zb_zcl_parsed_hdr_t *cmd_info, zb_uint
     {
       attr_desc = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
                                          cmd_info->cluster_id, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_CUSTOM_CIE_EP);
+      ZB_ASSERT(attr_desc);
       ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(attr_desc,ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint);
 
       attr_desc = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint,
                                          cmd_info->cluster_id, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_CUSTOM_CIE_SHORT_ADDR);
+      ZB_ASSERT(attr_desc);
       ZB_ZCL_SET_DIRECTLY_ATTR_VAL16(attr_desc,ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).source.u.short_addr);
 
       /* Fill in the rest fields of binding request */

@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -44,8 +44,8 @@
 #ifndef ZB_ZBOSS_API_CORE_H
 #define ZB_ZBOSS_API_CORE_H 1
 
-#include "zb_vendor.h"
 #include "zb_config.h"
+#include "zb_vendor.h"
 #include "zb_types.h"
 #include "zb_errors.h"
 
@@ -199,9 +199,20 @@ zb_time_t zb_timer_get(void);
 #define ZB_MILLISECONDS_TO_BEACON_INTERVAL_CEIL(ms) (((zb_time_t)(ms) * 1000U + (ZB_BEACON_INTERVAL_USEC - 1U)) / ZB_BEACON_INTERVAL_USEC)
 
 /**
+  Convert time from microseconds to beacon intervals (32-bit platforms). Round the result up. Note that result will be valid for all values less than UINT32_T_MAX - 15359 us.
+*/
+#define ZB_MICROSECONDS_TO_BEACON_INTERVAL_CEIL(us) (((zb_time_t)(us) + (ZB_BEACON_INTERVAL_USEC - 1U)) / ZB_BEACON_INTERVAL_USEC)
+
+/**
   Convert time from milliseconds to beacon intervals (32-bit platforms). Round the result down.
 */
 #define ZB_MILLISECONDS_TO_BEACON_INTERVAL_FLOOR(ms) ((zb_time_t)(ms) * 1000U / ZB_BEACON_INTERVAL_USEC)
+
+/**
+  Convert time from microseconds to beacon intervals (32-bit platforms). Round the result down.
+*/
+#define ZB_MICROSECONDS_TO_BEACON_INTERVAL_FLOOR(us) ((zb_time_t)(us) / ZB_BEACON_INTERVAL_USEC)
+
 
 #else
 /**

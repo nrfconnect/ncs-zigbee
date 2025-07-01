@@ -715,7 +715,8 @@ zb_ret_t zb_zcl_control4_network_cluster_start(void)
 
   /* Start Control4 Network cluster with random jitter delay */
   ZB_SCHEDULE_ALARM_CANCEL(zb_zcl_control4_network_cluster_start_delayed, 0);
-  ZB_SCHEDULE_ALARM(zb_zcl_control4_network_cluster_start_delayed, 0, ZB_RANDOM_VALUE(ZB_TIME_ONE_SECOND));
+  /* Start Control4 cluster after non-zero delay. Else Control4 test sometimes fails when C4 starts before Get Auth token resp complete. */
+  ZB_SCHEDULE_ALARM(zb_zcl_control4_network_cluster_start_delayed, 0, ZB_MILLISECONDS_TO_BEACON_INTERVAL(300u) + ZB_RANDOM_VALUE(ZB_TIME_ONE_SECOND));
   ZB_ZCL_CONTROL4_NETWORK_SET_STATE(ZB_ZCL_CONTROL4_NETWORK_STATE_SEARCHING_ZAP);
 
   return RET_OK;

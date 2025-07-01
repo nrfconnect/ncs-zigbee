@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -483,7 +483,7 @@ typedef bool zb_bitbool_t;
 #define ZB_WEAK
 #endif
 
-#if (defined __ARMCC_VERSION)
+#if (defined __ARMCC_VERSION || defined __ARM_EABI__)
 #define ZB_ALIGNED_PRE __attribute__((aligned))
 #endif
 
@@ -599,7 +599,7 @@ zb_addr_u;
 #define ZB_INT32_C(c)  c ## L
 #define ZB_UINT32_C(c) c ## UL
 
-#if (defined __GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
+#if ((defined __GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) || defined __clang__)
 #define ZB_OFFSETOF(t, f) __builtin_offsetof(t,f)
 #else
 #define ZB_OFFSETOF(t, f) ((zb_size_t)(&((t *)NULL)->f))
@@ -656,6 +656,14 @@ zb_addr_u;
 #define ZB_HTOLE16(ptr, val)   ZB_MEMCPY((ptr), (val), ZB_16BIT_SIZE)
 #define ZB_HTOLE32(ptr, val)   ZB_MEMCPY((ptr), (val), ZB_32BIT_SIZE)
 #define ZB_HTOLE64(ptr, val)   ZB_MEMCPY((ptr), (val), ZB_64BIT_SIZE)
+
+/**
+ * @brief Align ptr to 4 (increasing address if not aligned).
+ *
+ * @param ptr pointer to align
+ */
+#define ZB_ALIGN_UP_TO_4_IF_NOT_ALIGNED(ptr) ((void*)(((zb_size_t)(ptr) + 3) / 4 * 4))
+
 #else
 
 #define ZB_HTOLE16(ptr, val)   (((zb_uint16_t *)(ptr))[0] = *((zb_uint16_t *)(val)))
@@ -666,6 +674,9 @@ zb_addr_u;
    ((zb_uint32_t *)(ptr))[1] = ((zb_uint32_t *)(val))[1])
 */
 #define ZB_HTOLE64(ptr, val) zb_memcpy8(ptr, val)
+
+#define ZB_ALIGN_UP_TO_4_IF_NOT_ALIGNED(ptr) ((void*)(ptr))
+
 #endif  /* need_align */
 
 

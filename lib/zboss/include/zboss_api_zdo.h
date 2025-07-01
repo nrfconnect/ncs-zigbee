@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -2151,13 +2151,13 @@ zb_uint8_t zb_zdo_system_server_discovery_req(zb_uint8_t param, zb_callback_t cb
 #ifdef ZB_JOIN_CLIENT
 /**
  * @brief Set the number of network scan attempts
- *  
- * Sets the number of scan attempts to make before the NWK layer decides which Zigbee 
+ *
+ * Sets the number of scan attempts to make before the NWK layer decides which Zigbee
  * coordinator or router to associate with.
  * The default value is 5, see @ref ZB_ZDO_NWK_SCAN_ATTEMPTS.
- * 
+ *
  * @param [IN] attempts - value of scan attempts. Valid values between 1 and 255.
- * 
+ *
  * @return RET_OK - if success,
  *         RET_INVALID_PARAMETER_1 - if the attempts value is incorrect.
  */
@@ -2558,19 +2558,141 @@ ZB_PACKED_STRUCT
 zb_zdo_routing_table_record_t;
 
 /**
+   Maximal number of ed scan channels for all pages
+*/
+#define ZB_ED_SCAN_MAX_CHANNELS_COUNT                                   \
+  ((ZB_IO_BUF_SIZE - sizeof(zb_uint8_t)) / sizeof(zb_energy_detect_channel_info_t))
+
+/**
+   Channel energy info.
+*/
+typedef ZB_PACKED_PRE struct zb_energy_detect_channel_info_s
+{
+  zb_bitfield_t channel_page_idx : 3;
+  zb_bitfield_t channel_number : 5; /*!< bit # in the channel mask. Note: not a logical channel!  */
+  zb_uint8_t energy_detected;
+} ZB_PACKED_STRUCT zb_energy_detect_channel_info_t;
+
+/**
+   The structure is used to convey energy values for each channel that was scanned.
+*/
+typedef ZB_PACKED_PRE struct zb_energy_detect_list_s
+{
+  zb_uint8_t channel_count;                                                    /*!< Channel count in the zb_energy_detect_channel_info_t. */
+  zb_energy_detect_channel_info_t channel_info[ZB_ED_SCAN_MAX_CHANNELS_COUNT];
+} ZB_PACKED_STRUCT zb_energy_detect_list_t;
+
+/**
+   Arguments of the NLME-ED-SCAN.request routine.
+*/
+typedef struct zb_nlme_ed_scan_request_s
+{
+  zb_channel_page_t scan_channels_list[ZB_CHANNEL_PAGES_NUM]; /**< The list of all channel pages and the
+                                                               * associated channels that shall be scanned. */
+  zb_uint8_t scan_duration;                                   /**< Time to spend scanning each channel */
+}
+zb_nlme_ed_scan_request_t;
+
+/**
+   Parameters for zb_zdo_ed_scan_request call.
+ */
+typedef struct zb_zdo_ed_scan_param_s
+{
+  zb_callback_t cb;                    /*!< Callback that will be called after
+                                        *   ED scan finished. */
+  zb_nlme_ed_scan_request_t nwk_param; /*!< Parameters with which scan will be performed:
+                                            Channels and scan duration. */
+}
+zb_zdo_ed_scan_param_t;
+
+/**
+ * @brief Performs energy scan.
+ *
+ * The result of scan will be provided via callback
+ * that is passed within zb_zdo_ed_scan_param_t.
+ * The result buffer contains zb_energy_detect_list_t structure
+ * in its tail and can be acquired using ZB_BUF_GET_PARAM macro.
+ * The status of scan passed via buffer status and
+ * can be acquired using zb_buf_get_status macro.
+ *
+ * Sample usage of energy scan:
+ * @snippet zdo_ed_scan/zdo_sample_zc.c zb_zdo_ed_scan_request_snippet
+ * @snippet zdo_ed_scan/zdo_sample_zc.c ed_scan_completed_cb_snippet
+ *
+ * @param param - index of buffer that has zb_zdo_ed_scan_param_t structure in its tail.
+ *
+ * @note This function can't be used in NCP-host build.
+ */
+void zb_zdo_ed_scan_request(zb_uint8_t param);
+
+/** @brief Parameters for active_scan_req */
+typedef struct zb_zdo_active_scan_request_s
+{
+  zb_channel_list_t scan_channels_list; /**< A list of channel pages and the channels
+                                                               * within those pages that the discovery shall
+                                                               * be performed upon. */
+  zb_uint8_t        scan_duration;                            /**< Time to spend scanning each channel */
+  zb_callback_t     cb;                                       /* used by zb_zdo_active_scan_request */
+}
+zb_zdo_active_scan_request_t;
+
+/** @brief Network descriptor.
+ *  This is a part of network discovery confirm result.
+ */
+typedef ZB_PACKED_PRE struct zb_nlme_network_descriptor_s
+{
+   /* use bitfields to fit descriptors array to the single buffer */
+  zb_bitfield_t panid_ref:7; /**< Reference to extended Pan ID
+                              * of the network. Was zb_address_pan_id_ref_t.
+                              * Must be big enough to hold ZB_PANID_TABLE_SIZE.
+                              * ZB_PANID_TABLE_SIZE is now 16, so 7 is more than enough.
+                              */
+  zb_bitfield_t    channel_page:5; /**< channel page. in r22 0 to 31  */
+  zb_bitfield_t    logical_channel:7; /**< The current logical channel occupied by
+                                       * the network. In r22 0 to 76 */
+  /* Stack profile, Zigbee version, beacon order and superframe order
+   * defined by standard, but not actually required for us.
+   * Stack profile is not required now as stack supports only Pro Stack Profile ID. */
+  zb_bitfield_t pan_coordinator:1;/**< True if device is a coordinator */
+  zb_bitfield_t permit_joining:1; /**< Indicates that at least one router on
+                                   * the network currently permits joining */
+  zb_bitfield_t router_capacity:1; /**< True if device is capable of accepting
+                                    * join requests from router-capable devices */
+  zb_bitfield_t end_device_capacity:1; /**< True if device is capable of accepting
+                                    * join requests from end devices */
+  zb_bitfield_t processed:1; /**< True if record is processed */
+  zb_uint8_t    nwk_update_id;
+} ZB_PACKED_STRUCT
+zb_nlme_network_descriptor_t;
+
+/** @brief Parameters for active_scan_resp. */
+typedef ZB_PACKED_PRE struct zb_zdo_active_scan_resp_s
+{
+  zb_ret_t status;  /**< Our error or MAC status codes (see Table 3-11
+                     * NLME-NETWORK-DISCOVERY.confirm Parameters:
+                     * Any status value returned with the
+                     * MLME-SCAN.confirm primitive.) */
+  zb_uint8_t network_count; /**< Number of discovered networks */
+  /* next here is an array of zb_nlme_network_descriptor_t */
+} ZB_PACKED_STRUCT
+zb_zdo_active_scan_resp_t;
+
+
+
+/**
  * @brief Performs active scan
  *
  * The result will be provided via callback that is passed within
- * zb_nlme_network_discovery_request_t. The only
+ * zb_zdo_active_scan_request_t. The only
  * argument from this callback is the index of a buffer with
- * zb_nlme_network_discovery_confirm_t param, followed by a sequence of
+ * zb_zdo_active_scan_resp_t param, followed by a sequence of
  * zb_nlme_network_descriptor_t params (count is determined by 
- * zb_nlme_network_discovery_confirm_t - network_count)
+ * zb_zdo_active_scan_resp_t - network_count)
  * 
  * Sample use of active scan request:
  * @snippet zdo_startup_nwk_scan/zdo_start_ze.c active_scan_complete_cb
  * @snippet zdo_startup_nwk_scan/zdo_start_ze.c zb_zdo_active_scan_request
- * 
+ *
  * @param param - index of buffer with zb_nlme_network_discovery_request_t param
  */
 void zb_zdo_active_scan_request(zb_uint8_t param);
@@ -3560,10 +3682,10 @@ void zb_zdo_setup_network_as_distributed(void);
 
 /**
  *  Enable distributed security linkage
- * 
+ *
  *  Without that call ZR is not able to create a Distributed network.
- * 
- *  @deprecated This function will be removed in January 2024. 
+ *
+ *  @deprecated This function will be removed in January 2024.
  *  Use instead:
  *  - @ref zb_bdb_enable_distributed_network_formation
  */
@@ -3571,9 +3693,9 @@ void zb_enable_distributed(void);
 
 /**
  *  @brief Disable distributed security network formation at runtime
- *  
- * 
- *  @deprecated This function will be removed in January 2024. 
+ *
+ *
+ *  @deprecated This function will be removed in January 2024.
  *  Use instead:
  *  - @ref zb_bdb_enable_distributed_network_formation
  */
@@ -3581,7 +3703,7 @@ void zb_disable_distributed(void);
 
 /**
  *  @brief Enable distributed security network formation at runtime
- * 
+ *
  * After call the function device won't try
  * to join, but will form a distributed security network instead.
  */
@@ -3590,7 +3712,7 @@ void zb_bdb_enable_distributed_network_formation (void);
 
 /**
  *  @brief Disable distributed security network formation at runtime
- * 
+ *
  * After call the function the device will not be able to form a distributed security
  * network, but can join another distributed network.
  */
@@ -3599,13 +3721,13 @@ void zb_bdb_disable_distributed_network_formation (void);
 
 /**
  *  @brief Enable/disable distributed security network formation at runtime
- * 
+ *
  * After call the function with the enable param set to ZB_TRUE, device won't try
  * to join, but will form a distributed security network instead. If enable param
  * is set to ZB_FALSE, the device will not be able to form a distributed security
  * network, but can join another network.
- * 
- *  @param enable - ZB_TRUE to enable distributed formation, ZB_FALSE to disable. 
+ *
+ *  @param enable - ZB_TRUE to enable distributed formation, ZB_FALSE to disable.
  *
  * @deprecated This function will be moved to the private header in April 2025. Use @ref
  * zb_bdb_enable_distributed_network_formation() or @ref zb_bdb_disable_distributed_network_formation() instead.
@@ -3627,7 +3749,7 @@ void zb_disable_joining_to_distributed_network (void);
 
 /**
  * @brief Enable joining to a distributed network
- * 
+ *
  *  @param enable - ZB_TRUE to enable, ZB_FALSE to disable
  *
  * @deprecated This function will be moved to the private header in April 2025. Use @ref
@@ -4117,24 +4239,24 @@ ZB_PACKED_STRUCT zb_zdo_beacon_survey_resp_params_t;
 */
 
 /**
-   Setup required behavior for testing legacy R22 GU as specified by 
+   Setup required behavior for testing legacy R22 GU as specified by
    Zigbee Pro Compliant Test Specification - Section 7.5.1:
-    
+
      For Legacy Version= 22
-     The GU special build must be implemented which disables the following features of R23 
+     The GU special build must be implemented which disables the following features of R23
      and the device behaves as an R22 device:
        1. The device SHALL not attach nor process any TLVs
        2. The device SHALL not support NWK commissioning Request/Response
        3. The device SHALL not add beacon appendix to the beacon
        4. The device shall not support APSME relay upstream/downstream commands.
        5. Node descriptor SHALL respond with legacy payload and no TLVs the server mask may be 23.
-       6. Support Pre-configured keys and only supports TCLK. 
+       6. Support Pre-configured keys and only supports TCLK.
        7. Disable all new ZDO servers and respond with NOT_SUPPORTED default response.
        8. Frame Counter synchronisation should be disabled.
        9. Buffer Test Request should be sent without a payload
 
    Notes: If you’re unsure what the text above is, you probably do not need this call!
-          This is not a full r22 compatibility mode. 
+          This is not a full r22 compatibility mode.
 
    @snippet r23_new_api/r22_zr.c zboss_use_r22_behavior_snippet
  */
@@ -4243,7 +4365,7 @@ void zb_nwk_disable_silent_rejoin(zb_bool_t val);
  *  with custom ZDO sequence numbers.
  *
  *  Note: Only use it if you're clear on why it might be necessary.
- * 
+ *
  * @addtogroup zdo_app_tsn_feature
  * @{
  */
@@ -4260,7 +4382,7 @@ typedef enum zb_zdo_tsn_policy_e
 } zb_zdo_tsn_policy_t;
 
 /**
-   @brief Set the policy to update ZDO TSN value. 
+   @brief Set the policy to update ZDO TSN value.
 
    Note: Only use it if you're clear on why it might be necessary.
 
@@ -4283,7 +4405,7 @@ typedef struct zdo_app_tsn_entry_s
 /**
    @brief Allocate an entry of ZDO APP TSN
    @param buf_ref - index of buffer to link allocation
-   @return pointer to the allocated entry or 
+   @return pointer to the allocated entry or
    @return NULL if it could not be allocated
 
    @snippet onoff_server/on_off_switch_zed_app_tsn.c zb_zdo_app_tsn_allocate_snippet
@@ -4303,9 +4425,9 @@ void zb_zdo_app_tsn_release(zb_bufid_t buf_ref);
 /**
    @brief Get an entry of ZDO APP TSN by buffer id
    @param buf_ref - index of buffer
-   @return pointer to the entry associated with buffer id or 
+   @return pointer to the entry associated with buffer id or
    @return NULL if no entry was found
-   
+
    @snippet onoff_server/on_off_switch_zed_app_tsn.c zb_zdo_app_tsn_get_by_buf_ref_snippet
  */
 zb_zdo_app_tsn_entry_t * zb_zdo_app_tsn_get_by_buf_ref(zb_bufid_t buf_ref);

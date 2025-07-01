@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -49,7 +49,7 @@
 /**
  * Empty init-function
  *
- * @see zb_diag_init
+ * Should be called from @see zb_diag_init()
  */
 void zb_diag_key_exposure_init(void);
 
@@ -115,20 +115,18 @@ zb_ret_t zb_diag_broadcast_nwk_key(void);
 #define zb_debug_broadcast_nwk_key zb_diag_broadcast_nwk_key
 
 /**
- * Empty init-function
+ * Initialize and run ZBOSS core watchdog
  *
- * @see zb_diag_init
+ * Should be called from @see zb_diag_init()
  */
 void zb_diag_core_watchdog_init(void);
 
 /**
  * Periodically trace a message from ZBOSS core to inform external systems (for example, TDF)
  *
- * @param param - unused; it allows you to use the ZBOSS scheduler
+ * @param param - unused; it allows to use the ZBOSS scheduler
  *
- * You can redefine the following parameters in a vendor file:
- * - a message period, @see ZB_DIAG_CORE_WATCHDOG_TMO_MS
- * - base message text, @see ZB_DIAG_CORE_WATCHDOG_BASE_MSG
+ * You can redefine the message period in your vendor configuration file, @see ZB_DIAG_CORE_WATCHDOG_TMO_MS
  */
 void zb_diag_core_watchdog(zb_uint8_t param);
 

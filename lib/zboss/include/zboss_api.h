@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -2401,8 +2401,29 @@ void zb_disallow_provisional_key_as_tclk(void);
 void zb_compatibility_workaround_enabled(zb_bool_t val);
 #endif /* !ZB_COORDINATOR_ONLY */
 
+#ifdef APP_GENERATES_TCLK
+/** @brief Callback for the application to generate TCLK
+
+    @warning By using that function application developer takes full responsibility for any security issues that may occur
+
+    @param[in]  scr_address - IEEE address of a joiner device
+    @param[in]  key_size - size of the @a key array
+    @param[out] key - pointer to the array to be filled with the key sequence of size @a key_size
+*/
+typedef void (*app_generate_tclk_cb_t) (const zb_ieee_addr_t src_address, zb_uint8_t key_size, zb_uint8_t *key);
+
+/** @brief Set user callback to generate TCLK for the joiner
+
+    @warning By using that function application developer takes full responsibility for any security issues that may occur
+    @note if none is set or called with NULL pointer, default ZBOSS behaviour will be used
+
+    @param callback - function to be called during TLCK generation
+*/
+void zb_set_app_cb_to_generate_tclk(app_generate_tclk_cb_t callback);
+#endif /* APP_GENERATES_TCLK */
+
+
 #ifdef ZB_DIRECT_ENABLED
 #include "zboss_api_direct.h"
 #endif /* ZB_DIRECT_ENABLED */
-
 #endif /*ZBOSS_API_H*/

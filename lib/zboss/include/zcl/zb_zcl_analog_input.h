@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -521,7 +521,7 @@ enum zb_zcl_ai_count_unitless_e
 /** @brief Values for 'Enthalpy in KJoules per Kg' type of Analog Input cluster
  *  @see ZCL spec 3.14.11.19.1.14
  */
-enum zb_zcl_ai_enthaply_e
+enum zb_zcl_ai_enthalpy_e
 {
   ZB_ZCL_AI_ENTHALPY_OUTDOOR_AIR = ZB_ZCL_AI_SET_APP_TYPE_WITH_ID(ZB_ZCL_AI_APP_TYPE_ENTHALPY, 0x0000),
   ZB_ZCL_AI_ENTHALPY_RETURN_AIR,

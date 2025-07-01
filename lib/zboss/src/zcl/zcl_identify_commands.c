@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -217,6 +217,7 @@ zb_bool_t zb_zcl_process_identify_specific_commands(zb_uint8_t param)
           ZB_ZCL_CLUSTER_ID_IDENTIFY,
           ZB_ZCL_CLUSTER_SERVER_ROLE,
           ZB_ZCL_ATTR_IDENTIFY_IDENTIFY_TIME_ID);
+        ZB_ASSERT(attr_desc);
         ZB_ZCL_IDENTIFY_SEND_IDENTIFY_QUERY_RES(
           param,
           *(zb_uint16_t*)attr_desc->data_p,

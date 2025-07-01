@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -76,7 +76,7 @@ void bdb_initialization_procedure(zb_uint8_t param);
 static void bdb_precomm_rejoin_over_all_channels(zb_uint8_t param, zb_uint16_t secure);
 void bdb_network_steering_on_network(zb_uint8_t param);
 #ifdef ZB_JOIN_CLIENT
-void bdb_network_steering_not_on_network(zb_uint8_t param);
+static void bdb_network_steering_not_on_network(zb_uint8_t param);
 static void bdb_force_rejoin_if_not_in_progress(zb_bufid_t param);
 #ifndef NCP_MODE_HOST
 static void bdb_handle_leave_with_rejoin_signal(zb_bufid_t param);
@@ -84,17 +84,19 @@ static void bdb_initiate_key_exchange_if_needed(void);
 #endif /* NCP_MODE_HOST */
 #endif /* ZB_JOIN_CLIENT */
 void bdb_after_mgmt_permit_joining_cb(zb_uint8_t param);
-#ifdef ZB_ZCL_ENABLE_WWAH_SERVER
+#if defined ZB_ZCL_ENABLE_WWAH_SERVER && defined ZB_JOIN_CLIENT
 static void bdb_rejoin_machine(zb_uint8_t param);
 static void schedule_wwah_rejoin_backoff_attempt(zb_uint8_t param);
-#endif
-#ifndef NCP_MODE_HOST
+#endif /* ZB_ZCL_ENABLE_WWAH_SERVER && ZB_JOIN_CLIENT */
+#if !defined NCP_MODE_HOST && defined ZB_JOIN_CLIENT
 static void nwk_cancel_network_discovery_response(zb_bufid_t buf);
-#endif /* NCP_MODE_HOST */
+#endif /* !NCP_MODE_HOST && ZB_JOIN_CLIENT */
+#if defined ZB_JOIN_CLIENT
 static void bdb_handle_leave_done_signal(zb_bufid_t param);
+static void bdb_handle_leave_local_ind_signal(zb_uint8_t param);
+#endif /* ZB_JOIN_CLIENT */
 static zb_ret_t bdb_try_initiate_rejoin(zb_uint8_t param);
 static void bdb_initialization_procedure_for_nfn_devices(zb_uint8_t param);
-static void bdb_handle_leave_local_ind_signal(zb_uint8_t param);
 
 zb_bool_t bdb_not_ever_joined()
 {
@@ -606,11 +608,11 @@ void bdb_commissioning_machine(zb_uint8_t param)
       break;
 #endif
 
-#ifdef ZB_ZCL_ENABLE_WWAH_SERVER
+#if defined ZB_ZCL_ENABLE_WWAH_SERVER && defined ZB_JOIN_CLIENT
     case ZB_BDB_REJOIN:
       ZB_SCHEDULE_CALLBACK(bdb_rejoin_machine, param);
       break;
-#endif /* ZB_ZCL_ENABLE_WWAH_SERVER */
+#endif /* ZB_ZCL_ENABLE_WWAH_SERVER && ZB_JOIN_CLIENT */
 
     case ZB_BDB_COMMISSIONING_STOP:
       if (BDB_COMM_CTX().signal == BDB_COMM_SIGNAL_FINISH
@@ -1217,7 +1219,7 @@ void bdb_network_steering_start_scan(zb_uint8_t param)
 }
 
 
-void bdb_network_steering_not_on_network(zb_uint8_t param)
+static void bdb_network_steering_not_on_network(zb_uint8_t param)
 {
 #if !defined NCP_MODE_HOST
   zb_uint8_t used_page;
@@ -1231,10 +1233,14 @@ void bdb_network_steering_not_on_network(zb_uint8_t param)
     ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_IN_PROGRESS;
 
 #ifdef ZB_REJOIN_BACKOFF
-    if (zb_zdo_rejoin_backoff_is_running() && (ZDO_CTX().zdo_rejoin_backoff.rjb_cnt == 1) && !ZB_BDB().v_scan_channels)
+    if (zb_zdo_rejoin_backoff_is_running()
+#if !defined NCP_MODE_HOST
+        && (ZDO_CTX().zdo_rejoin_backoff.rjb_cnt == 1)
+#endif /* !NCP_MODE_HOST */
+        && !ZB_BDB().v_scan_channels)
     {
       /* the first attempt - do secure rejoin using the current channel */
-      ZB_BDB().v_scan_channels = (zb_uint32_t)(1l << ZB_PIBCACHE_CURRENT_CHANNEL());
+      ZB_BDB().v_scan_channels = (zb_uint32_t)(1l << zb_get_current_channel());
       /* TRICKY: Set primary_scan again - we will do 2 PRIMARY_SCANs (first on current channel,
        * second on bdb_primary_channel_set), then SECONDARY_SCAN.  */
       ZB_BDB().v_do_primary_scan = ZB_BDB_JOIN_MACHINE_PRIMARY_SCAN;
@@ -1267,7 +1273,7 @@ void bdb_network_steering_not_on_network(zb_uint8_t param)
 
       /* Implement insecure rejoin via BDB if needed. */
     }
-#endif
+#endif /* ZB_REJOIN_BACKOFF */
 
     if (!ZB_BDB().v_scan_channels)
     {
@@ -1312,9 +1318,8 @@ void bdb_network_steering_not_on_network(zb_uint8_t param)
   used_page = zb_aib_channel_page_list_get_first_filled_page();
   zb_channel_page_list_set_mask(ZB_AIB().aps_channel_mask_list, used_page, ZB_BDB().v_scan_channels);
 #endif /* !NCP_MODE_HOST */
-
 }
-#endif  /* ZB_JOIN_CLIENT */
+#endif /* ZB_JOIN_CLIENT */
 
 void bdb_network_steering_finish(zb_uint8_t param)
 {
@@ -1755,9 +1760,9 @@ static void bdb_finding_n_binding_machine(zb_uint8_t param)
       break;
   }
 }
-#endif
+#endif /* ZB_BDB_ENABLE_FINDING_BINDING */
 
-#ifdef ZB_ZCL_ENABLE_WWAH_SERVER
+#if defined ZB_ZCL_ENABLE_WWAH_SERVER && defined ZB_JOIN_CLIENT
 static zb_bool_t bdb_ds_filter_cb(zb_uint16_t i)
 {
   switch (i)
@@ -1862,7 +1867,6 @@ static void bdb_restore_saved_rr(zb_uint8_t param)
   /* Now pibcache is filled by right values, but values are not pushed to MAC. Switch MAC channel etc. */
   zb_nwk_sync_pibcache_with_mac(param, bdb_restore_cont);
 }
-#endif  /* #ifdef ZB_ZCL_ENABLE_WWAH_SERVER */
 
 /* WWAH Rejoin procedure:
    1. Store existing network settings.
@@ -1892,8 +1896,6 @@ static void bdb_restore_saved_rr(zb_uint8_t param)
    algorithm and prefer beacons with a higher network update ID when more than one share the same
    WWAH parent priority.
  */
-/* TODO: implement all rejoin triggers for ZR and ZED */
-#ifdef ZB_ZCL_ENABLE_WWAH_SERVER
 static void bdb_retry_rejoin_recovery(zb_uint8_t param)
 {
   TRACE_MSG(TRACE_ZDO1, "bdb_retry_rejoin_recovery param %hd", (FMT__H, param));
@@ -2173,7 +2175,7 @@ static void bdb_rejoin_machine(zb_uint8_t param)
   }
 }
 
-#endif /* ZB_ZCL_ENABLE_WWAH_SERVER */
+#endif /* ZB_ZCL_ENABLE_WWAH_SERVER && ZB_JOIN_CLIENT */
 
 void bdb_start_rejoin_recovery(zb_uint8_t param, zb_uint16_t user_param)
 {
@@ -2209,7 +2211,7 @@ void bdb_start_rejoin_recovery(zb_uint8_t param, zb_uint16_t user_param)
 #ifdef ZB_JOIN_CLIENT
 
 #ifdef ZB_ZCL_ENABLE_WWAH_SERVER
-void schedule_wwah_rejoin_backoff_attempt(zb_uint8_t param)
+static void schedule_wwah_rejoin_backoff_attempt(zb_uint8_t param)
 {
   if (!param)
   {
@@ -2370,6 +2372,8 @@ static void bdb_handle_leave_done_signal(zb_bufid_t param)
   /* TODO: Send special ZDO signal (LEAVE_DONE or so) - it will allow to avoid manual join
    * restarting after leave (from application). */
 
+  TRACE_MSG(TRACE_ZDO4, ">> bdb_handle_leave_done_signal param %hd", (FMT__H, param));
+
 #ifndef NCP_MODE_HOST
   /* FIXME: this will only work for the monolithic build, generic fix requires refactoring
             and moving of some logic from that file to some SoC file. See ZBS-1405 for more info */
@@ -2406,6 +2410,8 @@ static void bdb_handle_leave_done_signal(zb_bufid_t param)
   {
     zb_buf_free(param);
   }
+
+  TRACE_MSG(TRACE_ZDO4, "<< bdb_handle_leave_done_signal param %hd", (FMT__H, param));
 }
 
 
@@ -3275,7 +3281,9 @@ static void bdb_disable_distributed(void)
   FORMATION_SELECTOR().start_formation = NULL;
   FORMATION_SELECTOR().get_formation_channels_mask = NULL;
 #endif
+#if !defined(NCP_MODE_HOST)
   ZB_IEEE_ADDR_COPY(ZB_AIB().trust_center_address, g_zero_addr);
+#endif /* !NCP_MODE_HOST */
 }
 
 

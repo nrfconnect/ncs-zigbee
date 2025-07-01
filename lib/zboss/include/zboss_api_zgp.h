@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -554,7 +554,7 @@ zb_zgps_match_info_t;
 #define ZB_ZGP_MAPPING_ENTRY_OPTIONS(app_id, add_info_present) \
   (((((add_info_present) & 0x01) << 3)) | ((app_id) & 0x07))
 
-/* 
+/*
  * A.3.6.2.2 GPD application functionality translation
  * Figure 80 – Format of the Options field of the GPD Command Translation Table entry
  */
@@ -729,16 +729,23 @@ typedef enum zgp_communication_mode_e
  */
 typedef enum zgp_commissioning_exit_mode_e
 {
-  ZGP_COMMISSIONING_EXIT_MODE_ON_COMMISSIONING_WINDOW_EXPIRATION  = (1<<0),
-  ZGP_COMMISSIONING_EXIT_MODE_ON_PAIRING_SUCCESS                  = (1<<1),
-  ZGP_COMMISSIONING_EXIT_MODE_ON_GP_PROXY_COMMISSIONING_MODE_EXIT = (1<<2),
+  ZGP_COMMISSIONING_EXIT_MODE_ON_COMMISSIONING_WINDOW_EXPIRATION  = (1<<0), /**< Exit on CommissioningWindow expiration bit index */
+  ZGP_COMMISSIONING_EXIT_MODE_ON_PAIRING_SUCCESS                  = (1<<1), /**< Exit on first Pairing success bit index */
+  ZGP_COMMISSIONING_EXIT_MODE_ON_GP_PROXY_COMMISSIONING_MODE_EXIT = (1<<2), /**< Exit on GP Proxy Commissioning Mode (exit) bit index */
   ZGP_COMMISSIONING_EXIT_MODE_ON_CWE_OR_PS                        = (ZGP_COMMISSIONING_EXIT_MODE_ON_COMMISSIONING_WINDOW_EXPIRATION |
                                                                      ZGP_COMMISSIONING_EXIT_MODE_ON_PAIRING_SUCCESS),
+                                                                     /**< ZGP_COMMISSIONING_EXIT_MODE_ON_COMMISSIONING_WINDOW_EXPIRATION |
+                                                                      * ZGP_COMMISSIONING_EXIT_MODE_ON_PAIRING_SUCCESS */
   ZGP_COMMISSIONING_EXIT_MODE_ON_CWE_OR_PCM                       = (ZGP_COMMISSIONING_EXIT_MODE_ON_COMMISSIONING_WINDOW_EXPIRATION |
                                                                      ZGP_COMMISSIONING_EXIT_MODE_ON_GP_PROXY_COMMISSIONING_MODE_EXIT),
+                                                                     /**< ZGP_COMMISSIONING_EXIT_MODE_ON_COMMISSIONING_WINDOW_EXPIRATION |
+                                                                      * ZGP_COMMISSIONING_EXIT_MODE_ON_GP_PROXY_COMMISSIONING_MODE_EXIT */
   ZGP_COMMISSIONING_EXIT_MODE_ALL                                 = (ZGP_COMMISSIONING_EXIT_MODE_ON_COMMISSIONING_WINDOW_EXPIRATION |
                                                                      ZGP_COMMISSIONING_EXIT_MODE_ON_PAIRING_SUCCESS |
                                                                      ZGP_COMMISSIONING_EXIT_MODE_ON_GP_PROXY_COMMISSIONING_MODE_EXIT)
+                                                                     /**< ZGP_COMMISSIONING_EXIT_MODE_ON_COMMISSIONING_WINDOW_EXPIRATION |
+                                                                      * ZGP_COMMISSIONING_EXIT_MODE_ON_PAIRING_SUCCESS |
+                                                                      * ZGP_COMMISSIONING_EXIT_MODE_ON_GP_PROXY_COMMISSIONING_MODE_EXIT */
 } zgp_commissioning_exit_mode_t;
 
 /*! @} */
@@ -1826,66 +1833,68 @@ void zb_zgps_send_data(zb_uint8_t param);
 */
 
 /**
- * @brief Put ZGPS into commissioning mode
+ * @brief Puts ZGPS into the commissioning mode.
  *
- * @details @ref ZB_ZGP_SIGNAL_MODE_CHANGE is generated when sink changes mode from
- * Operation Mode to Commissioning Mode and when it changes from Commissioning
- * Mode to Operational Mode.
- * 
- * @details @ref ZB_ZGP_SIGNAL_COMMISSIONING is generated if a successful commission happens
- * or if a decommissioning happens
+ * @details @ref ZB_ZGP_SIGNAL_MODE_CHANGE is generated when sink changes mode from the
+ * operational mode to the commissioning mode and vice versa.
  *
- * @param[in] timeout Maximum commissioning time in beacon intervals, 0 means no timeout.
+ * @details @ref ZB_ZGP_SIGNAL_COMMISSIONING is generated if successful commissioning or
+ * decommissioning happens.
  *
- * @note The mode will be changed back to operational mode if:
- *          - "On first Pairing success" is set in gpsCommissioningModeExit attribute and a
- *            successful paring occurs. See @ref ZB_ZGP_DEFAULT_COMMISSIONING_EXIT_MODE.
- *          - The timeout parameter is different from 0 and a timeout occurs.
- *          - GP Sink Commissioning Mode command with Action field set to 0x0 is received.
- * 
+ * @param[in] timeout - maximum commissioning time in beacon intervals
+ * @parblock
+ * @arg @b 0 - no timeout
+ * @endparblock
+ *
+ * @note The mode will be changed back to the operational mode if:
+ *          - "On first Pairing success" is set in the @b gpsCommissioningModeExit attribute and a
+ *            successful paring occurs. See @ref ZGP_COMMISSIONING_EXIT_MODE_ON_PAIRING_SUCCESS.
+ *          - @p timeout parameter is different from 0 (timeout occurs).
+ *          - GP Sink Commissioning Mode command with @p Action field set to 0x0 is received.
+ *
  * @cond DOXYGEN_INTERNAL_DOC
- * When called from GP Sink Commissioning Mode command with Action field set to
- * 0x1 the timeout must be set to gpsCommissioningWindow attribute value if
- * "On CommissioningWindow expiration" bit is set in gpsCommissioningExitMode
+ * When called from GP Sink Commissioning Mode command with @p Action field set to
+ * 0x1, the timeout must be set to @b gpsCommissioningWindow attribute value if
+ * "On CommissioningWindow expiration" bit is set in @b gpsCommissioningExitMode
  * attribute or 0 if it is not set. \n
- * The mode changes back from commissioning mode to operation mode according to
- * the gpsCommissioningExitMode A.3.3.2.4 attribute and gpsCommissioningWindow
+ * The mode changes back from the commissioning mode to the operation mode according to
+ * the @b gpsCommissioningExitMode A.3.3.2.4 attribute and @b gpsCommissioningWindow
  * A.3.3.2.5.
  * @endcond
  *
- * @note It is safe to call this function when device is already in
+ * @note It is safe to call this function when device is already in the
  * commissioning mode. In this case function does nothing.
- * 
+ *
  * @par Example
- * Starting commissioning for 60 seconds
+ * Starting commissioning for 60 seconds:
  * @snippet light_sample_ext/light_coordinator_combo/light_zc.c zgps_start_comm
  */
 void zb_zgps_start_commissioning(zb_time_t timeout);
 
 /**
- * @brief Put ZGPS into commissioning mode on a specific endpoint
+ * @brief Puts ZGPS into the commissioning mode on a specific endpoint.
  *
- * @param[in] ep Endpoint to start a commissioning. Will be used for GPD command forwarding
+ * @param[in] ep - endpoint to start commissioning. Will be used for GPD command forwarding
  *
- * @param[in] timeout Maximum commissioning time in beacon intervals
+ * @param[in] timeout - maximum commissioning time in beacon intervals
  * @parblock
  * @arg @b 0 - no timeout
  * @endparblock
  *
- * @note If timeout occurs, then result of commissioning is @ref ZB_ZGP_COMMISSIONING_TIMED_OUT
+ * @note If timeout occurs, then result of commissioning is @ref ZB_ZGP_COMMISSIONING_TIMED_OUT.
  *
- * @note It is safe to call this function when device is already in
+ * @note It is safe to call this function when device is already in the
  * commissioning mode. In this case function does nothing.
  *
  */
 void zb_zgps_start_commissioning_on_ep(zb_uint8_t ep, zb_time_t timeout);
 
 /**
- * @brief Switch ZGPS back to operational mode from commissioning
+ * @brief Switches ZGPS back to the operational mode from the commissioning mode.
  *
  * @cond DOXYGEN_INTERNAL_DOC
  * After commissioning is cancelled, user is notified with
- * @ref zb_zgp_comm_completed_cb_t with ZB_ZGP_COMMISSIONING_CANCELLED_BY_USER
+ * @ref zb_zgp_comm_completed_cb_t with @b ZB_ZGP_COMMISSIONING_CANCELLED_BY_USER
  * status.
  * @endcond
  *
@@ -1894,17 +1903,17 @@ void zb_zgps_start_commissioning_on_ep(zb_uint8_t ep, zb_time_t timeout);
  * @endcond
  *
  * @par Example
- * Stopping commissioning
+ * Stopping commissioning:
  * @snippet light_sample_ext/light_coordinator_combo/light_zc.c zgps_stop_comm
  */
 void zb_zgps_stop_commissioning(void);
 
 /**
- * @brief Accept/reject ZGPD commissioning attempt
+ * @brief Accepts/rejects ZGPD commissioning attempt.
  *
  * @details This function should be called as an answer to commissioning request made by
- *          stack via signal @ref ZB_ZGP_SIGNAL_APPROVE_COMMISSIONING or @ref zb_zgp_comm_req_cb_t callback.
- * @details Also, it can be called from @ref zb_zgp_comm_req_cb_t callback as well as outside it.
+ *          stack via @ref ZB_ZGP_SIGNAL_APPROVE_COMMISSIONING signal or @ref zb_zgp_comm_req_cb_t() callback.
+ * @details Also, it can be called from @ref zb_zgp_comm_req_cb_t() callback as well as outside it.
  * @cond DOCS_DEV_NOTES
  * ^^^
  * Not clear wording
@@ -1912,52 +1921,52 @@ void zb_zgps_stop_commissioning(void);
  *
  * @param[in] accept
  * @parblock
- * @arg @b ZB_TRUE - stack will continue ongoing commissioning process with ZGPD
+ * @arg @b ZB_TRUE   - stack will continue ongoing commissioning process with ZGPD
  * @arg @b ZB_FALSE - ongoing commissioning process will be terminated
  * @endparblock
  *
  * @if DOXYGEN_INTERNAL_DOC
  * @par Example
- * A callback with filtering logic called on @ref ZB_ZGP_SIGNAL_APPROVE_COMMISSIONING
+ * A callback with filtering logic called on @ref ZB_ZGP_SIGNAL_APPROVE_COMMISSIONING:
  * @snippet simple_combo/zc_combo.c accept_comm
  * @endif
  */
 void zb_zgps_accept_commissioning(zb_bool_t accept);
 
 /**
- * @brief Remove all the information about ZGPD from stack
+ * @brief Removes all information about ZGPD from the stack.
  *
- * @details In ZGP there is no way to say ZGPD to leave the network.
- *          ZGPD can leave network by itself using "Decommissioning" command,
- *          but ZGPS can miss this command if it was not in commissioning state.
+ * @details In ZGP, there is no way to instruct the  ZGPD to leave the network.
+ *          ZGPD can leave the network on its own using the "Decommissioning" command,
+ *          but ZGPD may miss this command if it was not in the commissioning state.
  *
- * @details This function removes all the information related to specified ZGPD
- *          from stack.
+ * @details This function removes all information related to the specified ZGPD
+ *          from the stack.
  *
- * @param[in] buf_ref  reference to the free buffer
- * @param[in] zgpd_id  pointer to identifier of ZGPD to be removed
+ * @param[in] buf_ref  - reference to the free buffer
+ * @param[in] zgpd_id  - pointer to the identifier of the ZGPD to be removed
  *
- * @note It is safe to free or overwrite memory pointed by zgpd_id
- *       after call
+ * @note It is safe to free or overwrite memory pointed by @p zgpd_id
+ *       after call.
  */
 void zb_zgps_delete_zgpd(zb_uint8_t buf_ref, zb_zgpd_id_t *zgpd_id);
 
 /**
- * @brief Remove all the information about ALL ZGPD from stack
+ * @brief Removes all information about all ZGPDs from the stack.
  *
- * @details Clears proxy, sink, mapping tables and TX queue
+ * @details This function clears proxy, sink, mapping tables and TX queue.
  */
 void zb_zgps_delete_all_zgpd(void);
 
 /**
- * @brief Get LQI and RSSI last time received from that ZGPD.
+ * @brief Retrieves LQI and RSSI last received from the ZGPD.
  *
- * @details if @p zgpd_id is not present
- *          @ref ZB_MAC_LQI_UNDEFINED and @ref ZB_MAC_RSSI_UNDEFINED will be set respectively
+ * @details If there is no @p zgpd_id,
+ *          @ref ZB_MAC_LQI_UNDEFINED and @ref ZB_MAC_RSSI_UNDEFINED will be set respectively.
  *
- * @param[in] zgpd_id  pointer to identifier of ZGPD
- * @param[out] lqi pointer to store ZGPD's lqi
- * @param[out] rssi pointer to store ZGPD's rssi
+ * @param[in] zgpd_id - pointer to the ZGPD identifier
+ * @param[out] lqi - pointer to store the ZGPD's LQI
+ * @param[out] rssi - pointer to store the ZGPD's RSSI
  */
 void zb_zgps_get_diag_data(zb_zgpd_id_t *zgpd_id, zb_uint8_t *lqi, zb_int8_t *rssi);
 
@@ -1988,11 +1997,11 @@ void zb_zgps_get_diag_data(zb_zgpd_id_t *zgpd_id, zb_uint8_t *lqi, zb_int8_t *rs
 
 
 /**
- * @brief Set @b gpsSecurityLevel GP cluster attribute of gpcb
+ * @brief Sets @b gpsSecurityLevel GP cluster attribute of GPCB.
  *
- * @details Described in A.3.3.2.6 @b gpsSecurityLevel attribute.
+ * @details Details are described in A.3.3.2.6 @b gpsSecurityLevel attribute.
  *
- * @param[in] level Security level to set
+ * @param[in] level - security level to set
  *
  * @par Example
  * Setting security level constructed by @ref ZB_ZGP_FILL_GPS_SECURITY_LEVEL
@@ -2001,80 +2010,81 @@ void zb_zgps_get_diag_data(zb_zgpd_id_t *zgpd_id, zb_uint8_t *lqi, zb_int8_t *rs
 void zb_zgps_set_security_level(zb_uint_t level);
 
 /**
- * @brief Get @b gpsSecurityLevel GP cluster attribute of gpcb
+ * @brief Gets @b gpsSecurityLevel GP cluster attribute of the GPCB
  *
- * @details Described in A.3.3.2.6 @b gpsSecurityLevel attribute.
+ * @details Details are described in A.3.3.2.6 @b gpsSecurityLevel attribute.
  *
  * @return @b gpsSecurityLevel attribute's value
  */
 zb_uint8_t zb_zgps_get_security_level(void);
 
 /**
- * @brief Set @b gpSharedSecurityKeyType GP cluster attribute
+ * @brief Sets @b gpSharedSecurityKeyType GP cluster attribute.
  *
- * @details Described in A.3.3.3.1 @b gpSharedSecurityKeyType attribute.
+ * @details Details are described in A.3.3.3.1 @b gpSharedSecurityKeyType attribute.
  *
- * @param[in] key_type Security key type to set (see @ref zb_zgp_security_key_type_e)
+ * @param[in] key_type - security key type to set (see @ref zb_zgp_security_key_type_e())
  */
 void zb_zgp_set_shared_security_key_type(zb_uint_t key_type);
 
 /**
- * @brief Set @b gpSharedSecurityKey GP cluster attribute
+ * @brief Sets @b gpSharedSecurityKey GP cluster attribute.
  *
- * @details Described in A.3.3.3.1 @b gpSharedSecurityKey attribute.
+ * @details Details are described in A.3.3.3.1 @b gpSharedSecurityKey attribute.
  *
- * @param[in] key Security key to set
+ * @param[in] key - security key to set
  */
 void zb_zgp_set_shared_security_key(zb_uint8_t *key);
 
 /**
- * @brief Set @b gpsCommissioningExitMode GP cluster attribute
+ * @brief Sets @b gpsCommissioningExitMode GP cluster attribute.
  *
- * @details Described in A.3.3.2.4 @b gpsCommissioningExitMode attribute.
+ * @details Details are described in A.3.3.2.4 @b gpsCommissioningExitMode attribute.
  *
- * @param[in] cem Commissioning exit mode to set (see @ref zgp_commissioning_exit_mode_t)
+ * @param[in] cem - commissioning exit mode to set (see @ref zgp_commissioning_exit_mode_t())
  */
 void zb_zgps_set_commissioning_exit_mode(zb_uint_t cem);
 
 /**
- * @brief Set @b gpsCommunicationMode GP cluster attribute of gpcb
+ * @brief Sets @b gpsCommunicationMode GP cluster attribute of the GPCB
  *
- * @details Described in A.3.3.2.3 @b gpsCommunicationMode attribute
+ * @details Details are described in A.3.3.2.3 @b gpsCommunicationMode attribute.
  *
- * @param[in] mode Communication mode to set (see @ref zgp_communication_mode_t)
+ * @param[in] mode - communication mode to set (see @ref zgp_communication_mode_t())
  *
  * @par Example
- * Set communication mode to ZGP_COMMUNICATION_MODE_LIGHTWEIGHT_UNICAST
+ * Set communication mode to @b ZGP_COMMUNICATION_MODE_LIGHTWEIGHT_UNICAST :
  * @snippet light_sample_ext/light_coordinator_combo/light_zc.c set_comm_mode
  */
 void zb_zgps_set_communication_mode(zgp_communication_mode_t mode);
 
 /**
- * @brief Application function to override translation of 8-bit vector command (generic switch)
+ * @brief The function may be overridden by the application to implement custom
+ * translation of 8-bit vector command (generic switch).
  *
  * @par Details
  * @details If this function is not implemented in the application, then ZBOSS
- *          performs a default translation as recommended by ZGP spec (see Green Power
- *          Basic specification v1.1.1, tables 51, 52). If there is no default
- *          translation found, then the received command is dropped.
+ *          performs a default translation as recommended by ZGP spec (see <b> Green Power
+ *          Basic specification v1.1.1, tables 51, 52</b>). If no default translation is found,
+ *          the received command will be dropped.
  *
- * @details If this function is implemented by the the application, then application is
+ * @details If this function is implemented in the application, then the application is
  *          fully responsible for a translation of GPD 8-bit vector commands. For any
- *          return code but RET_OK, ZBOSS will stop command processing and drop it.
+ *          return code but @p RET_OK, ZBOSS will stop command processing and drop it.
  *
- * @param[in] vector_8bit_cmd_id incoming command ID: press (0x69) or release(0x6a)
- * @param[in] switch_type switch type of the command's originator (see ZGP spec. A.4.2.1.1.10)
- * @param[in] num_of_contacts number of contacts command's originator provides
- * @param[in] contact_status contacts status from the payload of the received command
- * @param[out] zgp_cmd_out GPDF command ID to which incoming command should be translated
+ * @param[in] vector_8bit_cmd_id - incoming command ID: press (0x69) or release (0x6a)
+ * @param[in] switch_type - switch type of the command's originator (see <b>ZGP spec. A.4.2.1.1.10</b>)
+ * @param[in] num_of_contacts - number of contacts, which command's originator provides
+ * @param[in] contact_status - contact status from the payload of the received command
+ * @param[out] zgp_cmd_out - GPDF command ID, to which incoming command should be translated
  *
  * @retval RET_OK - on successful translation
  * @retval RET_ERROR - on failure
  *
- * @note The translation is done to GPDF command ID, not to ZCL command ID.
+ * @note The translation is applied to the GPDF command ID, not to the ZCL command ID.
  *
  * @par Example
- * Sample application implementation of translation of 8-bit vector command
+ * Sample application implementation of 8-bit vector command translation:
  * @snippet simple_combo/zc_combo.c convert_8bit_vector
  *
  * @see <b> Green Power Basic specification v1.1.1, chapters A.3.6.2.2.2, A.4.2.2.1</b>
@@ -2086,55 +2096,55 @@ zb_ret_t zb_zgp_convert_8bit_vector(zb_uint8_t vector_8bit_cmd_id,      /* press
                                     zb_uint8_t *zgp_cmd_out);
 
 /**
- * @brief Application function to override allows custom handling incoming raw GPDF packet
+ * @brief Frees the incoming raw GPDF packet (buffer). This function can be overridden by the application to implement custom
+ * handling of the buffer.
  *
- * @details If this function is not implemented by the application, then ZBOSS
- *          drops the buffer without any additional handling.
+ * @par Details
  *
- * @details If this function is implemented by the application, the application itself
- *          shall carry to free this resource.
+ * @details If this function is implemented in the application, the application itself shall handle freeing the buffer; otherwise
+ *          ZBOSS will drop the buffer without any additional handling.
  *
- * @param[in] buf_ref buffer with incoming raw GPDF packet
+ * @param[in] buf_ref - buffer with incoming raw GPDF packet
  */
 void zb_zgp_gpdf_raw_indication(zb_bufid_t buf_ref);
 
 #ifdef ZB_ENABLE_ZGP_DIRECT
 /**
- * @brief Set ZBOSS to skip all incoming GPDF.
+ * @brief Sets ZBOSS to skip all incoming GPDFs.
  *
- * @param[in] skip 
+ * @param[in] skip
  * @parblock
- * @arg @b ZB_TRUE - Ignore direct GPDF recv: always work through the proxy
- * @arg @b ZB_FALSE - Process GPDF: work as combo (default)
+ * @arg @b ZB_TRUE   - to ignore direct GPDF reception: always work through the proxy
+ * @arg @b ZB_FALSE - to process GPDF: work as a combo (default)
  * @endparblock
  *
  * @attention To be used for testing only.
- *            Use that function with ZB_TRUE parameter to prevent Combo device from
- *            receiving GPDFS thus always working thru Proxy device.
+ *            This function should be used with the @p ZB_TRUE parameter to prevent Combo device from
+ *            receiving GPDFs, thus always working through the Proxy device.
  */
 void zb_zgp_set_skip_gpdf(zb_uint8_t skip);
 
 /**
- * @brief Check if ZBOSS skips all incoming GPDF.
+ * @brief Checks if ZBOSS skips all incoming GPDFs.
  *
- * @retval ZB_TRUE - Direct GPDF recv is ignored: device works always through the proxy
- * @retval ZB_FALSE - GPDF is processed: device works as combo (default)
+ * @retval ZB_TRUE  - direct GPDF reception is ignored: device works always through the proxy
+ * @retval ZB_FALSE - GPDF is processed: device works as a combo (default)
  *
  * @attention To be used for testing only.
  *
- * @see zb_zgp_set_skip_gpdf - setter function
+ * @see zb_zgp_set_skip_gpdf()
  */
 zb_uint8_t zb_zgp_get_skip_gpdf(void);
 
 /**
- * @brief Call MLME-SET.request to sync SKIP_ALL_GPF attribute
+ * @brief Calls @b MLME-SET.request to sync @b SKIP_ALL_GPF attribute.
  *
- * @param[in] param reference to the free buffer
+ * @param[in] param - reference to the free buffer
  *
  * @attention To be used for testing only.
  *
- * @see zb_zgp_set_skip_gpdf - setter function
- * @see zb_zgp_get_skip_gpdf - getter function
+ * @see zb_zgp_set_skip_gpdf
+ * @see zb_zgp_get_skip_gpdf
  */
 void zb_zgp_sync_pib(zb_uint8_t param);
 

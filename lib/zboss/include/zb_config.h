@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -49,6 +49,10 @@ constants etc.
    Load vendor specific configurations
 */
 
+/*! Specification version of the specification */
+/* Moved here so it is defined before zb_vendor.h is included */
+#define ZB_STACK_SPEC_VERSION 23
+
 /* \defgroup buildconfig Build Configurations
    @{ */
 #include "zb_vendor.h"
@@ -56,6 +60,44 @@ constants etc.
    Load common ZBOSS definitions
 */
 #include "zb_config_common.h"
+
+
+/*
+  some BDB defaults
+*/
+#if defined ZB_LITE_BDB_ONLY_COMMISSIONING && !defined ZB_BDB_MODE
+#define ZB_BDB_MODE
+#endif
+
+#ifdef ZB_BDB_MODE
+#define ZB_BDB_ENABLE_FINDING_BINDING
+#if !defined(NCP_MODE_HOST)
+/* BDB mandates GPPB */
+#define ZB_ENABLE_ZGP
+#endif /* !NCP_MODE_HOST */
+/* Starting from BDB 3.1 rejoin backoff is mandatory. */
+#define ZB_REJOIN_BACKOFF
+/* Distributed is M for BDB, but not for SE */
+#define ZB_DISTRIBUTED_SECURITY_ON
+#endif  /* ZB_BDB_MODE */
+
+/*
+ * NCP does not yet support the rejoin backoff.
+ * However, some vendor files explicitly define it.
+ */
+#if defined(NCP_MODE_HOST) && defined(ZB_REJOIN_BACKOFF)
+#undef ZB_REJOIN_BACKOFF
+#endif
+
+/* Always ON in r23 */
+#define APS_FRAGMENTATION
+#define ZB_BEACON_SURVEY
+#define ZB_PARENT_CLASSIFICATION
+#if !defined ZB_MACSPLIT_DEVICE && !defined TC_SWAPOUT
+#define TC_SWAPOUT
+#endif
+#define ZB_SECURITY_INSTALLCODES
+
 
 /*
  * ZC/ZR - GPPB role library     (default) (implementation of Basic Proxy is mandatory for Zigbee 3.0 ZR)
@@ -108,6 +150,10 @@ constants etc.
 
 #elif defined ZB_ENABLE_ZGP && !defined ZB_ENABLE_ZGP_TARGET && defined ZB_ED_ROLE
 #undef ZB_ENABLE_ZGP
+#endif
+
+#if defined ZB_ENABLE_ZGP_DIRECT && !defined ZB_ENABLE_ZGP_TARGET && defined ZB_ED_ROLE
+#undef ZB_ENABLE_ZGP_DIRECT
 #endif
 
 
@@ -240,6 +286,7 @@ constants etc.
 #define ZB_ENABLE_SE_MIN_CONFIG
 #endif
 #endif
+
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
 
 #if defined ZB_ENABLE_SE_MIN_CONFIG
@@ -524,7 +571,7 @@ Ideally should rework the whole zb_config.h to suit better for that new concept.
 #undef ZB_DISTRIBUTED_SECURITY_ON
 #endif
 #ifdef ZB_CONFIGURABLE_MEM
-#undef ZB_CONFIGURABLE_MEM
+#error "MACSPLIT SOC cannot be compiled with configurable memory"
 #endif
 #endif  /* ZB_MACSPLIT_DEVICE */
 
@@ -537,18 +584,25 @@ Ideally should rework the whole zb_config.h to suit better for that new concept.
 #endif  /* ZB_MACSPLIT_HOST */
 
 #ifdef ZB_MACSPLIT
-#if defined ZB_MACSPLIT_TRANSPORT_SERIAL || defined ZB_TRANSPORT_LINUX_UART
+
+#if defined ZB_MACSPLIT_TRANSPORT_EXTERNAL
+#define ZB_MACSPLIT_TRANSPORT_TYPE ZB_MACSPLIT_TRANSPORT_TYPE_EXTERNAL
+#elif defined ZB_MACSPLIT_TRANSPORT_SERIAL || defined ZB_TRANSPORT_LINUX_UART
+
+#if defined ZB_MACSPLIT_TRANSPORT_MUX
+#define ZB_MACSPLIT_TRANSPORT_TYPE ZB_MACSPLIT_TRANSPORT_TYPE_MUX
+#else
 #define ZB_MACSPLIT_TRANSPORT_TYPE ZB_MACSPLIT_TRANSPORT_TYPE_SERIAL
-#endif
-#ifdef ZB_MACSPLIT_TRANSPORT_USERIAL
+#endif /* ZB_MACSPLIT_TRANSPORT_MUX */
+
+#elif defined ZB_MACSPLIT_TRANSPORT_USERIAL
 #define ZB_MACSPLIT_TRANSPORT_TYPE ZB_MACSPLIT_TRANSPORT_TYPE_USERIAL
-#endif
-#ifdef ZB_MACSPLIT_TRANSPORT_SPI
+#elif defined ZB_MACSPLIT_TRANSPORT_SPI
 #define ZB_MACSPLIT_TRANSPORT_TYPE ZB_MACSPLIT_TRANSPORT_TYPE_SPI
-#endif
-#ifdef ZB_MACSPLIT_TRANSPORT_MUX
+#elif defined ZB_MACSPLIT_TRANSPORT_MUX
 #define ZB_MACSPLIT_TRANSPORT_TYPE ZB_MACSPLIT_TRANSPORT_TYPE_MUX
 #endif
+
 #endif  /* ZB_MACSPLIT */
 
 
@@ -694,6 +748,13 @@ Ideally should rework the whole zb_config.h to suit better for that new concept.
 #define ZB_DELAY_BEFORE_MTORR_AT_BOOT ZB_MILLISECONDS_TO_BEACON_INTERVAL(100u)
 
 #endif /*ZB_PRO_STACK*/
+
+#if defined ZB_MULTIPAN_HOST && !defined ZB_MULTIPAN_DISABLE_CHANNEL_CHANGE_BLOCKING_WHILE_JOINED
+/** This define disables channel changing by default (except for temporary channel changes) while device is on network
+ *  regardless of device's role. It may be ZC that formed the network or ZR/ZED that joined it.
+ *  This feature may be configured in run-time, see zb_nwk_mutlipan_allow_channel_change_while_joined for more info. */
+#define ZB_MULTIPAN_ENABLE_CHANNEL_CHANGE_BLOCKING_WHILE_JOINED
+#endif /* ZB_MULTIPAN_HOST && !ZB_MULTIPAN_DISABLE_CHANNEL_CHANGE_BLOCKING_WHILE_JOINED */
 
 
 #if defined ZB_MAC_PENDING_BIT_SOURCE_MATCHING
@@ -871,6 +932,10 @@ ZB_ED_RX_OFF_WHEN_IDLE
 
 #if ZB_NEIGHBOR_TABLE_SIZE > 255U
 #error ZB_NEIGHBOR_TABLE_SIZE should be less than 255 (fit into 1 byte)
+#endif
+
+#if (defined ZB_ED_ROLE) && (ZB_NEIGHBOR_TABLE_SIZE != 1)
+#error Invalid configuration, neighbor table for ED build should have a single entry according to R23 PICS - "NWK-NT-SIZE-ZED - Neighbor Table Size is equal to 1 (for End Devices)"
 #endif
 
 /**
@@ -1249,10 +1314,10 @@ exponent.
 #endif /* ZB_NWK_NEIGHBOUR_PATH_COST_RSSI_BASED */
 
 /*! Reserved space for routing on a parent when a device in ZED role.
- * 
+ *
  * According to R22 specification 3.6.3.3 and 3.6.3.3.1:
  * Source route info is added when a data frame is received from the NEXT HIGHER LAYER
- * Since Source Route is only added on ZC, this case only happens when ZC is the one 
+ * Since Source Route is only added on ZC, this case only happens when ZC is the one
  * creating the frame.
  * When a ZED sends a packet that is routed through ZC, Source Route is not added
  * to the packet, thus we do not have to reserve space for that in ZED.
@@ -1385,8 +1450,9 @@ exponent.
 #endif /* defined ZB_LITTLE_ENDIAN && defined ZB_BIG_ENDIAN */
 
 /** @cond DOXYGEN_INTERNAL_DOC */
+
 /* DA: network status with OUT_OF_MEMORY custom value */
-#if !defined ZB_CHECK_OOM_STATUS && !defined xZB_CHECK_OOM_STATUS && !defined ZB_MACSPLIT_DEVICE && !defined ZB_LITE_NO_OOM_DETECTION
+#if !defined ZB_CHECK_OOM_STATUS && !defined xZB_CHECK_OOM_STATUS && !defined ZB_MACSPLIT_DEVICE && !defined ZB_LITE_NO_OOM_DETECTION && !defined ZB_MAC_ONLY_STACK
 /** Enable check whether the ZBOSS stack is out of memory */
 #define ZB_CHECK_OOM_STATUS
 #endif
@@ -1469,13 +1535,13 @@ exponent.
 
 /*************************Serial and UDP trace**********************/
 #ifndef ZB_PLATFORM_LINUX /* Uncomment for binary logs! */
-#if defined ZB_SERIAL_FOR_TRACE || defined ZB_TRACE_OVER_JTAG || defined ZB_NET_TRACE
+#if defined ZB_SERIAL_FOR_TRACE || defined ZB_TRACE_OVER_JTAG || defined ZB_NET_TRACE || defined ZB_TRACE_OVER_MUX
 /* binary trace: optimize traffic size. need special win_com_dump */
 #define ZB_BINARY_TRACE
 /* #define ZB_TRAFFIC_DUMP_ON */
 /* #define ZB_TRAF_DUMP_V2 */
 
-#endif /*ZB_SERIAL_FOR_TRACE || defined ZB_TRACE_OVER_JTAG || defined ZB_NET_TRACE*/
+#endif /*ZB_SERIAL_FOR_TRACE || defined ZB_TRACE_OVER_JTAG || defined ZB_NET_TRACE || defined ZB_TRACE_OVER_MUX*/
 #endif /*ZB_PLATFORM_LINUX*/
 
 /* If trace baudrate isn't set, set it to 115200 by default */
@@ -1787,6 +1853,14 @@ exponent.
 #endif /* ZB_ZGP_APP_DESCR_REPORT_DATA_SIZE */
 
 #ifdef ZB_ENABLE_ZGP_DIRECT
+
+#ifndef ZB_ALIEN_MAC
+/* Now all our MAC implementations have an ability to send GPD frame at predefined time, so no need for a delay in GP stub in zb_zgp_try_bidir_tx().
+   Some alien MAC can have that feature too, so define MAC_AUTO_DELAY_IN_MAC_GP_SEND for them in a vendor file.
+ */
+#define MAC_AUTO_DELAY_IN_MAC_GP_SEND
+#endif
+
 /* Old GP GPD sensors (until May, 2014) use
  * 5 ms offset. New sensors use 20 ms offset.*/
 //#define ZB_GPD_RX_OFFSET_MS 5
@@ -1839,6 +1913,7 @@ exponent.
 #if defined ENABLE_ZGP_TARGET_PLUS || defined ZB_ENABLE_ZGP_EP || defined ZB_DIRECT_MODE_WITH_ZGPD
 #error Old ZGP define detected!
 #endif
+
 
 /* ZBOSS Lite defines */
 
@@ -2375,6 +2450,11 @@ exponent.
 /* By default keep counting children: it covered by ZOI CI, don't want to update it.. */
 #if !defined ZB_NO_COUNT_CHILDREN && !defined ZB_COUNT_CHILDREN
 #define ZB_COUNT_CHILDREN
+#endif
+
+#if defined ZB_ENABLE_SE && defined ZB_BDB_MODE
+/* No need to define mixed mode in a vendor file - do it here */
+#define ZB_SE_BDB_MIXED
 #endif
 
 #if !defined(ZB_DIAG_CORE_WATCHDOG_TMO_MS)

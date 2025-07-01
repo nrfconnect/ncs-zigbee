@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -275,6 +275,9 @@ typedef struct zb_sec_globals_s
 #endif
 #if defined TC_SWAPOUT && defined ZB_COORDINATOR_ROLE
   zb_tcswap_t tcswap;
+#endif
+#ifdef APP_GENERATES_TCLK
+  app_generate_tclk_cb_t app_generate_tclk_cb;
 #endif
 #ifdef SNCP_MODE
   zb_bitbool_t accept_partner_lk:1;   /**!< enable/disable acceptance of partner LK establishment procedure */
@@ -674,6 +677,9 @@ typedef struct zb_cert_hacks_s
  * see: ZBOSS/tests/regression_tests/
  */
 
+typedef zb_bool_t (*zb_reg_api_aps_retrans_table_cmd_access_cb_t) (
+  zb_uint8_t param, zb_uint16_t dest_addr, zb_uint8_t command, zb_bool_t with_ack);
+
 /* Flags and attributes for tests, allows to switch stack behavior in run-time.
  * Used to simulate legacy device behavior, error behavior e.t.c.
  * By default set to zero and does not affect stack behavior.
@@ -739,6 +745,10 @@ typedef struct zb_reg_api_s
   zb_bool_t disable_mac_ack_for_data_packets_after_confirm_key; /*!< Disable MAC ACKs for incoming
                                                                  *   MAC data packets after Confirm key command. */
   zb_callback_t disable_mac_ack_for_data_packets_cb;    /*!< To notify an app when a MAC ack was skipped */
+
+  zb_reg_api_aps_retrans_table_cmd_access_cb_t aps_retrans_table_cmd_access_cb; /*!< Allows to enable or disable access to add
+                                                                                 *   new command entry to APS retransmission table. */
+
 #if defined(ZB_MAC_MONOLITHIC)
   zb_bool_t disable_mac_ack_for_data_packets_and_pass_up; /*!< When MAC ACKs disabled for incoming
                                                            *   Data packets pass them up anyway */
@@ -829,8 +839,8 @@ struct zb_globals_s
   zb_nwk_globals_t        nwk;      /*!< Global NWK context - NIB */
   zb_aps_globals_t        aps;      /*!< Global APS context - AIB */
   zb_zdo_globals_t        zdo;      /*!< Global ZDO context - ZDO_CTX */
-#endif /* (!(defined ZB_MACSPLIT_DEVICE)) || (defined ZB_TH_ENABLED) */
   zb_sec_globals_t        sec;      /*!< Global security context - SEC_CTX */
+#endif /* (!(defined ZB_MACSPLIT_DEVICE)) || (defined ZB_TH_ENABLED) */
 #endif /* !defined NCP_MODE_HOST */
 
 #if !defined ZB_MACSPLIT_DEVICE || defined ZB_TH_ENABLED

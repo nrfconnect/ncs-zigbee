@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -1025,6 +1025,7 @@ zb_zcl_reporting_info_t* zb_zcl_get_next_reporting_info(zb_zcl_reporting_info_t 
 
           attr_desc =
             zb_zcl_get_attr_desc_manuf_a(rep_info->ep, rep_info->cluster_id, rep_info->cluster_role, rep_info->attr_id, rep_info->manuf_code);
+          ZB_ASSERT(attr_desc);
           attr_manuf_spec = !!ZB_ZCL_IS_ATTR_MANUF_SPEC(attr_desc);
 
           if (ZB_ZCL_GET_REPORTING_FLAG(rep_info, ZB_ZCL_REPORT_ATTR) &&
@@ -1249,7 +1250,7 @@ void zb_zcl_save_reported_value(zb_zcl_reporting_info_t *rep_info, zb_zcl_attr_t
   } /* is analog type */
   else
   {
-    TRACE_MSG(TRACE_ZCL3, "descrete attr type", (FMT__0));
+    TRACE_MSG(TRACE_ZCL3, "discrete attr type", (FMT__0));
     attr_size = zb_zcl_get_attribute_size(attr_desc->type, attr_desc->data_p);
     rep_info->u.send_info.reported_value.data_buf_crc32 = zb_crc32(attr_desc->data_p, attr_size);
     TRACE_MSG(TRACE_ZCL3, "reported attr size %hd, data crc32 = 0x%08x",

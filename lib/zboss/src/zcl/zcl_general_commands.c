@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -624,20 +624,19 @@ zb_zcl_attr_t* zb_zcl_get_attr_desc_manuf_a(zb_uint8_t ep,
 {
   zb_af_endpoint_desc_t *ep_desc;
   zb_zcl_cluster_desc_t *cluster_desc;
-  zb_zcl_attr_t *attr_desc;
+  zb_zcl_attr_t *attr_desc = NULL;
 
   TRACE_MSG(TRACE_ZCL2, ">> zb_zcl_get_attr_desc_manuf_a ep %hd, cluster_id 0x%x, attr_id 0x%x, manuf_code 0x%x",
             (FMT__H_D_D_D, ep, cluster_id, attr_id, manuf_code));
 
   ep_desc = zb_af_get_endpoint_desc(ep);
-  /* EP existence was checked on command accept - it must be in the list */
-  ZB_ASSERT(ep_desc);
-
   cluster_desc = get_cluster_desc(ep_desc, cluster_id, cluster_role);
-  /* Cluster existence was checked on command accept - it must be in the list */
-  ZB_ASSERT(cluster_desc);
 
-  attr_desc = zb_zcl_get_attr_desc_manuf(cluster_desc, attr_id, manuf_code);
+  if (cluster_desc != NULL)
+  {
+    attr_desc = zb_zcl_get_attr_desc_manuf(cluster_desc, attr_id, manuf_code);
+  }
+
   TRACE_MSG(TRACE_ZCL2, "<< zb_zcl_get_attr_desc_manuf_a ret %p", (FMT__P, attr_desc));
   return attr_desc;
 }
@@ -1261,16 +1260,16 @@ void zb_zcl_read_report_config_cmd_handler(zb_uint8_t param)
          case ZB_ZCL_STATUS_UNSUP_ATTRIB:
          case ZB_ZCL_STATUS_UNREPORTABLE_ATTRIB:
          case ZB_ZCL_STATUS_NOT_FOUND:
-         /*We already have enough space for unsuccess report, so it is no need
+         /*We already have enough space for unsuccessful report, so it is no need
           * to check it again
           */
-           TRACE_MSG(TRACE_ZCL1, "setting UNSUCCESS status", (FMT__0));
+           TRACE_MSG(TRACE_ZCL1, "setting UNSUCCESSFUL status", (FMT__0));
 
            ZB_ZCL_PACKET_PUT_DATA8(resp_data, status);                     /*Add status field*/
            ZB_ZCL_PACKET_PUT_DATA8(resp_data, read_rep_cfg_req.direction);   /*Add direction field*/
            ZB_ZCL_PACKET_PUT_DATA16_VAL(resp_data, read_rep_cfg_req.attr_id);   /*Add attr_id field*/
 
-           TRACE_MSG(TRACE_ZCL1, "setting UNSUCCESS status end", (FMT__0));
+           TRACE_MSG(TRACE_ZCL1, "setting UNSUCCESSFUL status end", (FMT__0));
 
            break;
        } /*switch(status)*/
@@ -1466,6 +1465,8 @@ void zb_zcl_send_report_attr_command(zb_zcl_reporting_info_t *rep_info, zb_uint8
       rep_info->attr_id,
       rep_info->manuf_code);
 
+  ZB_ASSERT(attr_desc);
+
   is_manuf_spec = !!ZB_ZCL_IS_ATTR_MANUF_SPEC(attr_desc);
 
   /* ZCL spec, 2.4.11 Report Attributes Command */
@@ -1603,17 +1604,6 @@ static void zb_zcl_disc_attr_handler(zb_uint8_t param)
   disc_attr_req = (zb_zcl_disc_attr_req_t*)zb_buf_begin(param);
   TRACE_MSG(TRACE_ZCL2, "disc_attr_req %p", (FMT__P, disc_attr_req));
 
-  max_info_num = extended ?
-    (ZB_ZCL_HI_WO_IEEE_MAX_PAYLOAD_SIZE / sizeof(zb_zcl_disc_attr_ext_info_t)) :
-    (ZB_ZCL_HI_WO_IEEE_MAX_PAYLOAD_SIZE / sizeof(zb_zcl_disc_attr_info_t));
-
-  /* ZB_ZCL_DISC_ATTR_MAX - max possibly number attr for send */
-  if (disc_attr_req->maximum > max_info_num)
-  {
-    ZB_ASSERT(max_info_num <= ZB_UINT8_MAX);
-    disc_attr_req->maximum = (zb_uint8_t)max_info_num;
-  }
-
   /* Construct packet header */
   /* Use runtime_buf buffer for composing and sending response, request buffer
    * will be saved as runtime_buf */
@@ -1644,6 +1634,16 @@ static void zb_zcl_disc_attr_handler(zb_uint8_t param)
   complete = resp_data;
   /* There is the same beginning for both Discover Attr and Discover attr ext Resp */
   ZB_ZCL_PACKET_PUT_DATA8(resp_data, ZB_ZCL_DISC_NON_COMPLETE);
+
+  max_info_num = ((ZB_ZCL_HI_WO_IEEE_MAX_PAYLOAD_SIZE - ZB_ZCL_GET_BYTES_WRITTEN(ZCL_CTX().runtime_buf, resp_data)) ) /
+    (extended ? sizeof(zb_zcl_disc_attr_ext_info_t) : sizeof(zb_zcl_disc_attr_info_t));
+
+  /* ZB_ZCL_DISC_ATTR_MAX - max possibly number attr for send */
+  if (disc_attr_req->maximum > max_info_num)
+  {
+    ZB_ASSERT(max_info_num <= ZB_UINT8_MAX);
+    disc_attr_req->maximum = (zb_uint8_t)max_info_num;
+  }
 
   i = 0;
   /* Decrement (cluster_desc->attr_count) by 1 because

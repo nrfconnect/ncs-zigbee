@@ -654,7 +654,10 @@ enum zb_zcl_ota_upgrade_image_status_e
 #define ZB_ZCL_OTA_UPGRADE_MAX_INTERVAL 60
 
 /*! @brief Resend buffer delay */
-#define ZB_ZCL_OTA_UPGRADE_RESEND_BUFFER_DELAY ZB_TIME_ONE_SECOND * 45
+#define ZB_ZCL_OTA_UPGRADE_RESEND_BUFFER_DELAY ZB_TIME_ONE_SECOND * 15
+
+/*! @brief End Response timeout */
+#define ZB_ZCL_OTA_UPGRADE_END_RES_TIMEOUT ZB_TIME_ONE_SECOND * 90
 
 /*! @cond internals_doc
     @name OTA Upgrade cluster internals
@@ -2028,22 +2031,23 @@ enum zb_zcl_ota_upgrade_status_e
   if (ZCL_CTX().device_cb)                                          \
   {                                                                 \
     zb_zcl_device_callback_param_t *user_app_data =                 \
-        ZB_BUF_GET_PARAM(buffer, zb_zcl_device_callback_param_t);   \
-    zb_zcl_ota_upgrade_value_param_t value;                         \
-    value.upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_START;         \
-    value.upgrade.start.manufacturer = (manufacturer_);             \
-    value.upgrade.start.image_type  = (image_type_);                \
-    value.upgrade.start.file_version = (file_version_);             \
-    value.upgrade.start.file_length = (file_length_);               \
-    user_app_data->cb_param.ota_value_param = value;                \
+        ZB_BUF_GET_PARAM(buffer, zb_zcl_device_callback_param_t);      \
+    zb_zcl_ota_upgrade_value_param_t *value =                       \
+        &(user_app_data->cb_param.ota_value_param);                 \
+    value->upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_START;        \
+    value->upgrade.start.manufacturer = (manufacturer_);            \
+    value->upgrade.start.image_type  = (image_type_);               \
+    value->upgrade.start.file_version = (file_version_);            \
+    value->upgrade.start.file_length = (file_length_);              \
     user_app_data->device_cb_id = ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID;   \
     user_app_data->endpoint = get_endpoint_by_cluster(ZB_ZCL_CLUSTER_ID_OTA_UPGRADE, ZB_ZCL_CLUSTER_CLIENT_ROLE); \
     user_app_data->status = RET_OK;                                 \
-    (ZCL_CTX().device_cb)(buffer);                                  \
-    result = user_app_data->cb_param.ota_value_param.upgrade_status;\
+    (ZCL_CTX().device_cb)(buffer);                                   \
+    result = value->upgrade_status;                                 \
   }                                                                 \
 }
 
+// NOTE file data place`s in buffer, payload saves pointer to data only!
 #define ZB_ZCL_OTA_UPGRADE_RECEIVE_USER_APP(buffer,                 \
                                             file_offset_, data_length_, block_data_, result) \
 {                                                                   \
@@ -2052,17 +2056,17 @@ enum zb_zcl_ota_upgrade_status_e
   {                                                                 \
     zb_zcl_device_callback_param_t *user_app_data =                 \
       ZB_BUF_GET_PARAM(buffer, zb_zcl_device_callback_param_t);     \
-    zb_zcl_ota_upgrade_value_param_t value;                         \
-    value.upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_RECEIVE;       \
-    value.upgrade.receive.file_offset = (file_offset_);             \
-    value.upgrade.receive.data_length = (data_length_);             \
-    value.upgrade.receive.block_data  = (block_data_);              \
-    user_app_data->cb_param.ota_value_param = value;                \
+    zb_zcl_ota_upgrade_value_param_t *value =                       \
+        &(user_app_data->cb_param.ota_value_param);                 \
+    value->upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_RECEIVE;      \
+    value->upgrade.receive.file_offset = (file_offset_);            \
+    value->upgrade.receive.data_length = (data_length_);            \
+    value->upgrade.receive.block_data  = (block_data_);             \
     user_app_data->device_cb_id = ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID;   \
     user_app_data->endpoint = get_endpoint_by_cluster(ZB_ZCL_CLUSTER_ID_OTA_UPGRADE, ZB_ZCL_CLUSTER_CLIENT_ROLE); \
     user_app_data->status = RET_OK;                                 \
-    (ZCL_CTX().device_cb)(buffer);                                  \
-    result = user_app_data->cb_param.ota_value_param.upgrade_status;\
+    (ZCL_CTX().device_cb)(buffer);                                   \
+    result = value->upgrade_status;                                 \
   }                                                                 \
 }
 
@@ -2074,16 +2078,16 @@ enum zb_zcl_ota_upgrade_status_e
   result = ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;                         \
   if (ZCL_CTX().device_cb)                                          \
   {                                                                 \
-    zb_zcl_ota_upgrade_value_param_t value;                         \
-    value.upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_FINISH;        \
-    user_app_data->cb_param.ota_value_param = value;                \
+    zb_zcl_ota_upgrade_value_param_t *value =                       \
+        &(user_app_data->cb_param.ota_value_param);                 \
+    value->upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_FINISH;       \
     user_app_data->device_cb_id = ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID;   \
     user_app_data->endpoint = get_endpoint_by_cluster(ZB_ZCL_CLUSTER_ID_OTA_UPGRADE, ZB_ZCL_CLUSTER_CLIENT_ROLE); \
     user_app_data->status = RET_OK;                                 \
-    (ZCL_CTX().device_cb)(buffer);                                  \
+    (ZCL_CTX().device_cb)(buffer);                                   \
     if (user_app_data->status == RET_OK)                            \
     {                                                               \
-      result = user_app_data->cb_param.ota_value_param.upgrade_status;\
+      result = value->upgrade_status;                               \
     }                                                               \
   }else                                                             \
   {                                                                 \
@@ -2091,7 +2095,7 @@ enum zb_zcl_ota_upgrade_status_e
   }                                                                 \
 }                                                                   \
 
-#define ZB_ZCL_OTA_UPGRADE_APPLY_USER_APP(buffer, result)           \
+#define ZB_ZCL_OTA_UPGRADE_APPLY_USER_APP(buffer, result)          \
 {                                                                   \
   zb_zcl_device_callback_param_t *user_app_data =                   \
       ZB_BUF_GET_PARAM(buffer, zb_zcl_device_callback_param_t);     \
@@ -2099,22 +2103,23 @@ enum zb_zcl_ota_upgrade_status_e
   result = ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;                         \
   if (ZCL_CTX().device_cb)                                          \
   {                                                                 \
-    zb_zcl_ota_upgrade_value_param_t value;                         \
-    value.upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_APPLY;         \
-    user_app_data->cb_param.ota_value_param = value;                \
+    zb_zcl_ota_upgrade_value_param_t *value =                       \
+        &(user_app_data->cb_param.ota_value_param);                 \
+    value->upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_APPLY;       \
     user_app_data->device_cb_id = ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID;   \
     user_app_data->endpoint = get_endpoint_by_cluster(ZB_ZCL_CLUSTER_ID_OTA_UPGRADE, ZB_ZCL_CLUSTER_CLIENT_ROLE); \
     user_app_data->status = RET_OK;                                 \
-    (ZCL_CTX().device_cb)(buffer);                                  \
+    (ZCL_CTX().device_cb)(buffer);                                   \
     if (user_app_data->status == RET_OK)                            \
     {                                                               \
-      result = user_app_data->cb_param.ota_value_param.upgrade_status;\
+      result = value->upgrade_status;                               \
     }                                                               \
   }else                                                             \
   {                                                                 \
     result = ZB_ZCL_OTA_UPGRADE_STATUS_OK;                          \
   }                                                                 \
-}
+}                                                                   \
+
 
 #define ZB_ZCL_OTA_UPGRADE_ABORT_USER_APP(buffer)                   \
 {                                                                   \
@@ -2123,9 +2128,9 @@ enum zb_zcl_ota_upgrade_status_e
   {                                                                 \
     zb_zcl_device_callback_param_t *user_app_data =                 \
         ZB_BUF_GET_PARAM(buffer, zb_zcl_device_callback_param_t);   \
-    zb_zcl_ota_upgrade_value_param_t value;                         \
-    value.upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_ABORT;         \
-    user_app_data->cb_param.ota_value_param = value;                \
+    zb_zcl_ota_upgrade_value_param_t *value =                       \
+        &(user_app_data->cb_param.ota_value_param);                 \
+    value->upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_ABORT;        \
     user_app_data->device_cb_id = ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID;   \
     user_app_data->endpoint = get_endpoint_by_cluster(ZB_ZCL_CLUSTER_ID_OTA_UPGRADE, ZB_ZCL_CLUSTER_CLIENT_ROLE); \
     user_app_data->status = RET_OK;                                 \
@@ -2141,22 +2146,22 @@ enum zb_zcl_ota_upgrade_status_e
   result = ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;                         \
   if (ZCL_CTX().device_cb)                                          \
   {                                                                 \
-    zb_zcl_ota_upgrade_value_param_t value;                         \
-    value.upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_CHECK;         \
-    user_app_data->cb_param.ota_value_param = value;                \
+    zb_zcl_ota_upgrade_value_param_t *value =                       \
+        &(user_app_data->cb_param.ota_value_param);                 \
+    value->upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_CHECK;        \
     user_app_data->device_cb_id = ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID;   \
     user_app_data->endpoint = get_endpoint_by_cluster(ZB_ZCL_CLUSTER_ID_OTA_UPGRADE, ZB_ZCL_CLUSTER_CLIENT_ROLE); \
     user_app_data->status = RET_OK;                                 \
-    (ZCL_CTX().device_cb)(buffer);                                  \
+    (ZCL_CTX().device_cb)(buffer);                                   \
     if (user_app_data->status == RET_OK)                            \
     {                                                               \
-      result = user_app_data->cb_param.ota_value_param.upgrade_status;\
+      result = value->upgrade_status;                               \
     }                                                               \
   }else                                                             \
   {                                                                 \
     result = ZB_ZCL_OTA_UPGRADE_STATUS_OK;                          \
   }                                                                 \
-}
+}                                                                   \
 
 #define ZB_ZCL_OTA_UPGRADE_SERVER_NOT_FOUND_USER_APP(buffer)        \
 {                                                                   \
@@ -2165,13 +2170,13 @@ enum zb_zcl_ota_upgrade_status_e
   {                                                                 \
     zb_zcl_device_callback_param_t *user_app_data =                 \
         ZB_BUF_GET_PARAM(buffer, zb_zcl_device_callback_param_t);   \
-    zb_zcl_ota_upgrade_value_param_t value;                         \
-    value.upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_SERVER_NOT_FOUND; \
-    user_app_data->cb_param.ota_value_param = value;                \
+    zb_zcl_ota_upgrade_value_param_t *value =                       \
+        &(user_app_data->cb_param.ota_value_param);                 \
+    value->upgrade_status = ZB_ZCL_OTA_UPGRADE_STATUS_SERVER_NOT_FOUND; \
     user_app_data->device_cb_id = ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID;   \
     user_app_data->endpoint = get_endpoint_by_cluster(ZB_ZCL_CLUSTER_ID_OTA_UPGRADE, ZB_ZCL_CLUSTER_CLIENT_ROLE); \
     user_app_data->status = RET_OK;                                 \
-    (ZCL_CTX().device_cb)(buffer);                                  \
+    (ZCL_CTX().device_cb)(buffer);                                   \
   }                                                                 \
 }
 

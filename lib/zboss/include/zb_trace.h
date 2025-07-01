@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -170,6 +170,7 @@ extern zb_uint_t g_trace_inside_intr;
 #define TRACE_SUBSYSTEM_DIAGNOSTIC  0x10000000U /**< Diagnostic subsystem */
 #define TRACE_SUBSYSTEM_NS          0x20000000U /**< Network simulator subsystem */
 #define TRACE_SUBSYSTEM_TEST        0x40000000U /**< Subsystem for tests and CI */
+
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
 
 #define TRACE_SUBSYSTEM_INFO      ((zb_uint_t)-1)  /**< Common subsystem */
@@ -412,7 +413,7 @@ Define readable constants like
 
 #if defined ZB_TRACE_OVER_SIF
 #define TRACE_INIT(name) zb_osif_sif_init()
-#elif ! defined ZB_SERIAL_FOR_TRACE || defined ZB_TRACE_OVER_JTAG
+#elif ! defined ZB_SERIAL_FOR_TRACE || defined ZB_TRACE_OVER_JTAG || defined ZB_TRACE_OVER_MUX
 #define TRACE_INIT(name)
 #else
 #define TRACE_INIT(name) zb_serial_trace_init(name)
@@ -843,6 +844,7 @@ typedef struct zb_byte128_struct_s
 #define FMT__H_H_H_H_H_H_H                              TRACE_ARG_SIZE(7,0,0,0,0)
 #define FMT__H_H_H_H_H_H_H_H                            TRACE_ARG_SIZE(8,0,0,0,0)
 #define FMT__H_H_H_H_H_H_H_H_H                          TRACE_ARG_SIZE(9,0,0,0,0)
+#define FMT__H_H_H_H_H_L                                TRACE_ARG_SIZE(5,0,1,0,0)
 #define FMT__H_H_H_H_H_H_H_H_P_P                        TRACE_ARG_SIZE(8,0,0,2,0)
 #define FMT__H_H_H_H_H_H_P_P                            TRACE_ARG_SIZE(6,0,0,2,0)
 #define FMT__H_H_H_H_H_H_P_P_P_P                        TRACE_ARG_SIZE(6,2,0,4,0)
@@ -1092,6 +1094,7 @@ typedef struct zb_byte128_struct_s
 #define FMT__H_D_A_D_D_D                                TRACE_ARG_SIZE(1,4,0,0,1)
 #define FMT__H_D_A_P                                    TRACE_ARG_SIZE(1,1,0,1,1)
 #define FMT__H_H_H_H_H_H_H_H_H_H                        TRACE_ARG_SIZE(10,0,0,0,0)
+#define FMT__P_D_P_D_D_D                                TRACE_ARG_SIZE(0,4,0,2,0)
 
 /** @} */ /* TRACE_DATA_FORMAT */
 

@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -342,6 +342,14 @@ zb_bool_t zb_nwk_nbt_capacity_is_full(void);
 zb_bool_t zb_nwk_nbt_have_ed_children(void);
 
 zb_uint16_t zb_nwk_nbt_get_rank_of_router(zb_neighbor_tbl_ent_t *nbt);
+
+/* This function is based on zb_nwk_neighbor_get with create_if_absent == ZB_TRUE
+ * The difference is in finding candidate entry. Here it is based on device_type.
+ *
+ * PLEASE NOTE that returned nbt entry is initialized with default values.
+ * is_router parameter is neither incrementing nbt devs count nor sets device type of nbt entry.
+ * It is up to the user of this function to take care of, just like with zb_nwk_neighbor_get. */
+zb_ret_t zb_nwk_nbt_alloc_ent_for_device(zb_address_ieee_ref_t addr_ref, zb_bool_t is_router, zb_neighbor_tbl_ent_t** nbt);
 
 zb_neighbor_tbl_ent_t* zb_nwk_nbt_get_entry_for_substitution(void);
 

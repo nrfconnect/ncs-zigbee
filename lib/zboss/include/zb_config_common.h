@@ -153,7 +153,8 @@ key. They use same algorithm.
 /* NLS5 - All devices shall maintain at least 2 NWK keys with the frame
    counters consistent with the security mode of the network (Standard or High).*/
 /*! Define number of network keys with the frame counter */
-#define ZB_SECUR_N_SECUR_MATERIAL 3U
+/* 5 is required by Core certification tests */
+#define ZB_SECUR_N_SECUR_MATERIAL 5U
 #endif
 
 #define ZB_PAKE_PASSCODE_LENGTH 4
@@ -264,8 +265,13 @@ key. They use same algorithm.
  *
  * See Zigbee specification revision 22 section 2.2.7.1 APS Constants
 */
-  #define ZB_N_APS_MAX_FRAME_RETRIES 3U
+  #define ZB_N_APS_MAX_FRAME_RETRIES_CONST 3U
 
+#ifndef ZB_CONFIGURABLE_RETRIES
+  #define ZB_N_APS_MAX_FRAME_RETRIES ZB_N_APS_MAX_FRAME_RETRIES_CONST
+#else
+  #define ZB_N_APS_MAX_FRAME_RETRIES ZB_AIB().max_frame_retries
+#endif
 
 /*!
  APS: APS ACK wait time from Sleepy devices. After this timeout resend APS packet
@@ -275,12 +281,18 @@ key. They use same algorithm.
 /*
 Motivation of increasing wait duration: be able to retry send when ZED polling not so fast, else it all will be expired in MAC.
  */
-  #define ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY (10U*ZB_TIME_ONE_SECOND)
+  #define ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY_CONST (10U*ZB_TIME_ONE_SECOND)
 #else
 /*
 To satisfy negative test in the testsute of some customer use same value as for ZR
 */
-#define ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY
+#define ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY_CONST ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY
+#endif
+
+#ifndef ZB_CONFIGURABLE_RETRIES
+#define ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY_CONST
+#else
+#define ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY ZB_AIB().aps_ack_wait_duration_sleepy
 #endif
 
 /** @cond internals_doc */
@@ -303,7 +315,13 @@ The max amount of jitter that is added to the apsParentAnnounceBaseTimer before 
   /* Some devices send APS_ACK to AF and ZDO commands after sending appropriate response or
    * DefaultResponse. For example, ZCL On/Off command can be done within 5-7 seconds,
    * so 2 seconds for wail duration is insufficiently. */
+  #define ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY_CONST (ZB_MILLISECONDS_TO_BEACON_INTERVAL(1600))
+
+#ifndef ZB_CONFIGURABLE_RETRIES
   #define ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY (ZB_MILLISECONDS_TO_BEACON_INTERVAL(1600))
+#else
+  #define ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY ZB_AIB().aps_ack_wait_duration_non_sleepy
+#endif
 
 /**
  APS: maximum number of tables with information from a binding table to be sent to the devices
@@ -433,13 +451,25 @@ At the worst case our NWK can skip long address at tx: 8 bytes of reserve.
  * reporting the result to the higher layer. It must be at least 3.
  * Value: 3
  */
-#define ZB_NWKC_UNICAST_RETRIES 3U
+#define ZB_NWKC_UNICAST_RETRIES_CONST 3U
+
+#ifndef ZB_CONFIGURABLE_RETRIES
+#define ZB_NWKC_UNICAST_RETRIES ZB_NWKC_UNICAST_RETRIES_CONST
+#else
+#define ZB_NWKC_UNICAST_RETRIES ZB_NIB().max_unicast_retries
+#endif
 
 /*!
  * The delay between network layer retries.
  * Value: 50 ms
  */
-#define ZB_NWKC_UNICAST_RETRY_DELAY ZB_MILLISECONDS_TO_BEACON_INTERVAL(50U)
+#define ZB_NWKC_UNICAST_RETRY_DELAY_CONST ZB_MILLISECONDS_TO_BEACON_INTERVAL(50U)
+
+#ifndef ZB_CONFIGURABLE_RETRIES
+#define ZB_NWKC_UNICAST_RETRY_DELAY ZB_NWKC_UNICAST_RETRY_DELAY_CONST
+#else
+#define ZB_NWKC_UNICAST_RETRY_DELAY ZB_NIB().unicast_retry_delay
+#endif
 
 /* max nsdulength = aMaxPHYFrameSize -(nwkcMACFrameOverhead + nwkcMinHeaderOverhead) (D.4 aMaxMACFrameSize) */
 /*! Maximum NSDU(Network Service Data Unit) length */
@@ -1677,8 +1707,6 @@ request command frame.
 /*! Number of Trust Center link attempts to exchange link keys with the newly joined node. */
 #define ZB_DEFAULT_BDB_TCLINK_KEY_EXCHANGE_ATTEMPTS_MAX 3U
 /** @endcond *//*internals_doc*/
-/*! Specification version of the specification */
-#define ZB_STACK_SPEC_VERSION 23U
 
 #define ZB_MAX_BEACON_APPENDIX_TLV_SIZE    32U
 

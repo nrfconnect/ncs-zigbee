@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -366,7 +366,7 @@ static zb_ret_t zb_zcl_process_on_off_on_handler(zb_uint8_t param)
   zb_zcl_attr_t *attr_desc_global_scene = zb_zcl_get_attr_desc_a(endpoint,
           ZB_ZCL_CLUSTER_ID_ON_OFF, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_ON_OFF_GLOBAL_SCENE_CONTROL);
 
-  zb_bool_t is_need_call_user_app = (ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_on_off)==ZB_ZCL_ON_OFF_IS_OFF) ? ZB_TRUE : ZB_FALSE;
+  zb_bool_t is_need_call_user_app = (attr_desc_on_off && ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_on_off)==ZB_ZCL_ON_OFF_IS_OFF) ? ZB_TRUE : ZB_FALSE;
 
   ZB_ASSERT(attr_desc_on_off);
 
@@ -416,7 +416,7 @@ static zb_ret_t zb_zcl_process_on_off_off_handler(zb_uint8_t param)
   zb_zcl_attr_t *attr_desc_on_time = zb_zcl_get_attr_desc_a(endpoint,
           ZB_ZCL_CLUSTER_ID_ON_OFF, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_ON_OFF_ON_TIME);
 
-  zb_bool_t is_need_call_user_app = (ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_on_off)!=ZB_ZCL_ON_OFF_IS_OFF) ? ZB_TRUE : ZB_FALSE;
+  zb_bool_t is_need_call_user_app = (attr_desc_on_off && ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_on_off)!=ZB_ZCL_ON_OFF_IS_OFF) ? ZB_TRUE : ZB_FALSE;
 
   ZB_ASSERT(attr_desc_on_off);
 
@@ -557,6 +557,7 @@ void zb_zcl_on_off_effect_invoke_user_app(zb_uint8_t param)
 
     attr_desc_on_time = zb_zcl_get_attr_desc_a(ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint,
             ZB_ZCL_CLUSTER_ID_ON_OFF, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_ON_OFF_ON_TIME);
+    ZB_ASSERT(attr_desc_on_time);
     ZB_ZCL_SET_DIRECTLY_ATTR_VAL16(attr_desc_on_time, 0x0000);
   }
 
@@ -651,7 +652,7 @@ static zb_ret_t zb_zcl_process_on_off_on_with_recall_global_scene_handler(zb_uin
   zb_zcl_attr_t *attr_desc_global_scene = zb_zcl_get_attr_desc_a(endpoint,
           ZB_ZCL_CLUSTER_ID_ON_OFF, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_ON_OFF_GLOBAL_SCENE_CONTROL);
 
-  zb_bool_t is_need_call_user_app = (ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_on_off)==ZB_ZCL_ON_OFF_IS_OFF) ? ZB_TRUE : ZB_FALSE;
+  zb_bool_t is_need_call_user_app = (attr_desc_on_off && ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_on_off)==ZB_ZCL_ON_OFF_IS_OFF) ? ZB_TRUE : ZB_FALSE;
 
   /*According to ZCL On/Off Cluster Test Specification Test OO-TC-03S steps 3a and 6c,
     the OnOff should response with success status in both cases (GlobalSceneControl attribute is equal to TRUE or FALSE)

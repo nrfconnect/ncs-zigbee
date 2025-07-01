@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -120,31 +120,33 @@ void zb_zcl_ota_set_file_size(zb_uint8_t endpoint, zb_uint32_t size)
   get_upgrade_client_variables(endpoint)->download_file_size = size;
 }
 
+static void resend_buffer(zb_uint8_t param);
 
 static void zb_zcl_ota_upgrade_block_req_cb(zb_uint8_t param)
 {
   zb_zcl_command_send_status_t *cmd_send_status = ZB_BUF_GET_PARAM(param, zb_zcl_command_send_status_t);
   zb_zcl_ota_upgrade_client_variable_t *client_data = get_upgrade_client_variables(cmd_send_status->src_endpoint);
 
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_block_req_cb param %hx status %d",
+            (FMT__H_D, param, cmd_send_status->status));
+
   client_data->img_block_req_sent = 0;
+
+  ZB_SCHEDULE_ALARM_CANCEL(resend_buffer, 0);
+  TRACE_MSG(TRACE_ZCL2, "scheduling resend_buffer in %d BI", (FMT__D, ZB_ZCL_OTA_UPGRADE_RESEND_BUFFER_DELAY));
+  ZB_SCHEDULE_ALARM(resend_buffer, 0, ZB_ZCL_OTA_UPGRADE_RESEND_BUFFER_DELAY);
 
   if (client_data->pending_img_block_resp)
   {
-    if (cmd_send_status->status == RET_OK)
-    {
-      /* Block_req is acknowledged, can process pending resp if exists */
-      zb_zcl_process_ota_upgrade_specific_commands_cli(client_data->pending_img_block_resp);
-    }
-    else
-    {
-      /* Block_req is not acknowledged, drop pending img_block_resp */
-      zb_buf_free(client_data->pending_img_block_resp);
-    }
+    /* if we have a pending block response, we can process it regardless of
+       whether we received an APS ack for the request */
+    zb_zcl_process_ota_upgrade_specific_commands_cli(client_data->pending_img_block_resp);
   }
-
   client_data->pending_img_block_resp = 0;
 
   zb_buf_free(param);
+
+  TRACE_MSG(TRACE_ZCL1, "< zb_zcl_ota_upgrade_block_req_cb", (FMT__0));
 }
 
 /* Do not allow to do OTA upgrade too fast (even if it is configured by ZCL attr) - dups from OTA
@@ -759,11 +761,10 @@ static zb_ret_t query_next_image_resp_handler(zb_uint8_t param)
 }
 
 
-static void resend_buffer(zb_uint8_t param);
-
-
 static void cancel_resend_buffer()
 {
+  TRACE_MSG(TRACE_ZCL2, "cancel_resend_buffer", (FMT__0));
+
   ZCL_CTX().ota_cli.resend_retries = 0;
   ZB_SCHEDULE_ALARM_CANCEL(resend_buffer, 0);
 }
@@ -772,6 +773,8 @@ static void cancel_resend_buffer()
 static void schedule_resend_buffer(zb_uint8_t endpoint)
 {
   zb_uint16_t delay = zb_zcl_ota_upgrade_get16(endpoint, ZB_ZCL_ATTR_OTA_UPGRADE_MIN_BLOCK_REQUE_ID);
+
+  TRACE_MSG(TRACE_ZCL2, "schedule_resend_buffer endpoint %h", (FMT__H, endpoint));
 
   ZCL_CTX().ota_cli.resend_retries = 0;
   ZB_SCHEDULE_ALARM_CANCEL(resend_buffer, 0);
@@ -895,6 +898,12 @@ static void zcl_ota_abort_and_set_tc_cli()
 #endif  /* ZB_COORDINATOR_ONLY */
 #endif
 
+static void zb_zcl_ota_upgrade_end_res_timeout(zb_uint8_t endpoint)
+{
+  TRACE_MSG(TRACE_OTA1, "Error: receive upgrade end response timed out for endpoint %d. Aborting OTA", (FMT__D, endpoint));
+  zcl_ota_abort(endpoint, ZB_UNDEFINED_BUFFER);
+}
+
 /* Helper routine to finish OTA Upgrade */
 static void zb_zcl_ota_upgrade_end(zb_uint8_t param,
                                    zb_uint8_t status,
@@ -921,6 +930,8 @@ static void zb_zcl_ota_upgrade_end(zb_uint8_t param,
                                           payload->response.success.manufacturer,
                                           payload->response.success.image_type,
                                           payload->response.success.file_version);
+  // Set end response timeout
+  ZB_SCHEDULE_ALARM(zb_zcl_ota_upgrade_end_res_timeout, endpoint, ZB_TIME_ONE_SECOND);
 }
 
 
@@ -938,8 +949,8 @@ static void resend_buffer(zb_uint8_t param)
 
   ZCL_CTX().ota_cli.ota_restart_after_rejoin = 0;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL3, "resend_buffer", (FMT__0));
   send_buf = zb_buf_get_out();
+  TRACE_MSG(TRACE_ZCL1, "resend_buffer, param %d", (FMT__D, send_buf));
   if (send_buf)
   {
     zb_buf_reuse(send_buf);
@@ -987,10 +998,6 @@ static void resend_buffer(zb_uint8_t param)
         *   quests, only the value set by the server on the client. */
                                                 delay, OTA_BLOCK_REQ_DELAY(delay));
         client_data->img_block_req_sent = 1;
-        ZB_SCHEDULE_ALARM_CANCEL(resend_buffer, 0);
-        /* Extend resend interval to exclude situation when we request new block and retransmit APS packet
-         * with old request. */
-        ZB_SCHEDULE_ALARM(resend_buffer, 0, ZB_ZCL_OTA_UPGRADE_RESEND_BUFFER_DELAY + ZB_MILLISECONDS_TO_BEACON_INTERVAL(delay));
       }
       else
       {
@@ -1034,7 +1041,7 @@ static void zb_zcl_ota_upgrade_get_next_image_block(zb_uint8_t param,
   /* Schedule resend buffer if we don't get response */
   ZB_MEMCPY(&ZCL_CTX().ota_cli.cmd_info_2, cmd_info, sizeof(zb_zcl_parsed_hdr_t));
   ZB_MEMCPY(&ZCL_CTX().ota_cli.payload_2, payload, sizeof(zb_zcl_ota_upgrade_image_block_res_t));
-  schedule_resend_buffer(endpoint);
+  cancel_resend_buffer();
 }
 
 /* Helper routine to process downloaded image */
@@ -1294,6 +1301,9 @@ static zb_ret_t image_block_resp_handler(zb_uint8_t param)
 
             current_offset=ZB_ZCL_GET_ATTRIBUTE_VAL_32(attr_desc);
 
+            TRACE_MSG(TRACE_ZCL2, "OTA: recv offset %d, curr offset %d",
+                      (FMT__D_D, payload.response.success.file_offset, current_offset));
+
             if (payload.response.success.file_offset==current_offset)
             {
               /* reserve space for user callback parameters, it will be used later while
@@ -1524,6 +1534,8 @@ static zb_ret_t upgrade_end_resp_handler(zb_uint8_t param)
   {
     zb_uint8_t endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint;
 
+    ZB_SCHEDULE_ALARM_CANCEL(zb_zcl_ota_upgrade_end_res_timeout, endpoint);
+
     TRACE_MSG(TRACE_ZCL2, "payload parameter %ld %d %d", (FMT__L_D_D,
         payload.file_version, payload.manufacturer, payload.image_type));
     TRACE_MSG(TRACE_ZCL2, "saved parameter %ld %d %d", (FMT__L_D_D,
@@ -1707,6 +1719,8 @@ static zb_bool_t zb_zcl_process_ota_cli_upgrade_specific_commands(zb_uint8_t par
         get_upgrade_client_variables(ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint);
 
       ZB_ASSERT(ZB_ZCL_FRAME_DIRECTION_TO_CLI == cmd_info.cmd_direction);
+      TRACE_MSG(TRACE_ZCL2, "got IMAGE_BLOCK_RESP, img_block_req_sent %d pending_img_block_resp %d",
+                (FMT__D_D, client_data->img_block_req_sent, client_data->pending_img_block_resp));
       if (client_data->img_block_req_sent)
       {
         /* We have pending request, do not handle new block immediately */

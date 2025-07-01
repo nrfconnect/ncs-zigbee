@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2020 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -40,8 +40,8 @@
  */
 /* PURPOSE: Very simple lists operations (macros).
 */
-#ifndef LIST_H
-#define LIST_H 1
+#ifndef ZB_LIST_MACROS_H
+#define ZB_LIST_MACROS_H 1
 
 /*! @cond internals_doc */
 /**
@@ -516,4 +516,4 @@ while (0)
 /*! @} */
 /*! @endcond */
 
-#endif /* LIST_H */
+#endif /* ZB_LIST_MACROS_H */

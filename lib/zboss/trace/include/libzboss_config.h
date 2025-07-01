@@ -363,6 +363,11 @@
 #define CONFIG_ZB_TEST_PROFILE y
 
 /**
+ * Disable auto reboot for CI
+ */
+#define CONFIG_ZB_DISABLE_AUTO_REBOOT_FOR_CI y
+
+/**
  * Enable Zigbee test mode and features - Serial console RX timeout
  */
 #define CONFIG_ZB_MULTITEST_CONSOLE_SLEEP_TIMEOUT 4000000
@@ -596,5 +601,10 @@
  * MAC only stack
  */
 /* #undef CONFIG_ZB_MAC_ONLY_STACK */
+
+/**
+ * Allow platform sleep
+ */
+#define CONFIG_ZB_USE_SLEEP y
 
 #endif /* LIBZBOSS_CONFIG_H__ */

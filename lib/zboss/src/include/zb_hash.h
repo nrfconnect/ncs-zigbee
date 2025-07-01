@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2021 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -71,6 +71,8 @@ zb_uint32_t zb_64bit_hash(zb_uint8_t const *data);
  * See: [FNV Hash](www.isthe.com/chongo/tech/comp/fnv/)
  */
 zb_uint32_t zb_fnv_32a_uint16(zb_uint16_t v);
+
+zb_uint32_t zb_fnv_32a_ieee64(const zb_64bit_addr_t a);
 
 /*! @} */
 /*! @endcond */

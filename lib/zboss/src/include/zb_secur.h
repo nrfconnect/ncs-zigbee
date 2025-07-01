@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -1131,7 +1131,7 @@ typedef ZB_PACKED_PRE struct zb_apsme_request_key_ind_s
  */
 typedef struct zb_apsme_verify_key_req_s
 {
-  zb_ieee_addr_t dest_address;  /*!< Destination address. ONly TC is valid  */
+  zb_ieee_addr_t dest_address;  /*!< Destination address. Only TC is valid  */
   zb_uint8_t key_type;          /*!< key type. Only ZB_TC_LINK_KEY is legal.  */
   zb_uint8_t use_relay;
 } zb_apsme_verify_key_req_t;
@@ -1474,12 +1474,14 @@ zb_bool_t zb_secur_aps_accept_policy(zb_uint8_t cmd_id, zb_bool_t secured, zb_ui
  */
 void zb_aps_in_tunnel_cmd(zb_uint8_t param);
 
+#ifdef ZB_JOIN_CLIENT
 /**
    Handle Start Key Update Request.
 
    @param param - packet buffer with request
  */
 void zb_zdo_secur_start_key_update_req_handle(zb_uint8_t param);
+#endif  /* ZB_JOIN_CLIENT */
 
 /**
    Fills ctx with private key and public point key for CURVE25519 ECDHE process.

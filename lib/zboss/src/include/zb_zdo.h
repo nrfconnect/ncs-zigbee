@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -420,19 +420,6 @@ void zdo_device_nwk_addr_res(zb_uint8_t param, zb_uint8_t fc);
    @param fc - APS FC of the response
 */
 void zdo_device_ieee_addr_res(zb_uint8_t param, zb_uint8_t fc);
-
-typedef struct zb_zdo_ed_scan_param_s
-{
-  zb_callback_t cb;
-  zb_nlme_ed_scan_request_t nwk_param;
-}
-zb_zdo_ed_scan_param_t;
-
-/**
-   Performs energy scan.
-   @param param - index of buffer
-*/
-void zb_zdo_ed_scan_request(zb_uint8_t param);
 
 /**
    Sends update notify command
@@ -1572,9 +1559,11 @@ void zb_zdo_key_neg_methods_put_tlv(zb_uint8_t param);
 
 void zb_zdo_upd_key_req_put_tlvs(zb_uint8_t param, zb_uint8_t selected_method, zb_uint8_t selected_secret);
 
+#ifdef ZB_JOIN_CLIENT
 zb_ret_t zb_zdo_upd_key_req_process_tlv(zb_uint8_t *tlv_ptr,
                                         zb_uint8_t tlv_data_len,
                                         zb_uint16_t src_short_addr);
+#endif /* ZB_JOIN_CLIENT */
 
 #if defined ZB_COORDINATOR_ROLE || defined ZB_ROUTER_ROLE
 zb_ret_t zb_zdo_select_key_neg_method(zb_ieee_addr_t partner_ieee_addr,

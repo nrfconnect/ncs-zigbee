@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -393,15 +393,7 @@ zb_nlme_set_confirm_t;
 
    This structure is not packed intentionally: scan_channels_list should be aligned
 */
-typedef struct zb_nlme_network_discovery_request_s
-{
-  zb_channel_list_t scan_channels_list; /**< A list of channel pages and the channels
-                                                               * within those pages that the discovery shall
-                                                               * be performed upon. */
-  zb_uint8_t        scan_duration;                            /**< Time to spend scanning each channel */
-  zb_callback_t     cb;                                       /* used by zb_zdo_active_scan_request */
-}
-zb_nlme_network_discovery_request_t;
+typedef zb_zdo_active_scan_request_t zb_nlme_network_discovery_request_t;
 
 /**
    NLME-NETWORK-DISCOVERY.request primitive
@@ -419,46 +411,9 @@ void zb_nlme_network_discovery_request(zb_uint8_t param);
 void zb_nwk_cancel_network_discovery(zb_bufid_t buf);
 
 
-/** @brief Network descriptor.
- *  This is a part of network discovery confirm result.
- */
-typedef ZB_PACKED_PRE struct zb_nlme_network_descriptor_s
-{
-   /* use bitfields to fit descriptors array to the single buffer */
-  zb_bitfield_t panid_ref:7; /**< Reference to extended Pan ID
-                              * of the network. Was zb_address_pan_id_ref_t.
-                              * Must be big enough to hold ZB_PANID_TABLE_SIZE.
-                              * ZB_PANID_TABLE_SIZE is now 16, so 7 is more than enough.
-                              */
-  zb_bitfield_t    channel_page:5; /**< channel page. in r22 0 to 31  */
-  zb_bitfield_t    logical_channel:7; /**< The current logical channel occupied by
-                                       * the network. In r22 0 to 76 */
-  zb_bitfield_t rvd0:1;
-  /* Stack profile, Zigbee version, beacon order and superframe order
-   * defined by standard, but not actually required for us.
-   * Stack profile is not required now as stack supports only Pro Stack Profile ID. */
-  zb_bitfield_t permit_joining:1; /**< Indicates that at least one router on
-                                   * the network currently permits joining */
-  zb_bitfield_t router_capacity:1; /**< True if device is capable of accepting
-                                    * join requests from router-capable devices */
-  zb_bitfield_t end_device_capacity:1; /**< True if device is capable of accepting
-                                    * join requests from end devices */
-  zb_bitfield_t processed:1; /**< True if record is processed */
-  zb_uint8_t    nwk_update_id;
-} ZB_PACKED_STRUCT
-zb_nlme_network_descriptor_t;
+typedef zb_zdo_active_scan_resp_t zb_nlme_network_discovery_confirm_t;
 
-/** @brief Arguments of the NLME-NETWORK-DISCOVERY.confirm routine. */
-typedef ZB_PACKED_PRE struct zb_nlme_network_discovery_confirm_s
-{
-  zb_ret_t status;  /**< Our error or MAC status codes (see Table 3-11
-                     * NLME-NETWORK-DISCOVERY.confirm Parameters:
-                     * Any status value returned with the
-                     * MLME-SCAN.confirm primitive.) */
-  zb_uint8_t network_count; /**< Number of discovered networks */
-  /* next here is an array of zb_nlme_network_descriptor_t */
-} ZB_PACKED_STRUCT
-zb_nlme_network_discovery_confirm_t;
+#ifdef ZB_JOIN_CLIENT
 
 /** @brief NLME-NETWORK-DISCOVERY.confirm primitive.
  *
@@ -475,6 +430,8 @@ zb_nlme_network_discovery_confirm_t;
  * @endcode
  */
 void zb_nlme_network_discovery_confirm(zb_uint8_t param);
+
+#endif /* ZB_JOIN_CLIENT */
 
 /**
    Arguments of the NLME-NETWORK-FORMATION.request routine.
@@ -607,36 +564,6 @@ zb_nlme_start_router_confirm_t;
    @endcode
  */
 void zb_nlme_start_router_confirm(zb_uint8_t param);
-
-/**
-   Channel energy info.
-*/
-typedef ZB_PACKED_PRE struct zb_energy_detect_channel_info_s
-{
-  zb_bitfield_t channel_page_idx : 3;
-  zb_bitfield_t channel_number : 5; /*!< bit # in the channel mask. Note: not a logical channel!  */
-  zb_uint8_t energy_detected;
-} ZB_PACKED_STRUCT zb_energy_detect_channel_info_t;
-
-/**
-   The structure is used to convey energy values for each channel that was scanned.
-*/
-typedef ZB_PACKED_PRE struct zb_energy_detect_list_s
-{
-  zb_uint8_t channel_count;
-  zb_energy_detect_channel_info_t channel_info[ZB_ED_SCAN_MAX_CHANNELS_COUNT];
-} ZB_PACKED_STRUCT zb_energy_detect_list_t;
-
-/**
-   Arguments of the NLME-ED-SCAN.request routine.
-*/
-typedef struct zb_nlme_ed_scan_request_s
-{
-  zb_channel_page_t scan_channels_list[ZB_CHANNEL_PAGES_NUM]; /**< The list of all channel pages and the
-                                                               * associated channels that shall be scanned. */
-  zb_uint8_t scan_duration;                                   /**< Time to spend scanning each channel */
-}
-zb_nlme_ed_scan_request_t;
 
 
 /* ED Scan functions were under ZB_ROUTER_ROLE ifdef,
@@ -1174,7 +1101,7 @@ void zb_nlme_send_redirect_ref_status(zb_uint8_t param, zb_uint16_t redir_cnt);
 
 /* AD: todo replace magic numbers with mask*/
 #define ZB_GET_OUTGOING_COST(a)                                                    \
-  (*((a) + sizeof(zb_uint16_t)) = ((*((a) + sizeof(zb_uint16_t)) & 0x70U) >> 4U) & 0x07U)
+  ((*((a) + sizeof(zb_uint16_t)) & 0x70U) >> 4U)
 #define ZB_GET_INCOMING_COST(a)                                                    \
   (*((a) + sizeof(zb_uint16_t)) & 0x7U)
 #define ZB_LS_SET_INCOMING_COST(a, b) ( *(a) = (*(a) & 0x70U) | ( (b) & 0x07U) )
@@ -2134,17 +2061,20 @@ void zb_nwk_set_dev_associate_cb(zb_addr_assignment_cb_t cb);
 #endif
 
 #ifndef ZB_LITE_NO_LINK_COST
-/**
-   Convert lqi to cost
-   lqi related from device type.
-   TODO: test algorithm on different platforms. Work with TI CC2520.
-   Look at incoming and outgoing routing cost values in the link status message. Value 1
-   indicates the best link, 7 indicates the worst one.
+ /**
+  * Convert LQA to Link Cost
+  * 
+  * R23 Core specification Section 3.6.4.1 Routing Cost Table 3-72. Link Cost to LQA Mapping
  */
+#define NWK_LQA_2_COST(lqa) (((lqa) <= 16U) ? 7U : \
+                             ((lqa) <= 32U) ? 6U : \
+                             ((lqa) <= 64U) ? 5U : \
+                             ((lqa) <= 96U) ? 4U : \
+                             ((lqa) <= 128U) ? 3U : \
+                             ((lqa) <= 192U) ? 2U : 1)
 
-#define NWK_LQI_2_COST(lqi) (((lqi) < 0xe0U) ? (7U - (((lqi) >> 5U ) & 0x07U)) : 1U)
 #else
-#define NWK_LQI_2_COST(lqi) ZB_NWK_STATIC_PATH_COST
+#define NWK_LQA_2_COST(lqa) ZB_NWK_STATIC_PATH_COST
 #endif
 
 #ifdef ZB_ROUTER_ROLE
@@ -2153,9 +2083,15 @@ void zb_nwk_set_dev_associate_cb(zb_addr_assignment_cb_t cb);
   Calc neighbour path cost
  */
 #if defined ZB_NWK_NEIGHBOUR_PATH_COST_RSSI_BASED
+/**
+ * Neighbor path cost calculation method.
+ * By default, calculate neighbor path cost from LQI and RSSI values as described in ZB
+ * spec(section 3.6.4.1). But for some special cases (e.g. LCGW) we need to calculate path cost
+ * from only RSSI value.
+ */
 #define ZB_NWK_NEIGHBOUR_GET_PATH_COST(nbt) zb_nwk_neighbour_get_path_cost((nbt))
 #elif defined ZB_NWK_NEIGHBOUR_PATH_COST_LQI_BASED
-#define ZB_NWK_NEIGHBOUR_GET_PATH_COST(nbt) NWK_LQI_2_COST((nbt)->lqa)
+#define ZB_NWK_NEIGHBOUR_GET_PATH_COST(nbt) NWK_LQA_2_COST((nbt)->lqa)
 #else
 #error Please specify neighbour path cost calculation method!
 #endif /* ZB_NWK_NEIGHBOUR_PATH_COST_RSSI_BASED */

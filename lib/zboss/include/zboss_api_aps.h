@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -193,6 +193,12 @@ typedef zb_uint8_t zb_aps_addr_mode_t;
 #define ZB_APS_AIB_MAX_WINDOW_SIZE 0xcdU
 /** The value of the current countdown timer before the next Parent_annce is sent. */
 #define ZB_APS_AIB_PARENT_ANNOUNCE_TIMER 0xceU
+/** APS maximum of apscMaxFrameRetries times. */
+#define ZB_APS_AIB_MAX_FRAME_RETRIES                  0xcfU
+/** APS ACK wait time from Sleepy devices. (units in beacon intervals) */
+#define ZB_APS_AIB_APS_ACK_WAIT_DURATION_SLEEPY      0xd0U
+/** APS ACK wait time from Non Sleepy devices. (units in beacon intervals) */
+#define ZB_APS_AIB_APS_ACK_WAIT_DURRATION_NON_SLEEPY  0xd1U
 /** @} */
 
 /**

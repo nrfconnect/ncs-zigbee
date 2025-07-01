@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -230,6 +230,7 @@ void send_alarm(zb_uint8_t param)
       ZB_ZCL_CLUSTER_ID_POWER_CONFIG,
       ZB_ZCL_CLUSTER_SERVER_ROLE,
       ZB_ZCL_ATTR_POWER_CONFIG_MAINS_VOLTAGE_ID);
+    ZB_ASSERT(attr_desc);
     val = ZB_ZCL_GET_ATTRIBUTE_VAL_16(attr_desc);
     attr_desc = zb_zcl_get_attr_desc_a(
       ep,
@@ -238,6 +239,7 @@ void send_alarm(zb_uint8_t param)
       (alarm_code == ZB_ZCL_POWER_CONFIG_MAINS_VOLTAGE_MIN_THRESHOLD_ALARM_CODE) ?
       ZB_ZCL_ATTR_POWER_CONFIG_MAINS_VOLTAGE_MIN_THRESHOLD :
       ZB_ZCL_ATTR_POWER_CONFIG_MAINS_VOLTAGE_MAX_THRESHOLD);
+    ZB_ASSERT(attr_desc);
     threshold = ZB_ZCL_GET_ATTRIBUTE_VAL_16(attr_desc);
     if (((alarm_code == ZB_ZCL_POWER_CONFIG_MAINS_VOLTAGE_MIN_THRESHOLD_ALARM_CODE) && (val >= threshold)) ||
         ((alarm_code == ZB_ZCL_POWER_CONFIG_MAINS_VOLTAGE_MAX_THRESHOLD_ALARM_CODE) && (val <= threshold)) ||

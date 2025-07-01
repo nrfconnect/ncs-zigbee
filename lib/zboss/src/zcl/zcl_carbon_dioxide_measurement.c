@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -103,8 +103,10 @@ static zb_ret_t check_value_carbon_dioxide_measurement_server(zb_uint16_t  attr_
       }
       else
       {
-        max_value = ZB_ZCL_GET_ATTRIBUTE_VAL_SINGLE(
-                      CO2_ATTR_DESC_A(endpoint, MAX_MEASURED_VALUE));
+        zb_zcl_attr_t* attr_desc = CO2_ATTR_DESC_A(endpoint, MAX_MEASURED_VALUE);
+        ZB_ASSERT(attr_desc);
+
+        max_value = ZB_ZCL_GET_ATTRIBUTE_VAL_SINGLE(attr_desc);
 
         ok = ok && min_value_new >= CO2(MIN_MEASURED_VALUE_MIN_VALUE);
         ok = ok && min_value_new < max_value;
@@ -124,8 +126,10 @@ static zb_ret_t check_value_carbon_dioxide_measurement_server(zb_uint16_t  attr_
       }
       else
       {
-        min_value = ZB_ZCL_GET_ATTRIBUTE_VAL_SINGLE(
-                       CO2_ATTR_DESC_A(endpoint, MIN_MEASURED_VALUE));
+        zb_zcl_attr_t* attr_desc = CO2_ATTR_DESC_A(endpoint, MIN_MEASURED_VALUE);
+        ZB_ASSERT(attr_desc);
+
+        min_value = ZB_ZCL_GET_ATTRIBUTE_VAL_SINGLE(attr_desc);
 
         ok = ok && max_value_new <= CO2(MAX_MEASURED_VALUE_MAX_VALUE);
         ok = ok && max_value_new > min_value;
@@ -145,11 +149,14 @@ static zb_ret_t check_value_carbon_dioxide_measurement_server(zb_uint16_t  attr_
       }
       else
       {
-        min_value = ZB_ZCL_GET_ATTRIBUTE_VAL_SINGLE(
-                      CO2_ATTR_DESC_A(endpoint, MIN_MEASURED_VALUE));
+        zb_zcl_attr_t* min_attr_desc = CO2_ATTR_DESC_A(endpoint, MIN_MEASURED_VALUE);
+        zb_zcl_attr_t* max_attr_desc = CO2_ATTR_DESC_A(endpoint, MIN_MEASURED_VALUE);
+        ZB_ASSERT(min_attr_desc);
+        ZB_ASSERT(max_attr_desc);
 
-        max_value = ZB_ZCL_GET_ATTRIBUTE_VAL_SINGLE(
-                      CO2_ATTR_DESC_A(endpoint, MAX_MEASURED_VALUE));
+        min_value = ZB_ZCL_GET_ATTRIBUTE_VAL_SINGLE(min_attr_desc);
+
+        max_value = ZB_ZCL_GET_ATTRIBUTE_VAL_SINGLE(max_attr_desc);
 
         ok = ok && new_measured_value <= max_value;
         ok = ok && new_measured_value >= min_value;

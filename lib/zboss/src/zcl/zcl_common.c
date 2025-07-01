@@ -184,6 +184,8 @@ zb_bool_t zb_zcl_check_cluster_list(void)
   zb_uint8_t cl_2;
   zb_zcl_cluster_desc_t * p_cluster1;
   zb_zcl_cluster_desc_t * p_cluster2;
+  zb_bool_t is_cl1_srv;
+  zb_bool_t is_cl2_srv;
   zb_bool_t ret = ZB_TRUE;
   zb_uint8_t violation_cnt = 0;
 
@@ -207,6 +209,9 @@ zb_bool_t zb_zcl_check_cluster_list(void)
           p_cluster1 = ZCL_CTX().device_ctx->ep_desc_list[ep_1]->cluster_desc_list + cl_1;
           p_cluster2 = ZCL_CTX().device_ctx->ep_desc_list[ep_2]->cluster_desc_list + cl_2;
 
+          is_cl1_srv = ZB_U2B(p_cluster1->role_mask & ZB_ZCL_CLUSTER_SERVER_ROLE);
+          is_cl2_srv = ZB_U2B(p_cluster2->role_mask & ZB_ZCL_CLUSTER_SERVER_ROLE);
+
           /* Can not have 2 instances of listed clusters.
              TODO: Divide by roles? 2 Thermostat clients may be ok, but
              currently it is not needed.
@@ -214,9 +219,9 @@ zb_bool_t zb_zcl_check_cluster_list(void)
           if (p_cluster1->cluster_id == p_cluster2->cluster_id &&
               p_cluster1->role_mask  == p_cluster2->role_mask &&
               (p_cluster1->cluster_id == ZB_ZCL_CLUSTER_ID_OTA_UPGRADE ||
-               p_cluster1->cluster_id == ZB_ZCL_CLUSTER_ID_POLL_CONTROL ||
+               (p_cluster1->cluster_id == ZB_ZCL_CLUSTER_ID_POLL_CONTROL && is_cl1_srv && is_cl2_srv) ||
                p_cluster1->cluster_id == ZB_ZCL_CLUSTER_ID_SUB_GHZ ||
-               p_cluster1->cluster_id == ZB_ZCL_CLUSTER_ID_THERMOSTAT ||
+               (p_cluster1->cluster_id == ZB_ZCL_CLUSTER_ID_THERMOSTAT && is_cl1_srv && is_cl2_srv) ||
                p_cluster1->cluster_id == ZB_ZCL_CLUSTER_ID_KEY_ESTABLISHMENT ||
                p_cluster1->cluster_id == ZB_ZCL_CLUSTER_ID_WWAH))
           {
@@ -239,9 +244,11 @@ zb_bool_t zb_zcl_check_cluster_list(void)
   {
     ret = ZB_TRUE;
   }
-#endif /* ZB_STACK_REGRESSION_TESTING_API */
-
+  /* rtp_zcl_29_r23 */
+  TRACE_MSG(TRACE_TEST2, "<< zb_zcl_check_cluster_list, problems found: %hd, ret %hd", (FMT__H_H, violation_cnt, ret));
+#else /* ZB_STACK_REGRESSION_TESTING_API */
   TRACE_MSG(TRACE_ZCL2, "<< zb_zcl_check_cluster_list, problems found: %hd, ret %hd", (FMT__H_H, violation_cnt, ret));
+#endif
 
   return ret;
 }
@@ -552,6 +559,11 @@ zb_uint8_t zb_zcl_get_analog_attribute_size(zb_uint8_t attr_type)
     case ZB_ZCL_ATTR_TYPE_U48:
     case ZB_ZCL_ATTR_TYPE_S48:
       ret = ZB_48BIT_SIZE;
+      break;
+
+    case ZB_ZCL_ATTR_TYPE_U64:
+    case ZB_ZCL_ATTR_TYPE_S64:
+      ret = sizeof(zb_uint64_t);
       break;
 
     default:
@@ -1695,7 +1707,12 @@ void zb_zcl_process_device_command(zb_uint8_t param)
   zb_zcl_parsed_hdr_t *cmd_info_ptr;
   zb_zcl_status_t status;
 
+#ifdef ZB_STACK_REGRESSION_TESTING_API
+  /* rtp_zdo_01 */
+  TRACE_MSG(TRACE_TEST1, "> zb_zcl_process_device_command %hd", (FMT__H, param));
+#else
   TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_device_command %hd", (FMT__H, param));
+#endif
 
   ZB_BZERO(&cmd_info, sizeof(cmd_info));
   status = zb_zcl_parse_header(param, &cmd_info);
@@ -1892,6 +1909,98 @@ zb_af_endpoint_desc_t *get_endpoint_by_cluster_with_role(
   return ret;
 }
 
+#ifdef ZB_ZCL_ALLOW_DYNAMIC_MANUFACTURER_SPECIFIC_PROFILE
+zb_ret_t zb_zcl_register_custom_msp(zb_uint16_t profile_id, zb_uint8_t index)
+{
+  /* Validate it is a correct MSP not already managed */
+  /* According to ZCL8 section 2.6.1.1 table 2.5 Valid Profile Identifier Values
+   * Manufacturer Specific Application Profile IDs range is 0xc000 - 0xffff
+   */
+  if(profile_id < ZB_MSP_INITIAL_PROFILE_ID ||
+#ifdef ZB_CONTROL4_NETWORK_SUPPORT
+    profile_id == ZB_AF_CONTROL4_PROFILE_ID ||
+#endif
+    profile_id == ZB_AF_ZLL_PROFILE_ID)
+  {
+    return RET_INVALID_PARAMETER_1;
+  }
+
+  if(index >= ZB_MAX_EP_NUMBER)
+  {
+    return RET_INVALID_PARAMETER_2;
+  }
+
+  ZCL_CTX().dyn_msp[index] = profile_id;
+  return RET_OK;
+}
+
+zb_bool_t zb_zcl_is_custom_msp(zb_uint16_t profile_id)
+{
+  for(zb_uint8_t i = 0; i < ZB_MAX_EP_NUMBER; i++)
+  {
+    if(ZCL_CTX().dyn_msp[i] == 0x0000)
+    {
+      continue;
+    }
+
+    if(ZCL_CTX().dyn_msp[i] == profile_id)
+    {
+      return ZB_TRUE;
+    }
+  }
+  return ZB_FALSE;
+}
+#endif
+
+#ifdef ZB_ZCL_ALLOW_FRAGMENTATION_ON_MANUFACTURER_SPECIFIC_CLUSTER
+zb_ret_t zb_zcl_register_custom_msc(zb_uint16_t cluster_id, zb_uint8_t index, zb_bool_t enable_fragmentation)
+{
+  /* Validate it is a manufacturer specific cluster id
+   */
+  if(cluster_id < ZB_MSC_INITIAL_CLUSTER_ID ||
+    cluster_id == ZB_ZCL_CLUSTER_ID_TUNNEL ||
+    cluster_id == ZB_ZCL_CLUSTER_ID_IR_BLASTER ||
+    cluster_id == ZB_ZCL_CLUSTER_ID_CUSTOM_ATTR)
+  {
+    return RET_INVALID_PARAMETER_1;
+  }
+
+  if(index >= ZB_MAX_EP_NUMBER)
+  {
+    return RET_INVALID_PARAMETER_2;
+  }
+
+  if(enable_fragmentation)
+  {
+    /* Fragmentation enabled, add in the list */
+    ZCL_CTX().frag_on_msc[index] = cluster_id;
+  }
+  else
+  {
+    /* Fragmentation disabled, remove from the list */
+    ZCL_CTX().frag_on_msc[index] = 0x0000;
+  }
+  return RET_OK;
+}
+
+zb_bool_t zb_zcl_is_msc_allows_frag(zb_uint16_t cluster_id)
+{
+  if(cluster_id >= ZB_MSC_INITIAL_CLUSTER_ID &&
+    cluster_id != ZB_ZCL_CLUSTER_ID_TUNNEL &&
+    cluster_id != ZB_ZCL_CLUSTER_ID_IR_BLASTER &&
+    cluster_id != ZB_ZCL_CLUSTER_ID_CUSTOM_ATTR)
+  {
+    for(zb_uint8_t i = 0; i < ZB_MAX_EP_NUMBER; i++)
+    {
+      if(ZCL_CTX().frag_on_msc[i] == cluster_id)
+      {
+        return ZB_TRUE;
+      }
+    }
+  }
+  return ZB_FALSE;
+}
+#endif
 
 /* Check if command should be handled - check command direction and
  * cluster role */
@@ -2285,6 +2394,9 @@ zb_bool_t zb_zcl_can_cluster_be_fragmented(zb_uint16_t profile_id, zb_uint16_t c
         || cluster_id == ZB_ZCL_CLUSTER_ID_ENERGY_MANAGEMENT
         || cluster_id == ZB_ZCL_CLUSTER_ID_MDU_PAIRING
         || cluster_id == ZB_ZCL_CLUSTER_ID_SUB_GHZ
+#ifdef ZB_ZCL_ALLOW_FRAGMENTATION_ON_MANUFACTURER_SPECIFIC_CLUSTER
+        || zb_zcl_is_msc_allows_frag(cluster_id)
+#endif
 #if defined ZB_ZCL_SUPPORT_CLUSTER_CUSTOM_CLUSTER
         || cluster_id == ZB_ZCL_CLUSTER_ID_CUSTOM
 #endif /* ZB_ZCL_SUPPORT_CLUSTER_CUSTOM_CLUSTER */

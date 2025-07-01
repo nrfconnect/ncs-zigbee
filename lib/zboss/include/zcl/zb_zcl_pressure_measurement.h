@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -152,10 +152,10 @@ enum zb_zcl_pressure_measurement_attr_e
 #define ZB_ZCL_ATTR_PRESSURE_MEASUREMENT_VALUE_DEFAULT_VALUE            ((zb_int16_t)0xFFFF)
 
 /** @brief Default value for MinValue attribute */
-#define ZB_ZCL_PATTR_RESSURE_MEASUREMENT_MIN_VALUE_DEFAULT_VALUE        ((zb_int16_t)0x8000)
+#define ZB_ZCL_ATTR_PRESSURE_MEASUREMENT_MIN_VALUE_DEFAULT_VALUE        ((zb_int16_t)0x8000)
 
 /** @brief Default value for MaxValue attribute */
-#define ZB_ZCL_PATTR_RESSURE_MEASUREMENT_MAX_VALUE_DEFAULT_VALUE        ((zb_int16_t)0x8000)
+#define ZB_ZCL_ATTR_PRESSURE_MEASUREMENT_MAX_VALUE_DEFAULT_VALUE        ((zb_int16_t)0x8000)
 
 
  /* (See: Table 4.16 Extended Pressure Measurement Information Attribute Set) */

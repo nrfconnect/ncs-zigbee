@@ -197,6 +197,15 @@ void zb_osif_serial_transport_put_bytes(zb_uint8_t *buf, zb_short_t len);
 /*! \addtogroup uart */
 /*! @{ */
 
+/**
+ * @brief Special reserved value to identify serial console
+ * for `zb_osif_mserial_open` function.
+ * Note that not all platforms supports this feature.
+ *
+ * The feature depends on ZB_HAVE_SERIAL_CONSOLE vendor option
+ */
+#define ZB_OSIF_MSERIAL_PORT_NAME_CONSOLE "console_stdio"
+
 typedef zb_int8_t zb_serial_port_t;
 #define SERIAL_PORT_INVALID ((zb_serial_port_t)(-1))
 
@@ -263,7 +272,7 @@ void zb_osif_mserial_set_byte_received_cb(zb_serial_port_t port_instance, zb_cal
  */
 void zb_osif_mserial_set_user_io_buffer(zb_serial_port_t port_instance, zb_byte_array_t *buf_ptr, zb_ushort_t capacity);
 
-/* Low leve API for thouse who do not need mserial and do not want to break existing code based on file fds. */
+/* Low level API for those who do not need mserial and do not want to break existing code based on file fds. */
 
 void osif_register_hup_on_slave_pty(int master_pty_fd);
 
@@ -315,6 +324,13 @@ void zb_osif_uart_sleep(void);
    Perform OS-dependent actions.
 */
 void zb_osif_uart_wake_up(void);
+
+/**
+   Process UART RX activities, doesn't depend on any upper logic such as MAC-split.
+   The purpose is polling and handling UART driver events.
+   To be called from a main loop.
+*/
+void zb_osif_uart_process_rx(void);
 
 #endif /* !ZB_HAVE_MULTI_SERIAL */
 
@@ -455,6 +471,11 @@ zb_osif_file_t *zb_osif_popen(zb_char_t *arg);
 int zb_osif_stream_read(zb_osif_file_t *stream, zb_uint8_t *buf, zb_uint_t len);
 int zb_osif_stream_write(zb_osif_file_t *stream, zb_uint8_t *buf, zb_uint_t len);
 
+#ifdef ZB_TRACE_CONFIGURABLE_MASK
+zb_uint8_t zb_osif_trace_get_configurable_level(void);
+zb_uint32_t zb_osif_trace_get_configurable_mask(void);
+#endif /* ZB_TRACE_CONFIGURABLE_MASK */
+
 enum zb_file_path_base_type_e
 {
   ZB_FILE_PATH_BASE_NOT_SPECIFIED,     /* not specified base type - allows to use default base path */
@@ -538,6 +559,8 @@ void zb_reset(zb_uint8_t param);
 #define ZB_RESET_SRC_BROWN_OUT  3U
 #define ZB_RESET_SRC_CLOCK_LOSS 4U
 #define ZB_RESET_SRC_OTHER      5U
+#define ZB_RESET_SRC_WDOG       6U
+#define ZB_RESET_SRC_UNKNOWN    7U
 /** @} */
 
 /**
@@ -994,5 +1017,112 @@ const char *zb_osif_cli_get_transport_serial_port(void);
 const zb_uint8_t *zb_osif_cli_format_message(const zb_char_t *message, zb_size_t message_length, zb_size_t *prepared_message_length);
 
 #endif /* !ZB_LITE_NO_DIAGNOSTIC */
+
+#if defined ZB_OSIF_SPI_SLAVE && defined ZB_MULTIPAN
+
+/* OT SPI Slave transport HAL */
+
+/**
+   Function from OT platform to be called when SPI transaction is done
+
+   @param rx_transferred - number of data bytes received in SPI transaction
+   @param tx_transferred - number of data bytes sent in SPI transaction
+ */
+typedef void (* spis_call_complete_callback_t)(zb_uint_t rx_transferred, zb_uint_t tx_transferred);
+
+/**
+   Initialize and enable SPI Slave HW
+
+   @param cb - callback to be called when SPI transaction completed
+ */
+void zb_osif_ot_spi_slave_ena(spis_call_complete_callback_t cb);
+
+/**
+   Disable SPI slave HW
+ */
+void zb_osif_ot_spi_slave_dis(void);
+
+/**
+   Assert or deassert GPIO INT line Slave to Host
+
+   @param active - if !0, set line to the active state (it can be high or low depending on a platform), else set it to inactive state.
+ */
+void zb_osif_ot_spi_slave_host_int(int active);
+
+/**
+   Check that SPI HW is busy in ongoing SPI transaction
+
+   @return 1 if SPI transaction is ongoing, else 0
+ */
+int zb_osif_ot_spi_slave_busy(void);
+
+/**
+   Abort SPI transaction.
+
+   Note: not all HW supports that functionality.
+ */
+void zb_osif_ot_spi_slave_abort(void);
+
+/**
+   Prepare SPI Slave transaction for OT
+
+   @param aOutputBuf - buffer for TX
+   @param aOutputBuf - the length to TX
+   @param aInputBuf  - buffer for RX
+   @param aInputBuf  - the length of RX buffer
+   @param aRequestTransactionFlag - if true, Slave have something to send to the Host - assert Host INT line when ready for SPI transaction
+
+   @return 0 if okm !0 in case of some error (including SPI is busy)
+ */
+int zb_osif_ot_spi_slave_tran_prepare(zb_uint8_t *aOutputBuf,
+                                      zb_uint16_t aOutputBufLen,
+                                      zb_uint8_t *aInputBuf,
+                                      zb_uint16_t aInputBufLen,
+                                      bool     aRequestTransactionFlag);
+
+#endif  /* SPI Slave in Multipan */
+
+#if defined ZB_ENABLE_PTA && defined ZB_MAC_CONFIGURABLE_PTA_DEFAULTS
+/**
+ * @brief Gets PTA state upon nwk init.
+ *        If this function returns !RET_OK then:
+ *          - value, pointed by pta_state argument won't be changed
+ *          - ZB_MAC_DEFAULT_PTA_STATE will be used as default PTA state
+ *             if ZB_MAC_DEFAULT_PTA_STATE define is set
+ *
+ * @param pta_state pointer to zb_bool_t value that will be changed if and only if function returns RET_OK
+ * @return zb_ret_t RET_OK if pta_state value has been set.
+ *                  Any other status code otherwise.
+ */
+zb_ret_t zb_osif_get_configurable_pta_state(zb_bool_t *pta_state);
+
+/**
+ * @brief Gets PTA priority upon nwk init.
+ *        If this function returns !RET_OK then:
+ *          - value, pointed by pta_priority argument won't be changed
+ *          - ZB_MAC_DEFAULT_PTA_PRIORITY will be used as default PTA priority
+ *             if ZB_MAC_DEFAULT_PTA_PRIORITY define is set
+ *        Possible PTA priority values are listed in @ref pta_prio section.
+ *
+ * @param pta_priority pointer to zb_uint8_t value that will be changed if and only if function returns RET_OK
+ * @return zb_ret_t RET_OK if pta_priority value has been set.
+ *                  Any other status code otherwise.
+ */
+zb_ret_t zb_osif_get_configurable_pta_priority(zb_uint8_t *pta_priority);
+
+/**
+ * @brief Gets PTA options upon nwk init.
+ *        If this function returns !RET_OK then:
+ *          - value, pointed by pta_options argument won't be changed
+ *          - ZB_MAC_DEFAULT_PTA_OPTIONS will be used as default PTA options
+ *             if ZB_MAC_DEFAULT_PTA_OPTIONS define is set
+ *        Possible PTA options values are listed in @ref pta_opt section.
+ *
+ * @param pta_options pointer to zb_uint32_t value that will be changed if and only if function returns RET_OK
+ * @return zb_ret_t RET_OK if pta_options value has been set.
+ *                  Any other status code otherwise.
+ */
+zb_ret_t zb_osif_get_configurable_pta_options(zb_uint32_t *pta_options);
+#endif /* ZB_ENABLE_PTA && ZB_MAC_CONFIGURABLE_PTA_DEFAULTS */
 
 #endif /* ZB_OSIF_H */

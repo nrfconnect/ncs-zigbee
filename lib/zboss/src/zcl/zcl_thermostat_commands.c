@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -197,10 +197,10 @@ zb_ret_t check_value_thermostat_server(zb_uint16_t attr_id, zb_uint8_t endpoint,
       min_val_s8 = (zb_int8_t)ZB_ZCL_THERMOSTAT_LOCAL_TEMPERATURE_CALIBRATION_MIN_VALUE;
       max_val_s8 = (zb_int8_t)ZB_ZCL_THERMOSTAT_LOCAL_TEMPERATURE_CALIBRATION_MAX_VALUE;
 
-      TRACE_MSG(TRACE_ZCL1, "int8 comp min %i max %i val %i", (FMT__H_H_H, min_val, max_val, *((zb_int8_t *)value)));
+      TRACE_MSG(TRACE_ZCL1, "int8 comp min %i max %i val %i", (FMT__H_H_H, min_val_s8, max_val_s8, *((zb_int8_t *)value)));
       if (*((zb_int8_t *)value) < min_val_s8 || *((zb_int8_t *)value) > max_val_s8)
       {
-        *((zb_int8_t *)value) = (*((zb_int8_t *)value) < min_val) ?
+        *((zb_int8_t *)value) = (*((zb_int8_t *)value) < min_val_s8) ?
                                 (zb_int8_t)ZB_ZCL_THERMOSTAT_LOCAL_TEMPERATURE_CALIBRATION_MIN_VALUE :
                                 (zb_int8_t)ZB_ZCL_THERMOSTAT_LOCAL_TEMPERATURE_CALIBRATION_MAX_VALUE;
       }
@@ -497,6 +497,7 @@ zb_ret_t check_value_thermostat_server(zb_uint16_t attr_id, zb_uint8_t endpoint,
     {
       zb_zcl_attr_t *attr_desc_max = zb_zcl_get_attr_desc_a(endpoint,
           ZB_ZCL_CLUSTER_ID_THERMOSTAT, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_THERMOSTAT_OCCUPIED_SETBACK_MAX_ID);
+      ZB_ASSERT(attr_desc_max);
       if (*value > ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_max))
       {
         *value = ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_max);
@@ -509,6 +510,7 @@ zb_ret_t check_value_thermostat_server(zb_uint16_t attr_id, zb_uint8_t endpoint,
     {
       zb_zcl_attr_t *attr_desc_min = zb_zcl_get_attr_desc_a(endpoint,
           ZB_ZCL_CLUSTER_ID_THERMOSTAT, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_THERMOSTAT_OCCUPIED_SETBACK_MIN_ID);
+      ZB_ASSERT(attr_desc_min);
       if (*value < ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_min))
       {
         *value = ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_min);
@@ -524,6 +526,9 @@ zb_ret_t check_value_thermostat_server(zb_uint16_t attr_id, zb_uint8_t endpoint,
       zb_zcl_attr_t *attr_desc_max = zb_zcl_get_attr_desc_a(endpoint,
           ZB_ZCL_CLUSTER_ID_THERMOSTAT, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_THERMOSTAT_OCCUPIED_SETBACK_MAX_ID);
 
+      ZB_ASSERT(attr_desc_min);
+      ZB_ASSERT(attr_desc_max);
+
       ret = (*value >= ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_min) && *value <= ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_max)) ? RET_OK : RET_ERROR;
       comp = ZB_FALSE;
     }
@@ -533,6 +538,7 @@ zb_ret_t check_value_thermostat_server(zb_uint16_t attr_id, zb_uint8_t endpoint,
     {
       zb_zcl_attr_t *attr_desc_max = zb_zcl_get_attr_desc_a(endpoint,
           ZB_ZCL_CLUSTER_ID_THERMOSTAT, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_THERMOSTAT_UNOCCUPIED_SETBACK_MAX_ID);
+      ZB_ASSERT(attr_desc_max);
       if (*value > ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_max))
       {
         *value = ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_max);
@@ -545,6 +551,7 @@ zb_ret_t check_value_thermostat_server(zb_uint16_t attr_id, zb_uint8_t endpoint,
     {
       zb_zcl_attr_t *attr_desc_min = zb_zcl_get_attr_desc_a(endpoint,
           ZB_ZCL_CLUSTER_ID_THERMOSTAT, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_THERMOSTAT_UNOCCUPIED_SETBACK_MIN_ID);
+      ZB_ASSERT(attr_desc_min);
       if (*value < ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_min))
       {
         *value = ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_min);
@@ -559,6 +566,9 @@ zb_ret_t check_value_thermostat_server(zb_uint16_t attr_id, zb_uint8_t endpoint,
           ZB_ZCL_CLUSTER_ID_THERMOSTAT, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_THERMOSTAT_UNOCCUPIED_SETBACK_MIN_ID);
       zb_zcl_attr_t *attr_desc_max = zb_zcl_get_attr_desc_a(endpoint,
           ZB_ZCL_CLUSTER_ID_THERMOSTAT, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_THERMOSTAT_UNOCCUPIED_SETBACK_MAX_ID);
+      
+      ZB_ASSERT(attr_desc_min);
+      ZB_ASSERT(attr_desc_max);
 
       ret = (*value >= ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_min) && *value <= ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc_max)) ? RET_OK : RET_ERROR;
       comp = ZB_FALSE;
@@ -1015,6 +1025,9 @@ zb_ret_t zb_zcl_thermostat_setpoint_raise_lower_handler(zb_uint8_t param)
     ZB_ZCL_CLUSTER_ID_THERMOSTAT, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_THERMOSTAT_OCCUPIED_HEATING_SETPOINT_ID);
   attr_desc_cooling_setpoint = zb_zcl_get_attr_desc_a(endpoint,
     ZB_ZCL_CLUSTER_ID_THERMOSTAT, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_THERMOSTAT_OCCUPIED_COOLING_SETPOINT_ID);
+  
+  ZB_ASSERT(attr_desc_heating_setpoint);
+  ZB_ASSERT(attr_desc_cooling_setpoint);
 
   TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_setpoint_raise_lower_handler: param %i", (FMT__H, param));
   ZB_ZCL_THERMOSTAT_GET_SETPOINT_RAISE_LOWER_REQ(param, setpoint_raise_lower_req, status);

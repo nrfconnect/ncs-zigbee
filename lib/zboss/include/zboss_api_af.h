@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -326,6 +326,8 @@ ZB_DECLARE_SIMPLE_DESC(8,9);
 /** Control4 profile identifier. */
 #define ZB_AF_CONTROL4_PROFILE_ID 0xC25DU
 #endif
+/** Manufacturer Specific Application Profile initial ID - ZCL8 2.6.1.1 */
+#define ZB_MSP_INITIAL_PROFILE_ID 0xC000U
 /** @} */
 
 /** @} */ /* af_common_constants */

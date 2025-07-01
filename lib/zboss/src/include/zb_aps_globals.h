@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -335,6 +335,11 @@ typedef struct zb_apsib_s
   zb_uint8_t    bdb_remove_device_param; /*!< Used to store buffer param with Remove zb. */
   zb_aps_cnt_challenge_ctx_t aps_challenge_ctx;
   zb_uint16_t aps_security_time_out_period;
+#ifdef ZB_CONFIGURABLE_RETRIES
+  zb_uint8_t max_frame_retries;                 /*!< APS maximum of apscMaxFrameRetries times. */
+  zb_time_t  aps_ack_wait_duration_sleepy;      /*!< APS ACK wait time from Sleepy devices. (units in beacon intervals) */
+  zb_time_t  aps_ack_wait_duration_non_sleepy;  /*!< APS ACK wait time from Non Sleepy devices. (units in beacon intervals) */
+#endif /* ZB_CONFIGURABLE_RETRIES */
 } zb_apsib_t;
 
 #ifdef ZB_DISTRIBUTED_SECURITY_ON

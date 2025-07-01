@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -537,7 +537,7 @@ static zb_ret_t bind_respondent_cluster(zb_bdb_comm_respondent_info_t *responden
               (FMT__P, BDB_COMM_CTX().finding_binding_progress_cb));
 
     zb_address_ieee_by_ref(resp_ext_addr, respondent->addr_ref);
-    /* Callback can return RET_IGNORE to skip bind to that cluster. */
+    /* Callback can return ZB_FALSE to skip bind to that cluster. */
     status = BDB_COMM_CTX().finding_binding_progress_cb(
       ZB_BDB_COMM_BIND_ASK_USER,
       resp_ext_addr,

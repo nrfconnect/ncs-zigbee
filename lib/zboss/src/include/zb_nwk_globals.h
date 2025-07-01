@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -108,6 +108,8 @@ zb_uint_t zb_calc_non_zero_bits_in_bit_vector(zb_uint8_t *vector, zb_uint_t size
     but NWK hasn't sent leave yet.
    Device doesn't handle any pkt on NWK layer if this state is set. */
 #define ZB_NLME_STATE_LEAVE_IN_PROCESS          29U
+/*!< State to execute the 'Active Scan' procedure from app request */
+#define ZB_NLME_STATE_ACTIVE_SCAN               30U
 
 /** @} */
 
@@ -211,8 +213,9 @@ typedef struct zb_rejoin_context_s /* do not pack for IAR */
   zb_address_ieee_ref_t addr_ref;       /*!< Address ref of "new" address */
   zb_bitfield_t is_used:1;
   zb_bitfield_t rx_on:1;
+  zb_bitfield_t is_ed:1;
   zb_bitfield_t zvd_capability:1;
-  zb_bitfield_t reserved:5;
+  zb_bitfield_t reserved:4;
 #ifdef ZB_MAC_PENDING_BIT_SOURCE_MATCHING
   zb_bufid_t rejoin_rsp_param;          /*!< Buf with nwk header. */
   zb_bufid_t mlme_set_conf_param;       /*!< This param is needed to determine ent in rejoin table
@@ -370,6 +373,7 @@ typedef struct zb_nwk_handle_s  /* do not pac for IAR */
   zb_uint8_t        scan_duration;                           /*!< Time to spend scanning each channel. */
   zb_uint8_t        ed_list_param;                           /*!< Index of buffer for ED scan results. */
   zb_uint8_t        scan_cancel_state;                       /*!< Network subsystem state @ref nlme_state when zb_mac_cancel_scan was requested */
+  zb_uint8_t        pending_leave_req_param;                 /*!< Parameter with pending NLME leave request command (see @ref zb_nlme_leave_request) */
 } zb_nwk_handle_t;
 
 #ifdef ZB_ROUTER_ROLE
@@ -519,6 +523,8 @@ typedef struct zb_nwk_globals_s
   zb_bitbool_t pta_prio_set:1;          /*!< PTA priority is to be set at NWK start */
   zb_bitbool_t pta_opt_set:1;           /*!< PTA options are to be set at NWK start */
   zb_bitbool_t postpone_data_processing:1; /*!< postpone data processing until joining finish */
+  zb_bitbool_t allow_channel_change_after_join:1; /*!< Allow/disallow channel change
+                                                       (except for temporary change) after network joining/formation */
 } zb_nwk_globals_t;
 
 

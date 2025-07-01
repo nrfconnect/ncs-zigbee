@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -140,6 +140,7 @@ void zdo_classic_initiate_commissioning(zb_uint8_t param)
 
     zb_channel_page_list_copy(req->scan_channels_list, ZB_AIB().aps_channel_mask_list);
     req->scan_duration = ZB_DEFAULT_SCAN_DURATION; /* TODO: configure it somehow? */
+    req->cb = NULL;
     TRACE_MSG(TRACE_APS1, "discovery, then join by association, scan attempts %hd", (FMT__H, COMM_CTX().discovery_ctx.nwk_scan_attempts));
 
     COMM_CTX().discovery_ctx.disc_count = COMM_CTX().discovery_ctx.nwk_scan_attempts;
@@ -161,6 +162,7 @@ static void zdo_restart_association(zb_uint8_t param)
 
   zb_channel_page_list_copy(req->scan_channels_list, ZB_AIB().aps_channel_mask_list);
   req->scan_duration = ZB_DEFAULT_SCAN_DURATION; /* TODO: configure it somehow? */
+  req->cb = NULL;
   COMM_CTX().discovery_ctx.disc_count = COMM_CTX().discovery_ctx.nwk_scan_attempts;
   ZB_SCHEDULE_CALLBACK(zb_nlme_network_discovery_request, param);
 }

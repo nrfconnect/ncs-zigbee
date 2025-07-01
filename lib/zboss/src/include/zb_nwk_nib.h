@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -290,6 +290,15 @@
      A table of lower-layer interfaces managed by the network layer.
    */
 #define ZB_NIB_ATTRIBUTE_MAC_INTERFACE_TABLE                0xAF
+
+  /**
+     The maximum number of retries allowed after a unicast transmission failure.
+    */
+#define ZB_NIB_ATTRIBUTE_MAX_UNICAST_RETRIES                0XB0
+  /**
+     The delay between network layer retries. (units in beacon intervals)
+    */
+#define ZB_NIB_ATTRIBUTE_UNICAST_RETRY_DELAY                0XB1
 /** @} */
 
 typedef zb_uint8_t zb_nib_attribute_t;
@@ -680,6 +689,10 @@ typedef struct zb_nib_s
 					   the parent and all child to retransmit a broadcast message */
   zb_uint8_t     sequence_number;        /*!< A sequence number used to identify outgoing frames */
   zb_uint8_t     max_broadcast_retries;  /*!< The maximum number of retries allowed after a broadcast transmission failure. */
+#ifdef ZB_CONFIGURABLE_RETRIES
+  zb_uint8_t     max_unicast_retries;    /*!< The maximum number of retries allowed after a unicast transmission failure. */
+  zb_time_t      unicast_retry_delay;    /*!< The delay between network layer retries. (units in beacon intervals) */
+#endif /* ZB_CONFIGURABLE_RETRIES */
   zb_ext_pan_id_t  extended_pan_id;      /*!< Extended Pan ID for the PAN for which the device is a member */
   zb_nwk_device_type_t device_type;      /*!< Current device role, @see @ref nwk_device_type */
   /**

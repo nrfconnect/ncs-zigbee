@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -53,11 +53,12 @@
  * By default ZBOSS libs are compiled with the 1st type of the diagnostic lib,
  * so we have two ways to build an app:
  * 1) link ZBOSS libs only - diagnostic functionality will be DISABLED
- * 2) link the common diagnostic lib (type b) before ZBOSS libs - diagnostic functionality will be ENABLED
+ * 2) link the common diagnostic lib before ZBOSS libs - diagnostic functionality will be ENABLED
  *
- * To build an app with the diagnostic functionality enabled:
- * 1) need to link the common diagnostic library before ZBOSS libs;
- * 2) need to call zb_diag_init() function from an application. This function
+ * To build an app with the diagnostic functionality enabled
+ * 1) Need to link the common diagnostic library before ZBOSS libs.
+ * 2) Need to call @ref zb_diag_init() function from an application,
+ * This will be done automatically from @ref ZB_INIT(). This function
  * should call an init-function for each diagnostic feature. A linker will have
  * to search for zb_diag_init() function and other init-functions in the diagnostic library first.
  *
