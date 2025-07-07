@@ -11,9 +11,6 @@ This page provides information about the amount of flash memory and RAM that is 
 Use it to check if your application has enough space for a given configuration.
 Values are provided for :ref:`ZBOSS libraries <zigbee_zboss>`.
 
-.. note::
-   .. include:: /includes/experimental_note.txt
-
 Samples were built using the available :ref:`zigbee_zboss`.
 Unless stated otherwise, the default :file:`prj.conf` was used.
 

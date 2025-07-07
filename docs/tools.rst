@@ -7,9 +7,6 @@ Tools
    :local:
    :depth: 2
 
-.. note::
-   .. include:: /includes/experimental_note.txt
-
 The tools listed on this page can be helpful when developing your Zigbee application with the |addon| for the |NCS|.
 
 .. _ug_zigbee_tools_sniffer:

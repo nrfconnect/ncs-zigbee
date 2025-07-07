@@ -5,9 +5,6 @@
 Adding ZCL clusters to application
 ##################################
 
-.. note::
-   .. include:: /includes/experimental_note.txt
-
 .. contents::
    :local:
    :depth: 2

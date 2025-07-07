@@ -8,9 +8,6 @@ Quick start guide
    :local:
    :depth: 2
 
-.. note::
-   .. include:: /includes/experimental_note.txt
-
 This guide demonstrates some of the basic concepts of the Zigbee network using the |addon| for the |NCS| and the |nRFVSC|.
 It guides you through programming and testing of the required samples.
 

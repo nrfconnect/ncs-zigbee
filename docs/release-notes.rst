@@ -10,15 +10,14 @@ Release notes
 All the notable changes to the |addon| for the |NCS| are listed here.
 See also the `Release notes for the nRF Connect SDK`_ and the `ZBOSS R23 changelog`_.
 
-.. note::
-   .. include:: /includes/experimental_note.txt
-
 The |addon| v\ |addon_version| is compatible with |NCS| v\ |ncs_version| and uses the ZBOSS stack version |zboss_version|.
 For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host package versions, view the following table:
 
 +-------------------+------------------+-----------------------+---------------------+
 | |addon| version   | |NCS| version    | ZBOSS stack version   | NCP host version    |
 +===================+==================+=======================+=====================+
+| 1.0.0             | 2.9.0            | 4.2.0.0               | 3.2.0               |
++-------------------+------------------+-----------------------+---------------------+
 | 0.4.0             | 2.9.0            | 4.1.14.0              | 3.1.0               |
 +-------------------+------------------+-----------------------+---------------------+
 | 0.3.1             | 2.9.0            | 4.1.4.2               | 3.0.1               | 
@@ -31,6 +30,21 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 +-------------------+------------------+-----------------------+---------------------+
 
 .. _zigbee_release:
+
+|addon| v1.0.0 - 07/07/2025
+***************************
+
+The following release is `supported <Software maturity levels_>`_.
+ 
+* Added:
+ 
+  * Production-ready support for the nRF52840, nRF54L15, nRF54L10, and nRF54L05 SoCs.
+    However, the released Zigbee libraries are not certified.
+  * FOTA support for the nRF52840, nRF54L15, and nRF54L10 SoCs, with an example of usage provided in the :ref:`Light switch <zigbee_light_switch_sample>` sample.
+  * The new ZBOSS R23 v4.2.0.0.
+  * The ZBOSS NCP Host package v3.2.0.
+
+* Updated the documentation to reflect the changes.
 
 |addon| v0.4.0 - 31/03/2025
 ***************************

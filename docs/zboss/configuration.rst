@@ -9,9 +9,6 @@ ZBOSS library configuration
 
 The ZBOSS stack is distributed as a set of precompiled linkable libraries.
 
-.. note::
-   .. include:: /includes/experimental_note.txt
-
 The libraries supports different Zigbee device roles, with each variant having its own configuration.
 This allows you to scale the application and select the most suitable set of features.
 

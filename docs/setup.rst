@@ -5,9 +5,6 @@ Requirements and setup
 
 This page outlines the requirements that you need to meet before you start working with the experimental support release of |addon| and Zigbee R23 protocol.
 
-.. note::
-   .. include:: /includes/experimental_note.txt
-
 Hardware requirements
 *********************
 
