@@ -7,9 +7,6 @@ The |addon| for the |NCS| provides the following samples showcasing the Zigbee R
 All samples are placed in the :file:`samples` directory in the Zigbee repository.
 You can build the samples for various boards and configure them for different usage scenarios.
 
-.. note::
-   .. include:: /includes/experimental_note.txt
-
 In addition to their basic functionalities, you can expand the samples with variants and extensions.
 The following table lists variants and extensions available for each Zigbee sample:
 

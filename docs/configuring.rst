@@ -7,9 +7,6 @@ Configuring |addon|
    :local:
    :depth: 2
 
-.. note::
-   .. include:: /includes/experimental_note.txt
-
 This page describes what is needed to start working with Zigbee using the |addon| for the |NCS|.
 |kconfig_search|
 

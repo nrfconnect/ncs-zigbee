@@ -1,9 +1,9 @@
 .. ### Versions
 
-.. |addon_version| replace:: 0.4.0
+.. |addon_version| replace:: 1.0.0
 .. |ncs_version| replace:: 2.9.0
 .. |zigbee_version| replace:: Zigbee 3.0
-.. |zboss_version| replace:: 4.1.14.0
+.. |zboss_version| replace:: 4.2.0.0
 .. |ubuntu_version| replace:: 24.04
 
 .. |NCS| replace:: nRF Connect SDK
@@ -32,7 +32,7 @@
 
 .. ### Zigbee & ZBOSS shortcuts
 
-.. |zigbee_ncp_package_version| replace:: 3.1.0
+.. |zigbee_ncp_package_version| replace:: 3.2.0
 .. |zigbee_description| replace:: Zigbee is a portable, low-power software networking protocol that provides connectivity over an 802.15.4-based mesh network.
 .. |enable_zigbee_before_testing| replace:: Make sure to configure the Zigbee stack before building and testing this sample.
    See :ref:`ug_zigbee_configuring` for more information.

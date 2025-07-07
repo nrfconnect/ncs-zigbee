@@ -5,9 +5,6 @@ ZBOSS Zigbee stack
 
 The |addon| for the |NCS| uses ZBOSS – a portable, high-performance Zigbee software protocol stack that allows for interoperability, customizing, testing, and optimizing of your Zigbee solution.
 
-.. note::
-   .. include:: /includes/experimental_note.txt
-
 The |addon| repository contains a version of the latest stable ZBOSS libraries.
 The library files are located in the :file:`lib/zboss/` directory.
 The libraries conform to the certification, but they are not necessarily certified.

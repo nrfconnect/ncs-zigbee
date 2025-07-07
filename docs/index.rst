@@ -3,9 +3,6 @@
 |addon| for the |NCS|
 #####################
 
-.. note::
-   .. include:: /includes/experimental_note.txt
-
 Zigbee is a portable, low-power software networking protocol that provides connectivity over a mesh network based on the IEEE 802.15.4 radio protocol.
 It also defines an application layer that provides interoperability among all Zigbee devices.
 
