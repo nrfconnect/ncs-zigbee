@@ -26,11 +26,17 @@ menuconfig ZIGBEE_ADD_ON
 	imply FLASH_PAGE_LAYOUT
 	imply FLASH_MAP
 	imply MPU_ALLOW_FLASH_WRITE
+	imply SOC_FLASH_NRF_PARTIAL_ERASE if SOC_NRF52840
 	depends on (SOC_NRF54L15 || SOC_NRF54L10 || SOC_NRF54L05 || SOC_NRF52840)
 
 if ZIGBEE_ADD_ON
 
 rsource "lib/Kconfig"
+
+if SOC_NRF52840
+config SOC_FLASH_NRF_PARTIAL_ERASE_MS
+	default 6
+endif
 
 # Override libc implementation
 choice LIBC_IMPLEMENTATION
