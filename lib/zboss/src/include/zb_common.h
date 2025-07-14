@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -54,7 +54,6 @@
 #include "zboss_api.h"
 #include "zb_types.h"
 #include "zb_errors.h"
-#include "zb_diag.h"
 #include "zb_debug.h"
 #include "zb_g_context.h"
 #include "zb_trace.h"

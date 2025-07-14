@@ -43,10 +43,6 @@
 #ifndef ZB_LOGGER_H
 #define ZB_LOGGER_H 1
 
-#ifdef ZB_TRACE_USE_VA_LIST
-#include <stdarg.h>
-#endif
-
 /** @cond DOXYGEN_DEBUG_SECTION */
 /**
  * @addtogroup ZB_TRACE Debug trace
@@ -55,16 +51,65 @@
 /** @cond DSR_TRACE */
 /**
  * @addtogroup ZB_TRACE_CONFIG Trace configuration
+ *
+ * Note: if ZB_TRACE_LEVEL is defined, at least TRACE_ERROR messages are issued every time
+ *       regardless ZB_TRACE_LEVEL value (precompiled or configured during runtime).
+ *       Along with that, ZB_TRACE_ALWAYS_ENABLED_INFO_LEVEL may be declared having range 1 .. 4,
+ *       it will enable INFO1 .. INFO4 messages to be issued every time as well.
+ *
+ *---------------------------------------------------------------------------------------------------------------------
+ * Text trace configuration:
+ * Declare ZB_TRACE_TO_FILE
+ *
+ *   Along with it the following defines MAY be declared:
+ *
+ *    - ZB_TRACE_TO_STDOUT in order to override trace output to STDOUT
+ *    - ZB_TRACE_TO_SYSLOG in order to override trace output to SYSLOG
+ *
+ *   Along with it the following defines MAY be declared:
+ *
+ *    - ZB_BINARY_AND_TEXT_TRACE_MODE in order to have both TEXT and BINARY modes
+ *      TEXT or BINARY mode may be selected during initialization (by default it is TEXT mode)
+ *      The mode may be selected only before calling TRACE_INIT() function otherwise the selection call will be ignored
+ *
+ *    - ZB_BINARY_TRACE in order to have only BINARY mode
+ *
+ *    - ZB_TRAFFIC_DUMP_ON in order to have ZB communication traffic be dumped
+ *      It is dumped into the same trace file in case BINARY mode is used,
+ *      or into separated dump file in case TEXT mode is used
+ *
+ *---------------------------------------------------------------------------------------------------------------------
+ * Binary trace configuration:
+ * Declare ZB_TRACE_TO_PORT
+ *
+ *   Along with it the following defines MUST be declared:
+ *
+ *    - ZB_TRACE_OVER_USART in order to have trace be transferred over USART interface
+ *    - ZB_TRACE_OVER_JTAG in order to have trace be transferred over JTAG interface
+ *    - ZB_TRACE_OVER_MACSPLIT in order to have trace be transferred over MACSPLIT interface
+ *    - custom interfaces like ZB_TI13XX_ITM_TRACE, etc.
+ *
+ *   Along with it the following defines MAY be declared:
+ *
+ *    - ZB_TRAFFIC_DUMP_ON in order to have ZB communication traffic be dumped
+ *      It is dumped into the same interface
+ *
+ *    - ZB_MEMTRACE in order to duplicate trace messages into the special memory area
+ *      that contains ring buffer to keep latest trace messages that may be used to
+ *      retrieve information and form a crash dump in case it is needed
+ *
+ *    - ZB_TRACE_FROM_CS in order to have trace messages be generated under critical section
+ *      but be issued with a delay along with next trace message once this next trace
+ *      message is generated outside of critical section
+ *
  * @{
  */
 /** @endcond */ /* DSR_TRACE */
 
 #if defined(ZB_TRACE_LEVEL)
-/** @cond DOXYGEN_INTERNAL_DOC */
-extern zb_uint8_t g_trace_level, g_o_trace_level;
-extern zb_uint32_t g_trace_mask;
-extern zb_uint_t g_trace_inside_intr;
-/** @endcond */ /* DOXYGEN_INTERNAL_DOC */
+
+void zb_trace_set_level(zb_uint8_t level);
+
 /**
    Set trace level at runtime
 
@@ -77,12 +122,16 @@ extern zb_uint_t g_trace_inside_intr;
    @snippet thermostat/thermostat_zr/thermostat_zr.c set_trace
    @par
  */
-#define ZB_SET_TRACE_LEVEL(l) g_trace_level = (l)
+#define ZB_SET_TRACE_LEVEL(l) zb_trace_set_level(l)
+
+void zb_trace_set_off(void);
 
 /**
    Switch off all trace at runtime
  */
-#define ZB_SET_TRACE_OFF() g_o_trace_level = g_trace_level, g_trace_level = 0U
+#define ZB_SET_TRACE_OFF() zb_trace_set_off()
+
+void zb_trace_set_on(void);
 
 /**
    Switch on trace at runtime
@@ -91,7 +140,9 @@ extern zb_uint_t g_trace_inside_intr;
 
    @snippet light_sample/dimmable_light/bulb.c switch_trace_on
  */
-#define ZB_SET_TRACE_ON() g_trace_level = g_o_trace_level
+#define ZB_SET_TRACE_ON() zb_trace_set_on()
+
+void zb_trace_set_mask(zb_uint32_t mask);
 
 /**
    Set trace mask at runtime
@@ -105,7 +156,48 @@ extern zb_uint_t g_trace_inside_intr;
    @snippet thermostat/thermostat_zr/thermostat_zr.c set_trace
    @par
  */
-#define ZB_SET_TRACE_MASK(m) g_trace_mask = (m)
+#define ZB_SET_TRACE_MASK(m) zb_trace_set_mask(m)
+
+#ifdef ZB_BINARY_AND_TEXT_TRACE_MODE
+
+zb_ret_t zb_trace_set_binary_mode(void);
+
+/**
+   Set trace binary mode at runtime
+
+   That macro can switch trace mode.
+   It should be used before TRACE_INIT() macro.
+
+   @return RET_OK if success, RET_IGNORE if trace subsystem was already initialized
+ */
+#define ZB_SET_TRACE_BINARY_MODE() zb_trace_set_binary_mode()
+
+zb_ret_t zb_trace_set_text_mode(void);
+
+/**
+   Set trace text mode at runtime
+
+   That macro can switch trace mode.
+   It should be used before TRACE_INIT() macro.
+
+   @return RET_OK if success, RET_IGNORE if trace subsystem was already initialized
+ */
+#define ZB_SET_TRACE_TEXT_MODE() zb_trace_set_text_mode()
+#endif  /* ZB_BINARY_AND_TEXT_TRACE_MODE */
+
+/**
+ *  @brief A universal way to print raw string as trace message (usually used to print a string data in case of BINARY mode).
+ */
+void zb_trace_str(const zb_char_t *str);
+
+/**
+ * @brief Put a hex representation of a byte into a buffer at specified position
+ *
+ * @param byte [in]     Value to be formatted as 2 hex digits
+ * @param buf  [in]     Pointer to char buffer
+ * @param pos  [in,out] Position in buf at which to put the hex data (incremented by 2)
+ */
+void zb_print2x(zb_uint8_t byte, zb_char_t *buf, zb_uint16_t *pos);
 
 #else
 
@@ -170,27 +262,31 @@ extern zb_uint_t g_trace_inside_intr;
 #define TRACE_SUBSYSTEM_DIAGNOSTIC  0x10000000U /**< Diagnostic subsystem */
 #define TRACE_SUBSYSTEM_NS          0x20000000U /**< Network simulator subsystem */
 #define TRACE_SUBSYSTEM_TEST        0x40000000U /**< Subsystem for tests and CI */
+#define TRACE_SUBSYSTEM_ADDR        0x80000000U /**< to trace address lock / unlock operations */
 
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
 
-#define TRACE_SUBSYSTEM_INFO      ((zb_uint_t)-1)  /**< Common subsystem */
+#define TRACE_SUBSYSTEM_INFO      (~0U)  /**< Common subsystem */
 
 /* to be continued... */
 
 /** @cond DSR_TRACE */
 /** @} */ /* TRACE_SUBSYSTEMS */
 /** @endcond */ /* DSR_TRACE */
-/** @} */ /* ZB_TRACE */
 
-/**
- * @addtogroup ZB_TRACE Debug trace
- * @{
- */
 #if defined ZB_TRACE_LEVEL || defined DOXYGEN
 /**
  * @addtogroup ZB_TRACE_CONFIG Trace configuration
  * @{
  */
+
+/**
+ *  @brief Check that trace is enabled for provided level and mask.
+ *  @param level - trace level.
+ *  @param mask - trace mask.
+ *  @return ZB_TRUE if enabled, ZB_FALSE if disabled.
+ */
+zb_bool_t zb_trace_level_mask_enabled(zb_uint8_t level, zb_uint32_t mask);
 
 #ifndef DOXYGEN
 #define TRACE_ENABLED_(mask,lev) ((lev) <= ZB_TRACE_LEVEL && ((mask) & ZB_TRACE_MASK))
@@ -210,10 +306,6 @@ extern zb_uint_t g_trace_inside_intr;
  */
 #define TRACE_ENABLED(m) TRACE_ENABLED_(m)
 
-#ifndef DOXYGEN
-zb_uint32_t zb_trace_get_counter(void);
-#endif /* DOXYGEN */
-
 #ifdef DOXYGEN
 /**
    Trace file ID used by win_com_dump to identify source file.
@@ -225,156 +317,152 @@ zb_uint32_t zb_trace_get_counter(void);
 */
 #define ZB_TRACE_FILE_ID 12345U
 #endif
+
 /** @} */ /* ZB_TRACE_CONFIG */
+#endif /* defined ZB_TRACE_LEVEL || defined DOXYGEN */
 
+zb_uint32_t zb_trace_get_counter(void);
+
+#if defined ZB_TRACE_LEVEL || defined DOXYGEN
+#if defined ZB_TRACE_TO_FILE || defined ZB_TRACE_TO_PORT || defined DOXYGEN
 /** @cond DOXYGEN_INTERNAL_DOC */
-#ifdef ZB_INTERRUPT_SAFE_CALLBACKS
-/* If HW can detect that we are inside ISR, let's use it and do not trace from ISR. */
-zb_bool_t zb_osif_is_inside_isr(void);
-#define ZB_HW_IS_INSIDE_ISR() zb_osif_is_inside_isr()
-#else
-#define ZB_HW_IS_INSIDE_ISR() 0
-#endif
-
-#define TRACE_ENTER_INT() g_trace_inside_intr = 1U
-#define TRACE_LEAVE_INT() g_trace_inside_intr = 0U
-#define ZB_TRACE_INSIDE_INTR() (g_trace_inside_intr || ZB_HW_IS_INSIDE_ISR())
-
-#ifndef ZB_TRACE_FROM_INTR
-#define ZB_TRACE_INSIDE_INTR_BLOCK() ZB_TRACE_INSIDE_INTR()
-#else
-#define ZB_TRACE_INSIDE_INTR_BLOCK() 0
-#endif
-/** @endcond */ /* DOXYGEN_INTERNAL_DOC */
-
-/**
- *  @brief A universal way to print raw string as trace message.
- */
-void zb_trace_str(const zb_char_t *str);
-
-#if defined ZB_TRACE_TO_FILE || defined ZB_TRACE_TO_SYSLOG || defined DOXYGEN
-/** @cond DOXYGEN_INTERNAL_DOC */
-/**
-   \par Trace to file means trace to disk file using printf() or its analog.
-   Tricks to decrease code size by excluding format strings are not used.
- */
-void zb_trace_init_file(zb_char_t *name);
-void zb_trace_deinit_file(void);
-void zb_trace_file_commit(void);
+zb_ret_t zb_trace_init(const zb_char_t * name);
+void zb_trace_deinit(void);
 void zb_trace_disable_deinit(void);
 zb_bool_t zb_trace_is_disable_deinit(void);
-void zb_trace_file_flush(void);
-#ifdef ZB_USE_LOGFILE_ROTATE
-void zb_trace_check_rotate(void);
-#endif
-
+void zb_trace_commit(void);
+void zb_trace_flush(void);
+/** @endcond */ /* DOXYGEN_INTERNAL_DOC */
 /**
 
  Initialize trace subsystem
 
  @param name - trace file name component
+ @return 0 if success, otherwise an error code (depends on platform).
 */
-#define TRACE_INIT(name)   zb_trace_init_file(name)
+#define TRACE_INIT(name) (void)zb_trace_init(name)
+
+/**
+   Deinitialize trace subsystem
+*/
+#define TRACE_DEINIT() zb_trace_deinit()
+
+/**
+   Prevent Trace subsystem be de-initialized
+   MAY be used when STACK restart logic is used
+*/
+#define TRACE_DISABLE_DEINIT() zb_trace_disable_deinit()
+
+/**
+   Check that trace subsystem deinitialization logic is disabled
+
+   @return ZB_TRUE if it is disabled, otherwise ZB_FALSE.
+*/
+#define TRACE_IS_DISABLE_DEINIT() zb_trace_is_disable_deinit()
+
+/**
+   Commit forces the file system to flush its buffers to disk.
+*/
+#define TRACE_COMMIT() zb_trace_commit()
+
+/**
+   Flush forces trace buffered data to be written to the file system or port
+*/
+#define TRACE_FLUSH() zb_trace_flush()
+
+/**
+   Lock the trace object. Completely platform depended function
+
+   It could be used in cases implementation is used trace object,
+   for example, by using, zb_trace_file_object_get() in multitheraded
+   applications.
+ */
+void zb_trace_lock(void);
+
+/**
+   Unlock the trace object. Completely platform depended function
+ */
+void zb_trace_unlock(void);
+
+typedef struct zb_trace_handler_info_s
+{
+  zb_uint_t level;
+  zb_uint_t mask;
+} zb_trace_handler_info_t;
+
+/**
+ * Prototype of trace callback that external code may setup
+ */
+typedef zb_ret_t (*zb_trace_handler_t)(const zb_trace_handler_info_t * info,
+                                       const zb_char_t               * trace_msg,
+                                       zb_uint16_t                     trace_len);
+
+/**
+ * Setup trace callback or clear it using NULL as argument value
+ * Two possible cases
+ * - redirecting trace messages
+ * - filtering trace messages
+ *
+ * Note: the setup itself is performed under zb_trace_lock()/zb_trace_unlock() block
+ */
+void zb_trace_handler_setup(zb_trace_handler_t handler);
+/** @cond DOXYGEN_INTERNAL_DOC */
+void zb_trace_enter_cs(void);
+void zb_trace_leave_cs(void);
+zb_bool_t zb_trace_inside_cs(void);
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
 
 /**
- Deinitialize trace subsystem
-*/
-#define TRACE_DEINIT zb_trace_deinit_file
+ * Enter to critical section
+ *
+ * Macro that can be used to prevent trace to be issued
+ * in case there some critical section of code.
+ * Instead, the trace itself will be generated but put
+ * into the special internal ring buffer,
+ * the trace issue itself will be delayed and finally issued
+ * once next trace message will be generated outside of critical section
+ */
+#define TRACE_ENTER_CS() zb_trace_enter_cs()
 
+/**
+ * Leave from critical section
+ */
+#define TRACE_LEAVE_CS() zb_trace_leave_cs()
+
+/**
+ * Check that critical section is placed
+ */
+#define TRACE_INSIDE_CS() zb_trace_inside_cs()
 /** @cond DOXYGEN_INTERNAL_DOC */
+/**
+ * Output trace message.
+ *
+ * @param mask - requested trace mask
+ * @param level - requested trace level
+ * @param format - printf-like format string
+ * @param file_name - source file name
+ * @param file_id - source file id
+ * @param line_number - source file line
+ * @param args_size - number of added parameters
+ */
+void zb_trace_msg(zb_uint_t        mask,
+                  zb_uint_t        level,
+                  const zb_char_t *format,
+                  const zb_char_t *file_name,
+                  zb_uint16_t      file_id,
+                  zb_int_t         line_number,
+                  zb_int_t         args_size, ...);
+
 #define ZB_T0_TRACE(...) __VA_ARGS__
 
-#if defined ZB_TRACE_USE_VA_LIST && (defined ZB_BINARY_AND_TEXT_TRACE_MODE || defined ZB_TRACE_TO_SYSLOG || !defined ZB_BINARY_TRACE)
-/**
- *  @brief Print trace message. Option with va_list
- */
-void zb_trace_msg_txt_file_vl(
-    zb_uint_t mask,
-    zb_uint_t level,
-    const zb_char_t *format,
-    const zb_char_t *file_name,
-    zb_int_t line_number,
-    zb_int_t args_size,
-    va_list arglist);
-#endif
-
-#if defined ZB_BINARY_TRACE && !defined ZB_TRACE_TO_SYSLOG
-
-/**
- *  @brief Print binary trace message.
- */
-void zb_trace_msg_bin_file(
-    zb_uint_t mask,
-    zb_uint_t level,
-#if defined ZB_BINARY_AND_TEXT_TRACE_MODE
-    zb_char_t *file_name,
-#endif
-    zb_uint16_t file_id,
-    zb_int_t line_number,
-    zb_int_t args_size, ...);
-
-#ifdef ZB_TRACE_USE_VA_LIST
-/**
- *  @brief Print binary trace message. Option with va_list
- */
-void zb_trace_msg_bin_file_vl(
-    zb_uint_t mask,
-    zb_uint_t level,
-    zb_uint16_t file_id,
-    zb_int_t line_number,
-    zb_int_t args_size,
-    va_list arglist);
-#endif
-
-#if defined ZB_BINARY_AND_TEXT_TRACE_MODE
-#define ZB_TRACE_MODE_BINARY 0U
-#define ZB_TRACE_MODE_TEXT   1U
-extern zb_uint8_t g_trace_text_mode;
-void zb_trace_set_mode(zb_uint8_t mode);
-
-/**
- *  @brief Print trace message.
- */
-void zb_trace_msg_txt_file(
-    zb_uint_t mask,
-    zb_uint_t level,
-    const zb_char_t *format,
-    const zb_char_t *file_name,
-    zb_uint16_t file_id,
-    zb_int_t line_number,
-    zb_int_t args_size, ...);
-
-#define ZB_T1_TRACE(s, l, fmts, args)                  \
-  if ((zb_int_t)ZB_TRACE_LEVEL>=(zb_int_t)l && \
-      ((s) & ZB_TRACE_MASK))                   \
-  {                                            \
-    if (g_trace_text_mode == 0U)               \
-    {                                          \
-      zb_trace_msg_bin_file(s, l, ZB_T0_TRACE args);   \
-    }                                          \
-    else                                       \
-    {                                          \
-      zb_trace_msg_txt_file(s, l, fmts, ZB_T0_TRACE args); \
-    }                                          \
-  }
+#if defined ZB_BINARY_AND_TEXT_TRACE_MODE || !defined ZB_BINARY_TRACE
+/* text and binary mode or only text mode */
+#define ZB_T1_TRACE(s, l, fmts, args) if ((zb_int_t)ZB_TRACE_LEVEL>=(zb_int_t)l && ((s) & ZB_TRACE_MASK)) zb_trace_msg(s, l, fmts, ZB_T0_TRACE args)
 #else
-#define ZB_T1_TRACE(s, l, fmts, args) if ((zb_int_t)ZB_TRACE_LEVEL>=(zb_int_t)l && ((s) & ZB_TRACE_MASK)) zb_trace_msg_bin_file(s, l, ZB_T0_TRACE args)
+/* only binary mode */
+#define ZB_T1_TRACE(s, l, fmts, args) if ((zb_int_t)ZB_TRACE_LEVEL>=(zb_int_t)l && ((s) & ZB_TRACE_MASK)) zb_trace_msg(s, l, NULL, NULL, ZB_T0_TRACE args)
 #endif
-#else
-/**
- *  @brief Print trace message.
- */
-void zb_trace_msg_txt_file(
-    zb_uint_t mask,
-    zb_uint_t level,
-    const zb_char_t *format,
-    const zb_char_t *file_name,
-    zb_int_t line_number,
-    zb_int_t args_size, ...);
 
-#define ZB_T1_TRACE(s, l, fmts, args) if ((zb_int_t)ZB_TRACE_LEVEL>=(zb_int_t)l && ((s) & ZB_TRACE_MASK)) zb_trace_msg_txt_file(s, l, fmts, ZB_T0_TRACE args)
-#endif
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
 
 /**
@@ -393,42 +481,36 @@ void zb_trace_msg_txt_file(
   } while (0)
 
 /** @cond DOXYGEN_INTERNAL_DOC */
-#elif (defined ZB_TRACE_TO_PORT || defined ZB_TRACE_OVER_SIF)
-/*
-  8051 trace does not use format string in the code to save code space.
+void zb_trace_hex_dump(zb_uint_t         mask,
+                       zb_uint_t         level,
+                       const zb_uint8_t *data,
+                       zb_uint16_t       length,
+                       const zb_char_t  *title);
+#define ZB_T1_TRACE_HEX_DUMP(s, l, data, length, title) if ((zb_int_t)ZB_TRACE_LEVEL>=(zb_int_t)l && ((s) & ZB_TRACE_MASK)) zb_trace_hex_dump(s, l, data, length, title)
+/** @cond DOXYGEN_INTERNAL_DOC */
 
-- will modify trace at device only, Linux will work as before
-- trace implementation will hex dump all arguments as set of bytes
-- external utility will parse dump, divide trace arguments dump into separate arguments and
-convert hex-int, unsigned etc.
-- utility will get argument strings from the source files (trace macros) and find it
-by file:line
-- Add one more parameter to the trace macro: sum of the trace argument sizes.
-Define readable constants like
-#define FMT_D_HD_X 5
-- create script/program to modify existing trace calls
-- combine dump parse utility functionality with win_com_dump, so it will produce human-readable trace
-
+/**
+ *  @brief Formatted hex dump to text output
+ *  @param lm - trace subsystem and level marker
+ *  @param data - data that should be traced
+ *  @param length - length of data
+ *  @param title - title in the header of trace
+ *
+ *  @return RET_OK if success, an error otherwise
+ *
+ *  Example:
+ *  [MAC1] zb_extmac.c:624: process_simple_frame stack_id 0 cmd01 0x4284 data 0xf10bfb9d len 16
+ *  [MAC1] zb_trace.c:36:  =========================[cmd01=0x428 len=016]==========================
+ *  [MAC1] zb_trace.c:101: | 00 07 63 9B 5C 00 23 00 | 00 00 00 00 0D 0C 01 00 | ..c.\.#......... |
+ *  [MAC1] zb_trace.c:101: |                         |                         |                  |
+ *  [MAC1] zb_trace.c:108: ------------------------------------------------------------------------
  */
+#define TRACE_HEX_DUMP(lm, data, length, title) \
+  do { \
+    ZB_T1_TRACE_HEX_DUMP(lm, data, length, title); \
+  } while (0)
 
-#if defined ZB_TRACE_OVER_SIF
-#define TRACE_INIT(name) zb_osif_sif_init()
-#elif ! defined ZB_SERIAL_FOR_TRACE || defined ZB_TRACE_OVER_JTAG || defined ZB_TRACE_OVER_MUX
-#define TRACE_INIT(name)
-#else
-#define TRACE_INIT(name) zb_serial_trace_init(name)
-#endif /* defined ZB_TRACE_OVER_SIF */
-
-/* No trace deinit */
-#define TRACE_DEINIT()
-
-#ifndef ZB_BINARY_TRACE
-void zb_trace_msg_port(
-    const zb_char_t ZB_IAR_CODE *file_name,
-    zb_int_t line_number,
-    zb_uint8_t args_size, ...);
-
-#else
+/** @cond DOXYGEN_INTERNAL_DOC */
 
 #ifndef ZB_TRACE_FILE_ID
 #ifndef ZB_DONT_NEED_TRACE_FILE_ID
@@ -439,74 +521,81 @@ void zb_trace_msg_port(
 ZB_ASSERT_COMPILE_DECL(ZB_TRACE_FILE_ID < ZB_UINT16_MAX);
 #endif
 
-void zb_trace_msg_port(
-  zb_uint_t mask,
-  zb_uint_t level,
-  zb_uint16_t file_id,
-  zb_uint16_t line_number,
-  zb_uint_t args_size, ...);
-
-#ifdef ZB_TRACE_USE_VA_LIST
-/* Option with va_list */
-void zb_trace_msg_port_vl(
-  zb_uint_t mask,
-  zb_uint_t level,
-  zb_uint16_t file_id,
-  zb_uint16_t line_number,
-  zb_uint_t args_size,
-  va_list arglist);
-#endif
-
-#endif
-
-#ifdef ZB_BINARY_TRACE
-#define ZB_T0_TRACE(...) __VA_ARGS__
-#define ZB_T1_TRACE(s, l, args) if ((zb_int_t)ZB_TRACE_LEVEL>=(zb_int_t)l && ((s) == (zb_uint_t)-1 || (s) & ZB_TRACE_MASK) && !ZB_TRACE_INSIDE_INTR_BLOCK()) zb_trace_msg_port(s, l, ZB_T0_TRACE args)
-
-#else
-#define ZB_T1_TRACE(s, l, args) \
-  if ((zb_int_t)ZB_TRACE_LEVEL>=(zb_int_t)l && ((s) == -1 || ((s) & ZB_TRACE_MASK)) && !ZB_TRACE_INSIDE_INTR_BLOCK()) zb_trace_msg_port args
-#endif
-
-
-#define TRACE_MSG(lm, fmt, args) \
-  do { \
-    ZB_T1_TRACE(lm, args); \
-  } while (0)
-
 #else
 
-#error Must define either ZB_TRACE_TO_FILE or ZB_TRACE_TO_PORT || ZB_TRACE_OVER_SIF
+#error Must define either ZB_TRACE_TO_FILE or ZB_TRACE_TO_PORT
 
 #endif  /* trace type */
 
+#ifndef ZB_TRACE_MASK
+#define ZB_TRACE_MASK ((zb_uint_t)-1)
+#endif  /* if not defined trace_mask */
+
+#ifdef ZB_TRACE_TO_FILE
+zb_osif_file_t * zb_trace_file_object_get(void);
+zb_osif_file_t * zb_dump_file_object_get(void);
+#endif  /* ZB_TRACE_TO_FILE */
 
 #else  /* if trace off */
 
-#ifndef KEIL
-#define TRACE_MSG(...) ((void)0)
-#else
-/* Keil does not support vararg macros */
-#define TRACE_MSG(a,b,c) ((void)0)
-#endif
-
 #define TRACE_INIT(name)
-#define TRACE_DEINIT(c)
+#define TRACE_DEINIT()
+#define TRACE_DISABLE_DEINIT()
+#define TRACE_IS_DISABLE_DEINIT()
+
+#define TRACE_COMMIT()
+#define TRACE_FLUSH()
 
 #define TRACE_ENABLED(m) ZB_FALSE
 
-#define TRACE_ENTER_INT()
-#define TRACE_LEAVE_INT()
+#define TRACE_ENTER_CS()
+#define TRACE_LEAVE_CS()
+#define TRACE_INSIDE_CS() ZB_FALSE
+
+#define TRACE_MSG(...) ((void)0)
+#define TRACE_HEX_DUMP(...) ((void)0)
 
 #endif  /* trace on/off */
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
+
+/* Backward compatibility */
+#define TRACE_ENTER_INT TRACE_ENTER_CS
+#define TRACE_LEAVE_INT TRACE_LEAVE_CS
+
+#if defined ZB_TRAFFIC_DUMP_ON || defined DOXYGEN
+/**
+   @addtogroup DUMP_ON_OFF
+   @{
+*/
+
+void zb_trace_traffic_dump_disable(void);
+void zb_trace_traffic_dump_enable(void);
+zb_uint8_t zb_trace_traffic_dump_state_get(void);
+
+/**
+ * Switch Zigbee traffic dump OFF
+ */
+#define ZB_SET_TRAF_DUMP_OFF() zb_trace_traffic_dump_disable()
+/**
+ * Switch Zigbee traffic dump ON
+ *
+ * That function works only if traffic dump is enabled at compile time.
+ */
+#define ZB_SET_TRAF_DUMP_ON() zb_trace_traffic_dump_enable()
+#define ZB_GET_TRAF_DUMP_STATE() zb_trace_traffic_dump_state_get()
+/** @} */ /* DUMP_ON_OFF */
+#else
+#define ZB_SET_TRAF_DUMP_OFF()
+#define ZB_SET_TRAF_DUMP_ON()
+#define ZB_GET_TRAF_DUMP_STATE()  0U
+#endif
 
 /** @cond DSR_TRACE */
 /**
  *  @addtogroup TRACE_DATA_FORMAT_ADDITIONAL Trace data format for keys
  *  @{
  */
-#if defined ZB_TRACE_TO_FILE || defined ZB_TRACE_TO_SYSLOG || defined DOXYGEN
+#if defined ZB_TRACE_TO_FILE || defined DOXYGEN
 /**
    Trace format for 64-bit address.
 
@@ -584,12 +673,6 @@ typedef struct zb_byte128_struct_s
 
 /** @} */ /* TRACE_GENERAL_MESSAGES */
 
-#ifdef ZB_TRACE_LEVEL
-#ifndef ZB_TRACE_MASK
-#define ZB_TRACE_MASK ((zb_uint_t)-1)
-#endif  /* if not defined trace_mask */
-#endif  /* if defined trace level */
-
 /**
  *  @addtogroup TRACE_DATA_FORMAT
  *  @{
@@ -611,28 +694,18 @@ typedef struct zb_byte128_struct_s
  *  @param n_a - number of As.
  *  @hideinitializer
  */
-#ifdef KEIL
-
-/* Keil pass 1-byte to varargs as is, pointer is 3-bytes, short is 2-bytes */
-
-#ifndef ZB_BINARY_TRACE
-#define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) __FILE__,__LINE__, (n_h + n_d*2 + n_l*4 + n_p*3 + n_a*8)
-#else
-#define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) ZB_TRACE_FILE_ID,__LINE__, (n_h + n_d*2 + n_l*4 + n_p*3 + n_a*8)
-#endif
-
-#elif defined ZB_PLATFORM_XAP5
+#ifdef ZB_PLATFORM_XAP5
 
 #ifndef __XAP5_NEAR__
 /* XAP5 passes bytes as shorts */
 #ifndef ZB_BINARY_TRACE
-#define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) __FILE__,__LINE__, (n_h*2 + n_d*2 + n_l*4 + n_p*4 + n_a*8)
+#define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) __FILE__,ZB_TRACE_FILE_ID,__LINE__, (n_h*2 + n_d*2 + n_l*4 + n_p*4 + n_a*8)
 #else
 #define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) ZB_TRACE_FILE_ID,__LINE__, (n_h*2 + n_d*2 + n_l*4 + n_p*4 + n_a*8)
 #endif
 #else
 #ifndef ZB_BINARY_TRACE
-#define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) __FILE__,__LINE__, (n_h*2 + n_d*2 + n_l*4 + n_p*2 + n_a*8)
+#define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) __FILE__,ZB_TRACE_FILE_ID,__LINE__, (n_h*2 + n_d*2 + n_l*4 + n_p*2 + n_a*8)
 #else
 #define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) ZB_TRACE_FILE_ID,__LINE__, (n_h*2 + n_d*2 + n_l*4 + n_p*2 + n_a*8)
 #endif
@@ -642,14 +715,10 @@ typedef struct zb_byte128_struct_s
 /* IAR for Cortex passes 1-byte and 2-bytes arguments as 4-bytes to vararg functions.
  * Pointers are 4-bytes. */
 
-#if defined ZB_BINARY_TRACE && !defined ZB_TRACE_TO_SYSLOG
-#if defined ZB_BINARY_AND_TEXT_TRACE_MODE
-  #define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) __FILE__,ZB_TRACE_FILE_ID,__LINE__, (n_h*4 + n_d*4 + n_l*4 + n_p*4 + n_a*8)
+#if defined ZB_BINARY_AND_TEXT_TRACE_MODE || !defined ZB_BINARY_TRACE
+#define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) __FILE__,ZB_TRACE_FILE_ID,__LINE__, (n_h*4 + n_d*4 + n_l*4 + n_p*4 + n_a*8)
 #else
 #define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) ZB_TRACE_FILE_ID,__LINE__, (n_h*4 + n_d*4 + n_l*4 + n_p*4 + n_a*8)
-#endif
-#else
-#define TRACE_ARG_SIZE(n_h, n_d, n_l, n_p, n_a) __FILE__,__LINE__, (n_h*4 + n_d*4 + n_l*4 + n_p*4 + n_a*8)
 #endif
 
 #endif
@@ -702,8 +771,10 @@ typedef struct zb_byte128_struct_s
 #define FMT__D_D_D_D                                    TRACE_ARG_SIZE(0,4,0,0,0)
 #define FMT__D_D_D_D_D                                  TRACE_ARG_SIZE(0,5,0,0,0)
 #define FMT__D_D_D_D_D_D                                TRACE_ARG_SIZE(0,6,0,0,0)
+#define FMT__D_D_D_D_D_D_H                              TRACE_ARG_SIZE(1,6,0,0,0)
 #define FMT__D_D_D_D_D_D_D                              TRACE_ARG_SIZE(0,7,0,0,0)
 #define FMT__D_D_D_D_D_D_D_D                            TRACE_ARG_SIZE(0,8,0,0,0)
+#define FMT__D_D_D_D_D_D_D_D_D                          TRACE_ARG_SIZE(0,9,0,0,0)
 #define FMT__D_D_D_D_D_D_D_D_D_D_D                      TRACE_ARG_SIZE(0,11,0,0,0)
 #define FMT__D_D_D_D_D_D_D_D_D_D_D_D_D_D                TRACE_ARG_SIZE(0,14,0,0,0)
 #define FMT__D_D_D_D_D_D_D_D_D_D_D_D_D_D_D              TRACE_ARG_SIZE(0,15,0,0,0)
@@ -712,6 +783,7 @@ typedef struct zb_byte128_struct_s
 #define FMT__D_D_D_D_H                                  TRACE_ARG_SIZE(1,4,0,0,0)
 #define FMT__D_D_D_H                                    TRACE_ARG_SIZE(1,3,0,0,0)
 #define FMT__D_D_D_H_H                                  TRACE_ARG_SIZE(2,3,0,0,0)
+#define FMT__D_D_D_H_H_H_H                              TRACE_ARG_SIZE(3,4,0,0,0)
 #define FMT__D_D_D_L                                    TRACE_ARG_SIZE(0,3,1,0,0)
 #define FMT__D_D_D_L_L                                  TRACE_ARG_SIZE(0,3,2,0,0)
 #define FMT__D_D_D_P                                    TRACE_ARG_SIZE(0,3,0,1,0)
@@ -744,6 +816,8 @@ typedef struct zb_byte128_struct_s
 #define FMT__D_H_H_D                                    TRACE_ARG_SIZE(2,2,0,0,0)
 #define FMT__D_H_H_D_H                                  TRACE_ARG_SIZE(3,2,0,0,0)
 #define FMT__D_H_H_D_H_D                                TRACE_ARG_SIZE(3,3,0,0,0)
+#define FMT__D_H_H_D_H_D_H                              TRACE_ARG_SIZE(4,3,0,0,0)
+#define FMT__D_H_H_D_D_H_H_D_H                          TRACE_ARG_SIZE(5,4,0,0,0)
 #define FMT__D_H_H_D_D_D_D                              TRACE_ARG_SIZE(2,5,0,0,0)
 #define FMT__D_H_H_H                                    TRACE_ARG_SIZE(3,1,0,0,0)
 #define FMT__D_H_H_H_H                                  TRACE_ARG_SIZE(4,1,0,0,0)
@@ -784,12 +858,14 @@ typedef struct zb_byte128_struct_s
 #define FMT__H_D_L                                      TRACE_ARG_SIZE(1,1,1,0,0)
 #define FMT__H_D_A                                      TRACE_ARG_SIZE(1,1,0,0,1)
 #define FMT__H_D_A_H_D                                  TRACE_ARG_SIZE(2,2,0,0,1)
+#define FMT__H_D_A_H_D_H                                TRACE_ARG_SIZE(3,2,0,0,1)
 #define FMT__H_D_A_H_H                                  TRACE_ARG_SIZE(3,1,0,0,1)
 #define FMT__H_D_A_H_H_H_H                              TRACE_ARG_SIZE(5,1,0,0,1)
 #define FMT__H_D_D                                      TRACE_ARG_SIZE(1,2,0,0,0)
 #define FMT__H_D_D_D                                    TRACE_ARG_SIZE(1,3,0,0,0)
 #define FMT__H_D_D_D_D                                  TRACE_ARG_SIZE(1,4,0,0,0)
 #define FMT__H_D_D_D_D_H                                TRACE_ARG_SIZE(2,4,0,0,0)
+#define FMT__H_D_D_D_H_D                                TRACE_ARG_SIZE(2,4,0,0,0)
 #define FMT__H_D_D_D_H_H_D                              TRACE_ARG_SIZE(3,4,0,0,0)
 #define FMT__H_D_D_H                                    TRACE_ARG_SIZE(2,2,0,0,0)
 #define FMT__H_D_D_H_D                                  TRACE_ARG_SIZE(2,3,0,0,0)
@@ -874,6 +950,7 @@ typedef struct zb_byte128_struct_s
 #define FMT__H_L_H_H_P                                  TRACE_ARG_SIZE(3,0,1,4,0)
 #define FMT__H_L_L_H_A                                  TRACE_ARG_SIZE(2,0,2,0,1)
 #define FMT__H_L_D_D_H                                  TRACE_ARG_SIZE(2,2,1,0,0)
+#define FMT__H_P_D_H_H                                  TRACE_ARG_SIZE(3,1,0,1,0)
 #define FMT__H_P_D_P                                    TRACE_ARG_SIZE(1,1,0,2,0)
 #define FMT__H_P_P_D_P                                  TRACE_ARG_SIZE(1,1,0,3,0)
 #define FMT__H_P_D_D_H                                  TRACE_ARG_SIZE(2,2,0,1,0)
@@ -1006,6 +1083,7 @@ typedef struct zb_byte128_struct_s
 #define FMT__P_P_P_H_H                                  TRACE_ARG_SIZE(2,0,0,3,0)
 #define FMT__P_P_P_L_H                                  TRACE_ARG_SIZE(1,0,1,3,0)
 #define FMT__P_P_P_L_D_H                                TRACE_ARG_SIZE(1,1,1,3,0)
+#define FMT__P_P_P_L_H_H                                TRACE_ARG_SIZE(2,0,1,3,0)
 #define FMT__P_P_P_P                                    TRACE_ARG_SIZE(0,0,0,4,0)
 #define FMT__P_L_H_H                                    TRACE_ARG_SIZE(2,0,1,1,0)
 #define FMT__P_P_P_P_P                                  TRACE_ARG_SIZE(0,0,0,5,0)
@@ -1084,6 +1162,7 @@ typedef struct zb_byte128_struct_s
 #define FMT__D_D_P_P                                    TRACE_ARG_SIZE(0,2,0,2,0)
 #define FMT__D_D_P_P_D_D                                TRACE_ARG_SIZE(0,4,0,2,0)
 #define FMT__H_P_P_H_H                                  TRACE_ARG_SIZE(3,0,0,2,0)
+#define FMT__D_P_H_H                                    TRACE_ARG_SIZE(2,1,0,1,0)
 #define FMT__H_P_H_H_P                                  TRACE_ARG_SIZE(3,0,0,2,0)
 #define FMT__H_P_P                                      TRACE_ARG_SIZE(1,0,0,2,0)
 #define FMT__H_P_P_H                                    TRACE_ARG_SIZE(2,0,0,2,0)
@@ -1095,6 +1174,9 @@ typedef struct zb_byte128_struct_s
 #define FMT__H_D_A_P                                    TRACE_ARG_SIZE(1,1,0,1,1)
 #define FMT__H_H_H_H_H_H_H_H_H_H                        TRACE_ARG_SIZE(10,0,0,0,0)
 #define FMT__P_D_P_D_D_D                                TRACE_ARG_SIZE(0,4,0,2,0)
+#define FMT__D_P_D_H_H                                  TRACE_ARG_SIZE(2,2,0,1,0)
+#define FMT__D_D_D_D_H_D                                TRACE_ARG_SIZE(1,5,0,0,0)
+#define FMT__D_P_H                                      TRACE_ARG_SIZE(1,1,0,1,0)
 
 /** @} */ /* TRACE_DATA_FORMAT */
 
@@ -1282,6 +1364,11 @@ typedef struct zb_byte128_struct_s
 #define TRACE_TEST3 TRACE_SUBSYSTEM_TEST, 3U
 #define TRACE_TEST4 TRACE_SUBSYSTEM_TEST, 4U
 
+#define TRACE_ADDR1 TRACE_SUBSYSTEM_ADDR, 1U
+#define TRACE_ADDR2 TRACE_SUBSYSTEM_ADDR, 2U
+#define TRACE_ADDR3 TRACE_SUBSYSTEM_ADDR, 3U
+#define TRACE_ADDR4 TRACE_SUBSYSTEM_ADDR, 4U
+
 #define TRACE_PTA1 TRACE_SUBSYSTEM_PTA, 1U
 #define TRACE_PTA2 TRACE_SUBSYSTEM_PTA, 2U
 #define TRACE_PTA3 TRACE_SUBSYSTEM_PTA, 3U
@@ -1289,51 +1376,9 @@ typedef struct zb_byte128_struct_s
 
 #endif /* DOXYGEN */
 
-#ifndef ZB_SET_TRACE_LEVEL
-
-/* empty definitions if not implemented */
-#define ZB_SET_TRACE_LEVEL(l)
-#define ZB_SET_TRACE_MASK(m)
-#define ZB_SET_TRACE_OFF()
-#define ZB_SET_TRACE_ON()
-
-#endif
-
 /** @} */ /* TRACE_FIRST_ARG */
 /** @endcond */ /* DSR_TRACE */
 /** @} */ /* Debug trace */
-
-#if defined ZB_TRAFFIC_DUMP_ON || defined DOXYGEN
-/**
-   @addtogroup DUMP_ON_OFF
-   @{
-*/
-/** @cond DOXYGEN_INTERNAL_DOC */
-extern zb_uint8_t g_traf_dump;
-/** @endcond */ /* DOXYGEN_INTERNAL_DOC */
-
-static ZB_INLINE zb_uint8_t zb_get_traf_dump_state(void)
-{
-  return g_traf_dump;
-}
-
-/**
- * Switch Zigbee traffic dump OFF
- */
-#define ZB_SET_TRAF_DUMP_OFF() (g_traf_dump = 0U)
-/**
- * Switch Zigbee traffic dump ON
- *
- * That function works only if traffic dump is enabled at compile time.
- */
-#define ZB_SET_TRAF_DUMP_ON() (g_traf_dump = 1U)
-#define ZB_GET_TRAF_DUMP_STATE()  zb_get_traf_dump_state()
-/** @} */ /* DUMP_ON_OFF */
-#else
-#define ZB_SET_TRAF_DUMP_OFF()
-#define ZB_SET_TRAF_DUMP_ON()
-#define ZB_GET_TRAF_DUMP_STATE()  0U
-#endif
 
 /** @endcond */ /* DOXYGEN_DEBUG_SECTION */
 

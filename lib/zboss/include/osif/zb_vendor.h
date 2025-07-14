@@ -22,6 +22,10 @@
 #include "zb_version.h"
 #include "zb_revision_r22.h"
 
+#ifdef CONFIG_ZBOSS_DEBUG
+#define DEBUG
+#endif
+
 #ifdef CONFIG_ZB_NCP_MODE
 #define NCP_MODE
 #endif

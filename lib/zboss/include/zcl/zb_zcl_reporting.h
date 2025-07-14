@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -361,7 +361,14 @@ zb_bool_t zcl_is_attr_reported(zb_uint8_t ep, zb_uint16_t cluster_id, zb_uint8_t
 */
 zb_bool_t zcl_is_attr_reported_manuf(zb_uint8_t ep, zb_uint16_t cluster_id, zb_uint8_t cluster_role, zb_uint16_t attr_id, zb_uint16_t manuf_code);
 
-/* TODO: Document */
+/**
+ * @brief Set reporting configuration for the attribute
+ * 
+ * @param rep_info_ptr - structure storing reporting configuration
+ * @param override - ZB_TRUE if you wand to allow overriding of existing reporting configuration, ZB_FALSE otherwise
+ * 
+ * @return zb_ret_t - RET_OK on success
+ */
 zb_ret_t zb_zcl_put_reporting_info(zb_zcl_reporting_info_t* rep_info_ptr, zb_bool_t override);
 
 /** @} */

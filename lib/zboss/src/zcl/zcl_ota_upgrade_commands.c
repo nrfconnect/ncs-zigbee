@@ -774,7 +774,7 @@ static void schedule_resend_buffer(zb_uint8_t endpoint)
 {
   zb_uint16_t delay = zb_zcl_ota_upgrade_get16(endpoint, ZB_ZCL_ATTR_OTA_UPGRADE_MIN_BLOCK_REQUE_ID);
 
-  TRACE_MSG(TRACE_ZCL2, "schedule_resend_buffer endpoint %h", (FMT__H, endpoint));
+  TRACE_MSG(TRACE_ZCL2, "schedule_resend_buffer endpoint %hd", (FMT__H, endpoint));
 
   ZCL_CTX().ota_cli.resend_retries = 0;
   ZB_SCHEDULE_ALARM_CANCEL(resend_buffer, 0);

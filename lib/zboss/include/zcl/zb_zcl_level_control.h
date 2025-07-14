@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -255,6 +255,15 @@ enum zb_zcl_level_control_options_e
   (void*) data_ptr                                                                  \
 }
 
+#define ZB_SET_ATTR_DESCR_WITH_ZB_ZCL_ATTR_LEVEL_CONTROL_CURRENT_FREQUENCY_ID(data_ptr) \
+{                                                                                       \
+  ZB_ZCL_ATTR_LEVEL_CONTROL_CURRENT_FREQUENCY_ID,                                       \
+  ZB_ZCL_ATTR_TYPE_U16,                                                                 \
+  ZB_ZCL_ATTR_ACCESS_READ_ONLY,                                                         \
+  (ZB_ZCL_NON_MANUFACTURER_SPECIFIC),                                                   \
+  (void*) data_ptr                                                                      \
+}
+
 #define ZB_SET_ATTR_DESCR_WITH_ZB_ZCL_ATTR_LEVEL_CONTROL_OPTIONS_ID(data_ptr)      \
 {                                                                                  \
   ZB_ZCL_ATTR_LEVEL_CONTROL_OPTIONS_ID,                                            \
@@ -381,6 +390,9 @@ enum zb_zcl_level_control_cmd_e
 
 /*! Default OptionsOverride value */
 #define ZB_ZCL_LEVEL_CONTROL_OPTIONS_OVERRIDE_DEFAULT_FIELD_VALUE ((zb_uint8_t)0x00)
+
+/*! Default unknown Frequency value */
+#define ZB_ZCL_LEVEL_CONTROL_FREQUENCY_UNKNOWN_DEFAULT_FIELD_VALUE ((zb_uint16_t)0x0000)
 
 /************************** Level Control cluster command definitions ****************************/
 
@@ -1373,6 +1385,92 @@ void zb_zcl_level_control_send_stop_req(zb_bufid_t buffer, const zb_addr_u *dst_
     ZB_ZCL_LEVEL_CONTROL_SEND_STOP_REQ(buffer, addr, dst_addr_mode, dst_ep, ep, prfl_id,  \
     def_resp, cb)                                                                         \
 }
+
+
+/*! @brief Structured representation of MOVE_TO_CLOSEST_FREQUENCY command payload
+    @see ZCL spec, subclause 3.10.2.3.5.1 */
+typedef ZB_PACKED_PRE struct zb_zcl_level_control_move_to_closest_frequency_req_s
+{
+  /** Frequency field */
+  zb_uint16_t frequency;
+} ZB_PACKED_STRUCT  zb_zcl_level_control_move_to_closest_frequency_req_t;
+
+/** @brief Move to Closest Frequency payload length macro */
+#define ZB_ZCL_LEVEL_CONTROL_MOVE_TO_CLOSEST_FREQUENCY_REQ_PAYLOAD_LEN \
+  sizeof(zb_zcl_level_control_move_to_closest_frequency_req_t)
+
+/** @internal Macro for getting Move to Closest Frequency command */
+#define ZB_ZCL_LEVEL_CONTROL_GET_MOVE_TO_CLOSEST_FREQUENCY_CMD(data_buf, move_to_closest_frequency_req, status) \
+  {                                                                                                             \
+    zb_zcl_level_control_move_to_closest_frequency_req_t *move_to_closest_frequency_req_ptr;                    \
+    (move_to_closest_frequency_req_ptr) = zb_buf_len(data_buf) >=                                               \
+      ZB_ZCL_LEVEL_CONTROL_MOVE_TO_CLOSEST_FREQUENCY_REQ_PAYLOAD_LEN ?                                          \
+      (zb_zcl_level_control_move_to_closest_frequency_req_t*)zb_buf_begin(data_buf) : NULL;                     \
+    if (move_to_closest_frequency_req_ptr != NULL)                                                              \
+    {                                                                                                           \
+      ZB_HTOLE16(&(move_to_closest_frequency_req).frequency, &(move_to_closest_frequency_req_ptr->frequency));  \
+      status = ZB_TRUE;                                                                                         \
+      (void)zb_buf_cut_left(data_buf, ZB_ZCL_LEVEL_CONTROL_MOVE_TO_CLOSEST_FREQUENCY_REQ_PAYLOAD_LEN);          \
+    }                                                                                                           \
+    else                                                                                                        \
+    {                                                                                                           \
+      status = ZB_FALSE;                                                                                        \
+    }                                                                                                           \
+  }
+
+/*! @brief Parses Move to Closest Frequency command and fills data request structure.
+    @param data_buf - pointer to zb_buf_t buffer, containing command request data
+    @param move_to_closest_frequency_req - variable to save command request
+    @param status - boolean flag indicating parameter reading success\
+    @note data_buf buffer should contain command request payload without ZCL header.
+*/
+#define ZB_ZCL_LEVEL_CONTROL_GET_MOVE_TO_CLOSEST_FREQUENCY_REQ(data_buf, move_to_closest_frequency_req, status) \
+{                                                                                                               \
+  ZB_ZCL_LEVEL_CONTROL_GET_MOVE_TO_CLOSEST_FREQUENCY_CMD(data_buf, move_to_closest_frequency_req, status);      \
+}
+
+/*! @brief Send Move to closest frequency command
+    @param buffer - to put packet to
+    @param dst_addr - address to send packet to
+    @param dst_addr_mode - addressing mode
+    @param dst_ep - destination endpoint
+    @param ep - sending endpoint
+    @param prof_id - profile identifier
+    @param def_resp - enable/disable default response
+    @param cb - callback for getting command send status
+    @param frequency - Frequency value
+*/
+void zb_zcl_level_control_send_move_to_closest_frequency_req_zcl8(zb_bufid_t buffer, const zb_addr_u *dst_addr,
+                                                                  zb_uint8_t dst_addr_mode, zb_uint8_t dst_ep,
+                                                                  zb_uint8_t ep, zb_uint16_t prof_id,
+                                                                  zb_uint8_t def_resp, zb_callback_t cb,
+                                                                  zb_uint16_t frequency);
+
+/*! @brief Send Move to closest frequency command (pre-ZCL8)
+    Use @ref zb_zcl_level_control_send_move_to_closest_frequency_req_zcl8 for ZCL8 revision call.
+    @param buffer - to put packet to
+    @param dst_addr - address to send packet to
+    @param dst_addr_mode - addressing mode
+    @param dst_ep - destination endpoint
+    @param ep - sending endpoint
+    @param prof_id - profile identifier
+    @param def_resp - enable/disable default response
+    @param cb - callback for getting command send status
+*/
+void zb_zcl_level_control_send_move_to_closest_frequency_req(zb_bufid_t buffer, const zb_addr_u *dst_addr,
+                                                              zb_uint8_t dst_addr_mode, zb_uint8_t dst_ep,
+                                                              zb_uint8_t ep, zb_uint16_t prof_id,
+                                                              zb_uint8_t def_resp, zb_callback_t cb);
+
+/** Macro for calling @ref zb_zcl_level_control_send_move_to_closest_frequency_req_zcl8 function
+ */
+#define ZB_ZCL_LEVEL_CONTROL_SEND_MOVE_TO_CLOSEST_FREQUENCY_REQ_ZCL8(                                                     \
+  buffer, addr, dst_addr_mode, dst_ep, ep, prfl_id, def_resp, cb, frequency)                                              \
+{                                                                                                                         \
+  zb_zcl_level_control_send_move_to_closest_frequency_req_zcl8(buffer, ZB_ADDR_U_CAST(addr), dst_addr_mode, dst_ep, ep,   \
+                                                               prfl_id, def_resp, cb, frequency);                         \
+}
+
 /** @cond internals_doc */
 typedef struct zb_zcl_level_control_set_value_param_s
 {

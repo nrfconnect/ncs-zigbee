@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2021 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -59,8 +59,8 @@
 
 #ifdef ZB_BUF_SHIELD
 
-#define ZB_BUF_HDR_SIGNATURE 0xaabbccddUL
-#define ZB_BUF_TAIL_SIGNATURE 0xbeU
+#define ZB_BUF_HDR_SIGNATURE  ZG->bpool.random_hdr_signature
+#define ZB_BUF_TAIL_SIGNATURE ZG->bpool.random_tail_signature
 
 #ifdef ZB_BIGBUF
 
@@ -143,6 +143,8 @@ typedef struct zb_buf_pool_s
 #else
   zb_uint8_t *buf_in_use;
 #endif
+  zb_uint8_t random_hdr_signature;
+  zb_uint8_t random_tail_signature;
 #endif
 } zb_buf_pool_t;
 

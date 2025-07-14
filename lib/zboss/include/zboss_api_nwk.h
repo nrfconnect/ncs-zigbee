@@ -628,6 +628,16 @@ typedef ZB_PACKED_PRE struct zb_nlme_permit_joining_request_s
 zb_nlme_permit_joining_request_t;
 
 /**
+   Permit Joining signal info
+*/
+typedef ZB_PACKED_PRE struct zb_nlme_permit_joining_signal_info_s
+{
+  zb_uint8_t permit_duration; /**< Time in seconds during which the coordinator
+                               * or router will allow associations */
+} ZB_PACKED_STRUCT
+zb_nlme_permit_joining_signal_info_t;
+
+/**
    NLME-PERMIT-JOINING.request primitive
 
    Allow/disallow network joining

@@ -66,7 +66,7 @@
 #include "zboss_api_zgp.h"
 #endif
 #include "zb_diag.h"
-#include "zb_diag_init.h"
+#include "zb_lite.h"
 
 /** @cond (!DOXYGEN_ERL_SECTION) */
 /*! @cond DOXYGEN_SECUR_SECTION */
@@ -1606,7 +1606,7 @@ typedef zb_bool_t (*zb_signal_handler_t)(zb_uint8_t param);
 /**
  * @brief Add new signal handler to the end of a subscription chain.
  *
- * @return ZB_TRUE if the handler was registered successfully. ZB_FALSE if there is no space left in the chain.
+ * @return ZB_TRUE if the handler was registered successfully. ZB_FALSE if there is no space left in the chain or handler is null.
  *
  */
 zb_bool_t zb_signal_handler_add_back(zb_signal_handler_t handler);
@@ -1614,7 +1614,7 @@ zb_bool_t zb_signal_handler_add_back(zb_signal_handler_t handler);
 /**
  * @brief Add new signal handler to the beginning of a subscription chain.
  *
- * @return ZB_TRUE if the handler was registered successfully. ZB_FALSE if there is no space left in the chain.
+ * @return ZB_TRUE if the handler was registered successfully. ZB_FALSE if there is no space left in the chain or handler is null.
  *
  */
 zb_bool_t zb_signal_handler_add_front(zb_signal_handler_t handler);

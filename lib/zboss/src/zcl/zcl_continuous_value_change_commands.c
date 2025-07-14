@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -680,14 +680,14 @@ zb_uint8_t zb_zcl_cvc_start_alarm(zb_uint8_t endpoint_id,
   zb_uint8_t alarm_id;
   zb_zcl_cvc_alarm_variables_t* alarm_info;
   zb_uindex_t i = 0, j = 0;
-  zb_uint16_t ret = ZB_ZCL_CVC_INVALID_ALARM_ID;
+  zb_uint8_t ret = ZB_ZCL_CVC_INVALID_ALARM_ID;
   zb_bool_t next_step = ZB_TRUE;
 
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_cvc_start_alarm", (FMT__0));
 
 /* 01/02/2013 CR:MAJOR
   Use ASSERT for all cases when context is broken/NULL
-  And t.b.h. I'm not sure that this check is usefull at all. Because it can be
+  And t.b.h. I'm not sure that this check is useful at all. Because it can be
   done once and after I doubt that it's really needed for any purpose except code size increasing.
   If it's overlapped somehow - it's a zero chance that it became zero. Most likely it will take
   some unapropriate value and will cause segmentation fault (or any prot.error) even if it pass

@@ -168,7 +168,7 @@ zb_bool_t zb_zcl_time_server_read_attr_handle(zb_uint8_t param)
   }
   else
   {
-    TRACE_MSG(TRACE_ZCL1, "Mallformed Read Time Status attribute response", (FMT__H, param));
+    TRACE_MSG(TRACE_ZCL1, "Mallformed Read Time Status attribute response %hd", (FMT__H, param));
   }
 
   zb_zcl_send_default_handler(param, cmd_info, ZB_ZCL_STATUS_SUCCESS);

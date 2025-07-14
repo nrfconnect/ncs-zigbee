@@ -38,16 +38,14 @@
  * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/* PURPOSE: general header file of the diagnostic library
-*/
 
-#ifndef ZB_DIAG_H
-#define ZB_DIAG_H
+#ifndef ZB_DIAG_DUT_BEHAVIOUR_H
+#define ZB_DIAG_DUT_BEHAVIOUR_H
 
-#include "zb_diag_common.h"
-#include "zb_diag_th_behaviour.h"
-#include "zb_diag_dut_behaviour.h"
-#include "zb_diag_core_watchdog.h"
-#include "zb_diag_key_exposure.h"
+/** Empty init-function
+ *
+ * Should be called from @see zb_diag_init()
+ */
+void zb_diag_dut_behaviour_init(void);
 
-#endif /* ZB_DIAG_H */
+#endif /* ZB_DIAG_DUT_BEHAVIOUR_H */

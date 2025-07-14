@@ -1640,6 +1640,12 @@ zb_ret_t zb_zdo_put_tlv_by_id(zb_uint8_t param, zb_uint8_t id);
 void zdo_load_production_config(void);
 void zb_send_no_autostart_signal(zb_uint8_t param);
 void zb_nlme_leave_indication_cont(zb_uint8_t param_buf);
+void zb_nlme_leave_handle_child(zb_uint8_t addr_ref, zb_uint8_t rejoin);
+
+#if defined(ZB_ROUTER_ROLE) && defined(ZB_LEAVE_RESPONSE_TIMEOUT_ENABLED)
+void zdo_mgmt_leave_without_rejoin_no_resp(zb_uint8_t addr_ref);
+void zdo_mgmt_leave_with_rejoin_no_resp(zb_uint8_t addr_ref);
+#endif /* ZB_ROUTER_ROLE && ZB_LEAVE_RESPONSE_TIMEOUT_ENABLED */
 
 /**
  * Returns if the device is authenticated in the network.
