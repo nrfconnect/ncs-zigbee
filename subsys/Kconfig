@@ -421,6 +421,10 @@ config APP_LINK_WITH_ZIGBEE
 	help
 	  Link application with Zigbee subsystem
 
+# Override default CCA ED threshold value (see KRKNWK-19974 known issue)
+config NRF_802154_CCA_ED_THRESHOLD
+	default 17 if SOC_NRF54L15 || SOC_NRF54L10 || SOC_NRF54L05 || SOC_NRF52840
+
 partition=ZBOSS_NVRAM
 partition-size=0x8000
 source "${ZEPHYR_BASE}/../nrf/subsys/partition_manager/Kconfig.template.partition_config"
