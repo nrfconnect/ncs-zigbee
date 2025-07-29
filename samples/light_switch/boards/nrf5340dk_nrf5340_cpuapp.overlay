@@ -1,0 +1,16 @@
+/*
+ * Copyright (c) 2025 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+ / {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+		ncs,zigbee-timer = &timer2;
+	};
+};
+
+&timer2 {
+	status = "okay";
+};
