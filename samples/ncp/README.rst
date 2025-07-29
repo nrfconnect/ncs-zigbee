@@ -21,6 +21,13 @@ The sample supports the following development kits:
 
 .. include:: /includes/device_table_ncp.txt
 
+The nRF5340 DK (``nrf5340dk/nrf5340/cpuapp``) is supported only for development.
+
+You can use any of the development kits listed above.
+
+.. note::
+    The nRF52840 Dongle uses a :ref:`different bootloader <zigbee_ncp_bootloader>` than other development kits.
+
 To test this sample, you also need the following:
 
 * :ref:`ug_zigbee_tools_ncp_host` tool, which is based on the ZBOSS stack and requires a PC with an operating system compatible with the 64-bit Ubuntu |ubuntu_version| Linux.
