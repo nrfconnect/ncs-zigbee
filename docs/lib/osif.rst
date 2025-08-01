@@ -140,7 +140,8 @@ Use the following Kconfig options to configure the Zigbee serial logger:
 
 * ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` - This option enables logging ZBOSS traces with Zigbee serial logger.
 * ``CONFIG_ZBOSS_TRACE_UART_LOGGING`` - This option selects the UART serial backend.
-* ``CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`` - This option specifies the size of the internal ring buffer.
+..
+  * ``CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`` - This option specifies the size of the internal ring buffer.
 
 The ZBOSS tracing serial device needs to be provided in Devicetree like this:
 
@@ -162,7 +163,8 @@ Zigbee logger configuration options
 Use the following Kconfig options to configure the Zigbee logger:
 
 * ``CONFIG_ZBOSS_TRACE_HEXDUMP_LOGGING`` - This option enables Logging ZBOSS Traces with Zigbee logger.
-* ``CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`` - This option specifies size of internal ring buffer.
+..
+  * ``CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`` - This option specifies size of internal ring buffer.
 
 API documentation
 *****************
