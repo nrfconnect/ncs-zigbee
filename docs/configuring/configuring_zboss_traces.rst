@@ -79,11 +79,12 @@ The :ref:`zigbee_osif_zboss_osif_serial` offers a few backends to choose from fo
 It is recommended to use the Zigbee serial logger, as it is the most efficient.
 To enable it, set the Kconfig option ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING``.
 
-Optional: Increasing the size of the ring buffer
-   You can increase size of the ring buffer that temporarily stores the trace logs.
-   To do this, use the ``CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`` Kconfig option to assign a value for size of the buffer.
-   This can prevent losing some of the logs in demanding scenarios such as high network traffic, multiple devices being configured or joined, and so on.
-   See :ref:`Zigbee serial logger <zigbee_osif_zigbee_async_serial>` for more information.
+..
+   Optional: Increasing the size of the ring buffer
+      You can increase size of the ring buffer that temporarily stores the trace logs.
+      To do this, use the ``CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`` Kconfig option to assign a value for size of the buffer.
+      This can prevent losing some of the logs in demanding scenarios such as high network traffic, multiple devices being configured or joined, and so on.
+      See :ref:`Zigbee serial logger <zigbee_osif_zigbee_async_serial>` for more information.
 
 Trace logs using UART (default)
 ===============================

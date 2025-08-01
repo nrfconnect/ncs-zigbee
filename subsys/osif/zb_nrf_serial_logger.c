@@ -5,7 +5,6 @@
  */
 
 #include <zboss_api.h>
-#include <zephyr/sys/ring_buffer.h>
 #include <zephyr/drivers/uart.h>
 #include <zephyr/usb/usb_device.h>
 
@@ -17,49 +16,10 @@
 
 LOG_MODULE_DECLARE(zboss_osif, CONFIG_ZBOSS_OSIF_LOG_LEVEL);
 
-RING_BUF_DECLARE(logger_buf, CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE);
-
-static K_SEM_DEFINE(ringbuf_sem, 1, 1);
-
 /* UART device used to print ZBOSS Trace messages. */
 static const struct device *uart_dev = DEVICE_DT_GET(DT_CHOSEN(ncs_zboss_trace_uart));
 static bool uart_dev_initialized;
 static zb_callback_t char_handler;
-
-static void handle_tx_ready_evt(const struct device *dev)
-{
-	zb_uint32_t data_len;
-	zb_uint32_t data_taken;
-	int ret_val;
-	zb_uint8_t *data_ptr = NULL;
-
-	ret_val = k_sem_take(&ringbuf_sem, K_NO_WAIT);
-
-	if (ret_val == 0) {
-		if (ring_buf_is_empty(&logger_buf)) {
-			uart_irq_tx_disable(dev);
-			k_sem_give(&ringbuf_sem);
-			return;
-		}
-	} else {
-		uart_irq_tx_disable(dev);
-		return;
-	}
-
-	data_len = ring_buf_get_claim(&logger_buf,
-				      &data_ptr,
-				      CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE);
-
-	data_taken = uart_fifo_fill(dev, data_ptr, data_len);
-
-	ret_val = ring_buf_get_finish(&logger_buf, data_taken);
-
-	if (ret_val != 0) {
-		LOG_ERR("%u exceeds valid bytes in the logger ring buffer", data_taken);
-	}
-
-	k_sem_give(&ringbuf_sem);
-}
 
 static void uart_rx_bytes(uint8_t *buf, size_t len)
 {
@@ -90,49 +50,10 @@ static void interrupt_handler(const struct device *dev, void *user_data)
 		if (uart_irq_rx_ready(dev)) {
 			handle_rx_ready_evt(dev);
 		}
-
-		if (uart_irq_tx_ready(dev)) {
-			handle_tx_ready_evt(dev);
-		}
 	}
 }
 
 void zb_osif_serial_logger_put_bytes(const zb_uint8_t *buf, zb_short_t len)
-{
-	zb_uint8_t *buf_dest;
-	zb_uint32_t allocated = 0;
-	zb_uint32_t bytes_copied = 0;
-
-	if (IS_ENABLED(CONFIG_ZBOSS_TRACE_LOG_LEVEL_OFF)) {
-		return;
-	}
-
-	if (k_sem_take(&ringbuf_sem, K_FOREVER)) {
-		LOG_ERR("Couldn't take semaphore, dropping %u bytes", len);
-		return;
-	}
-
-	allocated = ring_buf_put_claim(&logger_buf, &buf_dest, len);
-
-	while (allocated != 0) {
-		ZB_MEMCPY(buf_dest, &buf[bytes_copied], allocated);
-		ring_buf_put_finish(&logger_buf, allocated);
-		bytes_copied += allocated;
-		len -= allocated;
-		allocated = ring_buf_put_claim(&logger_buf, &buf_dest, len);
-	}
-
-	if (len != 0) {
-		LOG_DBG("Dropping %u bytes, ring buffer is full", len);
-	}
-
-	k_sem_give(&ringbuf_sem);
-}
-
-/* Is called when complete Trace message is put in the ring buffer.
- * Triggers sending buffered data through UART API.
- */
-void zb_trace_msg_port_do(void)
 {
 	if (IS_ENABLED(CONFIG_ZBOSS_TRACE_LOG_LEVEL_OFF)) {
 		return;
@@ -142,7 +63,10 @@ void zb_trace_msg_port_do(void)
 		return;
 	}
 
-	uart_irq_tx_enable(uart_dev);
+	/* Send data directly through UART */
+	for (int i = 0; i < len; i++) {
+		uart_poll_out(uart_dev, buf[i]);
+	}
 }
 
 void zb_osif_serial_logger_init(void)
@@ -184,14 +108,7 @@ void zb_osif_serial_logger_init(void)
 
 void zb_osif_serial_logger_flush(void)
 {
-	if (!uart_dev_initialized) {
-		return;
-	}
-
-	uart_irq_tx_enable(uart_dev);
-	while (!ring_buf_is_empty(&logger_buf)) {
-		k_sleep(K_MSEC(100));
-	}
+	/* No action needed since we're using direct transmission */
 }
 
 #if defined(CONFIG_ZB_NRF_TRACE_RX_ENABLE)

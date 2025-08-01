@@ -68,12 +68,6 @@ void zb_osif_set_uart_byte_received_cb(zb_callback_t cb)
 /* Prints remaining bytes. */
 void zb_osif_serial_flush(void)
 {
-	if (IS_ENABLED(CONFIG_ZBOSS_TRACE_HEXDUMP_LOGGING)) {
-		zb_osif_logger_flush();
-	}
-	if (IS_ENABLED(CONFIG_ZBOSS_TRACE_BINARY_LOGGING)) {
-		zb_osif_serial_logger_flush();
-	}
 	if (IS_ENABLED(CONFIG_ZIGBEE_HAVE_ASYNC_SERIAL)) {
 		zb_osif_async_serial_flush();
 	}

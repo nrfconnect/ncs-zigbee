@@ -177,9 +177,10 @@ You can configure how they are printed with the following Kconfig options:
 ..
   * ``CONFIG_ZBOSS_TRACE_BINARY_NCP_TRANSPORT_LOGGING`` - Stack logs are printed in the binary format using the NCP transport channel.
 
-Stack logs are stored in the internal buffer if they are printed using Zephyr's `Logging`_ API or the independent serial backend.
-You can customize the buffer size with the ``CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`` Kconfig option.
-The buffer size must be larger than ``256`` and smaller than ``2147483648``
+..
+  Stack logs are stored in the internal buffer if they are printed using Zephyr's `Logging`_ API or the independent serial backend.
+  You can customize the buffer size with the ``CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`` Kconfig option.
+  The buffer size must be larger than ``256`` and smaller than ``2147483648``
 
 ..
   If NCP transport channel is used, stack logs are stored in the buffer used for NCP transport.
