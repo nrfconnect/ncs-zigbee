@@ -21,7 +21,19 @@
 
 // restore full RRAM and SRAM space - by default some parts are dedicated to FLPR
 &cpuapp_rram {
-	reg = <0x0 DT_SIZE_K(1022)>;
+	reg = <0x0 DT_SIZE_K(1012)>;
+	
+	// Resize storage_partition to fit within memory boundaries 
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		
+		storage_partition: partition@f6000 {
+			label = "storage";
+			reg = <0xF6000 DT_SIZE_K(28)>;
+		};
+	};
 };
 
 &cpuapp_sram {
