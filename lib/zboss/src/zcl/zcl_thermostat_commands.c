@@ -739,7 +739,7 @@ void zb_zcl_thermostat_invoke_user_app(zb_uint8_t param, zb_uint16_t endpoint16)
 
     (ZCL_CTX().device_cb)(param);
     result = user_app_invoke_data->status;
-    TRACE_MSG(TRACE_ZCL1, "result %h", (FMT__H, result));
+    TRACE_MSG(TRACE_ZCL1, "result %hd", (FMT__H, result));
   }
   else
   {

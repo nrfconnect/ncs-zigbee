@@ -494,7 +494,7 @@ void zb_zcl_identify_write_attr_hook_server(zb_uint8_t endpoint, zb_uint16_t att
   ZB_ASSIGN_UINT16(&val, new_value);
 
   TRACE_MSG(TRACE_ZCL1, "> zb_zcl_identify_write_attr_hook endpoint %hx attr_id 0x%x, manuf_code 0x%x",
-            (FMT__H_D, endpoint, attr_id, manuf_code));
+            (FMT__H_D_D, endpoint, attr_id, manuf_code));
 
   ZVUNUSED(manuf_code);
 

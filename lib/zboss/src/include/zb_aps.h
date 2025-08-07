@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -555,6 +555,9 @@ void zb_aps_set_preconfigure_security_key(const zb_uint8_t *key);
 zb_ret_t zb_aps_get_ieee_source_from_cmd_frame(zb_uint8_t cmd_id, zb_uint8_t cmd_buf_param, zb_ieee_addr_t ieee_addr);
 
 void zb_aps_clear_after_leave(zb_uint16_t address);
+
+zb_ret_t zb_check_bind_trans(zb_uint8_t param);
+void zb_aps_stop_retransmission(zb_ushort_t retrans_table_index);
 
 void zb_apsme_remove_all_groups_internal(void);
 void apsme_forget_device(void);

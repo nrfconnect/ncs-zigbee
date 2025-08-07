@@ -1957,10 +1957,17 @@ zb_ret_t zb_zcl_register_custom_msc(zb_uint16_t cluster_id, zb_uint8_t index, zb
 {
   /* Validate it is a manufacturer specific cluster id
    */
-  if(cluster_id < ZB_MSC_INITIAL_CLUSTER_ID ||
+  if(
+#ifdef ZB_ZCL_SUPPORT_CLUSTER_TUNNEL
     cluster_id == ZB_ZCL_CLUSTER_ID_TUNNEL ||
+#endif /* ZB_ZCL_SUPPORT_CLUSTER_TUNNEL */
+#ifdef ZB_ZCL_SUPPORT_CLUSTER_IR_BLASTER
     cluster_id == ZB_ZCL_CLUSTER_ID_IR_BLASTER ||
-    cluster_id == ZB_ZCL_CLUSTER_ID_CUSTOM_ATTR)
+#endif /* ZB_ZCL_SUPPORT_CLUSTER_IR_BLASTER */
+#ifdef ZB_ZCL_SUPPORT_CLUSTER_CUSTOM_ATTR
+    cluster_id == ZB_ZCL_CLUSTER_ID_CUSTOM_ATTR ||
+#endif /* ZB_ZCL_SUPPORT_CLUSTER_CUSTOM_ATTR */
+    cluster_id < ZB_MSC_INITIAL_CLUSTER_ID)
   {
     return RET_INVALID_PARAMETER_1;
   }
@@ -1985,10 +1992,17 @@ zb_ret_t zb_zcl_register_custom_msc(zb_uint16_t cluster_id, zb_uint8_t index, zb
 
 zb_bool_t zb_zcl_is_msc_allows_frag(zb_uint16_t cluster_id)
 {
-  if(cluster_id >= ZB_MSC_INITIAL_CLUSTER_ID &&
+  if(
+#ifdef ZB_ZCL_SUPPORT_CLUSTER_TUNNEL
     cluster_id != ZB_ZCL_CLUSTER_ID_TUNNEL &&
+#endif /* ZB_ZCL_SUPPORT_CLUSTER_TUNNEL */
+#ifdef ZB_ZCL_SUPPORT_CLUSTER_IR_BLASTER
     cluster_id != ZB_ZCL_CLUSTER_ID_IR_BLASTER &&
-    cluster_id != ZB_ZCL_CLUSTER_ID_CUSTOM_ATTR)
+#endif /* ZB_ZCL_SUPPORT_CLUSTER_IR_BLASTER */
+#ifdef ZB_ZCL_SUPPORT_CLUSTER_CUSTOM_ATTR
+    cluster_id != ZB_ZCL_CLUSTER_ID_CUSTOM_ATTR &&
+#endif /* ZB_ZCL_SUPPORT_CLUSTER_CUSTOM_ATTR */
+    cluster_id >= ZB_MSC_INITIAL_CLUSTER_ID)
   {
     for(zb_uint8_t i = 0; i < ZB_MAX_EP_NUMBER; i++)
     {

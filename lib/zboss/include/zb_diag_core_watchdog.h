@@ -38,16 +38,24 @@
  * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/* PURPOSE: general header file of the diagnostic library
-*/
 
-#ifndef ZB_DIAG_H
-#define ZB_DIAG_H
+#ifndef ZB_DIAG_CORE_WATCHDOG_H
+#define ZB_DIAG_CORE_WATCHDOG_H
 
-#include "zb_diag_common.h"
-#include "zb_diag_th_behaviour.h"
-#include "zb_diag_dut_behaviour.h"
-#include "zb_diag_core_watchdog.h"
-#include "zb_diag_key_exposure.h"
+/**
+ * Initialize and run ZBOSS core watchdog
+ *
+ * Should be called from @see zb_diag_init()
+ */
+void zb_diag_core_watchdog_init(void);
 
-#endif /* ZB_DIAG_H */
+/**
+ * Periodically trace a message from ZBOSS core to inform external systems (for example, TDF)
+ *
+ * @param param - unused; it allows to use the ZBOSS scheduler
+ *
+ * You can redefine the message period in your vendor configuration file, @see ZB_DIAG_CORE_WATCHDOG_TMO_MS
+ */
+void zb_diag_core_watchdog(zb_uint8_t param);
+
+#endif /* ZB_DIAG_CORE_WATCHDOG_H */

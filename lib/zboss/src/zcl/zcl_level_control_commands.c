@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -1400,6 +1400,112 @@ void zb_zcl_level_control_send_stop_req(zb_bufid_t buffer, const zb_addr_u *dst_
   }
 
   TRACE_MSG(TRACE_ZCL3, "< zb_zcl_level_control_send_stop_req", (FMT__0));
+}
+
+
+static inline void zb_zcl_level_control_send_move_to_closest_frequency_req_rev1(zb_bufid_t buffer, const zb_addr_u *dst_addr,
+                                                                                zb_uint8_t dst_addr_mode, zb_uint8_t dst_ep,
+                                                                                zb_uint8_t ep, zb_uint16_t prof_id,
+                                                                                zb_uint8_t def_resp, zb_callback_t cb)
+{
+  zb_uint8_t* ptr = ZB_ZCL_START_PACKET_REQ(buffer)
+  ZB_ZCL_CONSTRUCT_SPECIFIC_COMMAND_REQ_FRAME_CONTROL(ptr, def_resp)
+  ZB_ZCL_CONSTRUCT_COMMAND_HEADER_REQ(ptr, ZB_ZCL_GET_SEQ_NUM(), ZB_ZCL_CMD_LEVEL_CONTROL_MOVE_TO_CLOSEST_FREQUENCY);
+  zb_zcl_finish_and_send_packet(buffer, ptr, dst_addr, dst_addr_mode, dst_ep, ep, prof_id, ZB_ZCL_CLUSTER_ID_LEVEL_CONTROL, cb);
+}
+
+static inline void zb_zcl_level_control_send_move_to_closest_frequency_req_rev3(zb_bufid_t buffer, const zb_addr_u *dst_addr,
+                                             zb_uint8_t dst_addr_mode, zb_uint8_t dst_ep,
+                                             zb_uint8_t ep, zb_uint16_t prof_id,
+                                             zb_uint8_t def_resp, zb_callback_t cb,
+                                             zb_uint16_t frequency)
+{
+  zb_uint8_t* ptr = ZB_ZCL_START_PACKET_REQ(buffer)
+  ZB_ZCL_CONSTRUCT_SPECIFIC_COMMAND_REQ_FRAME_CONTROL(ptr, def_resp)
+  ZB_ZCL_CONSTRUCT_COMMAND_HEADER_REQ(ptr, ZB_ZCL_GET_SEQ_NUM(), ZB_ZCL_CMD_LEVEL_CONTROL_MOVE_TO_CLOSEST_FREQUENCY);
+  ZB_ZCL_PACKET_PUT_DATA16_VAL(ptr, frequency);
+  zb_zcl_finish_and_send_packet(buffer, ptr, dst_addr, dst_addr_mode, dst_ep, ep, prof_id, ZB_ZCL_CLUSTER_ID_LEVEL_CONTROL, cb);
+}
+
+void zb_zcl_level_control_send_move_to_closest_frequency_req_zcl8(zb_bufid_t buffer, const zb_addr_u *dst_addr,
+                                                                  zb_uint8_t dst_addr_mode, zb_uint8_t dst_ep,
+                                                                  zb_uint8_t ep, zb_uint16_t prof_id,
+                                                                  zb_uint8_t def_resp, zb_callback_t cb,
+                                                                  zb_uint16_t frequency)
+{
+  zb_uint16_t rev;
+
+  TRACE_MSG(TRACE_ZCL3, "> zb_zcl_level_control_send_move_to_closest_frequency_req_zcl8", (FMT__0));
+
+  rev = zb_zcl_get_cluster_rev_by_mode(ZB_ZCL_LEVEL_CONTROL_CLUSTER_REVISION_MAX,
+                                       dst_addr, dst_addr_mode, dst_ep,
+                                       ZB_ZCL_CLUSTER_ID_LEVEL_CONTROL,
+                                       ZB_ZCL_CLUSTER_CLIENT_ROLE, ep);
+
+  TRACE_MSG(TRACE_ZCL3, "rev is %d", (FMT__D, rev));
+
+  switch(rev)
+  {
+    case ZB_ZCL_CLUSTER_REV_MIN:
+      /* FALLTHROUGH */
+    case 2:
+      zb_zcl_level_control_send_move_to_closest_frequency_req_rev1(buffer, dst_addr,
+                                                                    dst_addr_mode, dst_ep,
+                                                                    ep, prof_id,
+                                                                    def_resp, cb);
+      break;
+    case 3:
+      zb_zcl_level_control_send_move_to_closest_frequency_req_rev3(buffer, dst_addr,
+                                                                    dst_addr_mode, dst_ep,
+                                                                    ep, prof_id,
+                                                                    def_resp, cb,
+                                                                    frequency);
+      break;
+    default:
+      break;
+  }
+
+  TRACE_MSG(TRACE_ZCL3, "< zb_zcl_level_control_send_move_to_closest_frequency_req_zcl8", (FMT__0));
+}
+
+void zb_zcl_level_control_send_move_to_closest_frequency_req(zb_bufid_t buffer, const zb_addr_u *dst_addr,
+                                        zb_uint8_t dst_addr_mode, zb_uint8_t dst_ep,
+                                        zb_uint8_t ep, zb_uint16_t prof_id,
+                                        zb_uint8_t def_resp, zb_callback_t cb)
+{
+  zb_uint16_t rev;
+
+  TRACE_MSG(TRACE_ZCL3, "> zb_zcl_level_control_send_move_to_closest_frequency_req", (FMT__0));
+
+  rev = zb_zcl_get_cluster_rev_by_mode(ZB_ZCL_CLUSTER_REV_MIN,
+                                       dst_addr, dst_addr_mode, dst_ep,
+                                       ZB_ZCL_CLUSTER_ID_LEVEL_CONTROL,
+                                       ZB_ZCL_CLUSTER_CLIENT_ROLE, ep);
+
+  TRACE_MSG(TRACE_ZCL3, "rev is %d", (FMT__D, rev));
+
+  switch(rev)
+  {
+    case ZB_ZCL_CLUSTER_REV_MIN:
+      /* FALLTHROUGH */
+    case 2:
+      zb_zcl_level_control_send_move_to_closest_frequency_req_rev1(buffer, dst_addr,
+                                                                    dst_addr_mode, dst_ep,
+                                                                    ep, prof_id,
+                                                                    def_resp, cb);
+      break;
+    case 3:
+      zb_zcl_level_control_send_move_to_closest_frequency_req_rev3(buffer, dst_addr,
+                                              dst_addr_mode, dst_ep,
+                                              ep, prof_id,
+                                              def_resp, cb,
+                                              ZB_ZCL_LEVEL_CONTROL_FREQUENCY_UNKNOWN_DEFAULT_FIELD_VALUE);
+      break;
+    default:
+      break;
+  }
+
+  TRACE_MSG(TRACE_ZCL3, "< zb_zcl_level_control_send_move_to_closest_frequency_req", (FMT__0));
 }
 
 #ifdef ZB_COMPILE_ZCL_SAMPLE

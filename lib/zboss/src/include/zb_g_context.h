@@ -190,13 +190,13 @@ extern zb_intr_globals_t g_izb;
 #include "zb_sleep.h"
 #include "zb_signals.h"
 #include "zb_bufpool_globals.h"
-#if (!(defined ZB_MACSPLIT_DEVICE)) || (defined ZB_TH_ENABLED)
+#if (!(defined ZB_MACSPLIT_DEVICE)) || (defined ZB_TH_ENABLED) || (defined ZB_DIAGNOSTIC_FEATURES_ENABLED)
 #include "zb_addr_globals.h"
 #include "zb_nwk_globals.h"
 #include "zb_aps_globals.h"
 #include "zb_zdo_globals.h"
 #include "zb_commissioning.h"
-#endif  /* (!(defined ZB_MACSPLIT_DEVICE)) || (defined ZB_TH_ENABLED) */
+#endif  /* !defined ZB_MACSPLIT_DEVICE || ZB_TH_ENABLED || ZB_DIAGNOSTIC_FEATURES_ENABLED */
 
 #ifdef ZB_ENABLE_ZLL
 #include "zll/zb_zll_config.h"
@@ -318,6 +318,14 @@ typedef zb_bool_t (*zb_ccm_check_cb_t) (zb_uint8_t *ccm_p,
                                         zb_uint8_t *hdr,
                                         zb_ushort_t hdr_len);
 
+#if defined(ZB_MAC_MONOLITHIC) || defined(ZB_MACSPLIT_HOST)
+/** @brief Called on Update Device handling before
+ *         Decision on accepting device is taken
+ *  @param ind_p - pointer to Update Device indication
+ */
+typedef void (*zb_cert_auth_dev_ind_cb_t) (zb_apsme_update_device_ind_t* ind_p);
+#endif /* defined(ZB_MAC_MONOLITHIC) || defined(ZB_MACSPLIT_HOST) */
+
 /** @brief Called when APS adds security header (before adding counter to packet)
            to outgoing packet.
     @param p_sec_counter - pointer to counter that will be added to packet,
@@ -401,6 +409,17 @@ typedef struct zb_cert_hacks_s
                                                                  joiner (in bdb mode).
                                                                  Passed up with buffer in params.
                                                                  @see test CS-ICK-TC-03. */
+  zb_callback_t                  nlme_join_ind_cb;          /*!< This callback is called on
+                                                                 NLME Join indication.
+                                                                 @see test CS-NFS-TC-05A. */
+  zb_callback_t                  nlde_data_ind_cb;          /*!< This callback is called on
+                                                                 NLDE-Data indication.
+                                                                 @see test R20-BV-01*/
+#if defined(ZB_MAC_MONOLITHIC) || defined(ZB_MACSPLIT_HOST)
+  zb_cert_auth_dev_ind_cb_t      auth_dev_cb;               /*!< This callback called before TC
+                                                                 authenticates device.
+                                                                 @see zb_authenticate_dev */
+#endif /* defined(ZB_MAC_MONOLITHIC) || defined(ZB_MACSPLIT_HOST) */
   zb_callback2_t                 deliver_conf_key_cb;       /*!< This callback called before TC
                                                                  sends confirm key to joiner (TC
                                                                  link key).
@@ -529,6 +548,8 @@ typedef struct zb_cert_hacks_s
   zb_bitfield_t frag_disable_custom_ack_timer:1; /*!< If set to 1, ZBOSS does sends APS acks for
                                                        fragmented transmissions only in the cases
                                                        required by the specs. */
+  zb_bitfield_t frag_disable_aps_acks:1;         /*!< If set to 1, don't send APS ack
+                                                       for fragmented transmission. */
   zb_bitfield_t aps_counter_custom_setup:1;            //replace APS counter
   zb_uint8_t    aps_counter_custom_value;              //custom value of APS counter
   zb_bitfield_t nwk_counter_custom_setup:1;            //replace NWK counter
@@ -597,8 +618,9 @@ typedef struct zb_cert_hacks_s
                                                    *   Used into TP_R20_BV-01 */
   zb_bitfield_t nwk_leave_from_unknown_addr:1; /*!< Send all nwk leave_req with src ieee addr=<nwk_leave_unknown_addr>
                                                     and short=<nwk_leave_unknown_short> */
-  zb_bitfield_t disable_support_kn_tlv_in_beacon:1; /*!< Support kn methods TLV will not be placed in beacon apx (only for ZR)*/
-  zb_bitfield_t disable_update_hub_connectivity:1; /*!< */
+  zb_bitfield_t disable_support_kn_tlv_in_beacon:1; /*!< Support kn methods TLV will not be placed in beacon apx (only for ZR)
+                                                     * r23/zdo/TC_18_01_PARENT_SELECT - TH_ZR */
+  zb_bitfield_t disable_update_hub_connectivity:1; /*!< r23/zdo/TC_18_01_PARENT_SELECT - TH_ZR */
 
   zb_bitfield_t nwk_use_local_ieee:1; /*!< Force usong local ieee in nwk hdr */
 
@@ -620,17 +642,18 @@ typedef struct zb_cert_hacks_s
 
   zb_bitfield_t force_secure_rejoin:1;
 
-  zb_bitfield_t key_neg_req_truncated_tlv:1;
-  zb_bitfield_t key_neg_req_no_tlv:1;
-  zb_bitfield_t key_neg_req_add_extra_tlv:1;
+  zb_bitfield_t key_neg_req_truncated_tlv:1; /*!< r23/dlk/TC_16_03_DLK_NEGATIVE - TH_ZED */
+  zb_bitfield_t key_neg_req_no_tlv:1;        /*!< r23/dlk/TC_16_03_DLK_NEGATIVE - TH_ZED */
+  zb_bitfield_t key_neg_req_add_extra_tlv:1; /*!< r23/dlk/TC_16_03_DLK_NEGATIVE - TH_ZED */
 
-  zb_bitfield_t key_neg_rsp_not_autho:1;
-  zb_bitfield_t key_neg_rsp_truncated_tlv:1;
-  zb_bitfield_t key_neg_rsp_no_tlv:1;
-  zb_bitfield_t key_neg_rsp_add_extra_tlv:1;
+  zb_bitfield_t key_neg_rsp_not_autho:1;     /*!< r23/dlk/TC_16_03_DLK_NEGATIVE - TH_ZC, DUT_ZC */
+  zb_bitfield_t key_neg_rsp_truncated_tlv:1; /*!< r23/dlk/TC_16_03_DLK_NEGATIVE - TH_ZC */
+  zb_bitfield_t key_neg_rsp_no_tlv:1;        /*!< r23/dlk/TC_16_03_DLK_NEGATIVE - TH_ZC */
+  zb_bitfield_t key_neg_rsp_add_extra_tlv:1; /*!< r23/dlk/TC_16_03_DLK_NEGATIVE - TH_ZC */
 
   zb_bitfield_t skip_addr_conflict_check:1;
   zb_bitfield_t disable_aps_sec_for_all_zdo_cmd:1;        /*!< disable APS Enc for all zdo commands*/
+  zb_bitfield_t disable_aps_sec_for_get_auth_tok_rsp:1;   /*!< disable APS Enc for Security Get Auth Token Response */
 
   zb_bitfield_t disable_rejoin_resp_timeout:1; /* Disable zb_nlme_rejoin_response_timeout() alarm for rejoin */
   zb_bitfield_t tc_rejoin_aps_decrypt_error:1; /* Simulate TC rejoin without known aps key */
@@ -658,7 +681,8 @@ typedef struct zb_cert_hacks_s
   zb_bitfield_t restart_nwk_broadcast_delivery_time_after_reset:1; /*!< Restart nwk_broadcast_delivery_time_passed_cb alarm after NWK resetting  */
   zb_bitfield_t disable_nbt_iface_update_after_init:1; /*!< Disable updating of MAC iface id in neighbor entry after entry creation */
   zb_bitfield_t place_extra_item_for_bv_37_b:1; /*!< Added extra channel-page item for mgmt_nwk_enhanced_update_req  */
-  zb_bitfield_t keep_provisional_key_for_16_3:1; /*!< Don't delete provisional key in zb_legacy_device_auth_signal_alarm */
+  zb_bitfield_t keep_provisional_key_for_16_3:1; /*!< Don't delete provisional key in zb_legacy_device_auth_signal_alarm
+                                                  * r23/dlk/TC_16_03_DLK_NEGATIVE - TH_ZC */
   zb_uint8_t    zbd_outgoing_fc; /*!< Specified outgoing frame counter for BLE packets from ZDD */
   zb_bitfield_t disable_link_power_negotiation:1; /*!< Disable power negotiation */
   zb_bitfield_t disable_rejoin_after_key_switch_fail:1; /*!< Disable rejoin if key switch command was not proceeded */
@@ -679,6 +703,8 @@ typedef struct zb_cert_hacks_s
 
 typedef zb_bool_t (*zb_reg_api_aps_retrans_table_cmd_access_cb_t) (
   zb_uint8_t param, zb_uint16_t dest_addr, zb_uint8_t command, zb_bool_t with_ack);
+
+typedef zb_bool_t (*zb_reg_api_aps_packet_filter_cb_t) (const zb_aps_hdr_t *aps_hdr);
 
 /* Flags and attributes for tests, allows to switch stack behavior in run-time.
  * Used to simulate legacy device behavior, error behavior e.t.c.
@@ -749,6 +775,8 @@ typedef struct zb_reg_api_s
   zb_reg_api_aps_retrans_table_cmd_access_cb_t aps_retrans_table_cmd_access_cb; /*!< Allows to enable or disable access to add
                                                                                  *   new command entry to APS retransmission table. */
 
+  zb_reg_api_aps_packet_filter_cb_t aps_incoming_packet_filter_cb; /*!< Allows to filter incoming APS packets by test conditions  */
+
 #if defined(ZB_MAC_MONOLITHIC)
   zb_bool_t disable_mac_ack_for_data_packets_and_pass_up; /*!< When MAC ACKs disabled for incoming
                                                            *   Data packets pass them up anyway */
@@ -780,6 +808,7 @@ typedef struct zb_reg_api_s
 #endif
 
   zb_bool_t is_rejoin_failure;                          /*!< Set a rejoining status for a test, and should be reset from a test */
+  zb_bool_t lock_nwk_data_processing;                   /*!< NWK data processing will be locked, ZB_NWK_IN_Q won't be processed, be careful not to conflict with zb_nlme_start_router_request */
 } zb_reg_api_t;
 
 #define ZB_REGRESSION_TESTS_API() ZG->reg_api

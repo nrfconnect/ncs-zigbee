@@ -180,7 +180,8 @@ typedef ZB_PACKED_PRE struct zb_aps_device_key_pair_set_v2_s
   zb_bitfield_t  aps_link_key_type:1;         /*!< @ref zb_secur_aps_link_key_type_t: unique vs global (r20 stuff) */
   zb_bitfield_t  kn_methods_present:1; /*!< If true, then supported_kn_methods and supported_kn_secrets fields are present */
   zb_bitfield_t  aps_frame_cnt_sync_supported:1;
-  zb_bitfield_t  reserved: 4;
+  zb_bitfield_t  use_unverified:1; /*!< Allow to use unverified key to encrypting (for confirm key frame)*/
+  zb_bitfield_t  reserved: 3;
 
   zb_uint8_t     supported_kn_methods; /*!< Supported Key negotiation methods */
   zb_uint8_t     supported_kn_secrets; /*!< Supported Key negotiation secrets */
@@ -1877,7 +1878,7 @@ zb_ret_t zb_zdo_ecdhe_common_ctx_find_start_key_neg_rsp_param(zb_uint8_t param, 
 
 void zdo_secur_confirm_key_legacy_confirm(zb_ieee_addr_t ieee_addr);
 void zdo_secur_confirm_key_dlk_confirm(zb_secur_ecdhe_common_ctx_t *dlk_ctx);
-void zb_confirm_key_ack_received(zb_secur_ecdhe_common_ctx_t *dlk_ctx_p);
+void zb_confirm_key_ack_received(zb_secur_ecdhe_common_ctx_t *dlk_ctx_p, zb_address_ieee_ref_t addr_ref);
 #endif
 
 #ifndef ZB_COORDINATOR_ONLY

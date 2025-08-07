@@ -49,6 +49,12 @@
 #include "zb_types.h"
 #include "zb_errors.h"
 
+/**
+   @typedef zb_uint8_t zb_cb_param_t
+   Callback handler
+ */
+typedef zb_uint8_t zb_cb_param_t;
+
 /* zb_callback_t is used in osif if we have serial API */
 /*! \addtogroup sched */
 /*! @{ */

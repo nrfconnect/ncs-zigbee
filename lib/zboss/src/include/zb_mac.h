@@ -1227,7 +1227,7 @@ zb_mac_beacon_payload_t;
    @param p_sfs - pointer to 16bit SFS field.
 */
 
-#define ZB_MAC_GET_BEACON_ORDER( p_sfs ) ((zb_uint_t)((((zb_uint8_t*)(p_sfs))[ZB_PKT_16B_ZERO_BYTE]) & 0x07U))
+#define ZB_MAC_GET_BEACON_ORDER( p_sfs ) ((zb_uint_t)((((zb_uint8_t*)(p_sfs))[ZB_PKT_16B_ZERO_BYTE]) & 0x0fU))
 
 /**
    Gets Association Permit subfield in Superframe Specification field ( SFS )
@@ -1576,7 +1576,7 @@ typedef zb_uint8_t zb_mac_capability_info_t;
 #define MAC_NO_SHORT_ADDRESS        0xecU
 /** Rx enable request failed. Spec'd number of symbols longer than beacon interval */
 #define MAC_ON_TIME_TOO_LONG        0xf6U
-/** Association failed due to lack of capacity (no nbor tbl entry or no address) */
+/** A receiver enable request was unsuccessful because it could not be completed within the CAP (b/c IEEE 802.15.4-2003) */
 #define MAC_OUT_OF_CAP              0xedU
 /** Different networks within listening range have identical Pan IDs */
 #define MAC_PAN_ID_CONFLICT         0xeeU
@@ -2981,14 +2981,19 @@ zb_time_t osif_sub_trans_timer(zb_time_t t2, zb_time_t t1);
 
 typedef zb_ret_t (*zb_tx_power_provider_t)(zb_uint8_t page, zb_uint8_t channel, zb_int8_t *power_dbm);
 
+/**
+ * Set TX power provider function for MAC layer
+ *
+ * When page-channel pair is changed, MAC layer should update TX power for the new channel.
+ * In this case the power provider function is used to fetch actual TX power.
+ *
+ * In monolithic architecture MAC layer is able to fetch TX power directly, whereas
+ * in split architecture, host side should send an actual array of TX power for the current region and page.
+ * Please note, in split architecture this array of TX power is sending asynchronously without confirmation.
+ */
 void zb_mac_set_tx_power_provider_function(zb_tx_power_provider_t new_provider);
 void zb_mac_set_tx_power_async_confirm(zb_bufid_t param);
 void zb_mac_get_tx_power_async_confirm(zb_bufid_t param);
-
-/**
- * @brief Update transceiver power for each page and channel synchronously according to power provider.
-*/
-void zb_mac_update_channel_pages(void);
 
 #endif /* #ifdef ZB_MAC_CONFIGURABLE_TX_POWER */
 
@@ -3145,6 +3150,7 @@ void zb_mac_api_trace_scan_request(zb_uint8_t param);
 void zb_mac_api_trace_scan_confirm(zb_uint8_t param);
 void zb_mac_api_trace_poll_request(zb_uint8_t param);
 void zb_mac_api_trace_poll_confirm(zb_uint8_t param);
+void zb_mac_api_trace_poll_indication(zb_uint8_t param);
 void zb_mac_api_trace_start_request(zb_uint8_t param);
 void zb_mac_api_trace_start_confirm(zb_uint8_t param);
 void zb_mac_api_trace_set_request(zb_uint8_t param);
@@ -3179,6 +3185,7 @@ void zb_mac_api_trace_cca_confirm(zb_uint8_t param);
 #define ZB_MAC_API_TRACE_DATA_INDICATION(param)           zb_mac_api_trace_data_indication(param)
 #define ZB_MAC_API_TRACE_POLL_REQUEST(param)              zb_mac_api_trace_poll_request(param)
 #define ZB_MAC_API_TRACE_POLL_CONFIRM(param)              zb_mac_api_trace_poll_confirm(param)
+#define ZB_MAC_API_TRACE_POLL_INDICATION(param)           zb_mac_api_trace_poll_indication(param)
 #define ZB_MAC_API_TRACE_GET_REQUEST(param)               zb_mac_api_trace_get_request(param)
 #define ZB_MAC_API_TRACE_GET_CONFIRM(param)               zb_mac_api_trace_get_confirm(param)
 #define ZB_MAC_API_TRACE_SET_REQUEST(param)               zb_mac_api_trace_set_request(param)
@@ -3208,6 +3215,7 @@ void zb_mac_api_trace_cca_confirm(zb_uint8_t param);
 #define ZB_MAC_API_TRACE_DATA_INDICATION(param)
 #define ZB_MAC_API_TRACE_POLL_REQUEST(param)
 #define ZB_MAC_API_TRACE_POLL_CONFIRM(param)
+#define ZB_MAC_API_TRACE_POLL_INDICATION(param)
 #define ZB_MAC_API_TRACE_GET_REQUEST(param)
 #define ZB_MAC_API_TRACE_GET_CONFIRM(param)
 #define ZB_MAC_API_TRACE_SET_REQUEST(param)

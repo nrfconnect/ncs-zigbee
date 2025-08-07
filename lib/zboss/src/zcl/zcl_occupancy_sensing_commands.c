@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -73,6 +73,9 @@ void zb_zcl_occupancy_sensing_init_client()
                                 (zb_zcl_cluster_handler_t)NULL);
 }
 
+#define ZB_ZCL_OCCUPANCY_SENSING_THRESHOLD_GENERIC_INVALID_MIN_VALUE ((zb_uint8_t) 0x00)
+#define ZB_ZCL_OCCUPANCY_SENSING_THRESHOLD_GENERIC_INVALID_MAX_VALUE ((zb_uint8_t) 0xff)
+
 zb_ret_t check_value_occupancy_sensing_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value)
 {
     zb_ret_t ret = RET_ERROR;
@@ -80,8 +83,8 @@ zb_ret_t check_value_occupancy_sensing_server(zb_uint16_t attr_id, zb_uint8_t en
     zb_uint16_t new_delay;
     zb_uint16_t max_delay;
 
-    zb_uint8_t min_threshold;
-    zb_uint8_t max_threshold;
+    zb_uint8_t min_threshold = ZB_ZCL_OCCUPANCY_SENSING_THRESHOLD_GENERIC_INVALID_MIN_VALUE;
+    zb_uint8_t max_threshold = ZB_ZCL_OCCUPANCY_SENSING_THRESHOLD_GENERIC_INVALID_MAX_VALUE;
 
     /* Unused without trace. */
     ZVUNUSED(endpoint);

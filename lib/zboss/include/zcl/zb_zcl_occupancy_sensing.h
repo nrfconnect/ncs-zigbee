@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2022 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -38,7 +38,7 @@
  * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/* PURPOSE: Occupancy Sensing definitoins
+/* PURPOSE: Occupancy Sensing definitions
 */
 
 #ifndef ZB_ZCL_OCCUPANCY_SENSING_H
@@ -228,6 +228,16 @@ enum zb_zcl_occupancy_sensing_occupancy_e
   ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_OCCUPIED   = 1
 };
 
+/*! @brief Occupancy Sensor Type Bitmap attribute flags
+    @see ZCL spec, subclause 4.8.2.2.1.3
+*/
+enum zb_zcl_occupancy_sensing_occupancy_sensor_type_bitmap_e
+{
+  ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_BITMAP_PIR              = 1 << 0,
+  ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_BITMAP_ULTRASONIC       = 1 << 1,
+  ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_BITMAP_PHYSICAL_CONTACT = 1 << 2,
+};
+
 /* Custom Attributes values */
 
 /*! @brief Maximal value for switch type attribute */
@@ -248,8 +258,8 @@ enum zb_zcl_occupancy_sensing_occupancy_sensor_type_e
   ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_ULTRASONIC         = 1,
   /*! PIR and Ultrasonic value */
   ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_PIR_AND_ULTRASONIC = 2,
-  /*! Reserved value */
-  ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_RESERVED           = 3
+  /*! Physical contact value */
+  ZB_ZCL_OCCUPANCY_SENSING_OCCUPANCY_SENSOR_TYPE_PHYSICAL_CONTACT   = 3,
 };
 
 /** @cond internals_doc */
