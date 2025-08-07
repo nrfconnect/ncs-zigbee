@@ -437,6 +437,9 @@
 #define ZB_STACK_VERSION ((ZBOSS_MAJOR << 24) | (ZBOSS_MINOR << 16) | (ZBOSS_PATCH << 8) | (ZBOSS_SDK_REVISION))
 
 /* ZBOSS NCP protocol version. */
-#define ZB_NCP_PROTOCOL_VERSION 0x0115
+#define ZB_NCP_PROTOCOL_VERSION 0
+
+/* Send beacon immediately according to R23 spec */
+#define ZB_SEND_BEACON_IMMEDIATELY
 
 #endif /* ZB_VENDOR_H__ */

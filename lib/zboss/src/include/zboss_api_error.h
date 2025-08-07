@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -57,16 +57,16 @@ typedef struct zb_verify_additional_info_s {
 /**
  * @brief   Definition of error handler. It must be registered by application using
  *          @ref zb_error_register_app_handler .
- * 
+ *
  * @note    Severity @ref ZB_ERROR_SEVERITY_FATAL is excusive for errors raised by ZB_VERIFY
  *          or ZB_VERIFY_INFO
- * 
+ *
  * @note    If the registered callback is called with severity @ref ZB_ERROR_SEVERITY_FATAL ,
  *          the argument additional_info will point to a structure of type
  *          @ref zb_verify_additional_info_t , in which its parameter @ref caller_additional_info
  *          will point to the original additional info used by the caller in @ref  ZB_VERIFY_INFO
  *          (or NULL, in case of @ref ZB_VERIFY)
- * 
+ *
  * @param severity        severity level of the error
  * @param error_code      error code being raised
  * @param additional_info additional error-dependent info
@@ -119,6 +119,8 @@ ZB_NORETURN void zb_verify(zb_uint16_t file_id, zb_int_t line_number, zb_ret_t e
 #define ZB_ERROR_MACSPLIT_RADIO_FAILURE 1u /* unexpected SoC reboot */
 #define ZB_ERROR_MACSPLIT_RADIO_REBOOT  ZB_ERROR_MACSPLIT_RADIO_FAILURE
 #define ZB_ERROR_MACSPLIT_RADIO_HANG    2u /* no ACK etc */
+#define ZB_ERROR_MACSPLIT_NO_MEM_FOR_BOOT_IND    3u /* there is no buf for boot indication processing on host side */
+#define ZB_ERROR_MACSPLIT_NO_BOOT_IND   4u /* there is no boot indication  */
 
 /* ERROR_CATEGORY_SYSTEM */
 #define ZB_ERROR_ZBBUF_INVALID_PTR 1u

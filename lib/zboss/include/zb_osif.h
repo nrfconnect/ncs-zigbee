@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -94,6 +94,13 @@ zb_osif_platform.h is different in different platforms repo.
 */
 typedef void (*zb_osif_timer_exp_cb_t)(void *user_data);
 
+#if defined ZB_HAVE_SERIAL
+
+/* UART byte receive callback declaration */
+typedef void (*zb_osif_uart_byte_received_cb_t)(zb_uint8_t byte);
+
+#endif /* ZB_HAVE_SERIAL */
+
 #include "zb_osif_platform.h"
 
 #include "zb_ringbuffer.h"
@@ -105,6 +112,10 @@ typedef void (*zb_osif_timer_exp_cb_t)(void *user_data);
 
 #ifndef ZB_OSIF_IS_EXIT
 #define ZB_OSIF_IS_EXIT() ZB_FALSE
+#endif
+
+#ifndef ZB_OSIF_IS_INSIDE_ISR
+#define ZB_OSIF_IS_INSIDE_ISR() ZB_FALSE
 #endif
 
 /* Default (C standard) definition of MAIN() if not redefined in zb_osif_platform.h */
@@ -176,7 +187,7 @@ zb_uint32_t osif_get_time_ms(void);
 zb_ret_t osif_set_transmit_power(zb_uint8_t channel, zb_int8_t power);
 void osif_set_default_trasnmit_powers(zb_int8_t *tx_powers);
 
-#if defined ZB_MACSPLIT_TRANSPORT_SERIAL || defined ZB_MUX_TRANSPORT_OSIF_SERIAL || defined ZB_NCP_TRANSPORT_TYPE_SERIAL
+#if defined ZB_MACSPLIT_TRANSPORT_SERIAL || defined ZB_MUX_TRANSPORT_OSIF_SERIAL || defined ZB_NCP_TRANSPORT_TYPE_SERIAL || defined ZB_MACSPLIT_TRANSPORT_EXTERNAL
 void zb_osif_serial_transport_init();
 void zb_osif_serial_transport_put_bytes(zb_uint8_t *buf, zb_short_t len);
 #endif
@@ -417,9 +428,9 @@ void zb_osif_mserial_put_bytes(zb_serial_port_t port_instance, const zb_uint8_t 
 #endif
 
 
-#if defined ZB_SERIAL_FOR_TRACE && !defined ZB_OSIF_SERIAL_FLUSH
+#if defined ZB_TRACE_OVER_USART && !defined ZB_OSIF_SERIAL_FLUSH
 #define ZB_OSIF_SERIAL_FLUSH()
-#endif /* ZB_SERIAL_FOR_TRACE && !ZB_OSIF_SERIAL_FLUSH */
+#endif /* ZB_TRACE_OVER_USART && !ZB_OSIF_SERIAL_FLUSH */
 
 #ifdef ZB_TRACE_OVER_JTAG
 void zb_osif_jtag_put_bytes(const zb_uint8_t *buf, zb_short_t len);
@@ -428,14 +439,6 @@ void zb_osif_jtag_flush(void);
 
 /*! @} */
 /** @endcond */ /* DOXYGEN_UART_SECTION */
-
-
-
-#ifdef ZB_TRACE_OVER_SIF
-void zb_osif_sif_put_bytes(const zb_uint8_t *buf, zb_short_t len);
-void zb_osif_sif_init(void);
-void zb_osif_sif_debug_trace(zb_uint8_t param);
-#endif
 
 #ifdef ZB_HAVE_FILE
 /* File  */

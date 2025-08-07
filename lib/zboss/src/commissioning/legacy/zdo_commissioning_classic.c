@@ -74,7 +74,7 @@ void zdo_classic_initiate_commissioning(zb_uint8_t param)
   zb_ext_pan_id_t use_ext_pan_id;
 
   TRACE_MSG(TRACE_ZDO1, "zdo_classic_initiate_commissioning param %hd device type %d",
-            (FMT__H_D_D, param, zb_get_device_type()));
+            (FMT__H_D, param, zb_get_device_type()));
 
   ZB_ASSERT(zb_get_device_type() != ZB_NWK_DEVICE_TYPE_NONE);
 

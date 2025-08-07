@@ -134,6 +134,9 @@
 #if defined (ZB_ZCL_SUPPORT_CLUSTER_COLOR_CONTROL)
 #include "zcl/zb_zcl_color_control.h"
 #endif
+#if defined (ZB_ZCL_SUPPORT_CLUSTER_BALLAST_CONFIG)
+#include "zcl/zb_zcl_ballast_configuration.h"
+#endif
 #if defined (ZB_ZCL_SUPPORT_CLUSTER_SHADE_CONFIG)
 #include "zcl/zb_zcl_shade_config.h"
 #endif
@@ -2115,7 +2118,7 @@ zb_bool_t zb_zcl_check_cluster_list(void);
   */
 enum zb_bdb_error_codes_e
 {
-  ZB_BDB_STATUS_SUCCESS = 0,                 /*!<The commissioning sub-procedure was successful.*/
+  ZB_BDB_STATUS_SUCCESS = 0,                 /*!< The commissioning sub-procedure was successful.*/
   ZB_BDB_STATUS_IN_PROGRESS,                 /*!< One of the commissioning sub-procedures has started but is not yet complete.*/
   ZB_BDB_STATUS_NOT_AA_CAPABLE,              /*!< The initiator is not address assignment capable during touchlink. */
   ZB_BDB_STATUS_NO_NETWORK,                  /*!< A network has not been found during network steering or touchlink.*/
@@ -2129,8 +2132,9 @@ enum zb_bdb_error_codes_e
   ZB_BDB_STATUS_TCLK_EX_FAILURE,             /*!< The Trust Center link key exchange procedure has failed attempting to join a centralized security network.*/
   ZB_BDB_STATUS_NOT_ON_A_NETWORK,            /*!< A commissioning procedure was forbidden since the node was not currently on a network.*/
   ZB_BDB_STATUS_ON_A_NETWORK,                /*!< A commissioning procedure was forbidden since the node was currently on a network.*/
-  ZB_BDB_STATUS_CANCELLED,                    /*!< The current operation (steering or formation) was cancelled by an app */
-  ZB_BDB_STATUS_DEV_ANNCE_SEND_FAILURE        /*!< A device announce sending has been failed (e.g. device announce haven't acked by parent router). */
+  ZB_BDB_STATUS_CANCELLED,                   /*!< The current operation (steering or formation) was cancelled by an app */
+  ZB_BDB_STATUS_DEV_ANNCE_SEND_FAILURE,      /*!< A device announce sending has been failed (e.g. device announce haven't acked by parent router). */
+  ZB_BDB_STATUS_PJOIN_FAILED,                /*!< Local Permit joining failed */
 };
 /** @endcond */ /* internals_doc */
 /** @} */

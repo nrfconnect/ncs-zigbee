@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2023 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -85,29 +85,29 @@ enum zb_zcl_pm2_5_measurement_attr_e
 #define ZB_ZCL_PM2_5_MEASUREMENT_CLUSTER_REVISION_DEFAULT ((zb_uint16_t)0x0001u)
 
 /** @brief Default value for MeasuredValue attribute */
-#define ZB_ZCL_PM2_5_MEASUREMENT_MEASURED_VALUE_DEFAULT_VALUE     (.0/.0)
+#define ZB_ZCL_PM2_5_MEASUREMENT_MEASURED_VALUE_DEFAULT_VALUE     (.0f/.0f)
         
 /** @brief Default value for MinMeasuredValue attribute */
-#define ZB_ZCL_PM2_5_MEASUREMENT_MIN_MEASURED_VALUE_DEFAULT_VALUE (.0/.0)
+#define ZB_ZCL_PM2_5_MEASUREMENT_MIN_MEASURED_VALUE_DEFAULT_VALUE (.0f/.0f)
 
 /** @brief Default value for MaxMeasuredValue attribute */
-#define ZB_ZCL_PM2_5_MEASUREMENT_MAX_MEASURED_VALUE_DEFAULT_VALUE (.0/.0)
+#define ZB_ZCL_PM2_5_MEASUREMENT_MAX_MEASURED_VALUE_DEFAULT_VALUE (.0f/.0f)
 
 
 /** @brief MeasuredValue attribute unknown */
-#define ZB_ZCL_PM2_5_MEASUREMENT_MEASURED_VALUE_UNKNOWN       (.0/.0)
+#define ZB_ZCL_PM2_5_MEASUREMENT_MEASURED_VALUE_UNKNOWN       (.0f/.0f)
 
 /** @brief MinMeasuredValue attribute undefined */
-#define ZB_ZCL_PM2_5_MEASUREMENT_MIN_MEASURED_VALUE_UNDEFINED (.0/.0)
+#define ZB_ZCL_PM2_5_MEASUREMENT_MIN_MEASURED_VALUE_UNDEFINED (.0f/.0f)
 
 /** @brief MaxMeasuredValue attribute undefined */
-#define ZB_ZCL_PM2_5_MEASUREMENT_MAX_MEASURED_VALUE_UNDEFINED (.0/.0)
+#define ZB_ZCL_PM2_5_MEASUREMENT_MAX_MEASURED_VALUE_UNDEFINED (.0f/.0f)
 
 /** @brief MinMeasuredValue attribute minimum value */
-#define ZB_ZCL_PM2_5_MEASUREMENT_MIN_MEASURED_VALUE_MIN_VALUE 0.0
+#define ZB_ZCL_PM2_5_MEASUREMENT_MIN_MEASURED_VALUE_MIN_VALUE 0.0f
 
 /** @brief MaxMeasuredValue attribute maximum value */
-#define ZB_ZCL_PM2_5_MEASUREMENT_MAX_MEASURED_VALUE_MAX_VALUE 1.0
+#define ZB_ZCL_PM2_5_MEASUREMENT_MAX_MEASURED_VALUE_MAX_VALUE 1.0f
 
 /** @cond internals_doc */
 /** @name PM2.5 Measurement cluster internals

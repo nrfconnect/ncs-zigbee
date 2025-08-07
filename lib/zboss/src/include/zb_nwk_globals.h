@@ -143,13 +143,28 @@ zb_nwk_btr_t;
  */
 typedef ZB_PACKED_PRE struct zb_nwk_broadcast_retransmit_s
 {
-  zb_bitfield_t retries_left:2;        /*!< Number of currently available transmission attempts */
-
-  zb_bitfield_t been_broadcasted:1;  /*<! Whether the buffer was broadcasted at least once */
+  /**
+   * Race condition description. If there a case when a lot of broadcasts are in the network,
+   * and the network performance is not enough to process all of the transactions
+   * in ZB_NWK_EXPIRY_BROADCAST time window it may happen that previous transaction will be
+   * determied as a new one and a new set of rebroadcasts will be generated again in the network
+   * with the same NWK short address and NWK sequence number. So still in progress an old
+   * MCPS-DATA.request from previous BRR and a new one MCPS-DATA.request is generated again.
+   * Finally both may come and trigger an assertion in zb_nwk_broadcasting_confirm().
+   *
+   * According to the spec, nwkMaxBroadcastRetries can be in range from 0 to 5, see Table 3-66. NIB Attributes.
+   * So we can use 0b111 as a reserved value in order to avoid the race condition.
+   * Instead of completely releasing the BRR entry in case when MCPS-DATA.request is still
+   * in progress, this attribute value is set. Once the confirmation is received, the entry
+   * will be released. Moreover by keeping this entry for a while it becomes possible to detect a duplication
+   * of the network broadcast even after the time window is expired (although the chances are not great).
+   */
+  zb_bitfield_t retries_done:3;         /*!< Number of currently performed re-transmission attempts */
+  zb_bitfield_t waiting_confirm:1;      /*!< If 1, mcps-data.req was scheduled, so the entry is in state to wait mcps-data.conf  */
 #define BRRT_MAX_RETRANSMIT_COUNTDOWN_VALUE  0XFU /* ((1<<4) - 1) */
-  zb_bitfield_t retransmit_countdown:4; /* Number of BI until tx. */
-  zb_bitfield_t mcps_data_req_in_buf:1; /* If 1, buffer has mcps-data.req in its params section, else apsde-data.ind params */
-  zb_uint8_t buf;                     /* <! Buffer to be sent broadcast */
+  zb_bitfield_t retransmit_countdown:4; /*!< Number of BI until tx. */
+  zb_uint8_t buf;                       /*!< Buffer to be sent as broadcast */
+  zb_uint8_t tx_buf;                    /*!< Buffer to send broadcast */
   /* 01/15/2019 EE CR:MAJOR Can we exclude neighbor_table_iterator by passing it via second parameter of 2-arguments callback?
 
      AN: it is dependent on the specific zb_nwk_broadcast_retransmit_t anyway, so in such case we
@@ -196,8 +211,13 @@ typedef struct zb_leave_context_s
   zb_in_mgmt_leave_pending_list_t pending_list[ZB_ZDO_PENDING_LEAVE_SIZE];
   zb_uint8_t pending_list_bm;                                       /*!< */
   zb_bitfield_t rejoin_after_leave:1;                               /*!< */
-  zb_bitfield_t reserved:7;
+  zb_bitfield_t local_leave_in_progress:1;                          /*!< */
+  zb_bitfield_t reserved:6;
 } zb_leave_context_t;
+
+#define ZB_NWK_SET_LOCAL_LEAVE_IN_PROGRESS() (ZG->nwk.leave_context.local_leave_in_progress = 1U)
+#define ZB_NWK_CLR_LOCAL_LEAVE_IN_PROGRESS() (ZG->nwk.leave_context.local_leave_in_progress = 0U)
+#define ZB_NWK_GET_LOCAL_LEAVE_IN_PROGRESS() ZG->nwk.leave_context.local_leave_in_progress
 
 #define ZB_SET_LEAVE_PENDING(i) ZG->nwk.leave_context.pending_list_bm |= (1U<<(i))
 #define ZB_RESET_LEAVE_PENDING(i) ZG->nwk.leave_context.pending_list_bm &= ~(1U<<(i))
@@ -346,6 +366,7 @@ typedef struct zb_nwk_handle_s  /* do not pac for IAR */
 
   zb_uint16_t new_panid;                            /*!< */
 
+  zb_uint8_t   permit_join_duration; /*!< Last time of permit join, */
   zb_bitbool_t permit_join:1; /*!< True if permit join is in progress */
   zb_bitfield_t reserved:2;
   /*zb_bitfield_t joined:1; moved to AIB.tcpolicy and defined ZB_JOINED() macro      Non-zero if the device is joined into the network */

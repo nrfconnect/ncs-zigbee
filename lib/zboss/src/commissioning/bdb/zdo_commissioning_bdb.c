@@ -380,7 +380,7 @@ void bdb_preinit(void)
   if (ZB_IS_DEVICE_ZC())
   {
     TRACE_MSG(TRACE_INFO1, "dev type %hd, joined %hd, ext_pan_id %hd, authenticated %hd",
-            (FMT__H_H_H_H_H,
+            (FMT__H_H_H_H,
              zb_get_device_type(),
              joined,
              !ZB_EXTPANID_IS_ZERO(ext_pan_id),
@@ -641,7 +641,8 @@ void bdb_commissioning_machine(zb_uint8_t param)
                                                   0);
 
         }
-        else if (ZB_BDB().bdb_commissioning_status == ZB_BDB_STATUS_FORMATION_FAILURE)
+        else if (ZB_BDB().bdb_commissioning_status == ZB_BDB_STATUS_FORMATION_FAILURE ||
+                 ZB_BDB().bdb_commissioning_status == ZB_BDB_STATUS_PJOIN_FAILED)
         {
           zb_app_signal_pack_with_detailed_status(param,
                                                   ZB_BDB().bdb_application_signal,
@@ -1323,6 +1324,15 @@ static void bdb_network_steering_not_on_network(zb_uint8_t param)
 
 void bdb_network_steering_finish(zb_uint8_t param)
 {
+  zb_zdo_mgmt_permit_joining_resp_t *resp = (zb_zdo_mgmt_permit_joining_resp_t *)zb_buf_begin(param);
+
+  if (resp->status != (zb_uint8_t)ZB_ZDP_STATUS_SUCCESS)
+  {
+    ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_PJOIN_FAILED;
+    ZB_BDB().bdb_commissioning_step = ZB_BDB_COMMISSIONING_STOP;
+    bdb_commissioning_signal(BDB_COMM_SIGNAL_FINISH, param);
+    return;
+  }
   bdb_commissioning_signal(BDB_COMM_SIGNAL_NETWORK_STEERING_FINISH, param);
 }
 
@@ -2232,7 +2242,7 @@ static void schedule_wwah_rejoin_backoff_attempt(zb_uint8_t param)
       BDB_COMM_CTX().rejoin.rr_global_retries = 0;
     }
 
-    TRACE_MSG(TRACE_ZDO1, "Next rejoin attempt in %hd", (FMT__H_H, backoff_interval));
+    TRACE_MSG(TRACE_ZDO1, "Next rejoin attempt in %hd", (FMT__H, backoff_interval));
     rejoin_reason = ZB_BUF_GET_PARAM(param, zb_uint8_t);
     *rejoin_reason = ZB_REJOIN_REASON_BACKOFF_REJOIN;
     ZB_SCHEDULE_ALARM(zdo_commissioning_initiate_rejoin, param, backoff_interval);

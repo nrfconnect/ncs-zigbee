@@ -30,13 +30,13 @@
 
 #ifdef ZB_SERIAL_FOR_TRACE
 void zb_osif_serial_flush(void);
-#if defined(ZB_NRF_TRACE) && (defined CONFIG_ZB_ASYNC_TRACE_CONTROL || defined ZB_MULTI_TEST)
+#if defined(ZB_NRF_TRACE) && (defined CONFIG_ZB_ASYNC_TRACE_CONTROL || defined ZB_MULTI_TEST || defined ZB_TRACE_OVER_USART)
 #define ZB_OSIF_SERIAL_FLUSH()          zb_osif_serial_flush()
 #elif !defined(ZBOSS_BUILD)
 #define ZB_OSIF_SERIAL_FLUSH()          zb_osif_serial_flush()
-#else /* ZB_NRF_TRACE && (CONFIG_ZB_ASYNC_TRACE_CONTROL || defined ZB_MULTI_TEST) */
+#else /* ZB_NRF_TRACE && (CONFIG_ZB_ASYNC_TRACE_CONTROL || defined ZB_MULTI_TEST || defined ZB_TRACE_OVER_USART) */
 #define ZB_OSIF_SERIAL_FLUSH()
-#endif /* ZB_NRF_TRACE && (CONFIG_ZB_ASYNC_TRACE_CONTROL || defined ZB_MULTI_TEST) */
+#endif /* ZB_NRF_TRACE && (CONFIG_ZB_ASYNC_TRACE_CONTROL || defined ZB_MULTI_TEST || defined ZB_TRACE_OVER_USART) */
 #else /* ZB_SERIAL_FOR_TRACE */
 #define ZB_OSIF_SERIAL_FLUSH()
 #endif /* ZB_SERIAL_FOR_TRACE */

@@ -51,7 +51,7 @@ constants etc.
 
 /*! Specification version of the specification */
 /* Moved here so it is defined before zb_vendor.h is included */
-#define ZB_STACK_SPEC_VERSION 23
+#define ZB_STACK_SPEC_VERSION 23U
 
 /* \defgroup buildconfig Build Configurations
    @{ */
@@ -1533,16 +1533,23 @@ exponent.
 #endif /* defined ZB_ENABLE_ZLL || defined DOXYGEN */
 /** @endcond */ /* DOXYGEN_TOUCHLINK_FEATURE */
 
-/*************************Serial and UDP trace**********************/
-#ifndef ZB_PLATFORM_LINUX /* Uncomment for binary logs! */
-#if defined ZB_SERIAL_FOR_TRACE || defined ZB_TRACE_OVER_JTAG || defined ZB_NET_TRACE || defined ZB_TRACE_OVER_MUX
-/* binary trace: optimize traffic size. need special win_com_dump */
+#ifdef ZB_BINARY_AND_TEXT_TRACE_MODE
+#ifndef ZB_BINARY_TRACE
 #define ZB_BINARY_TRACE
-/* #define ZB_TRAFFIC_DUMP_ON */
-/* #define ZB_TRAF_DUMP_V2 */
+#endif
+#endif  /* ZB_BINARY_AND_TEXT_TRACE_MODE*/
 
-#endif /*ZB_SERIAL_FOR_TRACE || defined ZB_TRACE_OVER_JTAG || defined ZB_NET_TRACE || defined ZB_TRACE_OVER_MUX*/
-#endif /*ZB_PLATFORM_LINUX*/
+#ifdef ZB_MEMTRACE
+#ifndef ZB_BINARY_TRACE
+#define ZB_BINARY_TRACE
+#endif
+#endif  /* ZB_MEMTRACE */
+
+#ifdef ZB_TRACE_TO_PORT
+#ifndef ZB_BINARY_TRACE
+#define ZB_BINARY_TRACE
+#endif
+#endif  /* ZB_TRACE_TO_PORT */
 
 /* If trace baudrate isn't set, set it to 115200 by default */
 #ifndef ZB_TRACE_SERIAL_BAUDRATE
@@ -1594,7 +1601,7 @@ exponent.
 #endif  /* ZB_USE_LOGFILE_ROTATE */
 
 /* #  define ZB_BINARY_TRACE */
-/* #  define ZB_NET_TRACE */
+/* #  define ZB_MEMTRACE */
 /* #  define ZB_TRAFFIC_DUMP_ON */
 #if (ZB_STACK_SPEC_VERSION < 23U)
 #define ZB_TRAFFIC_DUMP_V3
@@ -1603,12 +1610,6 @@ exponent.
 
 #ifndef ZB_MEMTRACE_BUF_SIZE
 #define ZB_MEMTRACE_BUF_SIZE 4080U
-#endif
-
-/* Tune trace portion to fit HTTPS body into single Ethernet frame. Align to 3
- * because base64 packs 3 bytes into 4 chars. */
-#ifndef ZB_NET_TRACE_PORTION
-#define ZB_NET_TRACE_PORTION 1020U
 #endif
 
 
@@ -1654,7 +1655,9 @@ exponent.
 #define ZB_BUF_SHIELD
 /* extended membuffers debug*/
 #ifdef ZB_DEBUG_BUFFERS_EXT
+#ifndef ZB_DEBUG_BUFFERS_EXT_USAGES_COUNT
 #define ZB_DEBUG_BUFFERS_EXT_USAGES_COUNT 1U
+#endif
 #endif
 #endif /*ZB_DEBUG_BUFFERS*/
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
@@ -1669,6 +1672,13 @@ exponent.
 #if !defined ZB_TEST_PROFILE
 #define ZB_TEST_PROFILE
 #endif
+
+#if defined(ZB_DIAGNOSTIC_DUT_MODIFIERS_ENABLED) || defined(ZB_DIAGNOSTIC_TH_MODIFIERS_ENABLED)
+#error Please, disable ZB_CERTIFICATION_HACKS from your vendor file!
+#endif /* ZB_DIAGNOSTIC_DUT_MODIFIERS_ENABLED || ZB_DIAGNOSTIC_TH_MODIFIERS_ENABLED */
+
+#define ZB_DIAGNOSTIC_DUT_MODIFIERS_ENABLED
+#define ZB_DIAGNOSTIC_TH_MODIFIERS_ENABLED
 
 #endif /* ZB_CERTIFICATION_HACKS */
 

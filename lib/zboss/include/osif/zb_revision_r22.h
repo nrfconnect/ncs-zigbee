@@ -29,7 +29,7 @@
  *
  * Note: This value is automatically updated by the release script.
  */
-#define ZBOSS_PLATFORM_PATCH 5U
+#define ZBOSS_PLATFORM_PATCH 6U
 
 /**
  * Patch version number of the ZBOSS core.

@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2024 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -62,10 +62,7 @@ typedef ZB_PACKED_PRE struct zb_buf_hdr_s
   zb_ret_t status;            /*!< some status to be passed with packet  */
   zb_uint16_t len;              /*!< current layer buffer length  */
   zb_uint16_t data_offset;      /*!< data offset in buffer buf*/
-  zb_uint8_t  multiplicity;     /*!< if greater that 1, then the following (multiplicity - 1) buffers
-                                 * are occupied with payload data and should not be treated as
-                                 * having valid headers, etc.
-                                 */
+  zb_uint8_t  tail_len;     /*!< the length of the perameters section  */
   zb_uint8_t handle;           /*!< The handle associated with the NSDU to be
                                 * transmitted by the NWK layer entity.  */
   zb_bitfield_t is_in_buf:1;    /*!< if 1, this is input buffer */
@@ -84,7 +81,10 @@ typedef ZB_PACKED_PRE struct zb_buf_hdr_s
                                      */
   zb_bitfield_t has_aps_user_payload:1;   /*!< if 1, than packet comes with APS user's payload */
 
-  zb_bitfield_t tail_len:7;    /*!< the length of the perameters section  */
+  zb_bitfield_t multiplicity:7; /*!< if greater that 1, then the following (multiplicity - 1) buffers
+                                 * are occupied with payload data and should not be treated as
+                                 * having valid headers, etc.
+                                 */
 } ZB_PACKED_STRUCT zb_buf_hdr_t;
 
 /* if there is a platform with failed assertion, ZB_RESERVED_BUF_TO_ALIGN_HDR_SIZE

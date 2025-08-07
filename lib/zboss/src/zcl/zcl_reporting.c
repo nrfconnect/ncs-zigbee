@@ -196,26 +196,59 @@ void zb_zcl_init_reporting_info()
 zb_ret_t zb_zcl_put_reporting_info(zb_zcl_reporting_info_t* rep_info_ptr, zb_bool_t override)
 {
   zb_zcl_reporting_info_t *rep_info;
-/* 05/28/15 NK:CR {*/
   zb_af_endpoint_desc_t *ep_desc;
   zb_zcl_cluster_desc_t *cluster_desc;
   zb_zcl_attr_t *attr_desc;
+  zb_ret_t ret = RET_OK;
 
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_put_reporting_info", (FMT__0));
 
-  /* NK: Check if we support this attribute */
-  ep_desc = zb_af_get_endpoint_desc(rep_info_ptr->ep);
-  /* TRICKY: If role is not set, assume server by default. */
-  if (!rep_info_ptr->cluster_role)
+  if (rep_info_ptr == NULL)
   {
-    rep_info_ptr->cluster_role = ZB_ZCL_CLUSTER_SERVER_ROLE;
+    ret = RET_NULL_POINTER;
+    TRACE_MSG(TRACE_ERROR, "Error, NULL pointer provided as a parameter", (FMT__0));
   }
-  cluster_desc = get_cluster_desc(ep_desc, rep_info_ptr->cluster_id,
-                                  rep_info_ptr->cluster_role);
-  attr_desc = zb_zcl_get_attr_desc_manuf(cluster_desc, rep_info_ptr->attr_id, rep_info_ptr->manuf_code);
 
-  if (attr_desc)
+  /* NK: Check if we support this attribute */
+  if (ret == RET_OK)
   {
+    ep_desc = zb_af_get_endpoint_desc(rep_info_ptr->ep);
+    if (ep_desc == NULL)
+    {
+      ret = RET_NOT_FOUND;
+      TRACE_MSG(TRACE_ERROR, "Error, endpoint not found", (FMT__0));
+    }
+  }
+
+  if (ret == RET_OK)
+  {
+    cluster_desc = get_cluster_desc(ep_desc, rep_info_ptr->cluster_id,
+                                    rep_info_ptr->cluster_role);
+    if (cluster_desc == NULL)
+    {
+      ret = RET_NOT_FOUND;
+      TRACE_MSG(TRACE_ERROR, "Error, cluster not found", (FMT__0));
+    }
+  }
+
+  if (ret == RET_OK)
+  {
+    attr_desc = zb_zcl_get_attr_desc_manuf(cluster_desc, rep_info_ptr->attr_id, rep_info_ptr->manuf_code);
+    if (attr_desc == NULL)
+    {
+      ret = RET_NOT_FOUND;
+      TRACE_MSG(TRACE_ERROR, "Error, attribute not found", (FMT__0));
+    }
+  }
+
+  if (ret == RET_OK)
+  {
+    /* TRICKY: If role is not set, assume server by default. */
+    if (!rep_info_ptr->cluster_role)
+    {
+      rep_info_ptr->cluster_role = ZB_ZCL_CLUSTER_SERVER_ROLE;
+    }
+
     /* search for already registered configure reporting record */
     rep_info = zb_zcl_find_reporting_info_manuf(
       rep_info_ptr->ep,
@@ -229,106 +262,107 @@ zb_ret_t zb_zcl_put_reporting_info(zb_zcl_reporting_info_t* rep_info_ptr, zb_boo
     if (rep_info && !override)
     {
       /* not allowed - reporting already configured */
-      return RET_ALREADY_EXISTS;
+      ret = RET_ALREADY_EXISTS;
     }
 
-    if (!rep_info)
+    if ((ret == RET_OK) && (rep_info == NULL))
     {
       rep_info = get_new_reporting_info(rep_info_ptr->ep);
     }
 
-    if (rep_info)
+    if (rep_info == NULL)
     {
-      if (rep_info->u.send_info.def_max_interval != 0 &&
-           rep_info->u.send_info.def_max_interval < rep_info->u.send_info.def_min_interval)
+      /** If the error below happens, check ZBOSS_DEVICE_DECLARE_REPORTING_CTX 
+        * macro invocation in the app */
+      ret = RET_NO_MEMORY;
+      TRACE_MSG(TRACE_ERROR, "Error, no free slots for reporting info", (FMT__0));
+    }
+  }
+
+  if (ret == RET_OK)
+  {
+    if (rep_info->u.send_info.def_max_interval != 0 &&
+          rep_info->u.send_info.def_max_interval < rep_info->u.send_info.def_min_interval)
+    {
+      ret = RET_INVALID_PARAMETER_1;
+    }
+  }
+
+  if (ret == RET_OK)
+  {
+    ZB_MEMCPY(rep_info, rep_info_ptr, sizeof(zb_zcl_reporting_info_t));
+    ZB_ZCL_CLR_ALL_REPORTING_FLAGS(rep_info);
+
+    rep_info->u.send_info.min_interval = rep_info->u.send_info.def_min_interval;
+    rep_info->u.send_info.max_interval = rep_info->u.send_info.def_max_interval;
+
+    ZB_ZCL_SET_REPORTING_FLAG(rep_info, ZB_ZCL_REPORTING_SLOT_BUSY);
+
+    /* Set reported_value to 0xff - it is most likely not the default value and not the first change
+        for the attribute.
+        Rationale: we do not have a flag to check is it first or non-first report. Furthermore, we
+        do reporting checks AFTER applying new value to attribute. Because of that, if first
+        attribute change is to the value equal to initial reported_value (it is 0), this change
+        will not be reportable.
+        0xff value is invalid for the most of attributes, so looks like it is more safe to use.
+    */
+    ZB_MEMSET(&rep_info->u.send_info.reported_value, -1, sizeof(union zb_zcl_attr_var_u));
+
+    if (rep_info->direction == ZB_ZCL_CONFIGURE_REPORTING_SEND_REPORT)
+    {
+      if (rep_info->u.send_info.max_interval == ZB_ZCL_REPORTING_NOT_NEEDED)
       {
-        return RET_INVALID_PARAMETER_1;
+        TRACE_MSG(TRACE_ZCL3, "clear reporting info", (FMT__0));
+
+        /* Remember that we don't send reports by default */
+        ZB_ZCL_CLR_ALL_REPORTING_FLAGS(rep_info);
+        ZB_ZCL_SET_REPORTING_FLAG(rep_info, ZB_ZCL_REPORTING_SLOT_BUSY);
+        ZB_ZCL_SET_REPORTING_FLAG(rep_info, ZB_ZCL_REPORTING_STOP);
       }
-
-      ZB_MEMCPY(rep_info, rep_info_ptr, sizeof(zb_zcl_reporting_info_t));
-      ZB_ZCL_CLR_ALL_REPORTING_FLAGS(rep_info);
-
-      rep_info->u.send_info.min_interval = rep_info->u.send_info.def_min_interval;
-      rep_info->u.send_info.max_interval = rep_info->u.send_info.def_max_interval;
-
-      ZB_ZCL_SET_REPORTING_FLAG(rep_info, ZB_ZCL_REPORTING_SLOT_BUSY);
-
-      /* Set reported_value to 0xff - it is most likely not the default value and not the first change
-         for the attribute.
-         Rationale: we do not have a flag to check is it first or non-first report. Furthermore, we
-         do reporting checks AFTER applying new value to attribute. Because of that, if first
-         attribute change is to the value equal to initial reported_value (it is 0), this change
-         will not be reportable.
-         0xff value is invalid for the most of attributes, so looks like it is more safe to use.
-      */
-      ZB_MEMSET(&rep_info->u.send_info.reported_value, -1, sizeof(union zb_zcl_attr_var_u));
-
-      if (rep_info->direction == ZB_ZCL_CONFIGURE_REPORTING_SEND_REPORT)
-      {
-        if (rep_info->u.send_info.max_interval == ZB_ZCL_REPORTING_NOT_NEEDED)
-        {
-          TRACE_MSG(TRACE_ZCL3, "clear reporting info", (FMT__0));
-
-          /* Remember that we don't send reports by default */
-          ZB_ZCL_CLR_ALL_REPORTING_FLAGS(rep_info);
-          ZB_ZCL_SET_REPORTING_FLAG(rep_info, ZB_ZCL_REPORTING_SLOT_BUSY);
-          ZB_ZCL_SET_REPORTING_FLAG(rep_info, ZB_ZCL_REPORTING_STOP);
-        }
 #ifdef ZB_USE_NVRAM
-        /* WARNING: This function may be called from zb_zcl_put_default_reporting_info_for_cluster()
-         * BEFORE NVRAM init, in such case we do not need to write anything to NVRAM.
-         * This is default reporting configuration inited every startup, so it is ok NOT to store
-         * it in NVRAM.
-         * Note that it WILL be stored (or overwritten and stored) if application (locally or
-         * remotely via ZCL API) will configure the reporting (this will be done AFTER NVRAM
-         * init). This is also ok - default reporting will be CONFIGURED to defaults here (before
-         * NVRAM init) and than OVERWRITTEN by NVRAM loading procedure. */
-        if (ZB_NVRAM().inited)
-        {
-          /* If we fail, trace is given and assertion is triggered */
-          (void)zb_nvram_write_dataset(ZB_NVRAM_ZCL_REPORTING_DATA);
-        }
-#endif
-        if (!ZB_ZCL_GET_REPORTING_FLAG(rep_info, ZB_ZCL_REPORTING_STOP))
-        {
-          zb_zcl_update_reporting_info(rep_info);
-          zb_zcl_adjust_reporting_timer(0);
-          /* Mark attr for reporting - we need to send first report with min interval. */
-          /* [AN] 3/3/2020 maybe we should report only in case, when maximum interval is non-zero*/
-          if (rep_info->u.send_info.max_interval)
-          {
-            zb_zcl_mark_attr_for_reporting_manuf(rep_info->ep, rep_info->cluster_id, rep_info->cluster_role, rep_info->attr_id, rep_info->manuf_code);
-          }
-        }
-      }
-      else
+      /* WARNING: This function may be called from zb_zcl_put_default_reporting_info_for_cluster()
+        * BEFORE NVRAM init, in such case we do not need to write anything to NVRAM.
+        * This is default reporting configuration inited every startup, so it is ok NOT to store
+        * it in NVRAM.
+        * Note that it WILL be stored (or overwritten and stored) if application (locally or
+        * remotely via ZCL API) will configure the reporting (this will be done AFTER NVRAM
+        * init). This is also ok - default reporting will be CONFIGURED to defaults here (before
+        * NVRAM init) and than OVERWRITTEN by NVRAM loading procedure. */
+      if (ZB_NVRAM().inited)
       {
-        TRACE_MSG(TRACE_ZCL3, "accept wait reporting timeout %d", (FMT__D, rep_info->u.recv_info.timeout));
-        start_wait_reporting_timer(rep_info);
-
-        if (rep_info->u.recv_info.timeout == ZB_ZCL_TIMEOUT_ZERO)
+        /* If we fail, trace is given and assertion is triggered */
+        (void)zb_nvram_write_dataset(ZB_NVRAM_ZCL_REPORTING_DATA);
+      }
+#endif
+      if (!ZB_ZCL_GET_REPORTING_FLAG(rep_info, ZB_ZCL_REPORTING_STOP))
+      {
+        zb_zcl_update_reporting_info(rep_info);
+        zb_zcl_adjust_reporting_timer(0);
+        /* Mark attr for reporting - we need to send first report with min interval. */
+        /* [AN] 3/3/2020 maybe we should report only in case, when maximum interval is non-zero*/
+        if (rep_info->u.send_info.max_interval)
         {
-          TRACE_MSG(TRACE_ZCL3, "cancel wait reporting", (FMT__0));
-          ZB_ZCL_CLR_REPORTING_FLAG(rep_info, ZB_ZCL_REPORTING_SLOT_BUSY);
+          zb_zcl_mark_attr_for_reporting_manuf(rep_info->ep, rep_info->cluster_id, rep_info->cluster_role, rep_info->attr_id, rep_info->manuf_code);
         }
       }
     }
     else
     {
-      TRACE_MSG(TRACE_ERROR, "Error, no free slots for reporting info", (FMT__0));
-      return RET_NO_MEMORY/*  no memory */;
+      TRACE_MSG(TRACE_ZCL3, "accept wait reporting timeout %d", (FMT__D, rep_info->u.recv_info.timeout));
+      start_wait_reporting_timer(rep_info);
+
+      if (rep_info->u.recv_info.timeout == ZB_ZCL_TIMEOUT_ZERO)
+      {
+        TRACE_MSG(TRACE_ZCL3, "cancel wait reporting", (FMT__0));
+        ZB_ZCL_CLR_REPORTING_FLAG(rep_info, ZB_ZCL_REPORTING_SLOT_BUSY);
+      }
     }
   }
-  else
-  {
-    TRACE_MSG(TRACE_ERROR, "Error, attribute not found", (FMT__0));
-    return RET_NOT_FOUND;
-  }
-/* 05/28/15 NK:CR }*/
 
-  TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_put_reporting_info", (FMT__0));
-  return RET_OK /* success */;
+  TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_put_reporting_info, ret %d", (FMT__D, ret));
+  return ret;
 }
+
 
 void zb_zcl_put_default_reporting_info_for_cluster(zb_uint8_t endpoint, zb_uint16_t profile_id, struct zb_zcl_cluster_desc_s *cluster_desc)
 {
@@ -530,6 +564,8 @@ zb_ret_t zb_zcl_put_reporting_info_from_req(zb_zcl_configure_reporting_req_t *co
   }
   else
   {
+    /** If the error below happens, check ZBOSS_DEVICE_DECLARE_REPORTING_CTX 
+      * macro invocation in the app */
     TRACE_MSG(TRACE_ERROR, "Error, no free slots for reporting info", (FMT__0));
     ret = RET_NO_MEMORY;
   }
@@ -1312,7 +1348,7 @@ static zb_bool_t check_delta_value(zb_zcl_reporting_info_t *rep_info)
           {
             zb_int16_t delta;
 
-            delta = ZB_ABS(*(zb_int16_t*)(attr_desc->data_p) - rep_info->u.send_info.reported_value.s16);
+            delta = ZB_ABS((zb_int16_t)(*(zb_int16_t*)(attr_desc->data_p) - (zb_int32_t)rep_info->u.send_info.reported_value.s16));
 
             TRACE_MSG(TRACE_ZCL3, "S16 delta %d, min delta %d", (FMT__D_D, delta, rep_info->u.send_info.delta.s16));
             ret = (delta >= rep_info->u.send_info.delta.s16)?(RET_OK ):(RET_IGNORE );
@@ -1422,7 +1458,7 @@ static zb_bool_t check_delta_value(zb_zcl_reporting_info_t *rep_info)
 void zb_zcl_mark_attr_for_reporting(zb_uint8_t ep, zb_uint16_t cluster_id, zb_uint8_t cluster_role, zb_uint16_t attr_id)
 {
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_mark_attr_for_reporting, ep %hd, cluster_id 0x%x, attr_id 0x%x",
-            (FMT__H_D_D_D, ep, cluster_id, attr_id));
+            (FMT__H_D_D, ep, cluster_id, attr_id));
   zb_zcl_mark_attr_for_reporting_manuf(ep, cluster_id, cluster_role, attr_id, ZB_ZCL_NON_MANUFACTURER_SPECIFIC);
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_mark_attr_for_reporting", (FMT__0));
 }

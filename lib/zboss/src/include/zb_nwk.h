@@ -1146,8 +1146,9 @@ void zb_nlme_send_redirect_ref_status(zb_uint8_t param, zb_uint16_t redir_cnt);
 
 #define ZB_NWK_INTERNAL_COMMISSIONING_CMD_HANDLE 0xF6U
 #define ZB_NWK_INTERNAL_COMMISSIONING_CMD_RESPONSE_HANDLE 0xF5U
-
-#define ZB_NWK_MINIMAL_INTERNAL_HANDLE ZB_NWK_INTERNAL_COMMISSIONING_CMD_RESPONSE_HANDLE
+/* The handle is used to send broadcasts */
+#define ZB_NWK_INTERNAL_BROADCAST_HANDLE    0xF4U
+#define ZB_NWK_MINIMAL_INTERNAL_HANDLE ZB_NWK_INTERNAL_BROADCAST_HANDLE
 
 /** @brief Initialize NWK stack layer. */
 void zb_nwk_init(void);
@@ -2066,12 +2067,12 @@ void zb_nwk_set_dev_associate_cb(zb_addr_assignment_cb_t cb);
   * 
   * R23 Core specification Section 3.6.4.1 Routing Cost Table 3-72. Link Cost to LQA Mapping
  */
-#define NWK_LQA_2_COST(lqa) (((lqa) <= 16U) ? 7U : \
-                             ((lqa) <= 32U) ? 6U : \
-                             ((lqa) <= 64U) ? 5U : \
-                             ((lqa) <= 96U) ? 4U : \
-                             ((lqa) <= 128U) ? 3U : \
-                             ((lqa) <= 192U) ? 2U : 1)
+#define NWK_LQA_2_COST(lqa) (((lqa) <= (zb_uint8_t)16U) ? (zb_uint8_t)7U : \
+                             ((lqa) <= (zb_uint8_t)32U) ? (zb_uint8_t)6U : \
+                             ((lqa) <= (zb_uint8_t)64U) ? (zb_uint8_t)5U : \
+                             ((lqa) <= (zb_uint8_t)96U) ? (zb_uint8_t)4U : \
+                             ((lqa) <= (zb_uint8_t)128U) ? (zb_uint8_t)3U : \
+                             ((lqa) <= (zb_uint8_t)192U) ? (zb_uint8_t)2U : (zb_uint8_t)1U)
 
 #else
 #define NWK_LQA_2_COST(lqa) ZB_NWK_STATIC_PATH_COST
