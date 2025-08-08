@@ -9,10 +9,12 @@ tests:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54l15dk/nrf54l10/cpuapp
       - nrf52840dk/nrf52840
+      - nrf5340dk/nrf5340/cpuapp
     platform_allow:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54l15dk/nrf54l10/cpuapp
       - nrf52840dk/nrf52840
+      - nrf5340dk/nrf5340/cpuapp
     tags:
       - ci_build
       - smoke
@@ -26,10 +28,12 @@ tests:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54l15dk/nrf54l10/cpuapp
       - nrf52840dk/nrf52840
+      - nrf5340dk/nrf5340/cpuapp
     platform_allow:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54l15dk/nrf54l10/cpuapp
       - nrf52840dk/nrf52840
+      - nrf5340dk/nrf5340/cpuapp
     tags:
       - ci_build
       - sysbuild
@@ -47,10 +51,12 @@ tests:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54l15dk/nrf54l10/cpuapp
       - nrf52840dk/nrf52840
+      - nrf5340dk/nrf5340/cpuapp
     platform_allow:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54l15dk/nrf54l10/cpuapp
       - nrf52840dk/nrf52840
+      - nrf5340dk/nrf5340/cpuapp
     tags:
       - ci_build
       - shell
@@ -69,6 +75,19 @@ tests:
       - nrf52840dk/nrf52840
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54l15dk/nrf54l10/cpuapp
+    tags:
+      - ci_build
+      - smoke
+      - sysbuild
+      - ci_samples_zigbee
+  sample.zigbee.light_switch.fota.nrf5340dk:
+    sysbuild: true
+    build_only: true
+    extra_args:
+      - FILE_SUFFIX=fota
+    integration_platforms:
+      - nrf5340dk/nrf5340/cpuapp
+    platform_allow: nrf5340dk/nrf5340/cpuapp
     tags:
       - ci_build
       - smoke
