@@ -8,6 +8,8 @@ This page outlines the requirements that you need to meet before you start worki
 Hardware requirements
 *********************
 
+The Zigbee R23 add-on supports the nRF52840, nRF54L15, nRF54L10, and nRF54L05 SoCs.
+
 For the :ref:`zigbee_quickstart`, you need three development kits of the following types:
 
 .. include:: /includes/device_table_all.txt
@@ -31,7 +33,7 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
       In the **Get the nRF Connect SDK code** part of the install instructions:
 
-      In Step 4, select :guilabel:`Browse nRF Connect SDK Add-on Index` instead of selecting the SDK version, then select :guilabel:`Zigbee`, and select v\ |addon_version| of the |addon|, which also installs |NCS| v\ |ncs_version|.
+      In Step 2, click on :guilabel:`Create a new application`, select :guilabel:`Browse nRF Connect SDK Add-on Index`, then select :guilabel:`Zigbee R23`, and select v\ |addon_version| of the |addon|, which also installs |NCS| v\ |ncs_version|.
 
    .. group-tab:: command line
 
@@ -41,7 +43,7 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
       .. code-block:: console
 
-         west init -m "http://github.com/nrfconnect/ncs-zigbee" --mr main
+         west init -m "http://github.com/nrfconnect/ncs-zigbee" --mr v1.1.0
 
 
 To create an application, use :ref:`zigbee_template_sample` sample as a starting point.

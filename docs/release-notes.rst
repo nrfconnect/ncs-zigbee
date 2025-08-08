@@ -16,6 +16,8 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 +-------------------+------------------+-----------------------+---------------------+
 | |addon| version   | |NCS| version    | ZBOSS stack version   | NCP host version    |
 +===================+==================+=======================+=====================+
+| 1.1.0             | 2.9.0            | 4.2.2.0               | 3.3.0               |
++-------------------+------------------+-----------------------+---------------------+
 | 1.0.0             | 2.9.0            | 4.2.0.0               | 3.2.0               |
 +-------------------+------------------+-----------------------+---------------------+
 | 0.4.0             | 2.9.0            | 4.1.14.0              | 3.1.0               |
@@ -30,6 +32,20 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 +-------------------+------------------+-----------------------+---------------------+
 
 .. _zigbee_release:
+
+|addon| v1.1.0 - 08/08/2025
+***************************
+
+The following release is `supported <Software maturity levels_>`_.
+ 
+* Added:
+ 
+  * A fix for the nRF54L10 memory layout.
+  * CCA ED threshold for nRF54L and nRF52840 SoCs adjusted to correspond to -75dBm.
+  * The new ZBOSS R23 v4.2.2.0.
+  * The ZBOSS NCP Host package v3.3.0.
+
+* Updated the documentation to reflect the changes.
 
 |addon| v1.0.0 - 07/07/2025
 ***************************
