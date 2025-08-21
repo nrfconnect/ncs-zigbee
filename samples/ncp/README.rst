@@ -25,9 +25,6 @@ The nRF5340 DK (``nrf5340dk/nrf5340/cpuapp``) is supported only for development.
 
 You can use any of the development kits listed above.
 
-.. note::
-    The nRF52840 Dongle uses a :ref:`different bootloader <zigbee_ncp_bootloader>` than other development kits.
-
 To test this sample, you also need the following:
 
 * :ref:`ug_zigbee_tools_ncp_host` tool, which is based on the ZBOSS stack and requires a PC with an operating system compatible with the 64-bit Ubuntu |ubuntu_version| Linux.
@@ -86,7 +83,7 @@ The communication channel uses Zephyr's `UART API`_.
 
       The ``uart20`` pins are configured by devicetree overlay files for each supported development kit in the :file:`boards` directory.
 
-   .. group-tab:: nRF52840 DK
+   .. group-tab:: nRF52840 and nRF5340 DKs DK
 
       The serial device is selected in devicetree like this:
 
@@ -106,7 +103,7 @@ Communication through USB
 =========================
 
 .. note::
-     Communication through USB is available for nRF52840 SoC.
+     Communication through USB is available for nRF52840 and nRF5340 SoCs.
 
 To change the communication channel from the default UART to nRF USB CDC ACM ``cdc_acm_uart0``, use the :file:`prj_usb.conf` configuration file and add the ``-DFILE_SUFFIX=usb`` flag to the build command.
 When using the nRF52840 Dongle, please add the ``-DFILE_SUFFIX=dongle`` flag to the build command instead.
@@ -291,7 +288,7 @@ User interface
    .. group-tab:: nRF54L15 DK
 
 	  All the NCP sample's interactions with the application are automatically handled using serial communication.
-   .. group-tab:: nRF52840 DK
+   .. group-tab:: nRF52840 and nRF5340 DKs DK
 
 	  All the NCP sample’s interactions with the application are automatically handled using serial or USB communication.
 
@@ -336,7 +333,7 @@ After building the sample and programming it to your development kit, complete t
 	  When it is found, the simple gateway configures bindings and reporting for the device.
 	  It then starts sending On/Off toggle commands with a 15-second interval that toggle the **LED 1** on the light bulb on and off.
 
-   .. group-tab:: nRF52840 DK
+   .. group-tab:: nRF52840 and nRF5340 DKs DK
 
 	  1. Download and extract the `ZBOSS NCP Host`_ package.
 

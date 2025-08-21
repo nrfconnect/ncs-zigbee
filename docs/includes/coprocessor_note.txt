@@ -1,3 +1,0 @@
-.. important::
-   Co-processor designs are not supported for this release of the |addon| for the |NCS|.
-   Support is planned for a future release.
