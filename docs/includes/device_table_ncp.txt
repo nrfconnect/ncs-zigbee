@@ -26,3 +26,7 @@
      - PCA10059
      - `nrf52840dongle`_
      - ``nrf52840dongle/nrf52840``
+   * - `nRF5340 DK <Developing with nRF53 Series_>`_
+     - PCA10095
+     - `nrf5340dk`_
+     - | ``nrf5340dk/nrf5340/cpuapp``

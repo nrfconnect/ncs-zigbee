@@ -68,7 +68,7 @@ User interface
           * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
             The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
             Releasing the button within this time does not trigger the factory reset procedure.
-   .. group-tab:: nRF52840 DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
       LED 1:
           Blinks to indicate that the main application thread is running.
@@ -131,7 +131,7 @@ After programming the sample to your development kits, complete the following st
 
          The result of using the buttons is reflected on the light bulb's **LED 1**.
 
-   .. group-tab:: nRF52840 DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
       1. Turn on the development kit that runs the Network coordinator sample.
 
