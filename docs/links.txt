@@ -20,6 +20,7 @@
 .. _`Programming board names`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/board_support/board_names.html#programming-board-names
 
 .. _`Developing with nRF52 Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf52/index.html
+.. _`Developing with nRF53 Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf53/index.html
 .. _`Developing with nRF54L Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf54l/index.html
 .. _`Developing with Front-End Modules`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/fem/index.html
 .. _`Developing with the nRF21540 EK`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/fem/21540ek_dev_guide.html
@@ -80,6 +81,7 @@
 
 .. _`nrf52840dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/boards/nordic/nrf52840dk/doc/index.html
 .. _`nrf52840dongle`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf52840dongle/doc/index.html#nrf52840dongle-nrf52840
+.. _`nrf5340dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/boards/nordic/nrf5340dk/doc/index.html
 .. _`nrf54l15dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html
 
 .. _`USB DFU (Device Firmware Upgrade)`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/samples/subsys/usb/dfu/README.html
@@ -137,7 +139,7 @@
 .. _`ZBOSS stack release notes`: https://ncsdoc.z6.web.core.windows.net/zboss-r23
 .. _`external ZBOSS development guide and API documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/zigbee_devguide.html
 .. _`Stack commissioning start sequence`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#stack_start_initiation
-.. _`ZBOSS NCP Host`: https://github.com/nrfconnect/ncs-zigbee/releases/download/v1.1.0/ncp_host_v3.3.0.zip
+.. _`ZBOSS NCP Host`: https://github.com/nrfconnect/ncs-zigbee/releases/download/v1.2.0/ncp_host_v3.4.0.zip
 .. _`NCP Host documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/zboss_ncp_host_intro.html
 .. _`Rebuilding the ZBOSS libraries for host`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/zboss_ncp_host.html#rebuilding_libs
 .. _`process the frame`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#process_zcl_cmd
