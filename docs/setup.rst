@@ -43,7 +43,7 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
       .. code-block:: console
 
-         west init -m "http://github.com/nrfconnect/ncs-zigbee" --mr v1.1.0
+         west init -m "http://github.com/nrfconnect/ncs-zigbee" --mr v1.2.0
 
 
 To create an application, use :ref:`zigbee_template_sample` sample as a starting point.
