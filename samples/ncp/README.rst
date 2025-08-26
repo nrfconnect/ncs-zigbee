@@ -83,7 +83,7 @@ The communication channel uses Zephyr's `UART API`_.
 
       The ``uart20`` pins are configured by devicetree overlay files for each supported development kit in the :file:`boards` directory.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
       The serial device is selected in devicetree like this:
 
@@ -288,7 +288,7 @@ User interface
    .. group-tab:: nRF54L15 DK
 
 	  All the NCP sample's interactions with the application are automatically handled using serial communication.
-   .. group-tab:: nRF52840 and nRF5340 DKs DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
 	  All the NCP sample’s interactions with the application are automatically handled using serial or USB communication.
 
@@ -333,7 +333,7 @@ After building the sample and programming it to your development kit, complete t
 	  When it is found, the simple gateway configures bindings and reporting for the device.
 	  It then starts sending On/Off toggle commands with a 15-second interval that toggle the **LED 1** on the light bulb on and off.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
 	  1. Download and extract the `ZBOSS NCP Host`_ package.
 

@@ -58,7 +58,7 @@ The light switch supports the :ref:`zigbee_ug_sed` that enables the sleepy behav
    .. group-tab:: nRF54L15 DK
 
       To enable the sleepy behavior, press **Button 2** while the light switch sample is booting.
-   .. group-tab:: nRF52840 and nRF5340 DKs DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
       To enable the sleepy behavior, press **Button 3** while the light switch sample is booting.
 
@@ -209,7 +209,7 @@ User interface
           The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
           Releasing the button within this time does not trigger the factory reset procedure.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
       LED 3:
           Lit and solid when the device is connected to a Zigbee network.
@@ -248,7 +248,7 @@ FOTA behavior assignments
          Indicates the OTA activity.
          Used only if the FOTA support is enabled.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
       LED 2:
          Indicates the OTA activity.
@@ -264,7 +264,7 @@ Sleepy End Device behavior assignments
       Button 2:
           When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
       Button 3:
           When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
@@ -280,7 +280,7 @@ Multiprotocol Bluetooth LE extension assignments
           Lit and solid when a Bluetooth LE Central is connected to the NUS service.
           Available when using `Nordic UART Service (NUS)`_ in the multiprotocol configuration.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
       LED 1:
           Lit and solid when a Bluetooth LE Central is connected to the NUS service.
@@ -337,7 +337,7 @@ After programming the sample to your development kits, complete the following st
 
          This LED indicates that the light switch found a light bulb to control.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
       1. Turn on the development kit that runs the Network coordinator sample.
 
@@ -414,7 +414,7 @@ Set up nRF Toolbox by completing the following steps:
 	  
          Observe that **LED 0** on the light switch node is solid.
 
-      .. group-tab:: nRF52840 and nRF5340 DKs DK
+      .. group-tab:: nRF52840 and nRF5340 DKs
 	  
          Observe that **LED 1** on the light switch node is solid.   
 
