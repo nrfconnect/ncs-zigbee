@@ -82,7 +82,7 @@ User interface
 
       Button 3:
           Starts or cancels the Identify mode.
-   .. group-tab:: nRF52840 and nRF5340 DKs DK
+   .. group-tab:: nRF52840 and nRF5340 DKs
 
       LED 3:
           Turns on when the device joins the network.
@@ -92,7 +92,7 @@ User interface
 
       Button 4:
           Starts or cancels the Identify mode.
-   .. group-tab:: nRF52840 and nRF5340 DKs Dongle
+   .. group-tab:: nRF52840 Dongle
 
       LED 1:
           Blinks green to indicate that the identification mode is on.
