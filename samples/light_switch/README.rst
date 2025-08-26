@@ -145,6 +145,24 @@ For more information about configuration files in the |NCS|, see `Build and conf
 
   .. include:: /includes/sample_fem_support.txt
 
+Snippets
+========
+
+.. |snippet| replace:: :makevar:`light_switch_SNIPPET`
+
+The following snippets are available:
+
+* ``low_power`` - Enables low power consumption mode for the Light Switch sample.
+  This snippet disables serial communication, console output, enables sleepy end device behavior,
+  and disables LED indications to minimize power consumption.
+
+  To build with the low power snippet, use the following command:
+
+  .. parsed-literal::
+     :class: highlight
+
+     west build samples/light_switch -b *board_target* -- --snippet=low_power
+
 Configurable transmission power
 ===============================
 
