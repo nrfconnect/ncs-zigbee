@@ -25,3 +25,10 @@ config LIGHT_SWITCH_TX_POWER
 	default 0
 	help
 		TX power level in dBm.
+
+config LIGHT_SWITCH_LOW_POWER
+	bool "Low power mode"
+	default n
+	help
+		Enable low power mode for the Light Switch sample.
+		This enables sleepy behavior and disables LEDs for power savings.

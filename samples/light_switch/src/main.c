@@ -103,6 +103,17 @@
 
 LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
 
+/* Helper functions for LED control in low power mode */
+#if CONFIG_LIGHT_SWITCH_LOW_POWER
+static inline void led_set(uint32_t led, uint32_t val) { ARG_UNUSED(led); ARG_UNUSED(val); }
+static inline void led_set_on(uint32_t led) { ARG_UNUSED(led); }
+static inline void led_set_off(uint32_t led) { ARG_UNUSED(led); }
+#else
+static inline void led_set(uint32_t led, uint32_t val) { dk_set_led(led, val); }
+static inline void led_set_on(uint32_t led) { dk_set_led_on(led); }
+static inline void led_set_off(uint32_t led) { dk_set_led_off(led); }
+#endif
+
 struct bulb_context {
 	zb_uint8_t endpoint;
 	zb_uint16_t short_addr;
@@ -319,10 +330,12 @@ static void configure_gpio(void)
 		LOG_ERR("Cannot init buttons (err: %d)", err);
 	}
 
+#if !CONFIG_LIGHT_SWITCH_LOW_POWER
 	err = dk_leds_init();
 	if (err) {
 		LOG_ERR("Cannot init LEDs (err: %d)", err);
 	}
+#endif
 }
 
 static void alarm_timers_init(void)
@@ -350,7 +363,7 @@ static void toggle_identify_led(zb_bufid_t bufid)
 {
 	static int blink_status;
 
-	dk_set_led(IDENTIFY_LED, (++blink_status) % 2);
+	led_set(IDENTIFY_LED, (++blink_status) % 2);
 	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, bufid, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
 }
 
@@ -372,9 +385,9 @@ static void identify_cb(zb_bufid_t bufid)
 
 		/* Update network status/idenitfication LED. */
 		if (ZB_JOINED()) {
-			dk_set_led_on(ZIGBEE_NETWORK_STATE_LED);
+			led_set_on(ZIGBEE_NETWORK_STATE_LED);
 		} else {
-			dk_set_led_off(ZIGBEE_NETWORK_STATE_LED);
+			led_set_off(ZIGBEE_NETWORK_STATE_LED);
 		}
 	}
 }
@@ -458,7 +471,7 @@ static void find_light_bulb_cb(zb_bufid_t bufid)
 			bulb_ctx.endpoint);
 
 		k_timer_stop(&bulb_ctx.find_alarm);
-		dk_set_led_on(BULB_FOUND_LED);
+		led_set_on(BULB_FOUND_LED);
 	} else {
 		LOG_INF("Bulb not found, try again");
 	}
@@ -567,7 +580,7 @@ static void ota_evt_handler(const struct zigbee_fota_evt *evt)
 {
 	switch (evt->id) {
 	case ZIGBEE_FOTA_EVT_PROGRESS:
-		dk_set_led(OTA_ACTIVITY_LED, evt->dl.progress % 2);
+		led_set(OTA_ACTIVITY_LED, evt->dl.progress % 2);
 		break;
 
 	case ZIGBEE_FOTA_EVT_FINISHED:
@@ -706,13 +719,13 @@ static void decrease_cmd(struct k_work *item)
 static void on_nus_connect(struct k_work *item)
 {
 	ARG_UNUSED(item);
-	dk_set_led_on(NUS_STATUS_LED);
+	led_set_on(NUS_STATUS_LED);
 }
 
 static void on_nus_disconnect(struct k_work *item)
 {
 	ARG_UNUSED(item);
-	dk_set_led_off(NUS_STATUS_LED);
+	led_set_off(NUS_STATUS_LED);
 }
 
 static struct nus_entry commands[] = {
@@ -825,15 +838,18 @@ int main(void)
 	/* Set default bulb short_addr. */
 	bulb_ctx.short_addr = 0xFFFF;
 
-	/* If "sleepy button" is defined, check its state during Zigbee
-	 * initialization and enable sleepy behavior at device if defined button
-	 * is pressed.
+	/* Check if sleepy button is pressed during Zigbee initialization
+	 * and enable sleepy behavior. In low power mode, always enable sleepy behavior.
 	 */
-#if defined BUTTON_SLEEPY
-	if (dk_get_buttons() & BUTTON_SLEEPY) {
+#if CONFIG_LIGHT_SWITCH_LOW_POWER
+	bool enable_sleepy = true;
+#else
+	bool enable_sleepy = (dk_get_buttons() & BUTTON_SLEEPY) ? true : false;
+#endif
+
+	if (enable_sleepy) {
 		zigbee_configure_sleepy_behavior(true);
 	}
-#endif
 
 	/* Power off unused sections of RAM to lower device power consumption. */
 	if (IS_ENABLED(CONFIG_RAM_POWER_DOWN_LIBRARY)) {
