@@ -119,7 +119,7 @@ Communication through USB
 =========================
 
 .. note::
-     Communication through USB is available for nRF52840 and nRF5340 SoCs.
+     Communication through USB is available for nRF52840, nRF5340, and nRF54LM20 SoCs.
 
 To change the communication channel from the default UART to nRF USB CDC ACM ``cdc_acm_uart0``, use the :file:`prj_usb.conf` configuration file and add the ``-DFILE_SUFFIX=usb`` flag to the build command.
 When using the nRF52840 Dongle, please add the ``-DFILE_SUFFIX=dongle`` flag to the build command instead.

@@ -61,7 +61,7 @@ To change the shell backend from the default UART to the nRF USB CDC ACM, use th
 With such configuration, Zephyr logs are printed only to the backend that the shell is using.
 
 .. note::
-   USB interface is only available for nRF52840 and nRF5340 SoCs.
+   USB interface is only available for nRF52840, nRF5340, and nRF54LM20 SoCs.
    
 You can enable the UART backend for the logger, so that Zephyr logs are printed to both the shell backend and the UART.
 To do this, enable the ``CONFIG_LOG_BACKEND_UART`` Kconfig option. 
