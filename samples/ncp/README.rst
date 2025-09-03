@@ -77,13 +77,13 @@ The communication channel uses Zephyr's `UART API`_.
              ncs,zigbee-uart = &uart20;
          };
 
-      By default, Zephyr's logger uses ``uart20`` and the NCP sample communicates through the UART serialization using ``uart21``.
-      The DTS overlay file configures ``uart21`` to be connected to the on-board J-Link instead of ``uart20``.
-      As the result, Zephyr's logger ``uart20`` is available only through GPIO pins (**P1.08** and **P1.09**).
+      By default, Zephyr's logger uses ``uart20``, and the NCP sample communicates through the UART serialization using ``uart21``.
+      The DTS overlay file configures ``uart21`` to connect to the on-board J-Link instead of ``uart20``.
+      As a result, Zephyr's logger on ``uart20`` is available only through GPIO pins (**P1.08** and **P1.09**).
 
       The ``uart20`` pins are configured by devicetree overlay files for each supported development kit in the :file:`boards` directory.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF5340 DK
 
       The serial device is selected in devicetree like this:
 
@@ -93,9 +93,25 @@ The communication channel uses Zephyr's `UART API`_.
              ncs,zigbee-uart = &uart0;
          };
 
-      By default, Zephyr's logger uses ``uart0`` and the NCP sample communicates through the UART serialization using ``uart1``.
-      The DTS overlay file configures ``uart1`` to be connected to the on-board J-Link instead of ``uart0``.
-      As the result, Zephyr's logger ``uart0`` is available only through GPIO pins (**P1.00** and **P1.01**).
+      By default, Zephyr's logger uses ``uart0``, and the NCP sample communicates through the UART serialization using ``uart1``.
+      The DTS overlay file configures ``uart1`` to connect to the on-board J-Link instead of ``uart0``.
+      As a result, Zephyr's logger on ``uart0`` is available only through GPIO pins (**P1.04** and **P1.05**).
+
+      The ``uart0`` pins are configured by devicetree overlay files for each supported development kit in the :file:`boards` directory.
+
+   .. group-tab:: nRF52840 DK
+
+      The serial device is selected in the following devicetree:
+
+      .. code-block:: devicetree
+
+         chosen {
+             ncs,zigbee-uart = &uart0;
+         };
+
+      By default, Zephyr's logger uses ``uart0``, and the NCP sample communicates through the UART serialization using ``uart1``.
+      The DTS overlay file configures ``uart1`` to connect to the on-board J-Link instead of ``uart0``.
+      As a result, Zephyr's logger on ``uart0`` is available only through GPIO pins (**P1.01** and **P1.02**).
 
       The ``uart0`` pins are configured by devicetree overlay files for each supported development kit in the :file:`boards` directory.
 
