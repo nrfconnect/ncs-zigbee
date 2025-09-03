@@ -67,7 +67,7 @@ The communication channel uses Zephyr's `UART API`_.
 
 .. tabs::
 
-   .. group-tab:: nRF54L15 DK
+   .. group-tab:: nRF54LM20 DK
       
       The serial device is selected in devicetree like this:
 
@@ -75,6 +75,22 @@ The communication channel uses Zephyr's `UART API`_.
 
          chosen {
              ncs,zigbee-uart = &uart20;
+         };
+
+      By default, Zephyr's logger uses ``uart21`` and the NCP sample communicates through the UART serialization using ``uart20``.
+      The DTS overlay file configures ``uart20`` to be connected to the on-board J-Link instead of ``uart21``.
+      As the result, Zephyr's logger ``uart21`` is available only through GPIO pins (**P1.08** and **P1.09**).
+
+      The ``uart21`` pins are configured by devicetree overlay files for each supported development kit in the :file:`boards` directory.
+
+   .. group-tab:: nRF54L15 DK
+      
+      The serial device is selected in devicetree like this:
+
+      .. code-block:: devicetree
+
+         chosen {
+             ncs,zigbee-uart = &uart21;
          };
 
       By default, Zephyr's logger uses ``uart20``, and the NCP sample communicates through the UART serialization using ``uart21``.
@@ -301,10 +317,10 @@ User interface
 
 .. tabs::
 
-   .. group-tab:: nRF54L15 DK
+   .. group-tab:: nRF54 DKs
 
 	  All the NCP sample's interactions with the application are automatically handled using serial communication.
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52 and nRF53 DKs
 
 	  All the NCP sample’s interactions with the application are automatically handled using serial or USB communication.
 
@@ -326,7 +342,7 @@ After building the sample and programming it to your development kit, complete t
 
 .. tabs::
 
-   .. group-tab:: nRF54L15 DK
+   .. group-tab:: nRF54 DKs
 
 	  1. Download and extract the `ZBOSS NCP Host`_ package.
 
@@ -349,7 +365,7 @@ After building the sample and programming it to your development kit, complete t
 	  When it is found, the simple gateway configures bindings and reporting for the device.
 	  It then starts sending On/Off toggle commands with a 15-second interval that toggle the **LED 1** on the light bulb on and off.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52 and nRF53 DKs
 
 	  1. Download and extract the `ZBOSS NCP Host`_ package.
 

@@ -72,7 +72,7 @@ User interface
 
 .. tabs::
 
-   .. group-tab:: nRF54L15 DK
+   .. group-tab:: nRF54 DKs
 
       LED 2:
           Turns on when the device joins the network.
@@ -82,7 +82,7 @@ User interface
 
       Button 3:
           Starts or cancels the Identify mode.
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52 and nRF53 DKs
 
       LED 3:
           Turns on when the device joins the network.
