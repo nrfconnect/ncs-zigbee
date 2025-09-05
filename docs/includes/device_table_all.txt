@@ -19,6 +19,10 @@
      - `nrf54l15dk`_
      - ``nrf54l15dk/nrf54l05/cpuapp``
    * - `nRF52840 DK <Developing with nRF52 Series_>`_
+   * - `nRF54LM20 DK <Developing with nRF54L Series_>`_
+     - PCA10184
+     - `nrf54lm20dk`_
+     - ``nrf54lm20dk/nrf54lm20a/cpuapp``
      - PCA10056
      - `nrf52840dk`_
      - ``nrf52840dk/nrf52840``
