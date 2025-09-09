@@ -41,7 +41,7 @@ To program the samples, complete the following steps:
 
 .. tabs::
 
-   .. group-tab:: nRF54L Series DK
+   .. group-tab:: nRF54 DKs
 
       .. include:: includes/vsc_build_and_run.txt
 
@@ -84,7 +84,7 @@ To program the samples, complete the following steps:
 
       .. rst-class:: numbered-step
 
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52 and nRF53 DKs
 
       .. include:: includes/vsc_build_and_run.txt
 
@@ -134,14 +134,14 @@ After forming the Zigbee network, test the interaction between the devices.
 
 .. tabs::
 
-   .. group-tab:: nRF54L Series DK
+   .. group-tab:: nRF54 DKs
 
       1. Press **Button 1** once on the development kit programmed with the light switch sample to turn off the light bulb's **LED 1**.
       #. Press **Button 0** once on the development kit programmed with the light switch sample to turn on the light bulb's **LED 1**.
       #. Press and hold **Button 1** on the development kit programmed with the light switch sample to decrease the light bulb's **LED 1** brightness.
       #. Press and hold **Button 0** on the development kit programmed with the light switch sample to increase the light bulb's **LED 1** brightness.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52 and nRF53 DKs
 
       1. Press **Button 2** once on the development kit programmed with the light switch sample to turn off the light bulb's **LED 4**.
       #. Press **Button 1** once on the development kit programmed with the light switch sample to turn on the light bulb's **LED 4**.
