@@ -274,8 +274,8 @@ config ZBOSS_TRACE_UART_LOGGING
 
 config ZBOSS_TRACE_USB_CDC_LOGGING
 	bool "UART USB CDC (supported only for Zigbee NCP sample)"
-	select USB_DEVICE_STACK
-	select USB_CDC_ACM
+	select USB_DEVICE_STACK_NEXT
+	select USBD_CDC_ACM_CLASS
 	select UART_LINE_CTRL
 	select UART_INTERRUPT_DRIVEN
 

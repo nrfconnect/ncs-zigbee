@@ -19,6 +19,12 @@
 #include <zb_nrf_platform.h>
 #include "zb_range_extender.h"
 
+#if defined(CONFIG_ZIGBEE_SHELL_USB)
+#include <zephyr/device.h>
+#include <zephyr/usb/usbd.h>
+#include <zephyr/usb/bos.h>
+#endif
+
 
 /* Device endpoint, used to receive ZCL commands. */
 #define APP_ZIGBEE_ENDPOINT              CONFIG_ZIGBEE_SHELL_ENDPOINT
@@ -46,6 +52,128 @@
 #endif /* defined CONFIG_BOARD_NRF52840DONGLE_NRF52840 */
 
 LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
+
+#if defined(CONFIG_ZIGBEE_SHELL_USB)
+/* USB device setup - similar to sample_usbd_init.c */
+USBD_DEVICE_DEFINE(sample_usbd,
+		   DEVICE_DT_GET(DT_NODELABEL(zephyr_udc0)),
+		   CONFIG_ZIGBEE_SHELL_USB_VID, CONFIG_ZIGBEE_SHELL_USB_PID);
+
+USBD_DESC_LANG_DEFINE(sample_lang);
+USBD_DESC_MANUFACTURER_DEFINE(sample_mfr, CONFIG_ZIGBEE_SHELL_USB_MANUFACTURER);
+USBD_DESC_PRODUCT_DEFINE(sample_product, CONFIG_ZIGBEE_SHELL_USB_PRODUCT);
+USBD_DESC_SERIAL_NUMBER_DEFINE(sample_sn);
+
+USBD_DESC_CONFIG_DEFINE(fs_cfg_desc, "FS Configuration");
+USBD_DESC_CONFIG_DEFINE(hs_cfg_desc, "HS Configuration");
+
+static const uint8_t attributes = 0; /* Bus powered, no remote wakeup */
+
+/* Full speed configuration */
+USBD_CONFIGURATION_DEFINE(sample_fs_config,
+			  attributes,
+			  CONFIG_ZIGBEE_SHELL_USB_MAX_POWER, &fs_cfg_desc);
+
+/* High speed configuration */
+USBD_CONFIGURATION_DEFINE(sample_hs_config,
+			  attributes,
+			  CONFIG_ZIGBEE_SHELL_USB_MAX_POWER, &hs_cfg_desc);
+
+static void sample_fix_code_triple(struct usbd_context *uds_ctx,
+				   const enum usbd_speed speed)
+{
+	/* Always use class code information from Interface Descriptors */
+	if (IS_ENABLED(CONFIG_USBD_CDC_ACM_CLASS)) {
+		/*
+		 * Class with multiple interfaces have an Interface
+		 * Association Descriptor available, use an appropriate triple
+		 * to indicate it.
+		 */
+		usbd_device_set_code_triple(uds_ctx, speed,
+					    USB_BCC_MISCELLANEOUS, 0x02, 0x01);
+	} else {
+		usbd_device_set_code_triple(uds_ctx, speed, 0, 0, 0);
+	}
+}
+
+static struct usbd_context *setup_usb_device(void)
+{
+	int err;
+
+	err = usbd_add_descriptor(&sample_usbd, &sample_lang);
+	if (err) {
+		LOG_ERR("Failed to initialize language descriptor (%d)", err);
+		return NULL;
+	}
+
+	err = usbd_add_descriptor(&sample_usbd, &sample_mfr);
+	if (err) {
+		LOG_ERR("Failed to initialize manufacturer descriptor (%d)", err);
+		return NULL;
+	}
+
+	err = usbd_add_descriptor(&sample_usbd, &sample_product);
+	if (err) {
+		LOG_ERR("Failed to initialize product descriptor (%d)", err);
+		return NULL;
+	}
+
+	err = usbd_add_descriptor(&sample_usbd, &sample_sn);
+	if (err) {
+		LOG_ERR("Failed to initialize SN descriptor (%d)", err);
+		return NULL;
+	}
+
+	if (USBD_SUPPORTS_HIGH_SPEED &&
+	    usbd_caps_speed(&sample_usbd) == USBD_SPEED_HS) {
+		err = usbd_add_configuration(&sample_usbd, USBD_SPEED_HS,
+					     &sample_hs_config);
+		if (err) {
+			LOG_ERR("Failed to add High-Speed configuration");
+			return NULL;
+		}
+
+		err = usbd_register_all_classes(&sample_usbd, USBD_SPEED_HS, 1, NULL);
+		if (err) {
+			LOG_ERR("Failed to add register classes");
+			return NULL;
+		}
+
+		sample_fix_code_triple(&sample_usbd, USBD_SPEED_HS);
+	}
+
+	err = usbd_add_configuration(&sample_usbd, USBD_SPEED_FS,
+				     &sample_fs_config);
+	if (err) {
+		LOG_ERR("Failed to add Full-Speed configuration");
+		return NULL;
+	}
+
+	err = usbd_register_all_classes(&sample_usbd, USBD_SPEED_FS, 1, NULL);
+	if (err) {
+		LOG_ERR("Failed to add register classes");
+		return NULL;
+	}
+
+	sample_fix_code_triple(&sample_usbd, USBD_SPEED_FS);
+	usbd_self_powered(&sample_usbd, attributes & USB_SCD_SELF_POWERED);
+
+	err = usbd_init(&sample_usbd);
+	if (err) {
+		LOG_ERR("Failed to initialize device support");
+		return NULL;
+	}
+
+	err = usbd_enable(&sample_usbd);
+	if (err) {
+		LOG_ERR("Failed to enable device support");
+		return NULL;
+	}
+
+	LOG_INF("USB device initialized and enabled");
+	return &sample_usbd;
+}
+#endif /* CONFIG_ZIGBEE_SHELL_USB */
 
 /* Main application customizable context.
  * Stores all settings and static values.
@@ -239,6 +367,14 @@ int main(void)
 
 	/* Initialize */
 	configure_gpio();
+
+#if defined(CONFIG_ZIGBEE_SHELL_USB)
+	/* Initialize USB device */
+	if (setup_usb_device() == NULL) {
+		LOG_ERR("Failed to setup USB device");
+		return -1;
+	}
+#endif
 
 	/* Register device context (endpoints). */
 	ZB_AF_REGISTER_DEVICE_CTX(&app_zigbee_ctx);
