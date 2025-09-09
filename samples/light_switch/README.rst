@@ -12,7 +12,7 @@ You can use the this Light switch sample to change the state of light sources on
 You can use it together with the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` and the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` samples to set up a basic Zigbee network.
 
 This sample supports the optional `Sleepy End Device behavior`_ and :ref:`zigbee_light_switch_sample_nus`.
-It also supports :ref:`lib_zigbee_fota` for nRF52840, nRF5340, nRF54L15 and nRF54L10 SoCs.
+It also supports :ref:`lib_zigbee_fota` for nRF52840, nRF5340, nRF54L15, nRF54L10 and nRF54LM20 SoCs.
 See :ref:`zigbee_light_switch_activating_variants` for details about how to enable these variants.
 
 Requirements
@@ -55,10 +55,11 @@ The light switch supports the :ref:`zigbee_ug_sed` that enables the sleepy behav
 
 .. tabs::
 
-   .. group-tab:: nRF54L15 DK
+   .. group-tab:: nRF54 DKs
 
       To enable the sleepy behavior, press **Button 2** while the light switch sample is booting.
-   .. group-tab:: nRF52840 and nRF5340 DKs
+
+   .. group-tab:: nRF52 and nRF53 DKs
 
       To enable the sleepy behavior, press **Button 3** while the light switch sample is booting.
 
@@ -184,7 +185,7 @@ User interface
 
 .. tabs::
 
-   .. group-tab:: nRF54L15 DK
+   .. group-tab:: nRF54 DKs
 
       LED 2:
           Lit and solid when the device is connected to a Zigbee network.
@@ -209,7 +210,7 @@ User interface
           The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
           Releasing the button within this time does not trigger the factory reset procedure.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52 and nRF53 DKs
 
       LED 3:
           Lit and solid when the device is connected to a Zigbee network.
@@ -242,13 +243,13 @@ FOTA behavior assignments
 
 .. tabs::
 
-   .. group-tab:: nRF54L15 DK
+   .. group-tab:: nRF54 DKs
 
       LED 1:
          Indicates the OTA activity.
          Used only if the FOTA support is enabled.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52 and nRF53 DKs
 
       LED 2:
          Indicates the OTA activity.
@@ -259,12 +260,12 @@ Sleepy End Device behavior assignments
 
 .. tabs::
 
-   .. group-tab:: nRF54L15 DK
+   .. group-tab:: nRF54 DKs
 
       Button 2:
           When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52 and nRF53 DKs
 
       Button 3:
           When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
@@ -274,13 +275,13 @@ Multiprotocol Bluetooth LE extension assignments
 
 .. tabs::
 
-   .. group-tab:: nRF54L15 DK
+   .. group-tab:: nRF54 DKs
 
       LED 0:
           Lit and solid when a Bluetooth LE Central is connected to the NUS service.
           Available when using `Nordic UART Service (NUS)`_ in the multiprotocol configuration.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52 and nRF53 DKs
 
       LED 1:
           Lit and solid when a Bluetooth LE Central is connected to the NUS service.
@@ -316,7 +317,7 @@ After programming the sample to your development kits, complete the following st
 
 .. tabs::
 
-   .. group-tab:: nRF54L15 DK
+   .. group-tab:: nRF54 DKs
 
       1. Turn on the development kit that runs the Network coordinator sample.
 
@@ -337,7 +338,7 @@ After programming the sample to your development kits, complete the following st
 
          This LED indicates that the light switch found a light bulb to control.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52 and nRF53 DKs
 
       1. Turn on the development kit that runs the Network coordinator sample.
 
@@ -410,11 +411,11 @@ Set up nRF Toolbox by completing the following steps:
 
 
    .. tabs::
-      .. group-tab:: nRF54L15 DK
+      .. group-tab:: nRF54 DKs
 	  
          Observe that **LED 0** on the light switch node is solid.
 
-      .. group-tab:: nRF52840 and nRF5340 DKs
+      .. group-tab:: nRF52 and nRF53 DKs
 	  
          Observe that **LED 1** on the light switch node is solid.   
 
