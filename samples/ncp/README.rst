@@ -134,7 +134,7 @@ For example, when building from the command line, use the following commands:
 
    west build samples/ncp -b nrf52840dongle/nrf52840 -- -DFILE_SUFFIX=dongle
 
-The USB device VID and PID are configured by the sample's Kconfig file.
+The USB device VID and PID are configured by the :file:`prj_usb.conf` and :file:`prj_dongle.conf` files.
 
 When you change the communication channel to nRF USB using either :file:`prj_usb.conf` or :file:`prj_dongle.conf` and select any of the :file:`<board>_usb.overlay` or :file:`<board>_dongle.overlay` files, respectively, :ref:`Zigbee stack logs <zigbee_ug_logging_stack_logs>` are printed by default using ``uart1``.
 This is configured in the project file with the following settings:
@@ -151,8 +151,9 @@ And, in the overlay file like this:
        ncs,zboss-trace-uart = &uart1;
    };
 
-Alternatively, you can configure :ref:`Zigbee stack logs <zigbee_ug_logging_stack_logs>` to be printed in binary format using an independent CDC ACM device of the same nRF USB.
-Complete the following steps:
+Alternatively, you can configure :ref:`Zigbee stack logs <zigbee_ug_logging_stack_logs>` to be printed in binary format using an additional CDC ACM device (a second virtual COM port) on the same nRF USB.
+The primary NCP CDC ACM interface is already initialized at boot from :file:`prj_usb.conf` or :file:`prj_dongle.conf`.
+To add a second instance for trace logs, complete the following steps:
 
 1. Set the following Kconfig options:
 
