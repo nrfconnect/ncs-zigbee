@@ -2,7 +2,14 @@
  * Copyright (c) 2025 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ *
  */
 
 #include "nrf52840dongle_nrf52840.overlay"
-#include "../app_usb.overlay"
+ 
+/*
+ * For nrf52840dongle the board already includes cdc_acm_serial.dtsi which
+ * defines board_cdc_acm_uart and sets zephyr,shell-uart. Do not include
+ * app_usb.overlay here or it would add a duplicate cdc_acm_uart node and
+ * override shell-uart to it.
+ */

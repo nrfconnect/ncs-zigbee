@@ -19,7 +19,6 @@
 #include <zb_nrf_platform.h>
 #include "zb_range_extender.h"
 
-
 /* Device endpoint, used to receive ZCL commands. */
 #define APP_ZIGBEE_ENDPOINT              CONFIG_ZIGBEE_SHELL_ENDPOINT
 
