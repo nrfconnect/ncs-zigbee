@@ -21,7 +21,7 @@
 
 .. _`Developing with nRF52 Series`: https://docs.nordicsemi.com/bundle/ncs-3.1.0/page/nrf/app_dev/device_guides/nrf52/index.html
 .. _`Developing with nRF53 Series`: https://docs.nordicsemi.com/bundle/ncs-3.1.0/page/nrf/app_dev/device_guides/nrf53/index.html
-.. _`Developing with nRF54L Series`: https://docs.nordicsemi.com/bundle/ncs-3.1.0/page/nrf/app_dev/device_guides/nrf54l/index.html
+.. _`Developing with nRF54L Series`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/nrf54l/index.html
 .. _`Developing with Front-End Modules`: https://docs.nordicsemi.com/bundle/ncs-3.1.0/page/nrf/app_dev/device_guides/fem/index.html
 .. _`Developing with the nRF21540 EK`: https://docs.nordicsemi.com/bundle/ncs-3.1.0/page/nrf/app_dev/device_guides/fem/21540ek_dev_guide.html
 .. _`Building and programming with nRF21540 EK`: https://docs.nordicsemi.com/bundle/ncs-3.1.0/page/nrf/app_dev/device_guides/fem/21540ek_dev_guide.html
@@ -83,6 +83,7 @@
 .. _`nrf52840dongle`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf52840dongle/doc/index.html#nrf52840dongle-nrf52840
 .. _`nrf5340dk`: https://docs.nordicsemi.com/bundle/ncs-3.1.0/page/zephyr/boards/nordic/nrf5340dk/doc/index.html
 .. _`nrf54l15dk`: https://docs.nordicsemi.com/bundle/ncs-3.1.0/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html
+.. _`nrf54lm20dk`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf54lm20dk/doc/index.html
 
 .. _`USB DFU (Device Firmware Upgrade)`: https://docs.nordicsemi.com/bundle/ncs-3.1.0/page/zephyr/samples/subsys/usb/dfu/README.html
 

@@ -27,5 +27,4 @@ In combination with the |NCS|, the |addon| allows for development of low-power c
    samples/index
    lib/index
    tools
-   software-maturity
    release-notes

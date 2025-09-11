@@ -293,7 +293,7 @@ Values are provided in bytes (B).
 
    .. group-tab:: nRF54LM20
 
-      The following table lists memory requirements for the `nRF54LM20 <Developing with nRF54LM20_>`_ device.
+      The following table lists memory requirements for the `nRF54L Series <Developing with nRF54L Series_>`_ device.
 
       +----------------------------------------------------------------+-------------------------------+------------------------------+--------------------------------+-------------------------------+
       | Sample                                                         | ``main`` thread stack usage   | ``main`` thread stack size   | ``zboss`` thread stack usage   | ``zboss`` thread stack size   |
