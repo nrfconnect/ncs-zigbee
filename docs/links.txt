@@ -85,6 +85,7 @@
 .. _`nrf52833dk`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/zephyr/boards/nordic/nrf52833dk/doc/index.html
 .. _`nrf5340dk`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/zephyr/boards/nordic/nrf5340dk/doc/index.html
 .. _`nrf54l15dk`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html
+.. _`nrf54lm20dk`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/zephyr/boards/nordic/nrf54lm20dk/doc/index.html
 
 .. _`USB DFU (Device Firmware Upgrade)`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/zephyr/samples/subsys/usb/dfu/README.html
 
