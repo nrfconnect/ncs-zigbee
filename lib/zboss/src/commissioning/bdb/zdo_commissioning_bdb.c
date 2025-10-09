@@ -72,6 +72,10 @@ static void bdb_network_formation_machine(zb_uint8_t param);
 static void bdb_finding_n_binding_machine(zb_uint8_t param);
 #endif
 
+#if defined ZB_ROUTER_ROLE && defined NCP_MODE_HOST
+static zb_bool_t bdb_after_mgmt_permit_joining_reopen_loc_done;
+#endif
+
 void bdb_initialization_procedure(zb_uint8_t param);
 static void bdb_precomm_rejoin_over_all_channels(zb_uint8_t param, zb_uint16_t secure);
 void bdb_network_steering_on_network(zb_uint8_t param);
@@ -1356,6 +1360,35 @@ void bdb_network_steering_on_network(zb_uint8_t param)
   zb_zdo_mgmt_permit_joining_req(param, bdb_after_mgmt_permit_joining_cb);
 }
 
+#ifdef ZB_ROUTER_ROLE
+static void bdb_after_mgmt_permit_joining_reopen_local(zb_uint8_t param)
+{
+  zb_zdo_mgmt_permit_joining_req_param_t * req;
+
+  if (param)
+  {
+#ifdef NCP_MODE_HOST
+    bdb_after_mgmt_permit_joining_reopen_loc_done = ZB_TRUE;
+#endif
+
+    TRACE_MSG(TRACE_ZDO3, ">> bdb_after_mgmt_permit_joining_reopen_local, param %hd", (FMT__H, param));
+
+    req = ZB_BUF_GET_PARAM(param, zb_zdo_mgmt_permit_joining_req_param_t);
+    ZB_BZERO(req, sizeof(zb_zdo_mgmt_permit_joining_req_param_t));
+    req->permit_duration = ZB_BDBC_MIN_COMMISSIONING_TIME_S;
+    req->dest_addr = ZB_PIBCACHE_NETWORK_ADDRESS();
+
+    zb_zdo_mgmt_permit_joining_req(param, bdb_network_steering_finish);
+
+    TRACE_MSG(TRACE_ZDO3, "<< bdb_after_mgmt_permit_joining_reopen_local", (FMT__0));
+  }
+  else
+  {
+    zb_buf_get_out_delayed(bdb_after_mgmt_permit_joining_reopen_local);
+  }
+}
+#endif // ZB_ROUTER_ROLE
+
 /*
   Called when broadcasting PermitJoining finished
   during EZ-Mode Nwk Steering for ZC or ZR:
@@ -1380,14 +1413,22 @@ void bdb_after_mgmt_permit_joining_cb(zb_uint8_t param)
 #ifdef ZB_ROUTER_ROLE
     if (ZB_IS_DEVICE_ZC_OR_ZR())
     {
-      zb_zdo_mgmt_permit_joining_req_param_t *req = ZB_BUF_GET_PARAM(param,
-                                                                           zb_zdo_mgmt_permit_joining_req_param_t);
-
-      ZB_BZERO(req, sizeof(zb_zdo_mgmt_permit_joining_req_param_t));
-      req->permit_duration = ZB_BDBC_MIN_COMMISSIONING_TIME_S;
-      req->dest_addr = ZB_PIBCACHE_NETWORK_ADDRESS();
-
-      zb_zdo_mgmt_permit_joining_req(param, bdb_network_steering_finish);
+#ifndef NCP_MODE_HOST
+      bdb_after_mgmt_permit_joining_reopen_local(param);
+#else
+      /* For NCP-HOST we should avoid duplicating the triggering of the following
+       * request and use ZB_SCHEDULE_CALLBACK. This is due to the timing constraints
+       * of the serial interface.
+       */
+      if (bdb_after_mgmt_permit_joining_reopen_loc_done)
+      {
+        TRACE_MSG(TRACE_ERROR, "Already done: bdb_after_mgmt_permit_joining_reopen_local", (FMT__0));
+      }
+      else
+      {
+        ZB_SCHEDULE_CALLBACK(bdb_after_mgmt_permit_joining_reopen_local, 0);
+      }
+#endif
       param = 0;
     }
 #endif
