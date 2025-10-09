@@ -11,20 +11,20 @@
  * Please use release scripts to update it's contents.
  *
  * Repositories:
- * platform_ncs       391829ac38b02b52c5d2b7ae49b1dee480fe3ac1 https://projecttools.nordicsemi.no/bitbucket/scm/zoi/platform_ncs.git
- * zboss-stack-src    48d7622eb0265c84d035a9bd8e7aca45e944701b https://projecttools.nordicsemi.no/bitbucket/scm/zoi/zboss_r23
- * ncs-zigbee         06fcd30fae95b9d640e46061df37989389204f37 https://github.com/nrfconnect/ncs-zigbee
- * nrf                7787b264984022cda64d9629278942053e6462a5 https://github.com/nrfconnect/sdk-nrf
- * zephyr             1f8f3dc291420c70cd39e77a5cdc954561d4a08f https://github.com/nrfconnect/sdk-zephyr
+ * platform_ncs       bda55fedb68afa19eb498a6a300a01d75fa7637b https://projecttools.nordicsemi.no/bitbucket/scm/zoi/platform_ncs.git
+ * zboss-stack-src    87a7db34b4812077e71e34527a91e374398aebd2 https://projecttools.nordicsemi.no/bitbucket/scm/zoi/zboss_r23
+ * ncs-zigbee         551a75f6e311c9e171e4c0868859e94532ac22fb https://github.com/nrfconnect/ncs-zigbee
+ * nrf                4ab7b98fc76f658249bd8553cf8f9253ff840a53 https://github.com/nrfconnect/sdk-nrf
+ * zephyr             aa34a5632971262ce4002e73ed0fb09e9bd14808 https://github.com/nrfconnect/sdk-zephyr
  * wfa-qt-control-app af011c8a8d338ba529f17aed2cc2ef4c1c591a58 https://github.com/nrfconnect/sdk-wi-fiquicktrack-controlappc
  * mcuboot            12e5ee106034972b0f1074d6f2261b2b39d1501b https://github.com/nrfconnect/sdk-mcuboot
  * qcbor              751d36583a9ce1a640900c57e13c9b6b8f3a2ba2 https://github.com/laurencelundblade/QCBOR
  * mbedtls            98603a8c91660beac00e0ee1d76198fb7c4ed29b https://github.com/nrfconnect/sdk-mbedtls
  * oberon-psa-crypto  21728cf8402ac567326d0d69eec891a2bfdb8ea3 https://github.com/nrfconnect/sdk-oberon-psa-crypto
- * nrfxlib            756bcec432f49aa5def6f47d2d09272f8c4d9192 https://github.com/nrfconnect/sdk-nrfxlib
- * trusted-firmware-m f2bf78452629355e4180dc36756f6c1becc819fa https://github.com/nrfconnect/sdk-trusted-firmware-m
+ * nrfxlib            1143aee1e0521b5309e891b44a0a8048f83074d2 https://github.com/nrfconnect/sdk-nrfxlib
+ * trusted-firmware-m e200da60e1c82bbf442fcaa9d03f2e5a7c246040 https://github.com/nrfconnect/sdk-trusted-firmware-m
  * psa-arch-tests     3da9313e64806d352c519e3205e81cf959067588 https://github.com/nrfconnect/sdk-psa-arch-tests
- * matter             684c8128ad203c86d1f058913dcd73fde63e9eaf https://github.com/nrfconnect/sdk-connectedhomeip
+ * matter             88e08ccd278ab8991632812d509b59ac726dccde https://github.com/nrfconnect/sdk-connectedhomeip
  * soc-hwmv1          be0500992bd8c222118b651b88d1f3714855a3aa https://github.com/nrfconnect/sdk-soc-hwmv1
  * cjson              c6af068b7f05207b28d68880740e4b9ec1e4b50a https://github.com/nrfconnect/sdk-cjson
  * azure-sdk-for-c    308c171cb4b5eed266649012a68406487ec81fb2 https://github.com/nrfconnect/azure-sdk-for-c
@@ -47,7 +47,7 @@
  * cmsis-nn           ea987c1ca661be723de83bd159aed815d6cbd430 https://github.com/zephyrproject-rtos/cmsis-nn
  * edtt               b9ca3c7030518f07b7937dacf970d37a47865a76 https://github.com/zephyrproject-rtos/edtt
  * fatfs              427159bf95ea49b7680facffaa29ad506b42709b https://github.com/zephyrproject-rtos/fatfs
- * hal_nordic         54bde38c6f6ffb3780b26ae728cf79426184384e https://github.com/zephyrproject-rtos/hal_nordic
+ * hal_nordic         bc671cbc669b492144d021faab7df84e79fb0712 https://github.com/nrfconnect/sdk-hal_nordic
  * hal_st             b2f548fe672f24122c7f92027b2c9eeea8a0483a https://github.com/zephyrproject-rtos/hal_st
  * hal_wurthelektronik e5bcb2eac1bb9639ce13b4dafc78eb254e014342 https://github.com/zephyrproject-rtos/hal_wurthelektronik
  * hostap             44285310338f423021cc7df2c1056256882a00cc https://github.com/zephyrproject-rtos/hostap
@@ -70,16 +70,16 @@
 
 
 /** ZBOSS build tag */
-#define ZBOSS_BUILD_TAG "ncs_release-v4.2.2.1"
+#define ZBOSS_BUILD_TAG "ncs_release-v4.2.2.3"
 
 /** ZBOSS platform build tag */
-#define ZBOSS_PLATFORM_BUILD_TAG "v4.2.2.0+v6.0.6"
+#define ZBOSS_PLATFORM_BUILD_TAG "v4.2.2.0+v6.0.8"
 
 /** ZBOSS build date (UTC) */
-#define ZBOSS_BUILD_DATE 20250807
+#define ZBOSS_BUILD_DATE 20251009
 
 /** ZBOSS build time (UTC) */
-#define ZBOSS_BUILD_TIME 091605
+#define ZBOSS_BUILD_TIME 183922
 
 
 #endif /* ZBOSS_BUILD_INFO_H__ */
