@@ -1,49 +1,49 @@
 .. ### nRF Connect SDK documentation
 
-.. _`nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/index.html
-.. _`Installing the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/installation/install_ncs.html
+.. _`nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/index.html
+.. _`Installing the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/installation/install_ncs.html
 
-.. _`Application types`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/create_application.html#application_types
-.. _`Creating an application`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/create_application.html
-.. _`Repository application`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/create_application.html#repository_application
-.. _`Freestanding application`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/create_application.html#create-application-types-freestanding
-.. _`Configuring and building`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/index.html
-.. _`Build and configuration system`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/config_and_build_system.html
-.. _`Providing CMake options`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/cmake/index.html#providing_cmake_options
-.. _`Sysbuild enabled by default`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/config_and_build_system.html#sysbuild_enabled_by_default
-.. _`Configuring sysbuild usage in west`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/sysbuild/sysbuild_configuring_west.html
-.. _`Image-specific variables`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/multi_image.html
-.. _`Building an application`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/building.html
-.. _`Programming an application`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/programming.html
-.. _`Secure bootloader chain`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/bootloaders_dfu/mcuboot_nsib/bootloader.html
-.. _`Configuring devicetree`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/config_and_build/hardware/index.html
-.. _`Programming board names`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/board_support/board_names.html#programming-board-names
+.. _`Application types`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/create_application.html#application_types
+.. _`Creating an application`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/create_application.html
+.. _`Repository application`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/create_application.html#repository_application
+.. _`Freestanding application`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/create_application.html#create-application-types-freestanding
+.. _`Configuring and building`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/config_and_build/index.html
+.. _`Build and configuration system`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/config_and_build/config_and_build_system.html
+.. _`Providing CMake options`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/config_and_build/cmake/index.html#providing_cmake_options
+.. _`Sysbuild enabled by default`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/config_and_build/config_and_build_system.html#sysbuild_enabled_by_default
+.. _`Configuring sysbuild usage in west`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/config_and_build/sysbuild/sysbuild_configuring_west.html
+.. _`Image-specific variables`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/config_and_build/multi_image.html
+.. _`Building an application`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/config_and_build/building.html
+.. _`Programming an application`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/programming.html
+.. _`Secure bootloader chain`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/bootloaders_dfu/mcuboot_nsib/bootloader.html
+.. _`Configuring devicetree`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/config_and_build/hardware/index.html
+.. _`Programming board names`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/board_support/board_names.html#programming-board-names
 
-.. _`Developing with nRF52 Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf52/index.html
-.. _`Developing with nRF53 Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf53/index.html
-.. _`Developing with nRF54L Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/nrf54l/index.html
-.. _`Developing with Front-End Modules`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/fem/index.html
-.. _`Developing with the nRF21540 EK`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/fem/21540ek_dev_guide.html
-.. _`Building and programming with nRF21540 EK`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/app_dev/device_guides/fem/21540ek_dev_guide.html
+.. _`Developing with nRF52 Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/device_guides/nrf52/index.html
+.. _`Developing with nRF53 Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/device_guides/nrf53/index.html
+.. _`Developing with nRF54L Series`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/device_guides/nrf54l/index.html
+.. _`Developing with Front-End Modules`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/device_guides/fem/index.html
+.. _`Developing with the nRF21540 EK`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/device_guides/fem/21540ek_dev_guide.html
+.. _`Building and programming with nRF21540 EK`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/app_dev/device_guides/fem/21540ek_dev_guide.html
 
-.. _`Testing and optimization`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/test_and_optimize.html
+.. _`Testing and optimization`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/test_and_optimize.html
 
-.. _`Multiprotocol support`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/protocols/multiprotocol/index.html
+.. _`Multiprotocol support`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/protocols/multiprotocol/index.html
 
-.. _`Nordic UART Service (NUS)`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/bluetooth_services/services/nus.html
-.. _`DFU multi-image`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/dfu/dfu_multi_image.html
-.. _`DFU target`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/dfu/dfu_target.html
-.. _`FOTA download`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/networking/fota_download.html
-.. _`DK Buttons and LEDs`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/others/dk_buttons_and_leds.html
-.. _`RAM power-down`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/libraries/others/ram_pwrdn.html
+.. _`Nordic UART Service (NUS)`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/libraries/bluetooth_services/services/nus.html
+.. _`DFU multi-image`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/libraries/dfu/dfu_multi_image.html
+.. _`DFU target`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/libraries/dfu/dfu_target.html
+.. _`FOTA download`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/libraries/networking/fota_download.html
+.. _`DK Buttons and LEDs`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/libraries/others/dk_buttons_and_leds.html
+.. _`RAM power-down`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/libraries/others/ram_pwrdn.html
 
-.. _`Static and dynamic configuration`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/scripts/partition_manager/partition_manager.html#ug-pm-static
+.. _`Static and dynamic configuration`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/scripts/partition_manager/partition_manager.html#ug-pm-static
 
-.. _`Repository types`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/dev_model_and_contributions/code_base.html#repository_types
+.. _`Repository types`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/dev_model_and_contributions/code_base.html#repository_types
 
-.. _`Software maturity levels`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/releases_and_maturity/software_maturity.html
-.. _`Known issues for the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/releases_and_maturity/known_issues.html
-.. _`Release notes for the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrf/releases_and_maturity/release_notes.html
+.. _`Software maturity levels`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/releases_and_maturity/software_maturity.html
+.. _`Known issues for the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/releases_and_maturity/known_issues.html
+.. _`Release notes for the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrf/releases_and_maturity/release_notes.html
 
 .. _`DFU over Zigbee`: https://docs.nordicsemi.com/bundle/nrfutil/page/guides-nrf5sdk/dfu_performing.html#dfu-over-zigbee
 
@@ -59,40 +59,40 @@
 
 .. ### NCS nrfxlib documentation set
 
-.. _`Multiprotocol Service Layer`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrfxlib/mpsl/README.html
-.. _`SoftDevice Controller`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/nrfxlib/softdevice_controller/README.html
+.. _`Multiprotocol Service Layer`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrfxlib/mpsl/README.html
+.. _`SoftDevice Controller`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/nrfxlib/softdevice_controller/README.html
 
 .. ### NCS Zephyr documentation set
 
-.. _`Bluetooth API`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/connectivity/bluetooth/api/index.html
-.. _`CDC ACM`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/connectivity/usb/device/usb_device.html#cdc_acm
-.. _`USB device support APIs`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/connectivity/usb/device/api/index.html
-.. _`IEEE 802.15.4`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/connectivity/networking/api/ieee802154.html
+.. _`Bluetooth API`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/connectivity/bluetooth/api/index.html
+.. _`CDC ACM`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/connectivity/usb/device/usb_device.html#cdc_acm
+.. _`USB device support APIs`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/connectivity/usb/device/api/index.html
+.. _`IEEE 802.15.4`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/connectivity/networking/api/ieee802154.html
 
-.. _`Thread analyzer`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/debugging/thread-analyzer.html
-.. _`Logging`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/logging/index.html
-.. _`Settings`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/settings/index.html
-.. _`Shell`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/shell/index.html
-.. _`Non-Volatile Storage (NVS)`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/services/storage/nvs/nvs.html
-.. _`Pulse Width Modulation (PWM)`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/hardware/peripherals/pwm.html
-.. _`UART API`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/hardware/peripherals/uart.html
-.. _`Shields`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/hardware/porting/shields.html
+.. _`Thread analyzer`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/services/debugging/thread-analyzer.html
+.. _`Logging`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/services/logging/index.html
+.. _`Settings`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/services/settings/index.html
+.. _`Shell`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/services/shell/index.html
+.. _`Non-Volatile Storage (NVS)`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/services/storage/nvs/nvs.html
+.. _`Pulse Width Modulation (PWM)`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/hardware/peripherals/pwm.html
+.. _`UART API`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/hardware/peripherals/uart.html
+.. _`Shields`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/hardware/porting/shields.html
 .. _`Board support`: https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/board_names.html#programming-board-names
 
-.. _`nrf52840dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/boards/nordic/nrf52840dk/doc/index.html
+.. _`nrf52840dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/boards/nordic/nrf52840dk/doc/index.html
 .. _`nrf52840dongle`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf52840dongle/doc/index.html#nrf52840dongle-nrf52840
-.. _`nrf5340dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/boards/nordic/nrf5340dk/doc/index.html
-.. _`nrf54l15dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html
+.. _`nrf5340dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/boards/nordic/nrf5340dk/doc/index.html
+.. _`nrf54l15dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html
 
-.. _`USB DFU (Device Firmware Upgrade)`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/zephyr/samples/subsys/usb/dfu/README.html
+.. _`USB DFU (Device Firmware Upgrade)`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/samples/subsys/usb/dfu/README.html
 
 .. ### Source: Separate TechDocs bundles
 
-.. _`Using MCUboot in nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/mcuboot/readme-ncs.html
+.. _`Using MCUboot in nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/mcuboot/readme-ncs.html
 
 .. _`Programming the nRF52840 Dongle`: https://docs.nordicsemi.com/bundle/nrf-connect-programmer/page/programming_dk.html#programming-the-nrf52840-dongle
 
-.. _`Kconfig search`: https://docs.nordicsemi.com/bundle/ncs-2.9.0/page/kconfig/index.html
+.. _`Kconfig search`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/kconfig/index.html
 
 .. _`nRF Util`: https://docs.nordicsemi.com/bundle/nrfutil/page/README.html
 .. _`Installing nRF Util for nRF5 SDK`: https://docs.nordicsemi.com/bundle/nrfutil/page/guides-nrf5sdk/installing.html
@@ -137,48 +137,48 @@
 .. _`API documentation`:
 .. _`ZBOSS API documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23
 .. _`ZBOSS stack release notes`: https://ncsdoc.z6.web.core.windows.net/zboss-r23
-.. _`external ZBOSS development guide and API documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/zigbee_devguide.html
-.. _`Stack commissioning start sequence`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#stack_start_initiation
-.. _`ZBOSS NCP Host`: https://github.com/nrfconnect/ncs-zigbee/releases/download/v1.2.0/ncp_host_v3.4.0.zip
-.. _`NCP Host documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/zboss_ncp_host_intro.html
-.. _`Rebuilding the ZBOSS libraries for host`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/zboss_ncp_host.html#rebuilding_libs
-.. _`process the frame`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#process_zcl_cmd
-.. _`declaring custom cluster`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#cluster_declaration_custom
-.. _`Configuring sleepy behavior for end devices`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/zigbee_prog_principles.html#zigbee_power_optimization_sleepy
-.. _`zboss_signal_handler()`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zb__comm__signals.html#gae05c0ff285cfd03e0997fe438e8047fc
-.. _`Common ZCL terms and definitions`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#ZCL_definitions
-.. _`Declaring attributes`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#att_declaration
-.. _`Declaring endpoint`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#endpoint_dec
-.. _`Declaring simple descriptors`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#simple_desc_declaration
-.. _`Declaring Zigbee device context`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#zigbee_device_context_dec
-.. _`Declaring Zigbee device context with multiple endpoints`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#zigbee_device_context_mult_ep_dec
-.. _`Resetting to factory defaults`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#reset_factory_defaults
-.. _`Registering device context`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#register_zigbee_device
-.. _`Support for Zigbee commissioning`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/using_zigbee__z_c_l.html#zcl_zigbee_commissioning
-.. _`BDB Commissioning API`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zboss__bdb__api.html
+.. _`external ZBOSS development guide and API documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/zigbee_devguide.html
+.. _`Stack commissioning start sequence`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#stack_start_initiation
+.. _`ZBOSS NCP Host`: https://github.com/nrfconnect/ncs-zigbee/releases/download/v1.2.1/ncp_host_v3.5.0.zip
+.. _`NCP Host documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/zboss_ncp_host_intro.html
+.. _`Rebuilding the ZBOSS libraries for host`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/zboss_ncp_host.html#rebuilding_libs
+.. _`process the frame`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#process_zcl_cmd
+.. _`declaring custom cluster`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#cluster_declaration_custom
+.. _`Configuring sleepy behavior for end devices`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/zigbee_prog_principles.html#zigbee_power_optimization_sleepy
+.. _`zboss_signal_handler()`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__comm__signals.html#gae05c0ff285cfd03e0997fe438e8047fc
+.. _`Common ZCL terms and definitions`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#ZCL_definitions
+.. _`Declaring attributes`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#att_declaration
+.. _`Declaring endpoint`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#endpoint_dec
+.. _`Declaring simple descriptors`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#simple_desc_declaration
+.. _`Declaring Zigbee device context`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#zigbee_device_context_dec
+.. _`Declaring Zigbee device context with multiple endpoints`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#zigbee_device_context_mult_ep_dec
+.. _`Resetting to factory defaults`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#reset_factory_defaults
+.. _`Registering device context`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#register_zigbee_device
+.. _`Support for Zigbee commissioning`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#zcl_zigbee_commissioning
+.. _`BDB Commissioning API`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__api.html
 
-.. _`ZB_BDB_SIGNAL_FINDING_AND_BINDING_INITIATOR_FINISHED`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zb__comm__signals.html#ga18f5e7ddfefb7d01ef98f696a9694d79
-.. _`ZB_ZDO_SIGNAL_PRODUCTION_CONFIG_READY`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zb__comm__signals.html#ga3eb4631c12c345991be2461566c150e9
-.. _`ZB_ZDO_SIGNAL_SKIP_STARTUP`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zb__comm__signals.html#gab2b9e7a13fd471d7bb642655d825a04e
-.. _`ZB_BDB_SIGNAL_DEVICE_FIRST_START`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zb__comm__signals.html#gab55565980ef0580712f8dc160b01ea06
-.. _`ZB_BDB_SIGNAL_DEVICE_REBOOT`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zb__comm__signals.html#ga3e9d86f42d2c6c27240f423a40fb152b
-.. _`ZB_BDB_SIGNAL_FORMATION`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zb__comm__signals.html#ga342d4176c8932ff8ab0d8d6f997fa603
-.. _`ZB_BDB_SIGNAL_STEERING`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zb__comm__signals.html#ga25a801841c95d6daddb9c60b39542b13
-.. _`ZB_ZDO_SIGNAL_LEAVE`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zb__comm__signals.html#ga7942f336484c4fbb85626951480b2bba
-.. _`ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__ha__on__off__switch.html#ga566dbde2d408c46c488460219edf6002
-.. _`ZB_AF_REGISTER_DEVICE_CTX`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__af__management__service.html#ga2ba409e0ae3e25032b673a5f85859a45
-.. _`ZB_HA_DECLARE_TEMPERATURE_SENSOR_CLUSTER_LIST`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__ha__temperature__sensor.html#ga1baeb195bbce720ee97cf9c879726cbb
-.. _`zb_zcl_device_callback_param_t`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#ga0dfcc989252b93252f8bb1d27d2639fa
-.. _`zb_zcl_device_callback_id_t`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#gad27454b213ce8a00540ebc75288966ad
-.. _`ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#gga35caa2e3a9ef37535b1f75e0fe919266a8a87688c465e80b46ad821741a60fe84
-.. _`zb_bdb_set_legacy_device_support`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zboss__bdb__comm__params.html#ga8bf3b3beef192c00bcdca17ad1240921
-.. _`zboss_start()`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zb__general__start.html#ga31b4d46033aaf6a400409d03bd40d392
-.. _`bdb_start_top_level_commissioning()`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zboss__bdb__comm__start.html#ga0b54e93a19cadc5fc02df8eab18ecd45
-.. _`zb_bdb_commissioning_mode_mask_e`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zboss__bdb__comm__start.html#ga9c44bbce9f6f6b19b623837914959c02
-.. _`ZB_BDB_NETWORK_STEERING`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ae31d4a2067eb711a43f7049b08710299
-.. _`ZB_BDB_NETWORK_FORMATION`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ac723cfd38f78c08a673ec3664539027c
-.. _`ZB_BDB_FINDING_N_BINDING`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ad9bcb56a6668b6ba6f37edc73a796b58
-.. _`zb_bdb_finding_binding_initiator()`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.0/group__zboss__bdb__comm__fb.html#gae6fd60a050559ef0aa3c3e5ec32bc515
+.. _`ZB_BDB_SIGNAL_FINDING_AND_BINDING_INITIATOR_FINISHED`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__comm__signals.html#ga18f5e7ddfefb7d01ef98f696a9694d79
+.. _`ZB_ZDO_SIGNAL_PRODUCTION_CONFIG_READY`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__comm__signals.html#ga3eb4631c12c345991be2461566c150e9
+.. _`ZB_ZDO_SIGNAL_SKIP_STARTUP`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__comm__signals.html#gab2b9e7a13fd471d7bb642655d825a04e
+.. _`ZB_BDB_SIGNAL_DEVICE_FIRST_START`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__comm__signals.html#gab55565980ef0580712f8dc160b01ea06
+.. _`ZB_BDB_SIGNAL_DEVICE_REBOOT`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__comm__signals.html#ga3e9d86f42d2c6c27240f423a40fb152b
+.. _`ZB_BDB_SIGNAL_FORMATION`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__comm__signals.html#ga342d4176c8932ff8ab0d8d6f997fa603
+.. _`ZB_BDB_SIGNAL_STEERING`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__comm__signals.html#ga25a801841c95d6daddb9c60b39542b13
+.. _`ZB_ZDO_SIGNAL_LEAVE`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__comm__signals.html#ga7942f336484c4fbb85626951480b2bba
+.. _`ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__ha__on__off__switch.html#ga566dbde2d408c46c488460219edf6002
+.. _`ZB_AF_REGISTER_DEVICE_CTX`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__af__management__service.html#ga2ba409e0ae3e25032b673a5f85859a45
+.. _`ZB_HA_DECLARE_TEMPERATURE_SENSOR_CLUSTER_LIST`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__ha__temperature__sensor.html#ga1baeb195bbce720ee97cf9c879726cbb
+.. _`zb_zcl_device_callback_param_t`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#ga0dfcc989252b93252f8bb1d27d2639fa
+.. _`zb_zcl_device_callback_id_t`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#gad27454b213ce8a00540ebc75288966ad
+.. _`ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group___z_b___z_c_l___i_n_i_t_i_a_l_i_z_a_t_i_o_n.html#gga35caa2e3a9ef37535b1f75e0fe919266a8a87688c465e80b46ad821741a60fe84
+.. _`zb_bdb_set_legacy_device_support`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__comm__params.html#ga8bf3b3beef192c00bcdca17ad1240921
+.. _`zboss_start()`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__general__start.html#ga31b4d46033aaf6a400409d03bd40d392
+.. _`bdb_start_top_level_commissioning()`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__comm__start.html#ga0b54e93a19cadc5fc02df8eab18ecd45
+.. _`zb_bdb_commissioning_mode_mask_e`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__comm__start.html#ga9c44bbce9f6f6b19b623837914959c02
+.. _`ZB_BDB_NETWORK_STEERING`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ae31d4a2067eb711a43f7049b08710299
+.. _`ZB_BDB_NETWORK_FORMATION`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ac723cfd38f78c08a673ec3664539027c
+.. _`ZB_BDB_FINDING_N_BINDING`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ad9bcb56a6668b6ba6f37edc73a796b58
+.. _`zb_bdb_finding_binding_initiator()`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__comm__fb.html#gae6fd60a050559ef0aa3c3e5ec32bc515
 
 .. _`ZBOSS R23 changelog`: https://ncsdoc.z6.web.core.windows.net/zboss-r23
 
