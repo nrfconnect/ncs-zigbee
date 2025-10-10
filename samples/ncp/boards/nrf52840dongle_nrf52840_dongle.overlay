@@ -11,6 +11,7 @@
 
 	buttons {
 		compatible = "gpio-keys";
+
 		rst_button0: rst_button_0 {
 			gpios = <&gpio0 19 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
 			label = "Reset button";
