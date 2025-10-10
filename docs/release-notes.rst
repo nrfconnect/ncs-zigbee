@@ -16,9 +16,11 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 +-------------------+------------------+-----------------------+---------------------+
 | |addon| version   | |NCS| version    | ZBOSS stack version   | NCP host version    |
 +===================+==================+=======================+=====================+
+| 1.2.1             | 2.9.2            | 4.2.2.3               | 3.5.0               |
++-------------------+------------------+-----------------------+---------------------+
 | 1.2.0             | 2.9.0            | 4.2.2.0               | 3.4.0               |
-+-------------------+                  +-----------------------+---------------------+
-| 1.1.0             |                  | 4.2.2.0               | 3.3.0               |
++-------------------+                  +                       +---------------------+
+| 1.1.0             |                  |                       | 3.3.0               |
 +-------------------+                  +-----------------------+---------------------+
 | 1.0.0             |                  | 4.2.0.0               | 3.2.0               |
 +-------------------+                  +-----------------------+---------------------+
@@ -34,6 +36,22 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 +-------------------+------------------+-----------------------+---------------------+
 
 .. _zigbee_release:
+
+|addon| v1.2.1 - 10/10/2025
+***************************
+
+The following release is `supported <Software maturity levels_>`_.
+ 
+* Added:
+
+  * Support for the nRF Connect SDK v2.9.2.
+  * The new ZBOSS R23 v4.2.2.3.
+  * The ZBOSS NCP Host package v3.5.0 with improved NCP host application.
+  
+* Updated:
+
+   * The CMSA-CA parameters to improve joining performance in dense networks.
+   * The documentation to reflect the changes.
 
 |addon| v1.2.0 - 21/08/2025
 ***************************
