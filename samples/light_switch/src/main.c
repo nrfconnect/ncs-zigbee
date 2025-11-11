@@ -646,6 +646,8 @@ void zboss_signal_handler(zb_bufid_t bufid)
 		/* Call default signal handler. */
 		ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
 		if (status == RET_OK) {
+			zb_zdo_pim_set_long_poll_interval(3000);
+
 			/* Check the light device address. */
 			if (bulb_ctx.short_addr == 0xFFFF) {
 				k_timer_start(&bulb_ctx.find_alarm,
@@ -833,7 +835,7 @@ int main(void)
 
 	zigbee_erase_persistent_storage(ERASE_PERSISTENT_CONFIG);
 	zb_set_ed_timeout(ED_AGING_TIMEOUT_64MIN);
-	zb_set_keepalive_timeout(ZB_MILLISECONDS_TO_BEACON_INTERVAL(3000));
+	zb_set_keepalive_timeout(ZB_MILLISECONDS_TO_BEACON_INTERVAL(30000));
 
 	/* Set default bulb short_addr. */
 	bulb_ctx.short_addr = 0xFFFF;
