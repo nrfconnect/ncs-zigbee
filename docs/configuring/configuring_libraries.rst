@@ -63,7 +63,23 @@ Other :ref:`Zigbee FOTA Kconfig options <lib_zigbee_fota_options>` can be used w
 
 Because the Zigbee OTA DFU performs the upgrade using the `DFU target`_ library, the are several non-Zigbee Kconfig options that must be set to configure the update process:
 
-* ``CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION`` - This option specifies the current image version.
+* ``CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION`` - This option specifies the current image version in the format ``"major.minor.patch"`` or ``"major.minor.patch+build"``.
+  Each component must be in the range of 0 to 255.
+  This version string is converted to a 32-bit integer and stored in the Zigbee OTA File Version field according to the Zigbee Cluster Library specification.
+  
+  The File Version field format follows the recommended structure of four 8-bit integers in Binary Coded Decimal (BCD):
+  
+  * ``major`` component → Application Release (bits 31-24)
+  * ``minor`` component → Application Build (bits 23-16)
+  * ``patch`` component → Stack Release (bits 15-8)
+  * ``build`` component → Stack Build (bits 7-0)
+  
+  For example, ``"1.2.3+4"`` becomes ``0x01020304`` in the OTA header and is displayed as ``01020304`` in the generated ``.zigbee`` filename.
+
+* ``CONFIG_ZIGBEE_FOTA_FILE_VERSION_STACK`` - When enabled, this option automatically populates the Stack Release and Stack Build components of the OTA file version with the ZBOSS stack version (``ZBOSS_MAJOR`` and ``ZBOSS_MINOR``).
+  Only the ``major`` and ``minor`` components from ``CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION`` are used for the Application Release and Application Build.
+  For example, with ``"1.5.0+0"`` and ZBOSS 4.2, the OTA version becomes ``0x01050402``.
+
 * ``CONFIG_DFU_TARGET_MCUBOOT`` - This option enables updates that are performed by MCUboot.
 * ``CONFIG_IMG_MANAGER`` - This option enables the support for managing the DFU image downloaded using MCUboot.
 * ``CONFIG_IMG_ERASE_PROGRESSIVELY`` - This option instructs MCUboot to erase the flash memory progressively.

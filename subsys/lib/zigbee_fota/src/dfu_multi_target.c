@@ -12,12 +12,17 @@
 #include <pm_config.h>
 #include "dfu_multi_target.h"
 
+#ifdef CONFIG_ZIGBEE_FOTA_FILE_VERSION_STACK
+#include <zb_version.h>
+#endif
+
 #define DFU_TARGET_SCHEDULE_ALL_IMAGES -1
 
 union dfu_multi_target_ver {
 	uint32_t uint32_ver;
 	struct {
-		uint16_t revision;
+		uint8_t build_num;
+		uint8_t revision;
 		uint8_t minor;
 		uint8_t major;
 	};
@@ -138,7 +143,13 @@ uint32_t dfu_multi_target_get_version(void)
 	} else {
 		image_ver.major = mcuboot_header.h.v1.sem_ver.major;
 		image_ver.minor = mcuboot_header.h.v1.sem_ver.minor;
+#ifdef CONFIG_ZIGBEE_FOTA_FILE_VERSION_STACK
+		image_ver.revision = ZBOSS_MAJOR;
+		image_ver.build_num = ZBOSS_MINOR;
+#else
 		image_ver.revision = mcuboot_header.h.v1.sem_ver.revision;
+		image_ver.build_num = mcuboot_header.h.v1.sem_ver.build_num;
+#endif
 	}
 
         return image_ver.uint32_ver;

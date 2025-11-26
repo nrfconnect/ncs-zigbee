@@ -140,12 +140,37 @@ class OTA_header:
             self.__additional_fields.append(fields_values)
 
 def convert_version_string_to_int(s):
-    """Convert from semver string "1.2.3", to integer 1020003"""
-    match = re.match(r'^([0-9]+)\.([0-9]+)\.([0-9]+)(?:\+[0-9]+)?$', s)
+    """Convert from semver string to a 32-bit integer for OTA file version.
+    
+    Converts version components into a packed integer where each component occupies one byte:
+    - "1.2.3" → 0x01020300 (decimal 16909056)
+    - "1.2.3+4" → 0x01020304 (decimal 16909060)
+    
+    The returned integer is:
+    - Packed into the OTA binary header as a 4-byte little-endian value
+    - Formatted as an 8-digit hex string (e.g., "01020300") in the output filename
+    
+    Args:
+        s: Version string in format "major.minor.patch" or "major.minor.patch+build"
+        
+    Returns:
+        Integer where bits are arranged as: [major][minor][patch][build]
+        with each component occupying 8 bits (0-255 range per component)
+    """
+    match = re.match(r'^([0-9]+)\.([0-9]+)\.([0-9]+)(?:\+([0-9]+))?$', s)
     if match is None:
-        raise ValueError('application-version-string parameter must be on the format x.y.z or x.y.z+t')
-    js = [0x100*0x10000, 0x10000, 1]
-    return sum([js[i] * int(match.group(i+1)) for i in range(3)])
+        raise ValueError('application-version-string parameter must be in format x.y.z or x.y.z+b '
+                        'where x=major, y=minor, z=patch, b=build (all non-negative integers)')
+    js = [0x100*0x10000, 0x10000, 0x100, 1]
+    groups = [int(match.group(i+1)) if match.group(i+1) else 0 for i in range(4)]
+    
+    # Validate that each component fits in one byte (0-255)
+    component_names = ['major', 'minor', 'patch', 'build']
+    for i, (component, name) in enumerate(zip(groups, component_names)):
+        if component > 255:
+            raise ValueError(f'Version component {name}={component} exceeds maximum value of 255')
+    
+    return sum([js[i] * groups[i] for i in range(4)])
 
 def hex2int(x):
     """Convert hex to int."""
@@ -160,7 +185,10 @@ def parse_args():
     parser.add_argument('--application', required=True,
                         help='The application firmware file.')
     parser.add_argument('--application-version-string', required=True,
-                        help="The application version string, e.g. '2.7.31'. Will be converted to an integer, e.g. 20731.")
+                        help="The application version string, e.g. '2.7.31' or '1.2.3+4'. "
+                             "Converted to a 32-bit integer where each component occupies one byte: "
+                             "'2.7.31' becomes 0x02071F00 (stored in binary header, displayed as '02071F00' in filename). "
+                             "Format: 'major.minor.patch' or 'major.minor.patch+build' (each 0-255).")
     parser.add_argument('--zigbee-manufacturer-id', required=False, default=OTA_HEADER_MANUFACTURER_WILDCARD, type=hex2int,
                         help='Manufacturer ID to be used in Zigbee OTA header.')
     parser.add_argument('--zigbee-image-type', required=False, default=OTA_HEADER_IMAGE_TYPE_WILDCARD, type=hex2int,
