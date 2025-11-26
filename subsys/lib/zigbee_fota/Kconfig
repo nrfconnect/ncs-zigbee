@@ -70,6 +70,21 @@ config ZIGBEE_FOTA_COMMENT
 	help
 	  Firmware comment to be used in Zigbee OTA header.
 
+config ZIGBEE_FOTA_FILE_VERSION_STACK
+	bool "Use ZBOSS version for stack release and build in OTA file version"
+	help
+	  When enabled, the OTA file version field will be constructed using:
+	  - Application Release: major component from CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION
+	  - Application Build: minor component from CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION
+	  - Stack Release: ZBOSS_MAJOR from zb_version.h
+	  - Stack Build: ZBOSS_MINOR from zb_version.h
+	  
+	  When disabled (default), all four version components (major.minor.patch+build)
+	  from CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION are used directly as:
+	  [Application Release][Application Build][Stack Release][Stack Build]
+	  
+	  This follows the Zigbee OTA Version field format of four 8-bit integers in BCD.
+
 config ENABLE_ZIGBEE_FOTA_MIN_HW_VERSION
 	bool "Enable Zigbee OTA minimum hw version"
 
