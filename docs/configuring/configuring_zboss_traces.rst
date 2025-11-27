@@ -211,13 +211,13 @@ For information on configuring USB trace logs in this scenario, see the :ref:`Zi
    Before proceeding with the following steps, first check if your Zigbee application has USB enabled or is currently using USB.
    If your application is already using a virtual COM port through native USB, use a device name that is different from the default ``CDC_ACM_0`` when creating a new virtual COM port for printing trace logs.
    For example, if ``CDC_ACM_0`` is already in use, create a virtual COM port named ``CDC_ACM_1``.
-   Additionally, you must set the :kconfig:option:`CONFIG_USB_COMPOSITE_DEVICE` Kconfig option when configuring multiple virtual COM ports.
+   Additionally, you must set the ``CONFIG_USB_COMPOSITE_DEVICE`` Kconfig option when configuring multiple virtual COM ports.
 
    Refer to the :ref:`Zigbee NCP <zigbee_ncp_sample>` documentation page for an example in which one virtual COM port instance is already configured, and an additional instance must be created.
 
 To configure trace logs using native USB, complete the following steps:
 
-1. Set the Kconfig option :kconfig:option:`CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING`.
+1. Set the Kconfig option ``CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING``.
    This also enables the necessary USB Kconfig options.
 
 #. Create a virtual COM port that will be used for printing ZBOSS trace logs by extending the DTS overlay file for the selected board by running the following command:
