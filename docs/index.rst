@@ -29,3 +29,4 @@ In combination with the |NCS|, the |addon| allows for development of low-power c
    tools
    software-maturity
    release-notes
+   known_issues
