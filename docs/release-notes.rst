@@ -137,7 +137,7 @@ This is an `experimental <Software maturity levels_>`_ release.
 This is an `experimental <Software maturity levels_>`_ release.
  
 * Added:
- 
+
   * The :ref:`NCP <zigbee_ncp_sample>` sample.
   * The ZBOSS NCP Host package v3.0.0.
 
