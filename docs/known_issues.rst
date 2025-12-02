@@ -36,6 +36,14 @@ List of known issues
 
 .. rst-class:: v1-2-1 v1-2-0 v1-1-0 v1-0-0
 
+KRKNWK-20726: Too frequent keep-alive messages from SED to parent
+  When using the Light Switch sample application with a sleepy end device (SED), the SED sends End Device Timeout Requests to its parent too often if the parent supports the End Device Timeout Request Keepalive method.
+  This increases SED power consumption compared to using only the MAC Data Poll Keepalive method, because requests are longer and End Device Timeout Responses must be received.
+
+  **Workaround:** Use :c:func:`zb_zdo_pim_set_long_poll_interval` rather than :c:func:`zb_set_keepalive_timeout` to set the long poll interval, or manually cherry-pick and apply commit with the fix from ``main`` (commit hash: ``aa9763a8b1296baab2f302a5816215df3e4523b7``).
+
+.. rst-class:: v1-2-1 v1-2-0 v1-1-0 v1-0-0
+
 KRKNWK-21014: Increased power consumption after leaving network
   After a SED leaves the network and starts scanning for networks again, it does not go back to sleep as expected, leading to increased power consumption.
 
