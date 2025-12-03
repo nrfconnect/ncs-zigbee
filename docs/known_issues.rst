@@ -21,15 +21,16 @@ A known issue can list one or both of the following entries:
   Some known issues have a workaround.
   Sometimes, they are discovered later and added over time.
 
-.. version-filter::
-  :default: v1-2-1
-  :container: dl/dt
-  :tags: [("wontfix", "Won't fix")]
+..
+  .. version-filter::
+    :default: v1-2-1
+    :container: dl/dt
+    :tags: [("wontfix", "Won't fix")]
 
-.. page-filter::
-  :name: issues
+  .. page-filter::
+    :name: issues
 
-  wontfix    Won't fix
+    wontfix    Won't fix
 
 List of known issues
 ********************
