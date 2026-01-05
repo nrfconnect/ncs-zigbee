@@ -37,6 +37,12 @@ List of known issues
 
 .. rst-class:: v1-2-1 v1-2-0 v1-1-0 v1-0-0
 
+KRKNWK-21267: NCP crashes when migrating from the R22 to R23 firmware
+  After migrating the ZBOSS firmware from R22 to R23, the Network Co-Processor (NCP) crashes during the migration of application datasets.
+  This issue occurs only when the host application uses application‑specific datasets (:c:macro:`ZB_NVRAM_APP_DATA*`` types).
+
+.. rst-class:: v1-2-1 v1-2-0 v1-1-0 v1-0-0
+
 KRKNWK-21057: Poll Control cluster values overwritten to defaults on reboot
   After a sleepy end device (SED) reboots, the Poll Control cluster attributes are not restored to the values set before the reboot.
   Instead, they are reverted to their default values.
