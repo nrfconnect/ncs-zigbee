@@ -88,6 +88,12 @@
 
 .. ### Source: Separate TechDocs bundles
 
+.. _`Zigbee CIDs for nRF52840`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf52840/page/COMP/nrf52840/nrf52840_zigbee_cids.html
+.. _`Zigbee CIDs for nRF5340`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf5340/page/COMP/nrf5340/nrf5340_zigbee_cids.html
+.. _`Zigbee CIDs for nRF54L05`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf54l05/page/COMP/nrf54l05/nrf54l05_zigbee_cids.html
+.. _`Zigbee CIDs for nRF54L10`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf54l10/page/COMP/nrf54l10/nrf54l10_zigbee_cids.html
+.. _`Zigbee CIDs for nRF54L15`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf54l15/page/COMP/nrf54l15/nrf54l15_zigbee_cids.html
+
 .. _`Using MCUboot in nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/mcuboot/readme-ncs.html
 
 .. _`Programming the nRF52840 Dongle`: https://docs.nordicsemi.com/bundle/nrf-connect-programmer/page/programming_dk.html#programming-the-nrf52840-dongle
