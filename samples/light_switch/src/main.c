@@ -551,8 +551,8 @@ static void light_switch_button_handler(struct k_timer *timer)
 		zb_err_code = zb_buf_get_out_delayed_ext(light_switch_send_step,
 							 cmd_id,
 							 0);
-		if (!zb_err_code) {
-			LOG_WRN("Buffer is full");
+		if (zb_err_code != RET_OK) {
+			LOG_ERR("Failed to schedule buffer allocation: %d", zb_err_code);
 		}
 
 		k_timer_start(&buttons_ctx.alarm, BUTTON_LONG_POLL_TMO,
