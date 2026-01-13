@@ -1,0 +1,34 @@
+# Documentation build dependencies for ncs-zigbee Add-on
+
+# Sphinx core - pinned for theme compatibility
+sphinx==4.5.0
+
+# Sphinx theme - compatible with sphinx 4.x
+sphinx-ncs-theme==0.7.4
+
+# Sphinx extensions
+sphinx-tabs>=3.4
+sphinx-togglebutton>=0.3.2
+sphinx-copybutton>=0.5.2
+
+# Breathe for Doxygen integration
+breathe>=4.30.0
+
+# Diagram support
+sphinxcontrib-mscgen>=0.6
+
+# Sphinxcontrib packages - pinned for Sphinx 4.x compatibility
+sphinxcontrib-applehelp==1.0.2
+sphinxcontrib-devhelp==1.0.2
+sphinxcontrib-htmlhelp==2.0.1
+sphinxcontrib-jsmath==1.0.1
+sphinxcontrib-qthelp==1.0.3
+sphinxcontrib-serializinghtml==1.1.5
+
+# Jinja2 compatibility for Sphinx 4.x
+Jinja2<3.1
+MarkupSafe>=2.0.0,<2.2.0
+
+# Other dependencies
+Pygments>=2.15.0
+PyYAML>=5.4.1

@@ -28,11 +28,15 @@ extensions = [
     'sphinxcontrib.mscgen',
     'sphinx_tabs.tabs',
     'sphinx_togglebutton',
+    'sphinx_copybutton',
     'page_filter',
 ]
 
+# The root document.
+root_doc = 'index'
+
 templates_path = ['_templates']
-exclude_patterns = ['_build_sphinx', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build_sphinx', '_build_doxygen', 'venv', 'Thumbs.db', '.DS_Store']
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
