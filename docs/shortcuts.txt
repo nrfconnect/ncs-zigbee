@@ -1,5 +1,6 @@
 .. ### Versions
 
+.. |r22_addon_version| replace:: 1.0.1
 .. |addon_version| replace:: 1.2.1
 .. |ncs_version| replace:: 2.9.2
 .. |zigbee_version| replace:: Zigbee 3.0
@@ -8,6 +9,7 @@
 
 .. |NCS| replace:: nRF Connect SDK
 .. |addon| replace:: Zigbee R23 add-on
+.. |r22-addon| replace:: Zigbee R22 add-on
 
 .. |VSC| replace:: Visual Studio Code
 .. |nRFVSC| replace:: nRF Connect for VS Code extension
