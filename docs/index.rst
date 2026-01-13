@@ -23,6 +23,7 @@ In combination with the |NCS|, the |addon| allows for development of low-power c
    memory
    configuring
    configuring/index
+   migration
    zboss/index
    samples/index
    lib/index

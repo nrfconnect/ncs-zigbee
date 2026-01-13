@@ -162,6 +162,11 @@
 .. _`Registering device context`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#register_zigbee_device
 .. _`Support for Zigbee commissioning`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/using_zigbee__z_c_l.html#zcl_zigbee_commissioning
 .. _`BDB Commissioning API`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__api.html
+.. _`ZBOSS R23 changelog`: https://ncsdoc.z6.web.core.windows.net/zboss-r23
+.. _`ZBOSS Zigbee 2023 (R23) features`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/r23_new_features.html
+.. _`Runtime switch of R23 ZBOSS into R22 mode`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/r23_new_features.html#r23_r23_switch
+.. _`PANID conflict resolution API`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/r23_new_features.html#r23_panid_conflict
+.. _`ZBOSS NVRAM API`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__nvram.html
 
 .. _`ZB_BDB_SIGNAL_FINDING_AND_BINDING_INITIATOR_FINISHED`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__comm__signals.html#ga18f5e7ddfefb7d01ef98f696a9694d79
 .. _`ZB_ZDO_SIGNAL_PRODUCTION_CONFIG_READY`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zb__comm__signals.html#ga3eb4631c12c345991be2461566c150e9
@@ -185,8 +190,6 @@
 .. _`ZB_BDB_NETWORK_FORMATION`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ac723cfd38f78c08a673ec3664539027c
 .. _`ZB_BDB_FINDING_N_BINDING`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__comm__start.html#gga9c44bbce9f6f6b19b623837914959c02ad9bcb56a6668b6ba6f37edc73a796b58
 .. _`zb_bdb_finding_binding_initiator()`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.3/group__zboss__bdb__comm__fb.html#gae6fd60a050559ef0aa3c3e5ec32bc515
-
-.. _`ZBOSS R23 changelog`: https://ncsdoc.z6.web.core.windows.net/zboss-r23
 
 .. ### Other sources
 
