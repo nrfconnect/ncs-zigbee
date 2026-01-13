@@ -1,0 +1,77 @@
+# This GitHub Action deploys documentation previews for pull requests to the gh-pages branch.
+# 
+# When triggered during a PR build, it uploads the built documentation from the specified directory 
+# to a unique subdirectory (pr-preview/pr-<PR_NUMBER>) under the gh-pages branch.
+# This allows contributors and reviewers to view preview documentation for the PR without merging it.
+# The deployment is performed using the provided GitHub token for authentication, and is safe to run
+# concurrently for multiple PRs. If the gh-pages branch does not exist, it is initialized automatically.
+
+name: 'Deploy Docs Preview'
+description: 'Deploy documentation preview to gh-pages branch'
+
+inputs:
+  github_token:
+    description: 'GitHub token for authentication'
+    required: true
+  repository:
+    description: 'Repository in owner/repo format'
+    required: true
+  pr_number:
+    description: 'Pull request number'
+    required: true
+  commit_sha:
+    description: 'Commit SHA for the PR head'
+    required: true
+  docs_build_dir:
+    description: 'Path to the built documentation'
+    required: false
+    default: 'docs/_build_sphinx/html'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Deploy to gh-pages branch
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        REPOSITORY: ${{ inputs.repository }}
+        PR_NUMBER: ${{ inputs.pr_number }}
+        COMMIT_SHA: ${{ inputs.commit_sha }}
+        DOCS_BUILD_DIR: ${{ inputs.docs_build_dir }}
+      run: |
+        # Configure git
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+        # Create a temporary directory for gh-pages content
+        TEMP_DIR=$(mktemp -d)
+
+        # Clone just the gh-pages branch (or create it if it doesn't exist)
+        if git ls-remote --exit-code --heads "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git" gh-pages > /dev/null 2>&1; then
+          git clone --single-branch --branch gh-pages --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git" "$TEMP_DIR"
+        else
+          mkdir -p "$TEMP_DIR"
+          cd "$TEMP_DIR"
+          git init
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git"
+          git checkout -b gh-pages
+          touch .nojekyll
+          git add .nojekyll
+          git commit -m "Initialize gh-pages branch"
+        fi
+
+        # Create the preview directory
+        PR_PREVIEW_DIR="$TEMP_DIR/pr-preview/pr-${PR_NUMBER}"
+        rm -rf "$PR_PREVIEW_DIR"
+        mkdir -p "$PR_PREVIEW_DIR"
+
+        # Copy built docs to preview directory
+        cp -r "${GITHUB_WORKSPACE}/${DOCS_BUILD_DIR}"/* "$PR_PREVIEW_DIR/"
+
+        # Commit and push
+        cd "$TEMP_DIR"
+        git add .
+        git commit -m "Deploy docs preview for PR #${PR_NUMBER} (commit ${COMMIT_SHA})" || echo "No changes to commit"
+        git push origin gh-pages
+
+        echo "Documentation preview deployed to gh-pages branch"

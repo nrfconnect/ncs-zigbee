@@ -1,0 +1,72 @@
+# This GitHub Action generates and outputs key deployment metadata for documentation previews:
+# - Constructs the preview URL for GitHub Pages based on repository and PR info.
+# - Outputs a current, UTC-formatted build timestamp.
+# - Outputs the short (7-character) version of the commit SHA.
+#
+# The typical use is as a step in a workflow that builds and deploys documentation previews for pull requests.
+# Downstream steps or jobs can use the resulting outputs to inform users, link to previews, and tag deployments.
+#
+# Input parameters:
+#   - repo_owner:      (required) The GitHub username or organization name that owns the repository.
+#   - repo_name:       (required) The name of the repository.
+#   - pr_number:       (required) The pull request number that triggered the deployment.
+#   - commit_sha:      (required) The full SHA hash of the commit being built.
+#
+# Outputs:
+#   - preview_url:         The constructed GitHub Pages URL to this pull request's documentation preview.
+#   - build_timestamp:     The UTC timestamp when this workflow step ran.
+#   - commit_sha_short:    The first 7 characters of the commit SHA, useful as a short identifier.
+
+name: 'Set Deploy Info'
+description: 'Generates preview URL and deployment metadata'
+
+inputs:
+  repo_owner:
+    description: 'Repository owner (username or organization)'
+    required: true
+  repo_name:
+    description: 'Repository name'
+    required: true
+  pr_number:
+    description: 'Pull request number'
+    required: true
+  commit_sha:
+    description: 'Full commit SHA'
+    required: true
+
+outputs:
+  preview_url:
+    description: 'GitHub Pages preview URL'
+    value: ${{ steps.generate-info.outputs.preview_url }}
+  build_timestamp:
+    description: 'Build timestamp in UTC'
+    value: ${{ steps.generate-info.outputs.build_timestamp }}
+  commit_sha_short:
+    description: 'Shortened commit SHA (7 characters)'
+    value: ${{ steps.generate-info.outputs.commit_sha }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Generate deployment info
+      id: generate-info
+      shell: bash
+      run: |
+        # Construct the GitHub Pages URL
+        # Note: GitHub Pages serves gh-pages branch content at the root, not under /gh-pages/
+        repo_owner="${{ inputs.repo_owner }}"
+        repo_name="${{ inputs.repo_name }}"
+        pr_number="${{ inputs.pr_number }}"
+        preview_url="https://${repo_owner}.github.io/${repo_name}/pr-preview/pr-${pr_number}"
+
+        # Get build timestamp in UTC
+        build_timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+        commit_sha="${{ inputs.commit_sha }}"
+
+        echo "preview_url=$preview_url" >> $GITHUB_OUTPUT
+        echo "build_timestamp=$build_timestamp" >> $GITHUB_OUTPUT
+        echo "commit_sha=${commit_sha:0:7}" >> $GITHUB_OUTPUT
+
+        echo "Preview URL: $preview_url"
+        echo "Build timestamp: $build_timestamp"
+        echo "Commit: ${commit_sha:0:7}"

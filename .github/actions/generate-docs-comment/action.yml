@@ -1,0 +1,95 @@
+# This file defines a GitHub action used to generate the body content for a pull request (PR) comment,
+# providing details and quick access links to the documentation preview generated for that PR.
+# 
+# When integrated in a workflow, this action collects metadata (such as preview URL, changed documentation files,
+# build time, and commit SHA) and prepares a Markdown message that can be posted as a PR comment by subsequent workflow steps.
+#
+# Input Parameters:
+#   - preview_url:       (required) URL for the deployed documentation preview (GitHub Pages).
+#   - changed_docs:      (required) JSON array listing the documentation files changed in the PR.
+#   - build_timestamp:   (required) Timestamp (in UTC or specified format) when the docs preview was built.
+#   - commit_sha:        (required) Short SHA for the commit associated with the docs preview.
+
+name: 'Generate Documentation Comment'
+description: 'Generates PR comment body for documentation preview'
+
+inputs:
+  preview_url:
+    description: 'GitHub Pages preview URL'
+    required: true
+  changed_docs:
+    description: 'JSON array of changed documentation files'
+    required: true
+  build_timestamp:
+    description: 'Build timestamp'
+    required: true
+  commit_sha:
+    description: 'Short commit SHA'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Generate comment body
+      shell: bash
+      run: |
+        preview_url="${{ inputs.preview_url }}"
+        changed_docs='${{ inputs.changed_docs }}'
+        build_timestamp="${{ inputs.build_timestamp }}"
+        commit_sha="${{ inputs.commit_sha }}"
+
+        cat << 'EOF' > comment.md
+        ## Documentation Preview
+
+        The documentation has been built successfully and is available for preview.
+
+        | Build Info | Value |
+        |------------|-------|
+        | **Generated at** | `$TIMESTAMP_PLACEHOLDER` |
+        | **Commit** | `$COMMIT_PLACEHOLDER` |
+
+        ### Preview Links
+
+        | Page | Preview Link |
+        |------|--------------|
+        | **Index (Home)** | [View Preview]($preview_url_placeholder/index.html) |
+        EOF
+
+        # Replace placeholders with actual values
+        sed -i "s|\$preview_url_placeholder|$preview_url|g" comment.md
+        sed -i "s|\$TIMESTAMP_PLACEHOLDER|$build_timestamp|g" comment.md
+        sed -i "s|\$COMMIT_PLACEHOLDER|$commit_sha|g" comment.md
+        
+        # Add links to changed files
+        if [ "$changed_docs" != "[]" ] && [ -n "$changed_docs" ]; then
+          echo "" >> comment.md
+          echo "### Changed Pages" >> comment.md
+          echo "" >> comment.md
+          echo "| Source File | Preview Link |" >> comment.md
+          echo "|-------------|--------------|" >> comment.md
+
+          echo "$changed_docs" | jq -r '.[]' | while read -r file; do
+            if [ -n "$file" ]; then
+              # Convert .rst/.md path to .html path
+              # Remove 'docs/' prefix and change extension
+              html_path=$(echo "$file" | sed 's|^docs/||' | sed 's|\.rst$|.html|' | sed 's|\.md$|.html|')
+              # Handle index files in subdirectories
+              if [[ "$html_path" == */index.html ]]; then
+                html_path="${html_path}"
+              fi
+              filename=$(basename "$file")
+              echo "| \`$file\` | [View]($preview_url/$html_path) |" >> comment.md
+            fi
+          done
+        fi
+        
+        cat << 'EOF' >> comment.md
+
+        ---
+
+        > **Note:** The preview will be available after GitHub Pages deployment completes (usually 1-2 minutes).
+        > If you see stale content, hard-refresh your browser (Ctrl+Shift+R) or wait a moment for GitHub Pages to update.
+        EOF
+
+        echo "Comment content:"
+        cat comment.md

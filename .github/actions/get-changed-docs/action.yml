@@ -1,0 +1,50 @@
+# This file defines a GitHub Action for detecting documentation file changes in a pull request.
+#
+# This action compares two commit SHAs (typically the base and head of a PR)
+# and detects which `.rst` and `.md` files under the `docs/` directory were changed.
+# The list of changed documentation files is output as a JSON array, which can be used by subsequent workflow jobs—
+# for example, to generate targeted PR comments or drive conditional logic for documentation builds.
+#
+# Inputs:
+#   - base_sha:  The base commit SHA for comparison (e.g., the PR target branch).
+#   - head_sha:  The head commit SHA for comparison (e.g., the latest PR commit).
+#
+# Outputs:
+#   - docs_files:  A JSON array of documentation files changed between the SHAs,
+#                  suitable for further processing or comment generation.
+
+name: 'Get Changed Documentation Files'
+description: 'Detects changed .rst and .md files in the docs/ directory'
+
+inputs:
+  base_sha:
+    description: 'Base commit SHA to compare against'
+    required: true
+  head_sha:
+    description: 'Head commit SHA to compare to'
+    required: true
+
+outputs:
+  docs_files:
+    description: 'JSON array of changed documentation files'
+    value: ${{ steps.detect-changes.outputs.docs_files }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Detect changed documentation files
+      id: detect-changes
+      shell: bash
+      run: |
+        # Get list of changed .rst and .md files in docs/
+        changed_files=$(git diff --name-only ${{ inputs.base_sha }} ${{ inputs.head_sha }} -- 'docs/*.rst' 'docs/*.md' 'docs/**/*.rst' 'docs/**/*.md' | head -20)
+        echo "Changed documentation files:"
+        echo "$changed_files"
+
+        # Convert to JSON array for the comment
+        if [ -n "$changed_files" ]; then
+          docs_json=$(echo "$changed_files" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+        else
+          docs_json="[]"
+        fi
+        echo "docs_files=$docs_json" >> $GITHUB_OUTPUT
