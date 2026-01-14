@@ -27,7 +27,7 @@ menuconfig ZIGBEE_ADD_ON
 	imply FLASH_MAP
 	imply MPU_ALLOW_FLASH_WRITE
 	imply SOC_FLASH_NRF_PARTIAL_ERASE if SOC_NRF52840
-	depends on (SOC_NRF54L15 || SOC_NRF54L10 || SOC_NRF54L05 || SOC_NRF52840 || SOC_NRF5340_CPUAPP)
+	depends on (SOC_NRF54L15 || SOC_NRF54L10 || SOC_NRF54L05 || SOC_NRF52840 || SOC_NRF52833 || SOC_NRF5340_CPUAPP)
 
 if ZIGBEE_ADD_ON
 
@@ -347,6 +347,9 @@ config PSA_CRYPTO_DRIVER_CRACEN
 config PSA_CRYPTO_DRIVER_CC3XX
     default y if SOC_NRF52840 || SOC_NRF5340
 
+config PSA_CRYPTO_DRIVER_OBERON
+    default y if SOC_NRF52833
+
 endif
 
 config ZIGBEE_USE_LEDS
@@ -411,12 +414,18 @@ config APP_LINK_WITH_ZIGBEE
 
 # Override default CCA ED threshold value (see KRKNWK-19974 known issue)
 config NRF_802154_CCA_ED_THRESHOLD
-	default 17 if SOC_NRF54L15 || SOC_NRF54L10 || SOC_NRF54L05 || SOC_NRF52840
+	default 17 if SOC_NRF54L15 || SOC_NRF54L10 || SOC_NRF54L05 || SOC_NRF52840 || SOC_NRF52833
 	default 18 if SOC_NRF5340
 
 partition=ZBOSS_NVRAM
+if SOC_NRF52833
+partition-size=0x4000
+source "${ZEPHYR_BASE}/../nrf/subsys/partition_manager/Kconfig.template.partition_config"
+endif
+if !SOC_NRF52833
 partition-size=0x8000
 source "${ZEPHYR_BASE}/../nrf/subsys/partition_manager/Kconfig.template.partition_config"
+endif
 
 partition=ZBOSS_PRODUCT_CONFIG
 partition-size=0x1000
