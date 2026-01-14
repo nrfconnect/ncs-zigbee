@@ -99,7 +99,7 @@ The communication channel uses Zephyr's `UART API`_.
 
       The ``uart0`` pins are configured by devicetree overlay files for each supported development kit in the :file:`boards` directory.
 
-   .. group-tab:: nRF52840 DK
+   .. group-tab:: nRF52840 and nRF52833 DKs
 
       The serial device is selected in the following devicetree:
 
@@ -119,7 +119,7 @@ Communication through USB
 =========================
 
 .. note::
-     Communication through USB is available for nRF52840 and nRF5340 SoCs.
+     Communication through USB is available for nRF52840, nRF52833 and nRF5340 SoCs.
 
 To change the communication channel from the default UART to nRF USB CDC ACM ``cdc_acm_uart0``, use the :file:`prj_usb.conf` configuration file and add the ``-DFILE_SUFFIX=usb`` flag to the build command.
 When using the nRF52840 Dongle, please add the ``-DFILE_SUFFIX=dongle`` flag to the build command instead.
@@ -304,7 +304,7 @@ User interface
    .. group-tab:: nRF54L15 DK
 
 	  All the NCP sample's interactions with the application are automatically handled using serial communication.
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52840, nRF52833 and nRF5340 DKs
 
 	  All the NCP sample’s interactions with the application are automatically handled using serial or USB communication.
 
@@ -349,7 +349,7 @@ After building the sample and programming it to your development kit, complete t
 	  When it is found, the simple gateway configures bindings and reporting for the device.
 	  It then starts sending On/Off toggle commands with a 15-second interval that toggle the **LED 1** on the light bulb on and off.
 
-   .. group-tab:: nRF52840 and nRF5340 DKs
+   .. group-tab:: nRF52840, nRF52833 and nRF5340 DKs
 
 	  1. Download and extract the `ZBOSS NCP Host`_ package.
 

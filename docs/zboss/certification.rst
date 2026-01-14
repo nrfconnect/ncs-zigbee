@@ -38,3 +38,4 @@ Check the compatibility matrices for your device to find the latest certificatio
 * `Zigbee CIDs for nRF54L05`_
 * `Zigbee CIDs for nRF5340`_
 * `Zigbee CIDs for nRF52840`_
+* `Zigbee CIDs for nRF52833`_

@@ -40,7 +40,7 @@
    See :ref:`ug_zigbee_configuring` for more information.
 .. |zigbee_library| replace:: This is a Zigbee library.
    See :ref:`ug_zigbee_configuring_libraries` for information about how to configure it for you Zigbee application.
-.. |zigbee_ncp_package| replace:: It contains the full development-ready source code for host and evaluation-ready firmware for the nRF54L15 DK, nRF52840 DK, and the nRF52840 Dongle.
+.. |zigbee_ncp_package| replace:: It contains the full development-ready source code for host and evaluation-ready firmware for the nRF54L15 DK, nRF52840 DK, nRF52833 DK, and the nRF52840 Dongle.
    The package comes with prebuilt libraries compatible with 64-bit Ubuntu |ubuntu_version| Linux.
 .. |zigbee_ncp_package_more_info| replace:: For information about how to recompile the package libraries for a different host architecture or operating system, see the `NCP Host documentation`_.
    For information about how to use NCP Host with the |addon| for the |NCS| or build the firmware using the NCP sample, see the :ref:`NCP sample <zigbee_ncp_sample>`.
