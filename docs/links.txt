@@ -81,6 +81,7 @@
 
 .. _`nrf52840dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/boards/nordic/nrf52840dk/doc/index.html
 .. _`nrf52840dongle`: https://docs.nordicsemi.com/bundle/ncs-latest/page/zephyr/boards/nordic/nrf52840dongle/doc/index.html#nrf52840dongle-nrf52840
+.. _`nrf52833dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/boards/nordic/nrf52833dk/doc/index.html
 .. _`nrf5340dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/boards/nordic/nrf5340dk/doc/index.html
 .. _`nrf54l15dk`: https://docs.nordicsemi.com/bundle/ncs-2.9.2/page/zephyr/boards/nordic/nrf54l15dk/doc/index.html
 
@@ -89,6 +90,7 @@
 .. ### Source: Separate TechDocs bundles
 
 .. _`Zigbee CIDs for nRF52840`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf52840/page/COMP/nrf52840/nrf52840_zigbee_cids.html
+.. _`Zigbee CIDs for nRF52833`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf52833/page/COMP/nrf52833/nrf52833_zigbee_cids.html
 .. _`Zigbee CIDs for nRF5340`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf5340/page/COMP/nrf5340/nrf5340_zigbee_cids.html
 .. _`Zigbee CIDs for nRF54L05`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf54l05/page/COMP/nrf54l05/nrf54l05_zigbee_cids.html
 .. _`Zigbee CIDs for nRF54L10`: https://docs.nordicsemi.com/bundle/comp_matrix_nrf54l10/page/COMP/nrf54l10/nrf54l10_zigbee_cids.html
