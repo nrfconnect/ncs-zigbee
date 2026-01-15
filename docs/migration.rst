@@ -16,7 +16,6 @@ This page describes the changes required to successfully migrate a Zigbee applic
 Complete the following steps:
 
 1. Read the `ZBOSS Zigbee 2023 (R23) features`_ page about new R23 features.
-#. If you want to disable R23 functionality and keep R22 behavior, see `Runtime switch of R23 ZBOSS into R22 mode`_.
 #. Read the section about changes in PAN ID conflict resolution `PANID conflict resolution API`_.
 #. If the application manually adjusts configurable memory settings, note the new :c:macro:`ZB_CONFIG_NWK_DISC_TABLE_SIZE` setting.
 #. If the application manually adjusts configurable memory settings, note the new :c:macro:`ZB_CONFIG_ZDO_KEY_NEGOTIATIONS_NUM` setting.

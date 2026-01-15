@@ -92,7 +92,7 @@ The Zigbee FOTA library has the following limitations:
 
 * The endpoint definition in the library includes the endpoint ID, defined with ``CONFIG_ZIGBEE_FOTA_ENDPOINT``.
   When using the Zigbee FOTA library, this endpoint ID cannot be used for other endpoints.
-* The Zigbee FOTA upgrades are currently supported on the nRF52840 DK (PCA10056) and nRF54L15 DK (PCA10156).
+* The Zigbee FOTA upgrades are currently supported on the nRF52840 DK (PCA10056), nRF5340 DK (PCA10095) and nRF54L15 DK (PCA10156).
 * The Zigbee FOTA library does not currently support bootloader upgrades.
 
 API documentation
