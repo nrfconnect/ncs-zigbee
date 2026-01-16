@@ -1,6 +1,6 @@
 .. _migration:
 
-Migration guide for R22 to R23 Add-on
+Migration guide for R22 to R23 add-on
 #####################################
 
 .. contents::

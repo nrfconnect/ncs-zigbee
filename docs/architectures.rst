@@ -45,6 +45,11 @@ This is the design most commonly used for End Devices and Routers.
 
    Zigbee-only architecture on nRF54L Series and nRF52840 devices
 
+.. figure:: images/zigbee_platform_design_nRF53.svg
+   :alt: Zigbee-only architecture (nRF53 Series devices)
+
+   Zigbee-only architecture on nRF53 Series devices
+
 This platform design is suitable for the following development kits:
 
 .. include:: /includes/device_table_single_multi.txt
@@ -67,9 +72,14 @@ It also has the following disadvantages:
 
    Multiprotocol Zigbee and Bluetooth LE architecture on nRF54L Series and nRF52840 devices
 
+.. figure:: images/zigbee_platform_design_nRF5340_multi.svg
+   :alt: Multiprotocol Zigbee and Bluetooth LE architecture (nRF53 Series devices)
+
+   Multiprotocol Zigbee and Bluetooth LE architecture on nRF53 Series devices
+
 For more information, see `Multiprotocol support`_ in the |NCS| documentation and :ref:`zigbee_light_switch_sample_nus`.
 
-This platform design is suitable for the following development kit:
+This platform design is suitable for the following development kits:
 
 .. include:: /includes/device_table_single_multi.txt
 
@@ -91,7 +101,7 @@ Network Co-Processor (NCP)
 
 In this design, the host processor runs the Zigbee application layer (ZCL) and the Zigbee commissioning logic.
 The connectivity device (nRF SoC) runs the :ref:`NCP application <zigbee_ncp_sample>` that contains lower parts of the Zigbee stack (802.15.4 PHY/MAC and the Zigbee PRO network layer), as well as provides commands to execute BDB commissioning primitives.
-The host processor communicates with the NCP through a serial interface (UART).
+The host processor communicates with the NCP through a serial interface (USB or UART).
 
 The NCP design has the following advantages:
 
