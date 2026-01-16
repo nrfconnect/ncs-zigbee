@@ -10,15 +10,6 @@
 	};
 };
 
-/* Restore full RRAM and SRAM */
-&cpuapp_rram {
-	reg = <0x0 DT_SIZE_K(2036)>;
-};
-
-&cpuapp_sram {
-	reg = <0x20000000 DT_SIZE_K(512)>;
-};
-
 &timer24 {
 	status = "okay";
 };

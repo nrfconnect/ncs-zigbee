@@ -42,6 +42,13 @@ config DFU_MULTI_IMAGE_PACKAGE_NET
 
 endif # SOC_SERIES_NRF53X
 
+if BOARD_NRF54LM20DK
+
+config PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
+	default y
+
+endif # BOARD_NRF54LM20DK
+
 endif # BOOTLOADER_MCUBOOT
 
 source "${ZEPHYR_BASE}/share/sysbuild/Kconfig"
