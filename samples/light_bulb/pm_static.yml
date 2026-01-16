@@ -1,0 +1,111 @@
+#
+# Partition layout for Zigbee + Matter combined application with FOTA
+# Target: nRF54LM20A
+# Total internal flash: 0x1FD000 = 2,084,864 bytes (after OTP/bootconf reserves)
+# NO EXTERNAL FLASH - Everything fits in internal flash
+#
+# Fixed sizes:
+#   mcuboot: 52KB (0xD000)
+#   mcuboot_pad: 2KB (0x800)
+#   mcuboot_secondary_pad: 2KB (0x800)
+#   zboss_nvram: 32KB (0x8000)
+#   zboss_product_config: 4KB (0x1000)
+#   factory_data: 4KB (0x1000)
+#   settings_storage: 54KB (0xDC00)
+#   Total fixed: 152KB (0x26000)
+#
+# Calculated sizes (to use remaining space):
+#   Available for primary+secondary app: 0x1FD000 - 0x26000 = 0x1D7000 = 1,929,216 bytes
+#   Primary app: 1,116KB (0x117000)
+#   Secondary app: 769KB (0xC0400) - 70% of primary (30% smaller with compression)
+#   Total app: 0x117000 + 0xC0400 = 0x1D7400 = 1,930,240 bytes
+#
+# Memory layout:
+#   0x000000 - 0x00D000: mcuboot (52KB)
+#   0x00D000 - 0x00D800: mcuboot_pad (2KB)
+#   0x00D800 - 0x124800: app (1,116KB)
+#   0x124800 - 0x125000: mcuboot_secondary_pad (2KB)
+#   0x125000 - 0x1E5400: mcuboot_secondary_app (769KB)
+#   0x1E5400 - 0x1ED400: zboss_nvram (32KB)
+#   0x1ED400 - 0x1EE400: zboss_product_config (4KB)
+#   0x1EE400 - 0x1EF400: factory_data (4KB)
+#   0x1EF400 - 0x1FD000: settings_storage (55KB)
+#   Total used: 0x1FD000 = 2,084,864 bytes
+#   Spare: 0 bytes (100% utilized)
+#
+
+mcuboot:
+  address: 0x0
+  region: flash_primary
+  size: 0xD000
+
+mcuboot_pad:
+  address: 0xD000
+  region: flash_primary
+  size: 0x800
+
+app:
+  address: 0xD800
+  region: flash_primary
+  size: 0x117000
+
+# MCUBoot primary partition
+mcuboot_primary:
+  address: 0xD000
+  orig_span: &id001
+  - mcuboot_pad
+  - app
+  region: flash_primary
+  size: 0x117800
+  span: *id001
+
+mcuboot_primary_app:
+  address: 0xD800
+  orig_span: &id002
+  - app
+  region: flash_primary
+  size: 0x117000
+  span: *id002
+
+# MCUBoot secondary partition (70% of primary = 30% smaller with compression)
+mcuboot_secondary:
+  address: 0x124800
+  orig_span: &id003
+  - mcuboot_secondary_pad
+  - mcuboot_secondary_app
+  region: flash_primary
+  size: 0xC0C00
+  span: *id003
+
+mcuboot_secondary_pad:
+  address: 0x124800
+  region: flash_primary
+  size: 0x800
+
+mcuboot_secondary_app:
+  address: 0x125000
+  region: flash_primary
+  size: 0xC0400
+
+# Fixed size partitions
+zboss_nvram:
+  address: 0x1E5400
+  region: flash_primary
+  size: 0x8000
+
+zboss_product_config:
+  address: 0x1ED400
+  region: flash_primary
+  size: 0x1000
+
+factory_data:
+  address: 0x1EE400
+  region: flash_primary
+  size: 0x1000
+
+# Settings storage (NVS) - used by both Matter and Zigbee
+# Extended to fill all remaining flash space (no gap at end)
+settings_storage:
+  address: 0x1EF400
+  region: flash_primary
+  size: 0xDC00
