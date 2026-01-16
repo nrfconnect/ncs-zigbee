@@ -1,0 +1,10 @@
+#
+# Copyright (c) 2026 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+source "Kconfig.zephyr"
+
+# Include Matter common sample Kconfig if Matter is enabled
+rsource "$(ZEPHYR_NRF_MODULE_DIR)/samples/matter/common/src/Kconfig"
