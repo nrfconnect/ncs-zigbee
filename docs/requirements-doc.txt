@@ -1,7 +1,7 @@
 # Documentation build dependencies for ncs-zigbee Add-on
 
 # Sphinx core - pinned for theme compatibility
-sphinx==4.5.0
+sphinx==4.5.1
 
 # Sphinx theme - compatible with sphinx 4.x
 sphinx-ncs-theme==0.7.4
