@@ -6,6 +6,10 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
+# PoC: Force linker to allow duplicate symbols (Zigbee vs OpenThread radio callbacks)
+# This build is for memory estimation only - not functionally viable at runtime
+add_link_options(-Wl,--allow-multiple-definition)
+
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 project("Zigbee + Matter Light Bulb with FOTA")
