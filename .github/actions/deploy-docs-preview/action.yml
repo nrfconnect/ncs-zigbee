@@ -1,77 +1,68 @@
-# This GitHub Action deploys documentation previews for pull requests to the gh-pages branch.
+# This GitHub Action prepares documentation for deployment to GitHub Pages.
 # 
-# When triggered during a PR build, it uploads the built documentation from the specified directory 
-# to a unique subdirectory (pr-preview/pr-<PR_NUMBER>) under the gh-pages branch.
-# This allows contributors and reviewers to view preview documentation for the PR without merging it.
-# The deployment is performed using the provided GitHub token for authentication, and is safe to run
-# concurrently for multiple PRs. If the gh-pages branch does not exist, it is initialized automatically.
+# It prepares a _site directory with the documentation content, merging with existing
+# content from gh-pages branch if present. The actual deployment should be done using
+# the official GitHub Pages actions (actions/upload-pages-artifact and actions/deploy-pages)
+# which use OIDC authentication and require no secrets.
+#
+# For PR previews, docs are placed in pr-preview/pr-<PR_NUMBER> subdirectory.
+# For releases/main, docs are placed in the version directory (latest, v1.0.0, etc.).
 
-name: 'Deploy Docs Preview'
-description: 'Deploy documentation preview to gh-pages branch'
+name: 'Prepare Docs for Pages'
+description: 'Prepare documentation for GitHub Pages deployment'
 
 inputs:
-  github_token:
-    description: 'GitHub token for authentication'
+  docs_dir:
+    description: 'Path to the directory containing built documentation'
     required: true
-  repository:
-    description: 'Repository in owner/repo format'
+  target_path:
+    description: 'Target path within the site (e.g., "pr-preview/pr-123" or "latest")'
     required: true
-  pr_number:
-    description: 'Pull request number'
-    required: true
-  commit_sha:
-    description: 'Commit SHA for the PR head'
-    required: true
-  docs_build_dir:
-    description: 'Path to the built documentation'
+  existing_pages_dir:
+    description: 'Path to existing gh-pages content (checkout of gh-pages branch)'
     required: false
-    default: 'docs/_build_sphinx/html'
+    default: '_existing_pages'
+  output_dir:
+    description: 'Output directory for the prepared site'
+    required: false
+    default: '_site'
+
+outputs:
+  site_dir:
+    description: 'Path to the prepared site directory'
+    value: ${{ steps.prepare.outputs.site_dir }}
 
 runs:
   using: 'composite'
   steps:
-    - name: Deploy to gh-pages branch
+    - name: Prepare site directory
+      id: prepare
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
-        REPOSITORY: ${{ inputs.repository }}
-        PR_NUMBER: ${{ inputs.pr_number }}
-        COMMIT_SHA: ${{ inputs.commit_sha }}
-        DOCS_BUILD_DIR: ${{ inputs.docs_build_dir }}
+        DOCS_DIR: ${{ inputs.docs_dir }}
+        TARGET_PATH: ${{ inputs.target_path }}
+        EXISTING_DIR: ${{ inputs.existing_pages_dir }}
+        OUTPUT_DIR: ${{ inputs.output_dir }}
       run: |
-        # Configure git
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        # Create output directory
+        mkdir -p "${OUTPUT_DIR}"
 
-        # Create a temporary directory for gh-pages content
-        TEMP_DIR=$(mktemp -d)
-
-        # Clone just the gh-pages branch (or create it if it doesn't exist)
-        if git ls-remote --exit-code --heads "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git" gh-pages > /dev/null 2>&1; then
-          git clone --single-branch --branch gh-pages --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git" "$TEMP_DIR"
-        else
-          mkdir -p "$TEMP_DIR"
-          cd "$TEMP_DIR"
-          git init
-          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git"
-          git checkout -b gh-pages
-          touch .nojekyll
-          git add .nojekyll
-          git commit -m "Initialize gh-pages branch"
+        # Copy existing pages content if available (preserves other PR previews)
+        if [ -d "${EXISTING_DIR}" ] && [ "$(ls -A ${EXISTING_DIR} 2>/dev/null)" ]; then
+          echo "Copying existing pages content..."
+          cp -r "${EXISTING_DIR}"/* "${OUTPUT_DIR}/" 2>/dev/null || true
+          rm -rf "${OUTPUT_DIR}/.git"  # Remove git directory if present
         fi
 
-        # Create the preview directory
-        PR_PREVIEW_DIR="$TEMP_DIR/pr-preview/pr-${PR_NUMBER}"
-        rm -rf "$PR_PREVIEW_DIR"
-        mkdir -p "$PR_PREVIEW_DIR"
+        # Ensure .nojekyll exists (prevents Jekyll processing)
+        touch "${OUTPUT_DIR}/.nojekyll"
 
-        # Copy built docs to preview directory
-        cp -r "${GITHUB_WORKSPACE}/${DOCS_BUILD_DIR}"/* "$PR_PREVIEW_DIR/"
+        # Prepare target directory
+        FULL_TARGET="${OUTPUT_DIR}/${TARGET_PATH}"
+        rm -rf "$FULL_TARGET"
+        mkdir -p "$FULL_TARGET"
 
-        # Commit and push
-        cd "$TEMP_DIR"
-        git add .
-        git commit -m "Deploy docs preview for PR #${PR_NUMBER} (commit ${COMMIT_SHA})" || echo "No changes to commit"
-        git push origin gh-pages
+        # Copy built docs to target directory
+        cp -r "${DOCS_DIR}"/* "$FULL_TARGET/"
 
-        echo "Documentation preview deployed to gh-pages branch"
+        echo "site_dir=${OUTPUT_DIR}" >> $GITHUB_OUTPUT

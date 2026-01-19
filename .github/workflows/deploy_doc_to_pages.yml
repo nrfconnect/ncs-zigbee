@@ -1,0 +1,109 @@
+name: Publish documentation
+
+on:
+  workflow_run:
+    workflows: ["Build documentation"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+
+# Allow only one deployment at a time
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: _existing_pages
+        continue-on-error: true
+
+      - name: Download build artifacts
+        uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # v6
+        with:
+          workflow: build_documentation.yml
+          run_id: ${{ github.event.workflow_run.id }}
+
+      - name: Extract version and unzip docs
+        working-directory: doc-preview
+        run: |
+          # Extract version/output directory from monitor file
+          OUTDIR=$(awk 'NR==1 { if ($3 ~ /^(latest|PR-[0-9]+|[0-9]+\.[0-9a-zA-Z\.\-]+)$/) print $3 }' monitor_*.txt)
+          echo "OUTDIR=$OUTDIR" >> "$GITHUB_ENV"
+          echo "Output directory: $OUTDIR"
+
+          # Unzip the documentation archive
+          unzip legacy-ncs-zigbee*.zip -d "$OUTDIR"
+
+          # Determine target path based on version
+          if [[ "$OUTDIR" == PR-* ]]; then
+            PR_NUM="${OUTDIR#PR-}"
+            TARGET_PATH="pr-preview/pr-${PR_NUM}"
+          elif [[ "$OUTDIR" == "latest" ]]; then
+            TARGET_PATH="latest"
+          else
+            TARGET_PATH="${OUTDIR}"
+          fi
+          echo "TARGET_PATH=$TARGET_PATH" >> "$GITHUB_ENV"
+
+      - name: Prepare deployment content
+        uses: ./.github/actions/deploy-docs-preview
+        with:
+          docs_dir: doc-preview/${{ env.OUTDIR }}
+          target_path: ${{ env.TARGET_PATH }}
+          existing_pages_dir: _existing_pages
+          output_dir: _site
+
+      - name: Obtain PR number
+        working-directory: doc-preview
+        run: |
+          if [ -f pr.txt ]; then
+            PR=$(head -n 1 pr.txt | tr -cd '0-9')
+          fi
+          printf 'PR=%s\n' "$PR" >> "$GITHUB_ENV"
+          echo "PR number: $PR"
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Find existing comment
+        if: env.PR != ''
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3
+        id: fc
+        with:
+          issue-number: ${{ env.PR }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Documentation Preview
+
+      - name: Create or update PR comment
+        if: env.PR != ''
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ env.PR }}
+          body-path: doc-preview/comment.txt
+          edit-mode: replace
