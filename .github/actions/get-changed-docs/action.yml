@@ -2,8 +2,8 @@
 #
 # This action compares two commit SHAs (typically the base and head of a PR)
 # and detects which `.rst` and `.md` files under the `docs/` directory were changed.
-# The list of changed documentation files is output as a JSON array, which can be used by subsequent workflow jobs—
-# for example, to generate targeted PR comments or drive conditional logic for documentation builds.
+# The list of changed documentation files is output as a JSON array, which can be used by subsequent workflow jobs
+# to generate targeted PR comments or drive conditional logic for documentation builds.
 #
 # Inputs:
 #   - base_sha:  The base commit SHA for comparison (e.g., the PR target branch).
@@ -35,9 +35,12 @@ runs:
     - name: Detect changed documentation files
       id: detect-changes
       shell: bash
+      env:
+        BASE_SHA: ${{ inputs.base_sha }}
+        HEAD_SHA: ${{ inputs.head_sha }}
       run: |
         # Get list of changed .rst and .md files in docs/
-        changed_files=$(git diff --name-only ${{ inputs.base_sha }} ${{ inputs.head_sha }} -- 'docs/*.rst' 'docs/*.md' 'docs/**/*.rst' 'docs/**/*.md' | head -20)
+        changed_files=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- 'docs/*.rst' 'docs/*.md' 'docs/**/*.rst' 'docs/**/*.md' | head -20)
         echo "Changed documentation files:"
         echo "$changed_files"
 

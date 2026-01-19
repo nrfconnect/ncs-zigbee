@@ -1,0 +1,120 @@
+name: Build Documentation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docbuild.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "docs-build-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  Build_Documentation:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Get changed documentation files
+        id: changed-files
+        uses: ./.github/actions/get-changed-docs
+        with:
+          base_sha: ${{ github.event.pull_request.base.sha }}
+          head_sha: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r docs/requirements-doc.txt
+
+      - name: Install Doxygen and mscgen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen mscgen
+
+      - name: Build Doxygen API documentation
+        run: |
+          cd docs
+          if [ -f Doxyfile ]; then
+            doxygen Doxyfile
+          fi
+
+      - name: Build Sphinx documentation
+        run: |
+          cd docs
+          sphinx-build -M html . _build_sphinx -W --keep-going
+
+      - name: Determine version
+        id: version
+        run: |
+          VERSION_REGEX="^v([0-9a-zA-Z\.\-]+)$"
+          VERSION="PR-${{ github.event.pull_request.number }}"
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Version: ${VERSION}"
+
+      - name: Prepare documentation archive
+        working-directory: docs/_build_sphinx/html
+        run: |
+          ARCHIVE="legacy-ncs-zigbee-${{ steps.version.outputs.VERSION }}.zip"
+          zip -rq "${ARCHIVE}" .
+          mv "${ARCHIVE}" ../../../
+
+      - name: Create monitor file
+        run: |
+          MONITOR="monitor_${{ github.run_id }}.txt"
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          ARCHIVE="legacy-ncs-zigbee-${VERSION}.zip"
+
+          echo "publish2 dev ${VERSION} ${ARCHIVE}" > "${MONITOR}"
+
+      - name: Create PR info file
+        run: |
+          echo "${{ github.event.pull_request.number }}" > pr.txt
+
+      - name: Set deploy info
+        id: deploy-info
+        uses: ./.github/actions/set-deploy-info
+        with:
+          repo_owner: ${{ github.repository_owner }}
+          repo_name: ${{ github.event.repository.name }}
+          pr_number: ${{ github.event.pull_request.number }}
+          commit_sha: ${{ github.event.pull_request.head.sha }}
+
+      - name: Generate comment file
+        uses: ./.github/actions/generate-docs-comment
+        with:
+          preview_url: ${{ steps.deploy-info.outputs.preview_url }}
+          changed_docs: ${{ steps.changed-files.outputs.docs_files }}
+          build_timestamp: ${{ steps.deploy-info.outputs.build_timestamp }}
+          commit_sha: ${{ steps.deploy-info.outputs.commit_sha_short }}
+
+      - name: Rename comment file
+        run: mv comment.md comment.txt
+
+      - name: Upload documentation artifacts
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4
+        with:
+          name: doc-preview
+          path: |
+            *.zip
+            monitor_*.txt
+            pr.txt
+            comment.txt
+          retention-days: 7
+          if-no-files-found: error
