@@ -2,8 +2,8 @@
 #
 # This action compares two commit SHAs (typically the base and head of a PR)
 # and detects which `.rst` and `.md` files under the `docs/` directory were changed.
-# The list of changed documentation files is output as a JSON array, which can be used by subsequent workflow jobs—
-# for example, to generate targeted PR comments or drive conditional logic for documentation builds.
+# The list of changed documentation files is output as a JSON array, which can be used by subsequent workflow jobs
+# to generate targeted PR comments or drive conditional logic for documentation builds.
 #
 # Inputs:
 #   - base_sha:  The base commit SHA for comparison (e.g., the PR target branch).

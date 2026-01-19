@@ -1,14 +1,11 @@
-# This file defines a GitHub action used to generate the body content for a pull request (PR) comment,
+# This file defines a GitHub action used to generate the body content for a pull request comment,
 # providing details and quick access links to the documentation preview generated for that PR.
-# 
-# When integrated in a workflow, this action collects metadata (such as preview URL, changed documentation files,
-# build time, and commit SHA) and prepares a Markdown message that can be posted as a PR comment by subsequent workflow steps.
 #
 # Input Parameters:
-#   - preview_url:       (required) URL for the deployed documentation preview (GitHub Pages).
-#   - changed_docs:      (required) JSON array listing the documentation files changed in the PR.
-#   - build_timestamp:   (required) Timestamp (in UTC or specified format) when the docs preview was built.
-#   - commit_sha:        (required) Short SHA for the commit associated with the docs preview.
+#   - preview_url:       URL for the deployed documentation preview (GitHub Pages).
+#   - changed_docs:      JSON array listing the documentation files changed in the PR.
+#   - build_timestamp:   Timestamp (in UTC or specified format) when the docs preview was built.
+#   - commit_sha:        Short SHA for the commit associated with the docs preview.
 
 name: 'Generate Documentation Comment'
 description: 'Generates PR comment body for documentation preview'
