@@ -9,6 +9,10 @@ on:
       - '.gitignore'
     branches:
       - main
+
+permissions:
+  contents: read
+
 jobs:
   Build-samples:
     runs-on: ubuntu-24.04
@@ -20,7 +24,7 @@ jobs:
         shell: bash
     steps: 
     - name: Checkout repository code
-      uses: actions/checkout@v4
+      uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2 # v4
       with:
         fetch-depth: 0
         path: zigbee
@@ -35,7 +39,7 @@ jobs:
         source zephyr/zephyr-env.sh
         zephyr/scripts/twister --inline-logs --build-only -N --verbose -T zigbee/samples --all -x CONFIG_ZBOSS_HALT_ON_ASSERT=y -x CONFIG_RESET_ON_FATAL_ERROR=n -x CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS=2
     - name: Store hex files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4
       with:
         name: hexes
         path: twister-out/**/*.hex
