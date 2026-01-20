@@ -3,6 +3,8 @@
 Zigbee: Light switch
 ####################
 
+DOC TEST
+
 .. contents::
    :local:
    :depth: 2
