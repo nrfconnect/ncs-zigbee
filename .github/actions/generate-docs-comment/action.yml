@@ -40,58 +40,57 @@ runs:
         build_timestamp="$BUILD_TIMESTAMP"
         commit_sha="$COMMIT_SHA"
 
-        cat << 'EOF' > comment.md
-        ## Documentation Preview
-
-        The documentation has been built successfully and is available for preview.
-
-        | Build Info | Value |
-        |------------|-------|
-        | **Generated at** | `$TIMESTAMP_PLACEHOLDER` |
-        | **Commit** | `$COMMIT_PLACEHOLDER` |
-
-        ### Preview Links
-
-        | Page | Preview Link |
-        |------|--------------|
-        | **Index (Home)** | [View Preview]($preview_url_placeholder/index.html) |
-        EOF
-
-        # Replace placeholders with actual values
-        sed -i "s|\$preview_url_placeholder|$preview_url|g" comment.md
-        sed -i "s|\$TIMESTAMP_PLACEHOLDER|$build_timestamp|g" comment.md
-        sed -i "s|\$COMMIT_PLACEHOLDER|$commit_sha|g" comment.md
+        # Initialize comment.md file
+        echo "## Documentation Preview" > comment.md
+        echo "" >> comment.md
+        echo "The documentation has been built successfully. You can view the preview here: [preview]($preview_url/index.html)" >> comment.md
+        echo "" >> comment.md
+        echo "**Generated at**: \`$build_timestamp\` with commit \`$commit_sha\`." >> comment.md
         
         # Add links to changed files
-        if [ "$changed_docs" != "[]" ] && [ -n "$changed_docs" ]; then
+        # Parse JSON and get count of items
+        doc_count=$(echo "$changed_docs" | jq -r 'if type == "array" then length else 0 end' 2>/dev/null || echo "0")
+        
+        # Always show details section to ensure GitHub renders it
+        # Check if we have any files to show
+        has_files=false
+        if [ "$doc_count" != "0" ] && [ "$doc_count" != "null" ] && [ -n "$doc_count" ]; then
+          # Verify it's actually a number and > 0
+          if [ "$doc_count" -gt 0 ] 2>/dev/null; then
+            has_files=true
+          fi
+        fi
+        
+        echo "" >> comment.md
+        echo "<details>" >> comment.md
+        echo "<summary>Expand to view changed pages</summary>" >> comment.md
+        echo "" >> comment.md
+        
+        if [ "$has_files" = "true" ]; then
           echo "" >> comment.md
-          echo "### Changed Pages" >> comment.md
           echo "" >> comment.md
-          echo "| Source File | Preview Link |" >> comment.md
-          echo "|-------------|--------------|" >> comment.md
-
-          echo "$changed_docs" | jq -r '.[]' | while read -r file; do
-            if [ -n "$file" ]; then
-              # Convert .rst/.md path to .html path
-              # Remove 'docs/' prefix and change extension
+          echo "| File | Preview |" >> comment.md
+          echo "| ---- | ------- |" >> comment.md
+          while IFS= read -r file; do
+            if [ -n "$file" ] && [ "$file" != "null" ]; then
               html_path=$(echo "$file" | sed 's|^docs/||' | sed 's|\.rst$|.html|' | sed 's|\.md$|.html|')
-              # Handle index files in subdirectories
               if [[ "$html_path" == */index.html ]]; then
                 html_path="${html_path}"
               fi
-              filename=$(basename "$file")
               echo "| \`$file\` | [View]($preview_url/$html_path) |" >> comment.md
             fi
-          done
+          done < <(echo "$changed_docs" | jq -r '.[]' 2>/dev/null)
+        else
+          echo "No documentation files were changed in this PR." >> comment.md
         fi
         
-        cat << 'EOF' >> comment.md
+        echo "" >> comment.md
+        echo "</details>" >> comment.md
 
-        ---
-
-        > **Note:** The preview will be available after GitHub Pages deployment completes (usually 1-2 minutes).
-        > If you see stale content, hard-refresh your browser (Ctrl+Shift+R) or wait a moment for GitHub Pages to update.
-        EOF
+        echo "" >> comment.md
+        echo "---" >> comment.md
+        echo "" >> comment.md
+        echo "> **Note:** The preview will be available after GitHub Pages deployment completes (usually 1-2 minutes). Ensure that **generated at** timestamp is up to date. If the Pull Request is stale for more than 30 days, the preview may be deleted. In this case, please update the Pull Request, or re-run the Build Documentation workflow to generate a new preview." >> comment.md
 
         echo "Comment content:"
         cat comment.md
