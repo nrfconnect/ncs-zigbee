@@ -6,7 +6,8 @@ on:
       - main
     paths:
       - 'docs/**'
-      - '.github/workflows/docbuild.yml'
+      - '.github/workflows/doc*'
+      - 'samples/**/*.rst'
 
 permissions:
   contents: read
