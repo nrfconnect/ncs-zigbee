@@ -30,40 +30,51 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2 # v4
 
-      - name: Download site state from cleanup
-        id: download-cleanup
-        uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # v6
-        with:
-          workflow: docremove.yml
-          name: site-state
-          path: _existing_pages
-          workflow_conclusion: success
-          search_artifacts: true
-          if_no_artifact_found: warn
-        continue-on-error: true
-
       - name: Download site state from deploy
         id: download-deploy
-        if: steps.download-cleanup.outcome == 'failure'
         uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # v6
         with:
           workflow: docpreview.yml
           name: site-state
-          path: _existing_pages
+          path: ${{ runner.temp }}/existing_pages
           workflow_conclusion: success
           search_artifacts: true
           if_no_artifact_found: warn
-        continue-on-error: true
+        continue-on-error: false
 
       - name: Remove symlinks from downloaded artifacts
         run: |
-          find _existing_pages -type l -delete 2>/dev/null || true
+          if [ -d "${{ runner.temp }}/existing_pages" ]; then
+            find "${{ runner.temp }}/existing_pages" -type l -delete 2>/dev/null || true
+            rm -rf _existing_pages
+            mkdir -p _existing_pages
+            cp -a "${{ runner.temp }}/existing_pages/." _existing_pages/ || true
+          fi
 
       - name: Download build artifacts
         uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # v6
         with:
           workflow: docbuild.yml
           run_id: ${{ github.event.workflow_run.id }}
+          path: ${{ runner.temp }}
+
+      - name: Move doc-preview from temp
+        run: |
+          if [ -d "doc-preview" ]; then
+            rm -rf doc-preview
+          fi
+          if [ -d "${{ runner.temp }}/doc-preview" ]; then
+            mv "${{ runner.temp }}/doc-preview" ./doc-preview
+          else
+            echo "Expected doc-preview directory not found in runner.temp" >&2
+            exit 1
+          fi
+
+      - name: Cleanup site state
+        id: download-site-state
+        uses: ./.github/actions/cleanup-site
+        with:
+          site_dir: _existing_pages
 
       - name: Extract version and unzip docs
         working-directory: doc-preview
@@ -123,7 +134,7 @@ jobs:
         with:
           name: site-state
           path: _site
-          retention-days: 14 # 2 weeks
+          retention-days: 30 # 1 month, recall Build Documentation workflow to re-generate preview
           overwrite: true
 
       - name: Find existing comment

@@ -1,0 +1,130 @@
+# Cleanup site state: remove pr-preview directories for closed PRs.
+# Keeps only directories for currently open PRs so saved state matches reality.
+# This action keeps the existing pages only for the actually opened PRs to avoid restoring
+# the pages of closed PRs.
+
+name: 'Cleanup site state'
+description: 'Remove PR preview directories for closed PRs; keep only open PRs in site state'
+
+inputs:
+  site_dir:
+    description: 'Path to the site directory (e.g. _site) containing pr-preview subdirs'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Collect list of open PRs
+      id: open-prs
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -e
+        
+        # Build JSON array of open PR numbers for use in next step.
+        if ! OPEN_PRS_JSON=$(gh pr list --state open --json number -q '.[].number' --limit 100 | jq -R -s -c '[split("\n")[] | select(length > 0) | tonumber]'); then
+          echo "Error: Failed to list open PRs" >&2
+          exit 1
+        fi
+        
+        # Validate the output is valid JSON array
+        if ! echo "$OPEN_PRS_JSON" | jq -e 'type == "array"' >/dev/null 2>&1; then
+          echo "Error: Invalid JSON output from PR list" >&2
+          exit 1
+        fi
+        
+        echo "open_prs_json=$OPEN_PRS_JSON" >> "$GITHUB_OUTPUT"
+        echo "Found $(echo "$OPEN_PRS_JSON" | jq 'length') open PR(s)"
+
+    - name: Remove closed PR preview directories
+      shell: bash
+      env:
+        SITE_DIR: ${{ inputs.site_dir }}
+        OPEN_PRS_JSON: ${{ steps.open-prs.outputs.open_prs_json }}
+      run: |
+        set -e
+        
+        # Validate site_dir input
+        if [ -z "$SITE_DIR" ]; then
+          echo "Error: site_dir is empty" >&2
+          exit 1
+        fi
+        
+        # Reject paths with path traversal, absolute paths, or control characters
+        if [[ "$SITE_DIR" == *".."* ]] || \
+           [[ "$SITE_DIR" == /* ]] || \
+           [[ "$SITE_DIR" == *$'\n'* ]] || \
+           [[ "$SITE_DIR" == *$'\r'* ]] || \
+           [[ "$SITE_DIR" == *$'\t'* ]]; then
+          echo "Error: Invalid site_dir (path traversal or absolute path)" >&2
+          exit 1
+        fi
+        
+        # Get absolute path of workspace root for boundary checking
+        WORKSPACE_ROOT=$(cd "$GITHUB_WORKSPACE" && pwd)
+        
+        # Resolve and validate site_dir path
+        if [ ! -d "$SITE_DIR" ]; then
+          echo "Info: site_dir does not exist: $SITE_DIR (first run or no previous state)" >&2
+          exit 0
+        fi
+        
+        RESOLVED_SITE_DIR=$(cd "$SITE_DIR" && pwd)
+        
+        # Ensure resolved path is within workspace
+        if [[ "$RESOLVED_SITE_DIR" != "$WORKSPACE_ROOT"* ]]; then
+          echo "Error: site_dir resolves outside workspace" >&2
+          exit 1
+        fi
+        
+        PR_PREVIEW="${RESOLVED_SITE_DIR}/pr-preview"
+        
+        # Validate PR_PREVIEW path is still within workspace
+        if [[ "$PR_PREVIEW" != "$WORKSPACE_ROOT"* ]]; then
+          echo "Error: PR_PREVIEW path escapes workspace" >&2
+          exit 1
+        fi
+
+        # If there is no previews, just exit
+        if [ ! -d "$PR_PREVIEW" ]; then
+          exit 0
+        fi
+
+        # Process each pr-* directory
+        for dir in "$PR_PREVIEW"/pr-*; do
+          RESOLVED_DIR=$(cd "$dir" && pwd)
+
+          # Skip if glob didn't match anything, files, symlinks, etc.
+          if [ ! -e "$dir" ] || [ ! -d "$dir" ] || [[ "$RESOLVED_DIR" != "$WORKSPACE_ROOT"* ]] || [[ "$RESOLVED_DIR" != "$PR_PREVIEW"* ]]; then
+            continue
+          fi         
+          name=$(basename "$dir")
+          
+          # Validate directory name matches expected pattern (pr- followed by digits only)
+          if [[ "$name" =~ ^pr-([0-9]+)$ ]]; then
+            pr_num="${BASH_REMATCH[1]}"
+            
+            # Validate pr_num is numeric (extra safety)
+            if ! [[ "$pr_num" =~ ^[0-9]+$ ]]; then
+              echo "Warning: Invalid PR number extracted: $pr_num" >&2
+              continue
+            fi
+            
+            # Validate OPEN_PRS_JSON is valid before using it
+            if ! echo "$OPEN_PRS_JSON" | jq -e 'type == "array"' >/dev/null 2>&1; then
+              echo "Error: Invalid OPEN_PRS_JSON format" >&2
+              exit 1
+            fi
+            
+            # Check if PR is still open
+            if ! echo "$OPEN_PRS_JSON" | jq -e --argjson n "$pr_num" 'index($n) != null' >/dev/null 2>&1; then
+              rm -rf "$dir"
+            fi
+          fi
+        done
+        
+        # Clean up empty pr-preview directory
+        if [ -d "$PR_PREVIEW" ] && [ -z "$(ls -A "$PR_PREVIEW" 2>/dev/null)" ]; then
+          rm -rf "$PR_PREVIEW"
+        fi
