@@ -34,19 +34,85 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
    .. group-tab:: |nRFVSC|
 
-      In the **Get the nRF Connect SDK code** part of the install instructions:
-
-      In Step 2, click on :guilabel:`Create a new application`, select :guilabel:`Browse nRF Connect SDK Add-on Index`, then select :guilabel:`Zigbee R23`, and select v\ |addon_version| of the |addon|, which also installs |NCS| v\ |ncs_version|.
+      In the `Get the nRF Connect SDK code <Installing the nRF Connect SDK_>`_ section, click :guilabel:`Create a new application`. 
+      Select :guilabel:`Browse nRF Connect SDK Add-on Index`, then choose :guilabel:`Zigbee R23`. 
+      Select v\ |addon_version| of the |addon|. 
+      This step also installs nRF Connect SDK v\ |ncs_version|.
 
    .. group-tab:: command line
 
-      In the **Get the nRF Connect SDK code** part of the install instructions:
+      You can initialize workspace in two alternative ways:
 
-      In Step 4, use the following command to initialize west with |addon| v\ |addon_version|, which also initializes |NCS| v\ |ncs_version|:
+      **Initialize a new workspace:**
 
-      .. code-block:: console
+      1. In the `Get the nRF Connect SDK code <Installing the nRF Connect SDK_>`_, run the following command to initialize west with |addon| v\ |addon_version|, which also initializes nRF Connect SDK v\ |ncs_version|:
 
-         west init -m "http://github.com/nrfconnect/ncs-zigbee" --mr v1.2.1
+         a. Initialize ``ncs`` for the add-on:
 
+            .. code-block:: console
 
+               west init -m "http://github.com/nrfconnect/ncs-zigbee" --mr v1.2.1
+
+         #. Update the nRF Connect SDK modules:
+
+            .. code-block:: console
+
+               west update
+
+      **Include add-on in the existing nRF Connect SDK workspace:**
+
+      1. Assuming you have an existing nRF Connect SDK workspace in the :file:`ncs` folder, run the following commands:
+
+         a. Navigate to the workspace folder:
+
+            .. code-block:: console
+
+               cd ncs
+
+         #. Clone the add-on repository:
+
+            .. code-block:: console
+
+               git clone https://github.com/nrfconnect/ncs-zigbee
+
+         #. Set manifest path to the add-on directory:
+
+            .. code-block:: console
+
+               west config manifest.path ncs-zigbee
+
+         #. Update the nRF Connect SDK modules:
+
+            .. code-block:: console
+
+               west update
+         
+      2. Optionally, run these commands in case you need to go back to work on the nRF Connect SDK without the add-on:
+
+         a. Configure the manifest path back to the nRF Connect SDK directory
+
+            .. code-block:: console
+
+               west config manifest.path nrf
+
+         #. Update nRF Connect SDK modules
+
+            .. code-block:: console
+
+               west update
+         
+         #. Check the current manifest path with the following command:
+
+            .. code-block:: console
+
+               west config manifest.path
+
+            The output should be:
+
+            .. code-block:: console
+
+               nrf
+
+           This means that the current workspace is using the nRF Connect SDK.
+ 
 To create an application, use :ref:`zigbee_template_sample` sample as a starting point.
