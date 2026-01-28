@@ -40,7 +40,7 @@ runs:
         HEAD_SHA: ${{ inputs.head_sha }}
       run: |
         # Get list of changed .rst and .md files in docs/
-        changed_files=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- 'docs/*.rst' 'docs/*.md' 'docs/**/*.rst' 'docs/**/*.md' | head -20)
+        changed_files=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- 'docs/*.rst' 'docs/*.md' 'docs/**/*.rst' 'docs/**/*.md' 'samples/**/*.rst'  | head -20)
         echo "Changed documentation files:"
         echo "$changed_files"
 
