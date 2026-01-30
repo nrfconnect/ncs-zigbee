@@ -7,6 +7,13 @@ on:
       - 'LICENSE'
       - 'CODEOWNERS'
       - '.gitignore'
+      - '.github/workflows/doc*.yml'
+      - '.github/actions/generate-docs-comment/action.yml'
+      - '.github/actions/set-deploy-info/action.yml'
+      - '.github/actions/cleanup-site/action.yml'
+      - '.github/actions/deploy-docs-preview/action.yml'
+      - '.github/actions/generate-docs-comment/action.yml'
+      - '.github/actions/get-changed-docs/action.yml'
     branches:
       - main
 
