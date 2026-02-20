@@ -692,7 +692,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 				if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
 					LOG_INF("TC Rejoin was not successful (status: %d)",
 						status);
-					start_network_rejoin();
+					is_rejoin_in_progress = false;
 				} else {
 					LOG_INF("TC Rejoin failed on Zigbee coordinator"
 							" (status: %d)", status);
