@@ -11,9 +11,9 @@
  * Please use release scripts to update it's contents.
  *
  * Repositories:
- * platform_ncs       bda55fedb68afa19eb498a6a300a01d75fa7637b https://projecttools.nordicsemi.no/bitbucket/scm/zoi/platform_ncs.git
- * zboss-stack-src    87a7db34b4812077e71e34527a91e374398aebd2 https://projecttools.nordicsemi.no/bitbucket/scm/zoi/zboss_r23
- * ncs-zigbee         551a75f6e311c9e171e4c0868859e94532ac22fb https://github.com/nrfconnect/ncs-zigbee
+ * platform_ncs       5e15c81779b168458e8a155ec2ba9c6d28672f80 https://projecttools.nordicsemi.no/bitbucket/scm/zoi/platform_ncs.git
+ * zboss-stack-src    c8c5ef56106104ea6a6d29086e298b50eba588f2 https://projecttools.nordicsemi.no/bitbucket/scm/zoi/zboss_r23
+ * ncs-zigbee         20c332daaff16fdf6d013f94c39d46f23b687255 https://github.com/nrfconnect/ncs-zigbee
  * nrf                4ab7b98fc76f658249bd8553cf8f9253ff840a53 https://github.com/nrfconnect/sdk-nrf
  * zephyr             aa34a5632971262ce4002e73ed0fb09e9bd14808 https://github.com/nrfconnect/sdk-zephyr
  * wfa-qt-control-app af011c8a8d338ba529f17aed2cc2ef4c1c591a58 https://github.com/nrfconnect/sdk-wi-fiquicktrack-controlappc
@@ -70,16 +70,16 @@
 
 
 /** ZBOSS build tag */
-#define ZBOSS_BUILD_TAG "ncs_release-v4.2.2.3"
+#define ZBOSS_BUILD_TAG "ncs_release-v4.2.2.4"
 
 /** ZBOSS platform build tag */
-#define ZBOSS_PLATFORM_BUILD_TAG "v4.2.2.0+v6.0.8"
+#define ZBOSS_PLATFORM_BUILD_TAG "v4.2.2.4+v6.0.9"
 
 /** ZBOSS build date (UTC) */
-#define ZBOSS_BUILD_DATE 20251009
+#define ZBOSS_BUILD_DATE 20260220
 
 /** ZBOSS build time (UTC) */
-#define ZBOSS_BUILD_TIME 183922
+#define ZBOSS_BUILD_TIME 115334
 
 
 #endif /* ZBOSS_BUILD_INFO_H__ */
