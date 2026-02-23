@@ -51,7 +51,7 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
             .. code-block:: console
 
-               west init -m "http://github.com/nrfconnect/ncs-zigbee" --mr v1.2.1
+               west init -m "http://github.com/nrfconnect/ncs-zigbee" --mr v1.3.0
 
          #. Update the nRF Connect SDK modules:
 
