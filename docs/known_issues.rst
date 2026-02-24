@@ -22,7 +22,7 @@ A known issue can list one or both of the following entries:
   Sometimes, they are discovered later and added over time.
 
 .. version-filter::
-  :default: v1-2-1
+  :default: v1-3-0
   :container: dl/dt
   :tags: [("wontfix", "Won't fix")]
 
@@ -40,7 +40,7 @@ KRKNWK-21267: NCP crashes when migrating from the R22 to R23 firmware
   After migrating the ZBOSS firmware from R22 to R23, the Network Co-Processor (NCP) crashes during the migration of application datasets.
   This issue occurs only when the host application uses application‑specific datasets (:c:macro:`ZB_NVRAM_APP_DATA1` to :c:macro:`ZB_NVRAM_APP_DATA4` types).
 
-.. rst-class:: v1-2-1 v1-2-0 v1-1-0 v1-0-0
+.. rst-class:: v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
 
 KRKNWK-21057: Poll Control cluster values overwritten to defaults on reboot
   After a sleepy end device (SED) reboots, the Poll Control cluster attributes are not restored to the values set before the reboot.
@@ -95,7 +95,7 @@ KRKNWK-20726: Too frequent keep-alive messages from SED to parent
 
   **Workaround:** Use :c:func:`zb_zdo_pim_set_long_poll_interval` rather than :c:func:`zb_set_keepalive_timeout` to set the long poll interval, or manually cherry-pick and apply commit with the fix from ``main`` (commit hash: ``aa9763a8b1296baab2f302a5816215df3e4523b7``).
 
-.. rst-class:: v1-2-1 v1-2-0 v1-1-0 v1-0-0
+.. rst-class:: v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
 
 KRKNWK-21014: Increased power consumption after leaving network
   After a SED leaves the network and starts scanning for networks again, it does not go back to sleep as expected, leading to increased power consumption.
