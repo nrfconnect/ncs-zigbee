@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2026 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -809,6 +809,9 @@ typedef struct zb_reg_api_s
 
   zb_bool_t is_rejoin_failure;                          /*!< Set a rejoining status for a test, and should be reset from a test */
   zb_bool_t lock_nwk_data_processing;                   /*!< NWK data processing will be locked, ZB_NWK_IN_Q won't be processed, be careful not to conflict with zb_nlme_start_router_request */
+  zb_bool_t duplicate_nwk_comm_req_with_invalid_status; /*!< Duplicates received Network Commissioning Request, prepares and sends Response with invalid MAC status, and postpones processing of the original Request */
+  zb_bool_t enable_delay_nwk_comm_rsp_handling;         /*!< Enables delaying Network Commissioning Response with error status processing while setting PIB attributes */
+  zb_bool_t delay_nwk_comm_rsp_handling;                /*!< Delays processing Network Commissioning Response while setting PIB attributes */
 } zb_reg_api_t;
 
 #define ZB_REGRESSION_TESTS_API() ZG->reg_api
