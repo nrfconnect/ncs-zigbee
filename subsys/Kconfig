@@ -9,10 +9,8 @@ menuconfig ZIGBEE_ADD_ON
 	imply FPU
 	select APP_LINK_WITH_ZBOSS
 	select PM_SINGLE_IMAGE
-	select NET_L2_ZIGBEE
-	select NETWORKING
-	select NET_PKT_TXTIME
 	select REBOOT
+	select MPSL
 	select PSA_WANT_ALG_ECB_NO_PADDING if NRF_SECURITY
 	select PSA_WANT_ALG_ECDH if NRF_SECURITY
 	select PSA_WANT_KEY_TYPE_AES if NRF_SECURITY
@@ -20,6 +18,7 @@ menuconfig ZIGBEE_ADD_ON
 	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_DERIVE if NRF_SECURITY
 	select PSA_WANT_ECC_MONTGOMERY_255 if NRF_SECURITY
 	select MBEDTLS_ENABLE_HEAP if NRF_SECURITY
+	imply NRF_802154_RADIO_DRIVER
 	imply ENTROPY_GENERATOR
 	imply POLL
 	imply FLASH
@@ -45,12 +44,13 @@ choice LIBC_IMPLEMENTATION
 	  Use minimal libc implementation with Zigbee.
 endchoice
 
-config NET_L2_ZIGBEE
-	bool "Zigbee L2"
-	depends on NETWORKING
-	select NET_L2_CUSTOM_IEEE802154
-	select NET_PKT_TIMESTAMP
-	select IEEE802154_L2_PKT_INCL_FCS
+config ZIGBEE_VENDOR_OUI
+	hex "A value that represents MAC Address Block Large"
+	default 0xf4ce36
+	help
+	  A value that represents MAC Address Block Large (MA-L, formerly called Organizationally Unique Identifier,
+	  or OUI), a part of the device's EUI-64 address.
+	  By default, use Nordic Semiconductor's MA-L block (f4-ce-36), assigned by the IEEE Registration Authority.
 
 choice ZIGBEE_CHANNEL_SELECTION_MODE
 	prompt "Zigbee channel selection mode"
