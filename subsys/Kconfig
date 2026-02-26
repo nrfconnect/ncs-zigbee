@@ -50,7 +50,7 @@ config NET_L2_ZIGBEE
 	depends on NETWORKING
 	select NET_L2_CUSTOM_IEEE802154
 	select NET_PKT_TIMESTAMP
-	select IEEE802154_NRF5_FCS_IN_LENGTH
+	select IEEE802154_L2_PKT_INCL_FCS
 
 choice ZIGBEE_CHANNEL_SELECTION_MODE
 	prompt "Zigbee channel selection mode"
@@ -274,8 +274,8 @@ config ZBOSS_TRACE_UART_LOGGING
 
 config ZBOSS_TRACE_USB_CDC_LOGGING
 	bool "UART USB CDC (supported only for Zigbee NCP sample)"
-	select USB_DEVICE_STACK
-	select USB_CDC_ACM
+	select USB_DEVICE_STACK_NEXT
+	select USBD_CDC_ACM_CLASS
 	select UART_LINE_CTRL
 	select UART_INTERRUPT_DRIVEN
 
@@ -411,11 +411,6 @@ config APP_LINK_WITH_ZIGBEE
 	default y
 	help
 	  Link application with Zigbee subsystem
-
-# Override default CCA ED threshold value (see KRKNWK-19974 known issue)
-config NRF_802154_CCA_ED_THRESHOLD
-	default 17 if SOC_NRF54L15 || SOC_NRF54L10 || SOC_NRF54L05 || SOC_NRF52840 || SOC_NRF52833
-	default 18 if SOC_NRF5340
 
 partition=ZBOSS_NVRAM
 if SOC_NRF52833

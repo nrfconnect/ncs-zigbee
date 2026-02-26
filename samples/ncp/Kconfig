@@ -1,0 +1,54 @@
+#
+# Copyright (c) 2025 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+source "Kconfig.zephyr"
+
+menuconfig ZIGBEE_NCP_USB
+       bool "USB support for Zigbee NCP"
+       select USB_DEVICE_STACK_NEXT
+       select USBD_CDC_ACM_CLASS
+       select UART_LINE_CTRL
+       help
+         Enable USB CDC ACM support for Zigbee NCP interface.
+         This allows using the NCP over USB instead of UART.
+         This uses the new USB device stack and is incompatible with
+         the legacy USB_DEVICE_STACK option.
+
+if ZIGBEE_NCP_USB
+
+config ZIGBEE_NCP_USB_VID
+       hex "USB Vendor ID"
+       default 0x2fe3
+       help
+         USB Vendor ID for the Zigbee NCP device.
+         Default uses Zephyr project VID (for samples only).
+
+config ZIGBEE_NCP_USB_PID
+       hex "USB Product ID"
+       default 0x0001
+       help
+         USB Product ID for the Zigbee NCP device.
+
+config ZIGBEE_NCP_USB_MAX_POWER
+       int "USB device max power consumption (mA)"
+       default 100
+       range 2 500
+       help
+         Maximum power consumption of the USB device in milliamperes.
+
+config ZIGBEE_NCP_USB_MANUFACTURER
+       string "USB device manufacturer string"
+       default "Nordic Semiconductor ASA"
+       help
+         USB device manufacturer string descriptor.
+
+config ZIGBEE_NCP_USB_PRODUCT
+       string "USB device product string"
+       default "Zigbee NCP"
+       help
+         USB device product string descriptor.
+
+endif # ZIGBEE_NCP_USB
