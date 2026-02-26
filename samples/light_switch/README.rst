@@ -125,7 +125,9 @@ For example, when building from the command line, use the following command:
 Alternatively, you can :ref:`configure Zigbee FOTA manually <ug_zigbee_configuring_components_ota>`.
 
 .. note::
-   You can use the :file:`prj_fota.conf` file only with a development kit that contains the nRF52840, nRF5340, nRF54L15 or nRF54L10 SoC.
+   You can use the :file:`prj_fota.conf` file only with the nRF52840, nRF5340, nRF54L15, nRF54L10, or nRF54LM20 SoC.
+   The nRF54LM20 SoC does not use the external flash. 
+   All the images are stored in the internal flash with the compression enabled.
 
 To activate the Multiprotocol Bluetooth LE extension, set :makevar:`EXTRA_CONF_FILE` to the :file:`overlay-multiprotocol_ble.conf`.
 For example, when building from the command line, use the following command:
