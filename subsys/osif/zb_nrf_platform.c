@@ -13,8 +13,13 @@
 #include <ram_pwrdn.h>
 
 #include <hal/nrf_power.h>
+#include <hal/nrf_ficr.h>
 #if !NRF_POWER_HAS_RESETREAS
 #include <hal/nrf_reset.h>
+#endif
+
+#if defined(CONFIG_TRUSTED_EXECUTION_NONSECURE) && defined(NRF_FICR_S)
+#include <soc_secure.h>
 #endif
 
 #ifdef CONFIG_ZIGBEE_SHELL
@@ -35,6 +40,27 @@
 #define ZB_BROADCAST_PAN_ID 0xFFFFU
 /* The number of bytes to be checked before concluding that the ZBOSS NVRAM is not initialized. */
 #define ZB_PAGE_INIT_CHECK_LEN 32
+
+/* EUI64 address configuration */
+#if defined(CONFIG_NRF5_UICR_EUI64_ENABLE)
+#if defined(CONFIG_SOC_NRF5340_CPUAPP) || defined(CONFIG_SOC_SERIES_NRF54LX)
+#if defined(CONFIG_TRUSTED_EXECUTION_NONSECURE)
+#error "NRF_UICR->OTP is not supported to read from non-secure"
+#else
+#define EUI64_ADDR (NRF_UICR->OTP)
+#endif /* CONFIG_TRUSTED_EXECUTION_NONSECURE */
+#else
+#define EUI64_ADDR (NRF_UICR->CUSTOMER)
+#endif /* CONFIG_SOC_NRF5340_CPUAPP || CONFIG_SOC_SERIES_NRF54LX */
+#endif /* CONFIG_NRF5_UICR_EUI64_ENABLE */
+
+#if defined(CONFIG_NRF5_UICR_EUI64_ENABLE)
+#define EUI64_ADDR_HIGH CONFIG_NRF5_UICR_EUI64_REG
+#define EUI64_ADDR_LOW	(CONFIG_NRF5_UICR_EUI64_REG + 1)
+#else
+#define EUI64_ADDR_HIGH 0
+#define EUI64_ADDR_LOW	1
+#endif /* CONFIG_NRF5_UICR_EUI64_ENABLE */
 
 
 /**
@@ -66,6 +92,9 @@ typedef struct {
 
 
 LOG_MODULE_REGISTER(zboss_osif, CONFIG_ZBOSS_OSIF_LOG_LEVEL);
+
+BUILD_ASSERT(CONFIG_ZBOSS_INIT_PRIORITY > CONFIG_ZBOSS_RADIO_INIT_PRIORITY,
+	     "ZBOSS init priority must be greater than radio init priority");
 
 /* Signal object to indicate that frame has been received */
 static struct k_poll_signal zigbee_sig = K_POLL_SIGNAL_INITIALIZER(zigbee_sig);
@@ -342,6 +371,8 @@ int zigbee_init(void)
 
 	return 0;
 }
+
+SYS_INIT(zigbee_init, POST_KERNEL, CONFIG_ZBOSS_INIT_PRIORITY);
 
 #if IS_ENABLED(CONFIG_ZIGBEE_LIBRARY_NCP_DEV)
 void zb_ncp_app_fw_custom_post_start(void)
@@ -653,6 +684,41 @@ __weak zb_uint32_t zb_get_utc_time(void)
 		"Please implement %s in your application to provide the current UTC time.",
 		__func__);
 	return ZB_TIME_BEACON_INTERVAL_TO_MSEC(ZB_TIMER_GET()) / 1000;
+}
+
+void zb_osif_get_ieee_eui64(zb_ieee_addr_t ieee_eui64)
+{
+	uint64_t factoryAddress;
+	uint32_t index = 0;
+
+#if !defined(CONFIG_NRF5_UICR_EUI64_ENABLE)
+	uint32_t deviceid[2];
+
+	/* Set the MAC Address Block Larger (MA-L) formerly called OUI. */
+	ieee_eui64[index++] = (CONFIG_ZIGBEE_VENDOR_OUI >> 16) & 0xff;
+	ieee_eui64[index++] = (CONFIG_ZIGBEE_VENDOR_OUI >> 8) & 0xff;
+	ieee_eui64[index++] = CONFIG_ZIGBEE_VENDOR_OUI & 0xff;
+
+#if defined(NRF54H_SERIES)
+	/* Can't access SICR with device id on a radio core. Use BLE.ADDR. */
+	deviceid[0] = NRF_FICR->BLE.ADDR[0];
+	deviceid[1] = NRF_FICR->BLE.ADDR[1];
+#elif defined(CONFIG_TRUSTED_EXECUTION_NONSECURE) && defined(NRF_FICR_S)
+	soc_secure_read_deviceid(deviceid);
+#else
+	deviceid[0] = nrf_ficr_deviceid_get(NRF_FICR, 0);
+	deviceid[1] = nrf_ficr_deviceid_get(NRF_FICR, 1);
+#endif
+
+	factoryAddress = (uint64_t)deviceid[EUI64_ADDR_HIGH] << 32;
+	factoryAddress |= deviceid[EUI64_ADDR_LOW];
+#else
+	/* Use device identifier assigned during the production. */
+	factoryAddress = (uint64_t)EUI64_ADDR[EUI64_ADDR_HIGH] << 32;
+	factoryAddress |= EUI64_ADDR[EUI64_ADDR_LOW];
+#endif
+
+	memcpy(ieee_eui64 + index, &factoryAddress, sizeof(factoryAddress) - index);
 }
 
 void zigbee_event_notify(zigbee_event_t event)
