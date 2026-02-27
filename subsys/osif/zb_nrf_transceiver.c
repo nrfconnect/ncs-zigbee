@@ -78,7 +78,7 @@ static int nrf_802154_radio_init(void)
 	return 0;
 }
 
-SYS_INIT(nrf_802154_radio_init, POST_KERNEL, 80);
+SYS_INIT(nrf_802154_radio_init, POST_KERNEL, CONFIG_ZBOSS_RADIO_INIT_PRIORITY);
 
 void zb_trans_hw_init(void)
 {
