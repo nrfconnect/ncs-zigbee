@@ -401,6 +401,22 @@ config ZIGBEE_TIME_KTIMER
 
 endchoice
 
+config ZBOSS_RADIO_INIT_PRIORITY
+	int "nRF 802.15.4 radio driver initialization priority"
+	default 80
+	range 0 99
+	help
+	  Initialization priority for the nRF 802.15.4 radio driver in POST_KERNEL phase.
+	  Must be lower than ZBOSS_INIT_PRIORITY to ensure radio is ready before ZBOSS.
+
+config ZBOSS_INIT_PRIORITY
+	int "ZBOSS stack initialization priority"
+	default 90
+	range 1 99
+	help
+	  Initialization priority for the ZBOSS stack in POST_KERNEL phase.
+	  Must be higher than ZBOSS_RADIO_INIT_PRIORITY to ensure proper initialization order.
+
 endmenu #menu "ZBOSS osif configuration"
 
 config APP_LINK_WITH_ZIGBEE
