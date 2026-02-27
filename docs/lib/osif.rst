@@ -1,4 +1,4 @@
-﻿.. _lib_zigbee_osif:
+.. _lib_zigbee_osif:
 
 Zigbee ZBOSS OSIF
 #################
@@ -50,6 +50,10 @@ You can also configure the following OSIF-related Kconfig options:
   This option is used only if the device does not have NVRAM storage.
 * ``CONFIG_ZIGBEE_TIME_COUNTER`` - Configures the ZBOSS OSIF layer to use a dedicated timer-based counter as the Zigbee time source.
 * ``CONFIG_ZIGBEE_TIME_KTIMER`` - Configures the ZBOSS OSIF layer to use Zephyr's system time as the Zigbee time source.
+* ``CONFIG_ZBOSS_RADIO_INIT_PRIORITY`` - Initialization priority for the nRF 802.15.4 radio driver.
+  Must be lower than ``CONFIG_ZBOSS_INIT_PRIORITY`` so the radio is ready before ZBOSS starts.
+* ``CONFIG_ZBOSS_INIT_PRIORITY`` - Initialization priority for the ZBOSS stack.
+  Must be higher than ``CONFIG_ZBOSS_RADIO_INIT_PRIORITY``.
 
 Additionally, the following Kconfig option is available when setting :ref:`zigbee_ug_logging_logger_options`:
 
