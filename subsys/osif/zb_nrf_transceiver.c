@@ -15,6 +15,10 @@
 #include <zb_transceiver.h>
 #include "zb_nrf_platform.h"
 
+#if defined(CONFIG_NRF_802154_SER_HOST)
+#include "nrf_802154_serialization_error.h"
+#endif
+
 #if !defined NRF_802154_FRAME_TIMESTAMP_ENABLED || \
 	!NRF_802154_FRAME_TIMESTAMP_ENABLED
 #warning Must define NRF_802154_FRAME_TIMESTAMP_ENABLED!
@@ -461,3 +465,11 @@ void nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
 		k_sem_give(&nrf5_data.rssi_wait);
 	}
 }
+
+#if defined(CONFIG_NRF_802154_SER_HOST)
+void nrf_802154_serialization_error(const nrf_802154_ser_err_data_t *err)
+{
+	__ASSERT(false, "802.15.4 serialization error: %d", err->reason);
+	k_oops();
+}
+#endif
