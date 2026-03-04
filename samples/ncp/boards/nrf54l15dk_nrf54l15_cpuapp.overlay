@@ -72,14 +72,12 @@
 	status = "okay";
 };
 
-// TODO: re-enable HWFC once it's fixed
 &uart20 {
 	status = "okay";
 	current-speed = <115200>;
 	pinctrl-0 = <&uart20_default>;
 	pinctrl-1 = <&uart20_sleep>;
 	pinctrl-names = "default", "sleep";
-	/delete-property/ hw-flow-control;
 };
 
 &uart21 {
@@ -88,5 +86,4 @@
 	pinctrl-0 = <&uart21_default>;
 	pinctrl-1 = <&uart21_sleep>;
 	pinctrl-names = "default", "sleep";
-	/delete-property/ hw-flow-control;
 };
