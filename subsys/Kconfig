@@ -53,6 +53,27 @@ config ZIGBEE_VENDOR_OUI
 	  or OUI), a part of the device's EUI-64 address.
 	  By default, use Nordic Semiconductor's MA-L block (f4-ce-36), assigned by the IEEE Registration Authority.
 
+config ZIGBEE_UICR_EUI64_ENABLE
+	bool "Use EUI64 from UICR registers"
+	depends on SOC_SERIES_NRF52X || SOC_SERIES_NRF53X || SOC_SERIES_NRF54LX
+	help
+	  Use a custom EUI64 stored in User Information Configuration Registers (UICR)
+	  instead of deriving it from FICR and ZIGBEE_VENDOR_OUI.
+
+if ZIGBEE_UICR_EUI64_ENABLE
+
+config ZIGBEE_UICR_EUI64_REG
+	int "UICR base register index for EUI64"
+	range 0 30 if SOC_SERIES_NRF52X
+	range 0 190 if SOC_SERIES_NRF53X
+	range 0 318 if SOC_SERIES_NRF54LX
+	default 0
+	help
+	  Base index of the two consecutive UICR registers (customer or OTP section)
+	  where the 64-bit EUI64 is stored.
+
+endif # ZIGBEE_UICR_EUI64_ENABLE
+
 choice ZIGBEE_CHANNEL_SELECTION_MODE
 	prompt "Zigbee channel selection mode"
 	default ZIGBEE_CHANNEL_SELECTION_MODE_SINGLE
