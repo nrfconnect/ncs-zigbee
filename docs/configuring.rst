@@ -95,24 +95,72 @@ You can enable one of the following alternative options to select the channel on
 IEEE 802.15.4 EUI-64 configuration
 ==================================
 
-The Zigbee stack uses the EUI-64 address that is configured in the IEEE 802.15.4 shim layer.
-By default, it uses an address from Nordic Semiconductor's pool.
+An IEEE EUI-64 address consists of two parts:
 
-If your devices should use a different address, you can change the address according to your company's addressing scheme.
+* Company ID, which is a 24-bit MAC Address Block Large (MA-L), formerly called Organizationally Unique Identifier (OUI).
+* Extension identifier, which is a 40-bit device unique identifier.
 
-.. include:: includes/ieee802154_eui64_conf_nrf54l.txt
+You can configure the EUI-64 for a Zigbee device in the following ways:
+
+.. tabs::
+
+   .. tab:: Use the default
+
+      By default, the company ID is set to Nordic Semiconductor's MA-L (``f4-ce-36``) through the ``CONFIG_ZIGBEE_VENDOR_OUI`` Kconfig option.
+      The extension identifier is set to the DEVICEID from the factory information configuration registers (FICR).
+
+   .. tab:: Replace the company ID
+
+      Change the ``CONFIG_ZIGBEE_VENDOR_OUI`` Kconfig option to your company's MA-L value (24-bit, in hex).
+      The extension identifier remains the DEVICEID from FICR.
+
+   .. tab:: Replace the full EUI-64
+
+      You can provide the full EUI-64 value by programming certain user information configuration registers (UICR).
+      The nRF52 and nRF53 Series devices use the CUSTOMER registers block, while the nRF53 (application core) and nRF54L Series use the OTP registers block.
+
+      To use the EUI-64 value from the UICR you must enable the ``CONFIG_ZIGBEE_UICR_EUI64_ENABLE`` Kconfig option. 
+      Then, you need to the ``CONFIG_ZIGBEE_UICR_EUI64_REG`` to the base index of the two consecutive UICR registers that will contain your EUI-64 value.
+
+      The following example shows how to replace the full EUI-64 on the nRF52840 device:
+
+      1. Enable the ``CONFIG_ZIGBEE_UICR_EUI64_ENABLE`` Kconfig option.
+
+      #. Set ``CONFIG_ZIGBEE_UICR_EUI64_REG`` to the UICR offset.
+         For UICR->CUSTOMER[0] and UICR->CUSTOMER[1], use the default value ``0``.
+
+      #. Build and program your application, erasing the whole memory.
+         Replace *serial_number* with the serial number of your debugger:
+
+         .. parsed-literal::
+            :class: highlight
+
+            west build -b nrf52840dk/nrf52840 -p always
+            west flash --snr *serial_number* --erase
+
+      #. Program the two consecutive UICR registers with your EUI-64 value (replace *serial_number* with the serial number of your debugger).
+         For nRF52840 device with default ``CONFIG_ZIGBEE_UICR_EUI64_REG`` (0), the CUSTOMER base address is ``0x10001080``:
+
+         .. parsed-literal::
+            :class: highlight
+
+            nrfutil device x-write --serial-number *serial_number* --address 0x10001080 --value 0x11223344
+            nrfutil device x-write --serial-number *serial_number* --address 0x10001084 --value 0x55667788
+            nrfutil device reset --reset-kind=RESET_PIN
+
+         If you set ``CONFIG_ZIGBEE_UICR_EUI64_REG`` to a different value, use the corresponding register addresses for your SoC.
 
 At the end of the configuration process, you can check the EUI-64 value using :ref:`lib_zigbee_shell`:
 
 .. code-block:: console
 
-   > zdo eui64
+   uart:~$ zdo eui64
    8877665544332211
    Done
 
 .. note::
     Alternatively, you may use the Production Configuration feature to change the address.
-    The Production Configuration takes precedence over the shim's configuration.
+    The Production Configuration takes precedence over the OSIF configuration.
 
 ZBOSS stack start options
 =========================
