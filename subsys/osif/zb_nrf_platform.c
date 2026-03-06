@@ -5,7 +5,9 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include <zephyr/kernel.h>
+#include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/reboot.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
@@ -16,10 +18,6 @@
 #include <hal/nrf_ficr.h>
 #if !NRF_POWER_HAS_RESETREAS
 #include <hal/nrf_reset.h>
-#endif
-
-#if defined(CONFIG_TRUSTED_EXECUTION_NONSECURE) && defined(NRF_FICR_S)
-#include <soc_secure.h>
 #endif
 
 #ifdef CONFIG_ZIGBEE_SHELL
@@ -42,25 +40,18 @@
 #define ZB_PAGE_INIT_CHECK_LEN 32
 
 /* EUI64 address configuration */
-#if defined(CONFIG_NRF5_UICR_EUI64_ENABLE)
+#if defined(CONFIG_ZIGBEE_UICR_EUI64_ENABLE)
 #if defined(CONFIG_SOC_NRF5340_CPUAPP) || defined(CONFIG_SOC_SERIES_NRF54LX)
-#if defined(CONFIG_TRUSTED_EXECUTION_NONSECURE)
-#error "NRF_UICR->OTP is not supported to read from non-secure"
-#else
 #define EUI64_ADDR (NRF_UICR->OTP)
-#endif /* CONFIG_TRUSTED_EXECUTION_NONSECURE */
 #else
 #define EUI64_ADDR (NRF_UICR->CUSTOMER)
-#endif /* CONFIG_SOC_NRF5340_CPUAPP || CONFIG_SOC_SERIES_NRF54LX */
-#endif /* CONFIG_NRF5_UICR_EUI64_ENABLE */
-
-#if defined(CONFIG_NRF5_UICR_EUI64_ENABLE)
-#define EUI64_ADDR_HIGH CONFIG_NRF5_UICR_EUI64_REG
-#define EUI64_ADDR_LOW	(CONFIG_NRF5_UICR_EUI64_REG + 1)
+#endif
+#define EUI64_ADDR_HIGH CONFIG_ZIGBEE_UICR_EUI64_REG
+#define EUI64_ADDR_LOW  (CONFIG_ZIGBEE_UICR_EUI64_REG + 1)
 #else
 #define EUI64_ADDR_HIGH 0
-#define EUI64_ADDR_LOW	1
-#endif /* CONFIG_NRF5_UICR_EUI64_ENABLE */
+#define EUI64_ADDR_LOW  1
+#endif /* CONFIG_ZIGBEE_UICR_EUI64_ENABLE */
 
 
 /**
@@ -688,37 +679,24 @@ __weak zb_uint32_t zb_get_utc_time(void)
 
 void zb_osif_get_ieee_eui64(zb_ieee_addr_t ieee_eui64)
 {
-	uint64_t factoryAddress;
-	uint32_t index = 0;
+	uint64_t addr;
 
-#if !defined(CONFIG_NRF5_UICR_EUI64_ENABLE)
+#if defined(CONFIG_ZIGBEE_UICR_EUI64_ENABLE)
+	addr = (uint64_t)EUI64_ADDR[EUI64_ADDR_HIGH] << 32 | EUI64_ADDR[EUI64_ADDR_LOW];
+#else
 	uint32_t deviceid[2];
 
-	/* Set the MAC Address Block Larger (MA-L) formerly called OUI. */
-	ieee_eui64[index++] = (CONFIG_ZIGBEE_VENDOR_OUI >> 16) & 0xff;
-	ieee_eui64[index++] = (CONFIG_ZIGBEE_VENDOR_OUI >> 8) & 0xff;
-	ieee_eui64[index++] = CONFIG_ZIGBEE_VENDOR_OUI & 0xff;
-
-#if defined(NRF54H_SERIES)
-	/* Can't access SICR with device id on a radio core. Use BLE.ADDR. */
-	deviceid[0] = NRF_FICR->BLE.ADDR[0];
-	deviceid[1] = NRF_FICR->BLE.ADDR[1];
-#elif defined(CONFIG_TRUSTED_EXECUTION_NONSECURE) && defined(NRF_FICR_S)
-	soc_secure_read_deviceid(deviceid);
-#else
 	deviceid[0] = nrf_ficr_deviceid_get(NRF_FICR, 0);
 	deviceid[1] = nrf_ficr_deviceid_get(NRF_FICR, 1);
+
+	addr = ((uint64_t)deviceid[EUI64_ADDR_HIGH] << 32 | deviceid[EUI64_ADDR_LOW]) &
+	       0x000000FFFFFFFFFFULL;
+	addr = (addr << 24) | ((CONFIG_ZIGBEE_VENDOR_OUI & 0xFFU) << 16) |
+	       (((CONFIG_ZIGBEE_VENDOR_OUI >> 8) & 0xFFU) << 8) |
+	       (CONFIG_ZIGBEE_VENDOR_OUI >> 16);
 #endif
 
-	factoryAddress = (uint64_t)deviceid[EUI64_ADDR_HIGH] << 32;
-	factoryAddress |= deviceid[EUI64_ADDR_LOW];
-#else
-	/* Use device identifier assigned during the production. */
-	factoryAddress = (uint64_t)EUI64_ADDR[EUI64_ADDR_HIGH] << 32;
-	factoryAddress |= EUI64_ADDR[EUI64_ADDR_LOW];
-#endif
-
-	memcpy(ieee_eui64 + index, &factoryAddress, sizeof(factoryAddress) - index);
+	sys_memcpy_swap(ieee_eui64, &addr, sizeof(zb_ieee_addr_t));
 }
 
 void zigbee_event_notify(zigbee_event_t event)
