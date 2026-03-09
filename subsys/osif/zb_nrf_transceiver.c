@@ -68,6 +68,12 @@ struct nrf5_data {
 
 static struct nrf5_data nrf5_data;
 
+#if defined(CONFIG_NRF_802154_SER_HOST)
+static uint8_t *tx_done_pending_ack;
+static void tx_done_ack_work_fn(struct k_work *work);
+static K_WORK_DEFINE(tx_done_ack_work, tx_done_ack_work_fn);
+#endif
+
 static int nrf_802154_radio_init(void)
 {
 	k_fifo_init(&nrf5_data.rx.fifo);
@@ -357,6 +363,17 @@ zb_ret_t zb_trans_cca(void)
 	return cca_result ? RET_OK : RET_BUSY;
 }
 
+#if defined(CONFIG_NRF_802154_SER_HOST)
+static void tx_done_ack_work_fn(struct k_work *work)
+{
+	uint8_t *ack = tx_done_pending_ack;
+
+	tx_done_pending_ack = NULL;
+	zb_macll_transmitted_raw(ack);
+	zigbee_event_notify(ZIGBEE_EVENT_TX_DONE);
+}
+#endif
+
 /* nRF 802.15.4 driver callbacks - modern API with metadata structures */
 
 void nrf_802154_transmitted_raw(uint8_t *p_frame,
@@ -365,9 +382,17 @@ void nrf_802154_transmitted_raw(uint8_t *p_frame,
 	ARG_UNUSED(p_frame);
 
 	uint8_t *ack = p_metadata->data.transmitted.p_ack;
-	zb_macll_transmitted_raw(ack);
 
 	nrf5_data.state = ZB_RADIO_STATE_RECEIVE;
+
+#if defined(CONFIG_NRF_802154_SER_HOST)
+	if (ack != NULL) {
+		tx_done_pending_ack = ack;
+		k_work_submit(&tx_done_ack_work);
+		return;
+	}
+#endif
+	zb_macll_transmitted_raw(ack);
 	zigbee_event_notify(ZIGBEE_EVENT_TX_DONE);
 }
 
