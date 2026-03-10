@@ -18,6 +18,7 @@ System-on-Chip designs
 
 The single-chip solution has a combined RFIC (the IEEE 802.15.4 in case of Zigbee) and processor.
 Both the Zigbee stack and the application layer run on the local processor.
+The ZBOSS stack communicates directly with the nRF 802.15.4 radio driver, bypassing the Zephyr networking (L2) layer.
 
 This design has the following advantages:
 

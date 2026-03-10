@@ -74,16 +74,16 @@
 			<desc>Zigbee PRO + Green Power</desc>
 			<path d="M192.33 258.54 L0 258.54 L0 281.64 L192.33 281.64 L192.33 258.54" class="st2"/>
 			<text x="30.66" y="273.69" class="st9">Zigbee PRO + Green Power</text>		</g>
-		<g id="shape156-34" transform="translate(92.1339,-45.0498)">
+		<g id="shape156-34" transform="translate(92.1339,-68.05)">
 			<title>Sheet.156</title>
 			<path d="M171.21 233.45 L0 233.45 L0 281.64 L171.21 281.64 L171.21 233.45 Z" class="st6"/>
 		</g>
-		<g id="shape157-36" transform="translate(92.1339,-74.3672)">
+		<g id="shape157-36" transform="translate(92.1339,-97.37)">
 			<title>Sheet.157</title>
 			<desc>nRF IEEE 802.15.4 radio driver</desc>
 			<path d="M171.21 268.44 L0 268.44 L0 281.64 L171.21 281.64 L171.21 268.44" class="st2"/>
 			<text x="12.37" y="278.64" class="st9">nRF IEEE 802.15.4 radio driver</text>		</g>
-		<g id="shape158-40" transform="translate(98.7921,-50.5089)">
+		<g id="shape158-40" transform="translate(98.7921,-73.51)">
 			<title>Sheet.158</title>
 			<desc>IEEE 802.15.4 PHY</desc>
 			<path d="M156.18 261.84 L0 261.84 L0 281.64 L156.18 281.64 L156.18 261.84 Z" class="st8"/>
@@ -97,16 +97,6 @@
 			</g>
 			<g id="shape160-46">
 				<text x="10.61" y="270.44" class="st11">Multiprotocol Service Layer (MPSL)</text>			</g>
-		</g>
-		<g id="group162-48" transform="translate(92.1339,-99.2402)">
-			<title>Sheet.162</title>
-			<desc>Secure boot</desc>
-			<g id="shape163-49">
-				<title>Sheet.163</title>
-				<rect x="0" y="258.961" width="171.071" height="22.6772" class="st12"/>
-			</g>
-			<g id="shape162-51">
-				<text x="36.81" y="273.9" class="st9">Zephyr integration</text>			</g>
 		</g>
 	</g>
 </svg>

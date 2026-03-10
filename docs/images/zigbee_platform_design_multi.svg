@@ -76,18 +76,8 @@
 			<title>Dynamic connector</title>
 			<path d="M7.09 384.67 L7.09 385.03 L7.09 423.14" class="st9"/>
 		</g>
-		<g id="group96-30" transform="translate(294.811,-50.92)">
+		<g id="group96-30" transform="translate(294.811,-73.27)">
 			<title>Sheet.96</title>
-			<g id="group67-31" transform="translate(0,-45.4099)">
-				<title>Sheet.67</title>
-				<desc>Secure boot</desc>
-				<g id="shape68-32" transform="translate(1.64668E-12,-2.48578)">
-					<title>Sheet.68</title>
-					<rect x="0" y="352.118" width="162.551" height="22.3513" class="st11"/>
-				</g>
-				<g id="shape67-34">
-					<text x="32.72" y="365.65" class="st8">Zephyr integration</text>				</g>
-			</g>
 			<g id="group95-36">
 				<title>Sheet.95</title>
 				<g id="shape69-37">
