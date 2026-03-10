@@ -62,16 +62,6 @@
 				<title>Sheet.107</title>
 				<path d="M151.72 226.57 L0 226.57 L0 244.79 L151.72 244.79 L151.72 226.57" class="st2"/>
 			</g>
-			<g id="group110-16" transform="translate(310.483,-84.9184)">
-				<title>Sheet.110</title>
-				<desc>Secure boot</desc>
-				<g id="shape111-17">
-					<title>Sheet.111</title>
-					<rect x="0" y="226.899" width="201.249" height="17.8888" class="st7"/>
-				</g>
-				<g id="shape110-19">
-					<text x="51.29" y="239.44" class="st8">Zephyr integration</text>				</g>
-			</g>
 			<g id="shape112-21">
 				<title>Sheet.112</title>
 				<path d="M212.43 139.76 L0 139.76 L0 244.79 L212.43 244.79 L212.43 139.76 Z" class="st1"/>
@@ -91,26 +81,26 @@
 				<desc>nRF53 network core</desc>
 				<path d="M212.43 222.43 L0 222.43 L0 244.79 L212.43 244.79 L212.43 222.43" class="st2"/>
 				<text x="32.47" y="239.01" class="st3">nRF53 network core</text>			</g>
-			<g id="shape116-32" transform="translate(5.81388,-59.5386)">
+			<g id="shape116-32" transform="translate(5.81388,-77.54)">
 				<title>Sheet.116</title>
 				<path d="M198.45 206.77 L0 206.77 L0 244.79 L198.45 244.79 L198.45 206.77 Z" class="st6"/>
 			</g>
-			<g id="shape117-34" transform="translate(5.81388,-81.8996)">
+			<g id="shape117-34" transform="translate(5.81388,-99.9)">
 				<title>Sheet.117</title>
 				<desc>nRF IEEE 802.15.4 radio driver</desc>
 				<path d="M198.45 234.37 L0 234.37 L0 244.79 L198.45 244.79 L198.45 234.37" class="st2"/>
 				<text x="25.99" y="243.18" class="st8">nRF IEEE 802.15.4 radio driver</text>			</g>
-			<g id="shape118-38" transform="translate(13.5315,-64.0108)">
+			<g id="shape118-38" transform="translate(13.5315,-82.01)">
 				<title>Sheet.118</title>
 				<desc>IEEE 802.15.4 PHY</desc>
 				<path d="M181.03 229.17 L0 229.17 L0 244.79 L181.03 244.79 L181.03 229.17 Z" class="st9"/>
 				<text x="53.81" y="240.58" class="st10">IEEE 802.15.4 PHY</text>			</g>
-			<g id="shape120-41" transform="translate(310.483,-64.0108)">
+			<g id="shape120-41" transform="translate(310.483,-82.01)">
 				<title>Sheet.120</title>
 				<desc>nRF IEEE 802.15.4 radio driver</desc>
 				<path d="M201.25 226.9 L0 226.9 L0 244.79 L201.25 244.79 L201.25 226.9 Z" class="st6"/>
 				<text x="27.39" y="239.44" class="st8">nRF IEEE 802.15.4 radio driver</text>			</g>
-			<g id="shape121-44" transform="translate(310.483,-65.8686)">
+			<g id="shape121-44" transform="translate(310.483,-83.87)">
 				<title>Dynamic connector.121</title>
 				<path d="M-8.04 237.7 L-8.4 237.7 L-95.65 237.7" class="st11"/>
 			</g>

@@ -107,16 +107,6 @@
 			<g id="shape154-44">
 				<text x="6.34" y="373.62" class="st9">Multiprotocol Service Layer (MPSL)</text>			</g>
 		</g>
-		<g id="group156-46" transform="translate(84.0223,-85.632)">
-			<title>Sheet.156</title>
-			<desc>Secure boot</desc>
-			<g id="shape157-47">
-				<title>Sheet.157</title>
-				<rect x="0" y="363.681" width="173.384" height="19.2447" class="st10"/>
-			</g>
-			<g id="shape156-49">
-				<text x="45.47" y="376.3" class="st9">Zephyr integration</text>			</g>
-		</g>
 		<g id="shape159-51" transform="translate(442.787,-282.094)">
 			<title>Sheet.159</title>
 			<path d="M63.98 345.64 L0 345.64 L0 382.93 L63.98 382.93 L63.98 345.64" class="st2"/>
@@ -171,7 +161,7 @@
 				<path d="M122.71 363.32 L0 363.32 L0 382.93 L122.71 382.93 L122.71 363.32 Z" class="st8"/>
 				<text x="5.78" y="376.12" class="st9">Zigbee Device Object (ZDO)</text>			</g>
 		</g>
-		<g id="group184-91" transform="translate(84.0223,-39.9258)">
+		<g id="group184-91" transform="translate(84.0223,-59.18)">
 			<title>Sheet.184</title>
 			<g id="shape150-92">
 				<title>Sheet.150</title>
