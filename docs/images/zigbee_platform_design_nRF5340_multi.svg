@@ -104,40 +104,30 @@
 			<desc>SM</desc>
 			<path d="M75.51 354.56 L0 354.56 L0 403.97 L75.51 403.97 L75.51 354.56 Z" class="st10"/>
 			<text x="29.87" y="382.87" class="st11">SM</text>		</g>
-		<g id="group118-40" transform="translate(208.174,-197.626)">
-			<title>Sheet.118</title>
-			<desc>Secure boot</desc>
-			<g id="shape119-41" transform="translate(2.52598E-12,-2.22344)">
-				<title>Sheet.119</title>
-				<rect x="0" y="383.981" width="248.607" height="19.9924" class="st8"/>
-			</g>
-			<g id="shape118-43">
-				<text x="74.02" y="396.47" class="st9">Zephyr integration</text>			</g>
-		</g>
-		<g id="shape120-45" transform="translate(208.174,-172.918)">
+		<g id="shape120-45" transform="translate(208.174,-197.92)">
 			<title>Sheet.120</title>
 			<desc>nRF IEEE 802.15.4 radio driver</desc>
 			<path d="M248.69 381.76 L0 381.76 L0 403.97 L248.69 403.97 L248.69 381.76 Z" class="st6"/>
 			<text x="51.11" y="396.47" class="st9">nRF IEEE 802.15.4 radio driver</text>		</g>
-		<g id="shape122-48" transform="translate(241.069,-230.598)">
+		<g id="shape122-48" transform="translate(241.069,-255.60)">
 			<title>Sheet.122</title>
 			<desc>IEEE 802.15.4 MAC</desc>
 			<path d="M197.23 380.29 L0 380.29 L0 403.97 L197.23 403.97 L197.23 380.29 Z" class="st12"/>
 			<text x="52.52" y="395.73" class="st9">IEEE 802.15.4 MAC</text>		</g>
-		<g id="shape124-51" transform="translate(241.069,-282.921)">
+		<g id="shape124-51" transform="translate(241.069,-307.92)">
 			<title>Sheet.124</title>
 			<path d="M197.23 380.29 L0 380.29 L0 403.97 L197.23 403.97 L197.23 380.29 Z" class="st12"/>
 		</g>
-		<g id="shape125-53" transform="translate(240.858,-282.921)">
+		<g id="shape125-53" transform="translate(240.858,-307.92)">
 			<title>Sheet.125</title>
 			<desc>Zigbee app layer (ZCL)</desc>
 			<path d="M197.23 380.29 L0 380.29 L0 403.97 L197.23 403.97 L197.23 380.29" class="st2"/>
 			<text x="45.02" y="395.73" class="st9">Zigbee app layer (ZCL)</text>		</g>
-		<g id="shape126-57" transform="translate(241.069,-256.759)">
+		<g id="shape126-57" transform="translate(241.069,-281.76)">
 			<title>Sheet.126</title>
 			<path d="M197.23 380.29 L0 380.29 L0 403.97 L197.23 403.97 L197.23 380.29 Z" class="st12"/>
 		</g>
-		<g id="shape127-59" transform="translate(241.069,-256.759)">
+		<g id="shape127-59" transform="translate(241.069,-281.76)">
 			<title>Sheet.127</title>
 			<desc>Zigbee PRO + Green Power</desc>
 			<path d="M197.23 380.29 L0 380.29 L0 403.97 L197.23 403.97 L197.23 380.29" class="st2"/>
@@ -167,7 +157,7 @@
 			<title>Dynamic connector</title>
 			<path d="M7.09 395.93 L7.09 395.57 L7.09 313.85" class="st14"/>
 		</g>
-		<g id="shape134-84" transform="translate(341.956,-172.918)">
+		<g id="shape134-84" transform="translate(341.956,-197.92)">
 			<title>Dynamic connector.206</title>
 			<path d="M7.09 412.01 L7.09 412.37 L7.09 460.99" class="st14"/>
 		</g>
