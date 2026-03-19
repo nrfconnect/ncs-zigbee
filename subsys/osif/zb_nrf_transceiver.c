@@ -9,6 +9,7 @@
 #include <zephyr/logging/log.h>
 #include <nrf_802154.h>
 #include <nrf_802154_const.h>
+#include <nrf_802154_nrfx_addons.h>
 #include <nrf_802154_types.h>
 #include <zboss_api.h>
 #include <zb_macll.h>
@@ -25,6 +26,23 @@
 #endif
 
 LOG_MODULE_DECLARE(zboss_osif, CONFIG_ZBOSS_OSIF_LOG_LEVEL);
+
+/** Map ED in dBm to ZBOSS 0..255 scale. */
+static uint8_t zboss_normalize_ed_dbm(int8_t ed_dbm)
+{
+	int32_t ed = ed_dbm;
+	const int32_t min_dbm = ED_DBM_MIN;
+	const int32_t max_dbm = ED_DBM_MAX;
+
+	if (ed <= min_dbm) {
+		return 0U;
+	}
+	if (ed >= max_dbm) {
+		return UINT8_MAX;
+	}
+
+	return (uint8_t)(UINT8_MAX * (ed - min_dbm) / (max_dbm - min_dbm));
+}
 
 enum zb_radio_state {
 	ZB_RADIO_STATE_SLEEP,
@@ -60,7 +78,7 @@ struct nrf5_data {
 
 	struct {
 		uint32_t time_us;
-		int8_t value;
+		uint8_t value;
 	} energy_detection;
 	
 	struct k_sem rssi_wait;
@@ -149,7 +167,7 @@ void zb_trans_get_rssi(zb_uint8_t *rssi_value_p)
 	 * or by nrf_802154_energy_detection_failed() after retry attempt.
 	 */
 	k_sem_take(&nrf5_data.rssi_wait, K_FOREVER);
-	*rssi_value_p = (uint8_t)nrf5_data.energy_detection.value;
+	*rssi_value_p = nrf5_data.energy_detection.value;
 	LOG_DBG("Energy detected: %d", *rssi_value_p);
 }
 
@@ -474,7 +492,7 @@ void nrf_802154_receive_failed(nrf_802154_rx_error_t error, uint32_t id)
 
 void nrf_802154_energy_detected(const nrf_802154_energy_detected_t *p_result)
 {
-	nrf5_data.energy_detection.value = p_result->ed_dbm;
+	nrf5_data.energy_detection.value = zboss_normalize_ed_dbm(p_result->ed_dbm);
 	k_sem_give(&nrf5_data.rssi_wait);
 }
 
@@ -486,7 +504,7 @@ void nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
 	
 	if (err != 0) {
 		LOG_ERR("Failed to restart energy detection after failure");
-		nrf5_data.energy_detection.value = INT8_MAX;
+		nrf5_data.energy_detection.value = UINT8_MAX;
 		k_sem_give(&nrf5_data.rssi_wait);
 	}
 }
