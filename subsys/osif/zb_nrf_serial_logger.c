@@ -83,21 +83,6 @@ void zb_osif_serial_logger_init(void)
 		return;
 	}
 
-	/* Enable and configure USB device if USB CDC ACM is used to log ZBOSS Traces. */
-	if (IS_ENABLED(CONFIG_ZBOSS_TRACE_USB_CDC_LOGGING)) {
-		int ret = usb_enable(NULL);
-
-		if ((ret != 0) && (ret != -EALREADY)) {
-			LOG_ERR("USB initialization failed - No UART device to log ZBOSS Traces");
-			return;
-		}
-
-		/* Data Carrier Detect Modem - mark connection as established. */
-		(void)uart_line_ctrl_set(uart_dev, UART_LINE_CTRL_DCD, 1);
-		/* Data Set Ready - the NCP SoC is ready to communicate. */
-		(void)uart_line_ctrl_set(uart_dev, UART_LINE_CTRL_DSR, 1);
-	}
-
 	uart_irq_callback_set(uart_dev, interrupt_handler);
 
 	/* Enable rx interrupts. */
