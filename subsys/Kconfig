@@ -397,6 +397,18 @@ config ZIGBEE_NVRAM_PAGE_SIZE
 	int "The size of a single ZBOSS NVRAM page"
 	default 512
 
+config ZIGBEE_TOUCHLINK_INITIATOR
+	bool "Enable Touchlink initiator role"
+	select EXPERIMENTAL
+	help
+	  When set, the device acts as Touchlink initiator and can find and commission though a Touchlink target.
+
+config ZIGBEE_TOUCHLINK_TARGET
+	bool "Enable Touchlink target role"
+	select EXPERIMENTAL
+	help
+	  When set, the device acts as Touchlink target and can be found and commissioned by a Touchlink initiator.
+
 config ZIGBEE_TC_REJOIN_ENABLED
 	bool "Enables Trust Center Rejoin"
 	default y
