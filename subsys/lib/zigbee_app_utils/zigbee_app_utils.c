@@ -16,6 +16,10 @@
 #include <zigbee/zigbee_error_handler.h>
 #include <zb_nrf_platform.h>
 #include <zboss_api.h>
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR) || defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
+#include <zb_config.h>
+#include <zboss_api_zcl.h>
+#endif
 
 /* Number of retries until the pin value stabilizes. */
 #define READ_RETRIES  10
@@ -1057,3 +1061,139 @@ static void change_panid(zb_uint8_t param)
   }
 }
 #endif /* ZB_COORDINATOR_ROLE */
+
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+
+zb_uint32_t zigbee_touchlink_initiator_zll_primary_channel_mask(void)
+{
+	static const zb_uint8_t channels[] = ZB_ZLL_PRIMARY_CHANNELS;
+	zb_uint32_t mask = 0U;
+
+	for (size_t i = 0U; i < ARRAY_SIZE(channels); i++) {
+		mask |= (zb_uint32_t)1U << channels[i];
+	}
+	return mask;
+}
+
+void zigbee_touchlink_initiator_prepare_scan_channels(void)
+{
+	zb_uint32_t mask = zigbee_touchlink_initiator_zll_primary_channel_mask();
+
+#if defined(CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_SINGLE)
+	mask |= (zb_uint32_t)1U << CONFIG_ZIGBEE_CHANNEL;
+#elif defined(CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI)
+	mask |= (zb_uint32_t)CONFIG_ZIGBEE_CHANNEL_MASK;
+#endif
+
+	zb_set_channel_mask(mask);
+	zb_set_bdb_primary_channel_set(mask);
+}
+
+#endif /* CONFIG_ZIGBEE_TOUCHLINK_INITIATOR */
+
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
+
+extern void bdb_touchlink_target_start(zb_uint8_t param);
+
+enum zigbee_tl_target_state_e {
+	ZIGBEE_TL_TARGET_STATE_IDLE,
+	ZIGBEE_TL_TARGET_STATE_STARTED,
+	ZIGBEE_TL_TARGET_STATE_ON_NETWORK,
+};
+
+static enum zigbee_tl_target_state_e zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_IDLE;
+
+#define ZIGBEE_TL_STEERING_TO_TARGET_DELAY_BI (ZB_TIME_ONE_SECOND * 2U)
+
+static void zigbee_touchlink_target_request_network_steering(void)
+{
+	zb_set_bdb_commissioning_mode(ZB_BDB_NETWORK_STEERING);
+
+	if (bdb_start_top_level_commissioning(ZB_BDB_NETWORK_STEERING) != ZB_TRUE) {
+		LOG_WRN("Network steering: bdb_start_top_level_commissioning rejected");
+	}
+}
+
+static bool zigbee_touchlink_target_request(void)
+{
+	zb_ret_t zret;
+
+
+	zb_zdo_touchlink_set_rssi_threshold((zb_int8_t)-100);
+	zb_set_bdb_commissioning_mode(ZB_BDB_TOUCHLINK_TARGET);
+
+	zret = zb_buf_get_out_delayed(bdb_touchlink_target_start);
+	if (zret != RET_OK) {
+		LOG_WRN("Touchlink target: zb_buf_get_out_delayed failed (%d)", zret);
+		return false;
+	}
+
+	return true;
+}
+
+static void zigbee_touchlink_target_delayed_start(zb_uint8_t unused)
+{
+	ZVUNUSED(unused);
+	(void)zigbee_touchlink_target_request();
+}
+
+void zigbee_touchlink_target_signal_handler(zb_bufid_t bufid)
+{
+	zb_zdo_app_signal_type_t sig = zb_get_app_signal(bufid, NULL);
+	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(bufid);
+
+	if (sig == ZB_BDB_SIGNAL_STEERING && status != RET_OK && !ZB_JOINED() &&
+	    zigbee_tl_target_state == ZIGBEE_TL_TARGET_STATE_IDLE) {
+		zb_ret_t zr;
+
+		LOG_INF("Steering failed while not joined: schedule Touchlink target");
+		zr = ZB_SCHEDULE_APP_ALARM_CANCEL(zigbee_touchlink_target_delayed_start,
+						  ZB_ALARM_ANY_PARAM);
+		ZVUNUSED(zr);
+		zr = ZB_SCHEDULE_APP_ALARM(zigbee_touchlink_target_delayed_start, 0,
+					   ZIGBEE_TL_STEERING_TO_TARGET_DELAY_BI);
+		if (zr != RET_OK) {
+			LOG_WRN("Touchlink: schedule delayed start failed (%d)", zr);
+		}
+	}
+
+	switch (sig) {
+	case ZB_BDB_SIGNAL_TOUCHLINK_TARGET:
+		LOG_INF("Touchlink target: stack reported status %d", status);
+		if (status == RET_OK) {
+			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_STARTED;
+		} else {
+			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_IDLE;
+			zigbee_touchlink_target_request_network_steering();
+		}
+		break;
+
+	case ZB_BDB_SIGNAL_TOUCHLINK_NWK:
+		LOG_INF("Touchlink: network started/joined as target (status %d)", status);
+		if (status == RET_OK) {
+			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_ON_NETWORK;
+		}
+		break;
+
+	case ZB_BDB_SIGNAL_TOUCHLINK_TARGET_FINISHED:
+		LOG_INF("Touchlink target window finished (status %d)", status);
+		if (status == RET_OK) {
+			if (zigbee_tl_target_state == ZIGBEE_TL_TARGET_STATE_ON_NETWORK) {
+				LOG_INF("Touchlink: on network after target window");
+			} else {
+				LOG_INF("Touchlink: no pairing; idle (steering retries continue)");
+				zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_IDLE;
+			}
+		} else {
+			LOG_WRN("Touchlink target finished with error");
+			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_IDLE;
+			zigbee_touchlink_target_request_network_steering();
+		}
+		break;
+
+	default:
+		break;
+	}
+}
+
+#endif /* CONFIG_ZIGBEE_TOUCHLINK_TARGET */

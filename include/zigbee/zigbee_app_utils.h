@@ -282,6 +282,18 @@ static inline bool was_factory_reset_done(void)
 
 #endif /* CONFIG_ZIGBEE_FACTORY_RESET */
 
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+/** Bitmask from @ref ZB_ZLL_PRIMARY_CHANNELS (BDB Touchlink primary scan set). */
+zb_uint32_t zigbee_touchlink_initiator_zll_primary_channel_mask(void);
+/** Set AIB/BDB channel mask before Touchlink initiator commissioning. */
+void zigbee_touchlink_initiator_prepare_scan_channels(void);
+#endif
+
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
+/** Call from @c zboss_signal_handler() before @ref zigbee_default_signal_handler(). */
+void zigbee_touchlink_target_signal_handler(zb_bufid_t bufid);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
