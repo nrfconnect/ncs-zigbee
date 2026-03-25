@@ -16,6 +16,7 @@
 
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
+#include <zboss_api_zcl.h>
 #include <zigbee/zigbee_app_utils.h>
 #include <zigbee/zigbee_error_handler.h>
 #include <zb_nrf_platform.h>
@@ -642,6 +643,33 @@ void zboss_signal_handler(zb_bufid_t bufid)
 #endif /* CONFIG_ZIGBEE_FOTA */
 
 	switch (sig) {
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+	case ZB_BDB_SIGNAL_DEVICE_FIRST_START:
+		LOG_INF("First start: begin Touchlink commissioning (initiator)");
+		if (status == RET_OK) {
+			zigbee_touchlink_initiator_prepare_scan_channels();
+			zb_bool_t started = bdb_start_top_level_commissioning(
+				ZB_BDB_TOUCHLINK_COMMISSIONING);
+			if (!started) {
+				ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+			}
+		} else {
+			ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+		}
+		break;
+	case ZB_BDB_SIGNAL_TOUCHLINK:
+		ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+		if (status == RET_OK) {
+			LOG_INF("Touchlink done: start finding bulb");
+			zb_zdo_pim_set_long_poll_interval(3000);
+			if (bulb_ctx.short_addr == 0xFFFF) {
+				k_timer_start(&bulb_ctx.find_alarm,
+					      MATCH_DESC_REQ_START_DELAY,
+					      MATCH_DESC_REQ_TIMEOUT);
+			}
+		}
+		break;
+#endif /* CONFIG_ZIGBEE_TOUCHLINK_INITIATOR */
 	case ZB_BDB_SIGNAL_DEVICE_REBOOT:
 	/* fall-through */
 	case ZB_BDB_SIGNAL_STEERING:
@@ -809,6 +837,9 @@ void set_tx_power(void)
 	channel_mask = 1 << CONFIG_ZIGBEE_CHANNEL;
 #elif defined(CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI)
 	channel_mask = CONFIG_ZIGBEE_CHANNEL_MASK;
+#endif
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+	channel_mask |= zigbee_touchlink_initiator_zll_primary_channel_mask();
 #endif
 
 	for (; channel <= ZB_TRANSCEIVER_MAX_CHANNEL_NUMBER; channel++) {
