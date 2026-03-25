@@ -17,7 +17,6 @@ zb_ret_t zb_trans_set_channel(zb_uint8_t channel_number);
 void zb_trans_set_tx_power(zb_int8_t power);
 void zb_trans_get_tx_power(zb_int8_t *power);
 void zb_trans_set_pan_coord(zb_bool_t pan_coord);
-void zb_trans_set_auto_ack(zb_bool_t enabled);
 void zb_trans_set_promiscuous_mode(zb_bool_t enabled);
 void zb_trans_enter_receive(void);
 void zb_trans_enter_sleep(void);
@@ -33,6 +32,5 @@ zb_uint8_t zb_trans_get_next_packet(zb_bufid_t buf);
 zb_ret_t zb_trans_cca(void);
 zb_ret_t zb_trans_continuous_carrier(void);
 void zb_trans_set_crcpoly(zb_uint32_t iv, zb_uint32_t polynomial);
-void zb_trans_set_auto_ack_off(void);
 
 #endif /* ZB_TRANSCEIVER_H__ */
