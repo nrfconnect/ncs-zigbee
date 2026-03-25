@@ -79,8 +79,13 @@
 #define BUTTON_OFF                 DK_BTN2_MSK
 /* Dim step size - increases/decreses current level (range 0x000 - 0xfe). */
 #define DIMM_STEP                  15
-/* Button ID used to enable sleepy behavior. */
+/* Button ID used to enable sleepy behavior (sampled once at boot). */
 #define BUTTON_SLEEPY              DK_BTN3_MSK
+
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+/* Button 3: start Touchlink initiator at runtime (same pin as BUTTON_SLEEPY). */
+#define BUTTON_TOUCHLINK           DK_BTN3_MSK
+#endif
 
 /* Button to start Factory Reset */
 #define FACTORY_RESET_BUTTON       DK_BTN4_MSK
@@ -241,6 +246,19 @@ static void start_identifying(zb_bufid_t bufid)
 	}
 }
 
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+static void light_switch_touchlink_initiator_start_cb(zb_bufid_t bufid)
+{
+	ZVUNUSED(bufid);
+
+	LOG_INF("Starting Touchlink initiator");
+	zigbee_touchlink_initiator_prepare_scan_channels();
+	if (!bdb_start_top_level_commissioning(ZB_BDB_TOUCHLINK_COMMISSIONING)) {
+		LOG_WRN("Touchlink commissioning rejected (already in progress?)");
+	}
+}
+#endif
+
 /**@brief Callback for button events.
  *
  * @param[in]   button_state  Bitmask containing buttons state.
@@ -256,6 +274,13 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	user_input_indicate();
 
 	check_factory_reset_button(button_state, has_changed);
+
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+	if ((has_changed & BUTTON_TOUCHLINK) && (button_state & BUTTON_TOUCHLINK)) {
+		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
+		return;
+	}
+#endif
 
 	if (bulb_ctx.short_addr == 0xFFFF) {
 		LOG_DBG("No bulb found yet.");
@@ -644,19 +669,6 @@ void zboss_signal_handler(zb_bufid_t bufid)
 
 	switch (sig) {
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
-	case ZB_BDB_SIGNAL_DEVICE_FIRST_START:
-		LOG_INF("First start: begin Touchlink commissioning (initiator)");
-		if (status == RET_OK) {
-			zigbee_touchlink_initiator_prepare_scan_channels();
-			zb_bool_t started = bdb_start_top_level_commissioning(
-				ZB_BDB_TOUCHLINK_COMMISSIONING);
-			if (!started) {
-				ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
-			}
-		} else {
-			ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
-		}
-		break;
 	case ZB_BDB_SIGNAL_TOUCHLINK:
 		ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
 		if (status == RET_OK) {
