@@ -472,7 +472,9 @@ static void find_light_bulb_cb(zb_bufid_t bufid)
 
 		k_timer_stop(&bulb_ctx.find_alarm);
 		led_set_on(BULB_FOUND_LED);
-	} else {
+	} else if (bulb_ctx.short_addr != 0xFFFF) {
+		LOG_DBG("Match descriptor response ignored (bulb already selected)");
+	} else if ((resp->status != ZB_ZDP_STATUS_SUCCESS) || (resp->match_len == 0)) {
 		LOG_INF("Bulb not found, try again");
 	}
 
