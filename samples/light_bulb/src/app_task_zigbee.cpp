@@ -452,9 +452,10 @@ void zboss_signal_handler(zb_bufid_t bufid) {
   /* Update network status LED. */
   zigbee_led_status_update(bufid, ZIGBEE_NETWORK_STATE_LED);
 
-  /* No application-specific behavior is required.
-   * Call default signal handler.
-   */
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
+  zigbee_touchlink_target_signal_handler(bufid);
+#endif
+
   ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
 
   /* All callbacks should either reuse or free passed buffers.
