@@ -1118,8 +1118,7 @@ static bool zigbee_touchlink_target_request(void)
 {
 	zb_ret_t zret;
 
-
-	zb_zdo_touchlink_set_rssi_threshold((zb_int8_t)-100);
+	zb_zdo_touchlink_set_rssi_threshold((zb_int8_t)-64);
 	zb_set_bdb_commissioning_mode(ZB_BDB_TOUCHLINK_TARGET);
 
 	zret = zb_buf_get_out_delayed(bdb_touchlink_target_start);
