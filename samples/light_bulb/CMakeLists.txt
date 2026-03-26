@@ -18,7 +18,10 @@ project("Zigbee + Matter Light Bulb with FOTA")
 if(CONFIG_CHIP)
     # Enable GNU STD support for Matter
     include(${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR}/config/nrfconnect/app/enable-gnu-std.cmake)
-    
+
+    # Include all source files that are located in the Matter common directory.
+    include(${ZEPHYR_NRF_MODULE_DIR}/samples/matter/common/cmake/source_common.cmake)
+
     # Include Data Model utils (simplified for Zigbee coexistence)
     include(${ZEPHYR_NRF_MODULE_DIR}/samples/matter/common/cmake/data_model.cmake)
     
@@ -35,8 +38,10 @@ if(CONFIG_CHIP)
     
     # NORDIC SDK APP START
     target_sources(app PRIVATE
-        src/main_matter.c
-        src/matter_init.cpp
+        src/main.cpp
+        src/app_task_zigbee.cpp
+        src/app_task_matter.cpp
+        ${CHIP_ROOT}/src/app/persistence/DeferredAttributePersistenceProvider.cpp
     )
     
     ncs_configure_data_model()
@@ -44,7 +49,8 @@ if(CONFIG_CHIP)
 else()
     # Zigbee-only build
     target_sources(app PRIVATE
-        src/main.c
+        src/main.cpp
+        src/app_task_zigbee.cpp
     )
     
     target_include_directories(app PRIVATE include)

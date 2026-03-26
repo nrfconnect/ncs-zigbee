@@ -69,7 +69,3 @@ config DFU_MULTI_IMAGE_PACKAGE_NET
 endif # SOC_SERIES_NRF53X
 
 endif # BOOTLOADER_MCUBOOT
-
-#### Enable generating Matter factory data
-config MATTER_FACTORY_DATA_GENERATE
-	default y
