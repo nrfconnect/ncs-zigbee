@@ -11,10 +11,15 @@
 #include <nrf_802154_const.h>
 #include <nrf_802154_nrfx_addons.h>
 #include <nrf_802154_types.h>
+#include <string.h>
 #include <zboss_api.h>
 #include <zb_macll.h>
 #include <zb_transceiver.h>
 #include "zb_nrf_platform.h"
+
+#if defined(CONFIG_NRF_802154_CALLBACKS_DISPATCHER)
+#include <nrf_802154_callbacks_dispatcher.h>
+#endif
 
 #if defined(CONFIG_NRF_802154_SER_HOST)
 #include "nrf_802154_serialization_error.h"
@@ -61,7 +66,7 @@ struct zboss_rx_frame {
 
 struct nrf5_data {
 	enum zb_radio_state state;
-	
+
 	int8_t tx_power;
 	uint8_t channel;
 	bool promiscuous;
@@ -80,7 +85,7 @@ struct nrf5_data {
 		uint32_t time_us;
 		uint8_t value;
 	} energy_detection;
-	
+
 	struct k_sem rssi_wait;
 };
 
@@ -92,21 +97,15 @@ static void tx_done_ack_work_fn(struct k_work *work);
 static K_WORK_DEFINE(tx_done_ack_work, tx_done_ack_work_fn);
 #endif
 
-static int nrf_802154_radio_init(void)
+void zigbee_nrf_802154_radio_init(void)
 {
+	memset(&nrf5_data, 0, sizeof(nrf5_data));
 	k_fifo_init(&nrf5_data.rx.fifo);
 	k_sem_init(&nrf5_data.rssi_wait, 0, 1);
-	
-	nrf_802154_init();
-	
 	nrf5_data.state = ZB_RADIO_STATE_SLEEP;
 
-	LOG_INF("802.15.4 radio driver initialized");
-	
-	return 0;
+	LOG_INF("Zigbee radio initialized");
 }
-
-SYS_INIT(nrf_802154_radio_init, POST_KERNEL, CONFIG_ZBOSS_RADIO_INIT_PRIORITY);
 
 void zb_trans_hw_init(void)
 {
@@ -134,11 +133,11 @@ void zb_trans_set_short_addr(zb_uint16_t addr)
 static int zboss_energy_detection_start(uint32_t time_us)
 {
 	nrf5_data.energy_detection.time_us = time_us;
-	
+
 	if (!nrf_802154_energy_detection(time_us)) {
 		return -EBUSY;
 	}
-	
+
 	return 0;
 }
 
@@ -150,7 +149,7 @@ void zb_trans_start_get_rssi(zb_uint8_t scan_duration_bi)
 	LOG_DBG("%s: %d us", __func__, time_us);
 
 	err = zboss_energy_detection_start(time_us);
-	
+
 	while (err != 0) {
 		LOG_DBG("Energy detection start failed, retrying");
 		k_usleep(500);
@@ -328,7 +327,6 @@ zb_bool_t zb_trans_set_pending_bit(zb_uint8_t *addr, zb_bool_t value, zb_bool_t 
 
 void zb_trans_src_match_tbl_drop(void)
 {
-	LOG_DBG("%s", __func__);
 	nrf_802154_pending_bit_for_addr_reset(false);
 	nrf_802154_pending_bit_for_addr_reset(true);
 }
@@ -365,7 +363,7 @@ zb_uint8_t zb_trans_get_next_packet(zb_bufid_t buf)
 	zb_macll_metadata_t *metadata = ZB_MACLL_GET_METADATA(buf);
 	metadata->lqi = rx_frame->lqi;
 	metadata->power = rx_frame->power;
-	
+
 	*ZB_BUF_GET_PARAM(buf, zb_time_t) = (zb_time_t)rx_frame->time;
 	zb_macll_set_received_data_status(buf, rx_frame->ack_fpb);
 
@@ -394,8 +392,8 @@ static void tx_done_ack_work_fn(struct k_work *work)
 
 /* nRF 802.15.4 driver callbacks - modern API with metadata structures */
 
-void nrf_802154_transmitted_raw(uint8_t *p_frame,
-				const nrf_802154_transmit_done_metadata_t *p_metadata)
+static void zigbee_nrf_802154_transmitted_raw(uint8_t *p_frame,
+					      const nrf_802154_transmit_done_metadata_t *p_metadata)
 {
 	ARG_UNUSED(p_frame);
 
@@ -414,9 +412,8 @@ void nrf_802154_transmitted_raw(uint8_t *p_frame,
 	zigbee_event_notify(ZIGBEE_EVENT_TX_DONE);
 }
 
-void nrf_802154_transmit_failed(uint8_t *p_frame,
-				nrf_802154_tx_error_t error,
-				const nrf_802154_transmit_done_metadata_t *p_metadata)
+static void zigbee_nrf_802154_transmit_failed(uint8_t *p_frame, nrf_802154_tx_error_t error,
+					      const nrf_802154_transmit_done_metadata_t *p_metadata)
 {
 	ARG_UNUSED(p_frame);
 	ARG_UNUSED(p_metadata);
@@ -442,13 +439,13 @@ void nrf_802154_transmit_failed(uint8_t *p_frame,
 	zigbee_event_notify(ZIGBEE_EVENT_TX_FAILED);
 }
 
-void nrf_802154_tx_ack_started(const uint8_t *p_data)
+static void zigbee_nrf_802154_tx_ack_started(const uint8_t *p_data)
 {
 	nrf5_data.rx.last_frame_ack_fpb = p_data[FRAME_PENDING_OFFSET] & FRAME_PENDING_BIT;
 }
 
-void nrf_802154_received_timestamp_raw(uint8_t *p_data, int8_t power,
-				       uint8_t lqi, uint64_t time)
+static void zigbee_nrf_802154_received_timestamp_raw(uint8_t *p_data, int8_t power, uint8_t lqi,
+						     uint64_t time)
 {
 	struct zboss_rx_frame *rx_frame_free_slot = NULL;
 
@@ -483,25 +480,25 @@ void nrf_802154_received_timestamp_raw(uint8_t *p_data, int8_t power,
 	zigbee_event_notify(ZIGBEE_EVENT_RX_DONE);
 }
 
-void nrf_802154_receive_failed(nrf_802154_rx_error_t error, uint32_t id)
+static void zigbee_nrf_802154_receive_failed(nrf_802154_rx_error_t error, uint32_t id)
 {
 	ARG_UNUSED(id);
 	ARG_UNUSED(error);
 	nrf5_data.rx.last_frame_ack_fpb = false;
 }
 
-void nrf_802154_energy_detected(const nrf_802154_energy_detected_t *p_result)
+static void zigbee_nrf_802154_energy_detected(const nrf_802154_energy_detected_t *p_result)
 {
 	nrf5_data.energy_detection.value = zboss_normalize_ed_dbm(p_result->ed_dbm);
 	k_sem_give(&nrf5_data.rssi_wait);
 }
 
-void nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
+static void zigbee_nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
 {
 	ARG_UNUSED(error);
-	
+
 	int err = zboss_energy_detection_start(nrf5_data.energy_detection.time_us);
-	
+
 	if (err != 0) {
 		LOG_ERR("Failed to restart energy detection after failure");
 		nrf5_data.energy_detection.value = UINT8_MAX;
@@ -510,9 +507,102 @@ void nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
 }
 
 #if defined(CONFIG_NRF_802154_SER_HOST)
-void nrf_802154_serialization_error(const nrf_802154_ser_err_data_t *err)
+static void zigbee_nrf_802154_serialization_error(const nrf_802154_ser_err_data_t *err)
 {
+	ARG_UNUSED(err);
 	__ASSERT(false, "802.15.4 serialization error: %d", err->reason);
 	k_oops();
 }
 #endif
+
+#ifdef CONFIG_NRF_802154_CALLBACKS_DISPATCHER
+static void zigbee_nrf_802154_release_rx_frames(void)
+{
+	for (size_t i = 0; i < ARRAY_SIZE(nrf5_data.rx.frames); i++) {
+		if (nrf5_data.rx.frames[i].psdu != NULL) {
+			nrf_802154_buffer_free_raw(nrf5_data.rx.frames[i].psdu);
+			nrf5_data.rx.frames[i].psdu = NULL;
+		}
+	}
+}
+
+static void zigbee_nrf_802154_radio_deinit(void)
+{
+#if defined(CONFIG_NRF_802154_SER_HOST)
+	(void)k_work_cancel(&tx_done_ack_work);
+#endif
+	zigbee_nrf_802154_release_rx_frames();
+}
+
+static const struct nrf_802154_callbacks zigbee_802154_callbacks = {
+	.init = zigbee_nrf_802154_radio_init,
+	.deinit = zigbee_nrf_802154_radio_deinit,
+	.received_timestamp_raw = zigbee_nrf_802154_received_timestamp_raw,
+	.receive_failed = zigbee_nrf_802154_receive_failed,
+	.tx_ack_started = zigbee_nrf_802154_tx_ack_started,
+	.transmitted_raw = zigbee_nrf_802154_transmitted_raw,
+	.transmit_failed = zigbee_nrf_802154_transmit_failed,
+	.energy_detected = zigbee_nrf_802154_energy_detected,
+	.energy_detection_failed = zigbee_nrf_802154_energy_detection_failed,
+#if defined(CONFIG_NRF_802154_SER_HOST)
+	.serialization_error = zigbee_nrf_802154_serialization_error,
+#endif
+};
+
+NRF_802154_CALLBACKS_DISPATCHER_REGISTER(zigbee, zigbee_802154_callbacks);
+
+#else
+/* Translate the nrf_802154 callbacks to zigbee_nrf_802154_callbacks for
+ * backward compatibility */
+void nrf_802154_received_timestamp_raw(uint8_t *data, int8_t power, uint8_t lqi, uint64_t time)
+{
+	zigbee_nrf_802154_received_timestamp_raw(data, power, lqi, time);
+}
+
+void nrf_802154_receive_failed(nrf_802154_rx_error_t error, uint32_t id)
+{
+	zigbee_nrf_802154_receive_failed(error, id);
+}
+
+void nrf_802154_tx_ack_started(const uint8_t *data)
+{
+	zigbee_nrf_802154_tx_ack_started(data);
+}
+
+void nrf_802154_transmitted_raw(uint8_t *frame, const nrf_802154_transmit_done_metadata_t *metadata)
+{
+	zigbee_nrf_802154_transmitted_raw(frame, metadata);
+}
+
+void nrf_802154_transmit_failed(uint8_t *frame, nrf_802154_tx_error_t error,
+				const nrf_802154_transmit_done_metadata_t *metadata)
+{
+	zigbee_nrf_802154_transmit_failed(frame, error, metadata);
+}
+
+void nrf_802154_energy_detected(const nrf_802154_energy_detected_t *result)
+{
+	zigbee_nrf_802154_energy_detected(result);
+}
+
+void nrf_802154_energy_detection_failed(nrf_802154_ed_error_t error)
+{
+	zigbee_nrf_802154_energy_detection_failed(error);
+}
+
+#if defined(CONFIG_NRF_802154_SER_HOST)
+void nrf_802154_serialization_error(const nrf_802154_ser_err_data_t *err)
+{
+	zigbee_nrf_802154_serialization_error(err);
+}
+#endif
+
+static int zigbee_802154_radio_init(void)
+{
+	zigbee_nrf_802154_radio_init();
+	nrf_802154_init();
+	return 0;
+}
+
+SYS_INIT(zigbee_802154_radio_init, POST_KERNEL, CONFIG_ZBOSS_RADIO_INIT_PRIORITY);
+#endif /* CONFIG_NRF_802154_CALLBACKS_DISPATCHER */
