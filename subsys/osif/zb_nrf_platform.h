@@ -68,6 +68,9 @@ bool zigbee_is_zboss_thread_suspended(void);
  */
 int zigbee_init(void);
 
+/**@brief Function for deinitializing Zigbee OSIF resources after disable. */
+void zigbee_deinit(void);
+
 /**@brief Notify the ZBOSS thread about a new event.
  *
  * @param[in] event  Event to notify.
