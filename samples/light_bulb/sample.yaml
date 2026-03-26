@@ -2,6 +2,20 @@ sample:
   description: Zigbee Light control - light bulb sample
   name: Zigbee Light control
 tests:
+  sample.zigbee.light_bulb.matter:
+    sysbuild: true
+    build_only: true
+    extra_args:
+      - FILE_SUFFIX=matter_fota
+    integration_platforms:
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+    platform_allow:
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+    tags:
+      - ci_build
+      - smoke
+      - sysbuild
+      - ci_samples_zigbee
   sample.zigbee.light_bulb:
     sysbuild: true
     build_only: true
