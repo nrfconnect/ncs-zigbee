@@ -16,6 +16,7 @@
 
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
+#include <zboss_api_zcl.h>
 #include <zigbee/zigbee_app_utils.h>
 #include <zigbee/zigbee_error_handler.h>
 #include <zb_nrf_platform.h>
@@ -78,8 +79,13 @@
 #define BUTTON_OFF                 DK_BTN2_MSK
 /* Dim step size - increases/decreses current level (range 0x000 - 0xfe). */
 #define DIMM_STEP                  15
-/* Button ID used to enable sleepy behavior. */
+/* Button ID used to enable sleepy behavior (sampled once at boot). */
 #define BUTTON_SLEEPY              DK_BTN3_MSK
+
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+/* Button 3: start Touchlink initiator at runtime (same pin as BUTTON_SLEEPY). */
+#define BUTTON_TOUCHLINK           DK_BTN3_MSK
+#endif
 
 /* Button to start Factory Reset */
 #define FACTORY_RESET_BUTTON       DK_BTN4_MSK
@@ -240,6 +246,19 @@ static void start_identifying(zb_bufid_t bufid)
 	}
 }
 
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+static void light_switch_touchlink_initiator_start_cb(zb_bufid_t bufid)
+{
+	ZVUNUSED(bufid);
+
+	LOG_INF("Starting Touchlink initiator");
+	zigbee_touchlink_initiator_prepare_scan_channels();
+	if (!bdb_start_top_level_commissioning(ZB_BDB_TOUCHLINK_COMMISSIONING)) {
+		LOG_WRN("Touchlink commissioning rejected (already in progress?)");
+	}
+}
+#endif
+
 /**@brief Callback for button events.
  *
  * @param[in]   button_state  Bitmask containing buttons state.
@@ -255,6 +274,13 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	user_input_indicate();
 
 	check_factory_reset_button(button_state, has_changed);
+
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+	if ((has_changed & BUTTON_TOUCHLINK) && (button_state & BUTTON_TOUCHLINK)) {
+		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
+		return;
+	}
+#endif
 
 	if (bulb_ctx.short_addr == 0xFFFF) {
 		LOG_DBG("No bulb found yet.");
@@ -472,7 +498,9 @@ static void find_light_bulb_cb(zb_bufid_t bufid)
 
 		k_timer_stop(&bulb_ctx.find_alarm);
 		led_set_on(BULB_FOUND_LED);
-	} else {
+	} else if (bulb_ctx.short_addr != 0xFFFF) {
+		LOG_DBG("Match descriptor response ignored (bulb already selected)");
+	} else if ((resp->status != ZB_ZDP_STATUS_SUCCESS) || (resp->match_len == 0)) {
 		LOG_INF("Bulb not found, try again");
 	}
 
@@ -640,6 +668,20 @@ void zboss_signal_handler(zb_bufid_t bufid)
 #endif /* CONFIG_ZIGBEE_FOTA */
 
 	switch (sig) {
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+	case ZB_BDB_SIGNAL_TOUCHLINK:
+		ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+		if (status == RET_OK) {
+			LOG_INF("Touchlink done: start finding bulb");
+			zb_zdo_pim_set_long_poll_interval(3000);
+			if (bulb_ctx.short_addr == 0xFFFF) {
+				k_timer_start(&bulb_ctx.find_alarm,
+					      MATCH_DESC_REQ_START_DELAY,
+					      MATCH_DESC_REQ_TIMEOUT);
+			}
+		}
+		break;
+#endif /* CONFIG_ZIGBEE_TOUCHLINK_INITIATOR */
 	case ZB_BDB_SIGNAL_DEVICE_REBOOT:
 	/* fall-through */
 	case ZB_BDB_SIGNAL_STEERING:
@@ -807,6 +849,9 @@ void set_tx_power(void)
 	channel_mask = 1 << CONFIG_ZIGBEE_CHANNEL;
 #elif defined(CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI)
 	channel_mask = CONFIG_ZIGBEE_CHANNEL_MASK;
+#endif
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+	channel_mask |= zigbee_touchlink_initiator_zll_primary_channel_mask();
 #endif
 
 	for (; channel <= ZB_TRANSCEIVER_MAX_CHANNEL_NUMBER; channel++) {

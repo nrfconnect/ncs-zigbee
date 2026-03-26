@@ -1,7 +1,7 @@
 /*
  * ZBOSS Zigbee 3.0
  *
- * Copyright (c) 2012-2025 DSR Corporation, Denver CO, USA.
+ * Copyright (c) 2012-2026 DSR Corporation, Denver CO, USA.
  * www.dsr-zboss.com
  * www.dsr-corporation.com
  * All rights reserved.
@@ -119,6 +119,16 @@ void zb_secur_set_tc_rejoin_enabled(zb_bool_t enable);
  *  @param enable - whether to enable or disable TC Rejoin ignore.
  */
 void zb_secur_set_ignore_tc_rejoin(zb_bool_t enable);
+
+/**
+ *  Specifies whether remote policy changes are allowed.
+ *
+ *  If set to ZB_FALSE, remote requests that attempt to change Trust Center
+ *  policy (such as MgmtPermitJoin requests) will be rejected.
+ *
+ *  @param enable - whether to enable or disable remote policy changes.
+ */
+void zb_secur_set_allow_remote_policy_change(zb_bool_t enable);
 
 /**
  *  Specifies whether Trust Center Rejoin is allowed, when there is no unique TCLK.

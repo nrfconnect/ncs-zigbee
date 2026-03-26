@@ -304,8 +304,10 @@
 
 /**
  * Touchlink commissioning (experimental)
+ *
+ * Enable touchlink commissioning
  */
-/* #undef CONFIG_ZB_BDB_TOUCHLINK */
+#define CONFIG_ZB_BDB_TOUCHLINK y
 
 /**
  * Enable Zigbee MAC features, used by the verification framework - Enable API for sending inter-pan packets at non default channel
