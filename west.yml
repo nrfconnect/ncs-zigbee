@@ -5,10 +5,17 @@ manifest:
   remotes:
     - name: ncs
       url-base: https://github.com/nrfconnect
+    - name: ncs_ssh
+      url-base: git@github.com:nrfconnect
 
   projects:
     - name: nrf
       remote: ncs
       repo-path: sdk-nrf
-      revision: v3.2.0
+      revision: pull/27711/head
       import: true
+    - name: nrf-802154
+      remote: ncs_ssh
+      repo-path: sdk-nrf-802154
+      path: nrf-802154
+      revision: pull/719/head

@@ -365,6 +365,20 @@ int zigbee_init(void)
 
 SYS_INIT(zigbee_init, POST_KERNEL, CONFIG_ZBOSS_INIT_PRIORITY);
 
+void zigbee_deinit(void)
+{
+	if (zboss_tid) {
+		k_thread_abort(zboss_tid);
+		zboss_tid = NULL;
+	}
+
+	stack_is_started = false;
+	(void)k_work_cancel(&zb_app_cb_work);
+	k_msgq_purge(&zb_app_cb_msgq);
+	k_poll_signal_reset(&zigbee_sig);
+	(void)atomic_clear((atomic_t *)&zb_app_cb_process_scheduled);
+}
+
 #if IS_ENABLED(CONFIG_ZIGBEE_LIBRARY_NCP_DEV)
 void zb_ncp_app_fw_custom_post_start(void)
 {
