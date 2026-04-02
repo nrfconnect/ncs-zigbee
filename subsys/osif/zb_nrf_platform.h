@@ -15,10 +15,10 @@
 #include <zephyr/kernel.h>
 
 typedef enum {
-	ZIGBEE_EVENT_TX_FAILED,
-	ZIGBEE_EVENT_TX_DONE,
-	ZIGBEE_EVENT_RX_DONE,
-	ZIGBEE_EVENT_APP,
+  ZIGBEE_EVENT_TX_FAILED,
+  ZIGBEE_EVENT_TX_DONE,
+  ZIGBEE_EVENT_RX_DONE,
+  ZIGBEE_EVENT_APP,
 } zigbee_event_t;
 
 /**
@@ -67,6 +67,9 @@ bool zigbee_is_zboss_thread_suspended(void);
  * @return    0 if success
  */
 int zigbee_init(void);
+
+/**@brief Function for deinitializing Zigbee OSIF resources after disable. */
+void zigbee_deinit(void);
 
 /**@brief Notify the ZBOSS thread about a new event.
  *

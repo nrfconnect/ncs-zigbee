@@ -6,7 +6,13 @@
 
 / {
 	chosen {
-		ncs,zigbee-timer = &timer24;
+		ncs,zigbee-timer = &timer23;
+		ncs,zboss-trace-uart = &uart20;
+	};
+
+	aliases {
+		/* Configure PWM module for led1 (LED2 on the board) */
+		pwm-led1 = &pwm_led3;
 	};
 
 	pwmleds {
@@ -15,16 +21,6 @@
 			pwms = <&pwm20 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
 		};
 	};
-};
-
-// restore full RRAM and SRAM space - by default some parts are dedicated to FLRP
-&cpuapp_rram {
-	reg = <0x0 DT_SIZE_K(2036)>;
-};
-
-&cpuapp_sram {
-	reg = <0x20000000 DT_SIZE_K(512)>;
-	ranges = <0x0 0x20000000 DT_SIZE_K(512)>;
 };
 
 &pwm20 {
@@ -48,6 +44,6 @@
 	};
 };
 
-&timer24 {
+&timer23 {
 	status = "okay";
 };
