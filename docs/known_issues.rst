@@ -105,3 +105,37 @@ KRKNWK-21014: Increased power consumption after leaving network
   .. code-block:: C
 
     ZB_TRANSCEIVER_SET_RX_ON_OFF(zb_get_rx_on_when_idle());
+
+.. rst-class:: v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
+
+NCSIDB-1336: Zigbee Router device cannot rejoin after missing Network Key update or rotation
+  If a Zigbee Router device does not receive Network Key update or rotation messages (for example, while resetting or powered off), it may fall out of sync with the Trust Center and continue using old keys.
+
+  Section 4.3.6.1 of the Zigbee Core Specification states that a device which has missed a network key update may use procedures to obtain the latest key. 
+  That optional wording means the stack is not required to recover automatically.
+  In addition, BDB 3.0 does not describe a procedure a Zigbee Router can use to verify that its security keys are still valid.
+
+  **Workaround:** Extend the Router application to handle :c:macro:`ZB_NLME_STATUS_INDICATION` when the status is ``ZB_NWK_COMMAND_STATUS_BAD_KEY_SEQUENCE_NUMBER``.
+  Do not initiate a rejoin immediately after the first such status, because that could help an attacker force a rejoin without knowing the network key.
+  After several indications (for example, five), check whether the device is still connected to the network.
+  Do this by using the :c:func:`zb_zdo_simple_desc_req` function.
+  After several indications (for example, five), check whether the device is still connected to the network, for example using :c:func:`zb_zdo_simple_desc_req`.
+  If the returned message status is not ``ZB_ZDP_STATUS_SUCCESS``, start rejoin by calling :c:func:`zb_bdb_initiate_tc_rejoin`.
+  The device can then obtain the current key and rejoin whether the network is open or closed.
+
+  Place the logic in ``zboss_signal_handler()`` (inside the ``switch`` over the signal type), for example:
+
+  .. code-block:: C
+     :caption: Excerpt inside ``zboss_signal_handler()``
+
+     case ZB_NLME_STATUS_INDICATION: {
+       zb_zdo_signal_nlme_status_indication_params_t *nlme_status_ind =
+         ZB_ZDO_SIGNAL_GET_PARAMS(sig_hdr, zb_zdo_signal_nlme_status_indication_params_t);
+
+       if (nlme_status_ind->nlme_status.status ==
+           ZB_NWK_COMMAND_STATUS_BAD_KEY_SEQUENCE_NUMBER) {
+         /* Count indications; after a threshold, verify connectivity, then
+          * zb_bdb_initiate_tc_rejoin if needed. */
+       }
+       break;
+     }
