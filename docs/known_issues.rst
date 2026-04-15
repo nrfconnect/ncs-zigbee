@@ -139,3 +139,34 @@ NCSIDB-1336: Zigbee Router device cannot rejoin after missing Network Key update
        }
        break;
      }
+
+.. rst-class:: v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
+
+KRKNWK-12115: Simultaneous commissioning of many devices can cause the Coordinator device to assert
+  The Zigbee Coordinator can assert when multiple devices are being commissioned at the same time.
+  In some cases, the device can end up in a low memory state.
+
+  The :ref:`Zigbee network coordinator <zigbee_network_coordinator_sample>` sample includes :file:`zb_mem_config_max.h` by default, which already selects the coordinator-oriented configurable-memory profile, but the derived scheduler queue and buffer pool sizes can still be too small for very bursty join traffic.
+
+  **Workaround:** Where possible, reduce parallel commissioning. 
+  If you still hit asserts or allocation failures, increase the coordinator's scheduler queue and buffer pool:
+
+  #. Add a custom memory configuration header to your coordinator application (for layout, follow the :ref:`Light switch <zigbee_light_switch_sample>` sample and its :file:`samples/light_switch/include/zb_mem_config_custom.h` file).
+  #. Populate that header starting from the contents of :file:`zb_mem_config_max.h`, then override the limits as needed (see :file:`zb_mem_config_common.h` for how the base profile maps to numeric sizes).
+  #. In the custom header, after the block that includes :file:`zb_mem_config_common.h`, add overrides such as:
+
+     .. code-block:: c
+
+        /* Increase scheduler queue depth (allowed range 48U–256U). */
+        #undef ZB_CONFIG_SCHEDULER_Q_SIZE
+        #define ZB_CONFIG_SCHEDULER_Q_SIZE 96U
+        /* Increase IOBUF pool (allowed range 48U–127U). */
+        #undef ZB_CONFIG_IOBUF_POOL_SIZE
+        #define ZB_CONFIG_IOBUF_POOL_SIZE 64U
+
+  #. In the custom header, after the block that includes :file:`zb_mem_config_common.h`, add overrides such as:
+  #. In the coordinator :file:`main.c`, replace ``#include <zb_mem_config_max.h>`` with ``#include "zb_mem_config_custom.h"`` (or your header name).
+
+  Rebuild and re-check static RAM usage (see :ref:`zigbee_memory`). 
+  Higher pools increase footprint.
+
