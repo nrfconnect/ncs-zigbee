@@ -170,3 +170,10 @@ KRKNWK-12115: Simultaneous commissioning of many devices can cause the Coordinat
   Rebuild and re-check static RAM usage (see :ref:`zigbee_memory`). 
   Higher pools increase footprint.
 
+.. rst-class:: v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
+
+KRKNWK-7723: OTA upgrade process restarting after client reset
+  If the device resets while the ZCL OTA Upgrade Client is downloading an image, the transfer typically starts again from the beginning instead of continuing at the previous offset.
+
+  Download progress depends on volatile stack client state as well as OTA attributes. 
+  That state is not preserved across a chip reset in the default configuration.
