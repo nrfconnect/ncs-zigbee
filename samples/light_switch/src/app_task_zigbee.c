@@ -11,7 +11,8 @@
  */
 
 #include "app_task_zigbee.h"
-#include "protocol_state.h"
+
+#include <zigbee/matter_protocol_state.h>
 
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
