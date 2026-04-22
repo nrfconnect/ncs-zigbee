@@ -1,12 +1,17 @@
 /*
- * Copyright (c) 2024 Nordic Semiconductor ASA
+ * Copyright (c) 2024-2026 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
 /** @file
- * @brief Dimmer switch for HA profile implementation.
+ * @brief Dimmer switch for HA profile (Zigbee stack entry; Matter build shares the radio).
+ *
+ * Implemented in C because ZBOSS public macros use void * in ways that are not C++-compatible.
  */
+
+#include "app_task_zigbee.h"
+#include "protocol_state.h"
 
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
@@ -107,7 +112,7 @@
 #error Define ZB_ED_ROLE to compile light switch (End Device) source code.
 #endif
 
-LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(zb_lightswitch, LOG_LEVEL_INF);
 
 /* Helper functions for LED control in low power mode */
 #if CONFIG_LIGHT_SWITCH_LOW_POWER
@@ -259,16 +264,22 @@ static void light_switch_touchlink_initiator_start_cb(zb_bufid_t bufid)
 }
 #endif
 
-/**@brief Callback for button events.
+/**@brief Implementation of button event handling for Zigbee.
  *
  * @param[in]   button_state  Bitmask containing buttons state.
  * @param[in]   has_changed   Bitmask containing buttons that has
  *                            changed their state.
  */
-static void button_handler(uint32_t button_state, uint32_t has_changed)
+static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 {
 	zb_uint16_t cmd_id;
 	zb_ret_t zb_err_code;
+
+#ifdef CONFIG_CHIP
+	if (!protocol_is_zigbee_active()) {
+		return;
+	}
+#endif
 
 	/* Inform default signal handler about user input at the device. */
 	user_input_indicate();
@@ -346,6 +357,26 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	}
 }
 
+#ifdef CONFIG_CHIP
+void zb_button_handler(uint32_t button_state, uint32_t has_changed)
+{
+	zb_button_handler_impl(button_state, has_changed);
+}
+
+void zb_register_button_handler(void)
+{
+	static struct button_handler handler = {
+		.cb = zb_button_handler,
+	};
+	dk_button_handler_add(&handler);
+}
+#else
+/**@brief Callback wrapper for button events (non-Matter builds). */
+static void button_handler(uint32_t button_state, uint32_t has_changed)
+{
+	zb_button_handler_impl(button_state, has_changed);
+}
+
 /**@brief Function for initializing LEDs and Buttons. */
 static void configure_gpio(void)
 {
@@ -363,6 +394,7 @@ static void configure_gpio(void)
 	}
 #endif
 }
+#endif /* CONFIG_CHIP */
 
 static void alarm_timers_init(void)
 {
@@ -869,14 +901,16 @@ void set_tx_power(void)
 
 #endif /* CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER */
 
-int main(void)
+int ZigbeeStart(void)
 {
 	LOG_INF("Starting Zigbee R23 Light Switch example");
 
-	/* Initialize. */
+#ifndef CONFIG_CHIP
 	configure_gpio();
-	alarm_timers_init();
 	register_factory_reset_button(FACTORY_RESET_BUTTON);
+#endif
+
+	alarm_timers_init();
 
 	zigbee_erase_persistent_storage(ERASE_PERSISTENT_CONFIG);
 	zb_set_ed_timeout(ED_AGING_TIMEOUT_64MIN);
@@ -890,6 +924,8 @@ int main(void)
 	 */
 #if CONFIG_LIGHT_SWITCH_LOW_POWER
 	bool enable_sleepy = true;
+#elif defined(CONFIG_CHIP)
+	bool enable_sleepy = false;
 #else
 	bool enable_sleepy = (dk_get_buttons() & BUTTON_SLEEPY) ? true : false;
 #endif
