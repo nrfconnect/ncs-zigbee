@@ -15,8 +15,8 @@
 
 /* Reuse Nordic Matter light_switch sample AppTask (see CMakeLists.txt). */
 #include "app_task.h"
-#include "protocol_state.h"
 #include <app/matter_event_handler.h>
+#include <zigbee/matter_protocol_state.h>
 #include <nrf_802154_callbacks_dispatcher.h>
 #include <openthread.h>
 

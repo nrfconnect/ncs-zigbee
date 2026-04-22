@@ -1,0 +1,22 @@
+#
+# Copyright (c) 2026 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+menuconfig ZIGBEE_MATTER_PROTOCOL_STATE
+	bool "Persistent protocol state for combined Matter + Zigbee applications"
+	depends on CHIP && SETTINGS && ZIGBEE_ADD_ON
+	default y
+	help
+	  Small settings-backed module that tracks which protocol (Zigbee or
+	  Matter) the combined application should resume after a reboot. Used
+	  by samples that host both stacks on the same 802.15.4 radio.
+
+if ZIGBEE_MATTER_PROTOCOL_STATE
+
+module = ZIGBEE_MATTER_PROTOCOL_STATE
+module-str = Matter/Zigbee protocol state
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+endif # ZIGBEE_MATTER_PROTOCOL_STATE

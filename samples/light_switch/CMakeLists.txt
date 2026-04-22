@@ -34,7 +34,6 @@ if(CONFIG_CHIP)
 		src/app_task.cpp
 		src/app_task_zigbee.c
 		src/light_switch.cpp
-		src/protocol_state.c
 		src/shell_commands.cpp
 		${ZEPHYR_NRF_MODULE_DIR}/samples/matter/common/src/binding/binding_handler.cpp
 	)
