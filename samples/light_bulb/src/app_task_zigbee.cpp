@@ -9,6 +9,12 @@
  * @brief Simple Zigbee light bulb implementation.
  */
 
+#include "app_task_zigbee.h"
+
+#ifdef CONFIG_CHIP
+#include <zigbee/matter_protocol_state.h>
+#endif
+
 #include <soc.h>
 #include <zephyr/device.h>
 #include <zephyr/drivers/pwm.h>
@@ -191,14 +197,19 @@ static void start_identifying(zb_bufid_t bufid) {
   }
 }
 
-#ifndef CONFIG_CHIP
-/**@brief Callback for button events.
+/**@brief Implementation of button event handling for the Zigbee bulb.
  *
- * @param[in]   button_state  Bitmask containing the state of the buttons.
- * @param[in]   has_changed   Bitmask containing buttons that have changed their
- * state.
+ * In combined Matter+Zigbee builds the handler returns early when Matter is
+ * the active protocol so Matter's own handlers (registered by Board::Init())
+ * keep full ownership of the buttons.
  */
-static void button_changed(uint32_t button_state, uint32_t has_changed) {
+static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed) {
+#ifdef CONFIG_CHIP
+  if (!protocol_is_zigbee_active()) {
+    return;
+  }
+#endif
+
   if (IDENTIFY_MODE_BUTTON & has_changed) {
     if (IDENTIFY_MODE_BUTTON & button_state) {
       /* Button changed its state to pressed */
@@ -217,6 +228,23 @@ static void button_changed(uint32_t button_state, uint32_t has_changed) {
   }
 
   check_factory_reset_button(button_state, has_changed);
+}
+
+#ifdef CONFIG_CHIP
+void zb_button_handler(uint32_t button_state, uint32_t has_changed) {
+  zb_button_handler_impl(button_state, has_changed);
+}
+
+void zb_register_button_handler(void) {
+  static struct button_handler handler;
+
+  handler.cb = zb_button_handler;
+  dk_button_handler_add(&handler);
+}
+#else
+/**@brief Callback wrapper for button events (Zigbee-only builds). */
+static void button_changed(uint32_t button_state, uint32_t has_changed) {
+  zb_button_handler_impl(button_state, has_changed);
 }
 
 /**@brief Function for initializing additional PWM leds. */
