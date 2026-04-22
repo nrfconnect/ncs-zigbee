@@ -2,6 +2,35 @@ sample:
   description: Zigbee dimmable light switch based on ZBOSS stack
   name: Zigbee Light switch
 tests:
+  sample.zigbee.light_switch.matter:
+    sysbuild: true
+    build_only: true
+    extra_args:
+      - FILE_SUFFIX=matter_fota
+    integration_platforms:
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+    platform_allow:
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+    tags:
+      - ci_build
+      - smoke
+      - sysbuild
+      - ci_samples_zigbee
+  sample.zigbee.light_switch.matter.release:
+    sysbuild: true
+    build_only: true
+    extra_args:
+      - FILE_SUFFIX=matter_fota
+      - EXTRA_CONF_FILE=matter_fota_release.conf
+    integration_platforms:
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+    platform_allow:
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+    tags:
+      - ci_build
+      - smoke
+      - sysbuild
+      - ci_samples_zigbee
   sample.zigbee.light_switch:
     sysbuild: true
     build_only: true
