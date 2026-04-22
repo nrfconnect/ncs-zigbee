@@ -1,11 +1,24 @@
 /*
- * Copyright (c) 2024-2026 Nordic Semiconductor ASA
+ * Copyright (c) 2026 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#ifndef PROTOCOL_STATE_H
-#define PROTOCOL_STATE_H
+#ifndef ZIGBEE_MATTER_PROTOCOL_STATE_H_
+#define ZIGBEE_MATTER_PROTOCOL_STATE_H_
+
+/** @file
+ * @defgroup zigbee_matter_protocol_state Combined Matter + Zigbee protocol state
+ * @{
+ *
+ * @brief Persistent "which protocol is active" state for samples that host
+ * both Matter and Zigbee on the same 802.15.4 radio.
+ *
+ * The application boots on Zigbee by default. Once Matter commissioning
+ * completes, the state flips to Matter and is persisted so that subsequent
+ * reboots resume Matter directly (and Zigbee stack initialization is skipped).
+ * A factory reset resets the state back to Zigbee.
+ */
 
 #include <stdbool.h>
 
@@ -68,4 +81,6 @@ static inline bool protocol_is_matter_active(void)
 }
 #endif
 
-#endif /* PROTOCOL_STATE_H */
+/** @} */
+
+#endif /* ZIGBEE_MATTER_PROTOCOL_STATE_H_ */
