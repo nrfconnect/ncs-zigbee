@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2024-2026 Nordic Semiconductor ASA
+ * Copyright (c) 2026 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include "protocol_state.h"
+#include <zigbee/matter_protocol_state.h>
 
-#include <errno.h>
 #include <stdint.h>
 
 #include <zephyr/kernel.h>
@@ -14,7 +13,7 @@
 #include <zephyr/settings/settings.h>
 #include <zephyr/sys/atomic.h>
 
-LOG_MODULE_REGISTER(protocol_state, CONFIG_CHIP_APP_LOG_LEVEL);
+LOG_MODULE_REGISTER(matter_protocol_state, CONFIG_ZIGBEE_MATTER_PROTOCOL_STATE_LOG_LEVEL);
 
 /* Settings namespace dedicated to the Matter + Zigbee combined application.
  * Kept short and distinct from Matter's own subtrees ("mt/", "g/") and from
@@ -59,7 +58,7 @@ static int protocol_state_settings_set(const char *name, size_t len,
 	return 0;
 }
 
-SETTINGS_STATIC_HANDLER_DEFINE(protocol_state, PROTOCOL_STATE_SUBTREE, NULL,
+SETTINGS_STATIC_HANDLER_DEFINE(matter_protocol_state, PROTOCOL_STATE_SUBTREE, NULL,
 			       protocol_state_settings_set, NULL, NULL);
 
 int protocol_state_init(void)
