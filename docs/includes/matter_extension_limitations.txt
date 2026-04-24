@@ -1,0 +1,6 @@
+As a proof of concept, the Matter extension has the following limitations:
+
+* The 802.15.4 radio is time-shared, never concurrent: once the device is provisioned to Matter, Zigbee is torn down, and returning to Zigbee requires a Matter factory reset (which also wipes Matter storage).
+* The Matter extension cannot be combined with the :ref:`Multiprotocol Bluetooth LE extension <zigbee_light_switch_sample_nus>` (``overlay-multiprotocol_ble.conf``) or with the Zigbee-only FOTA build (``FILE_SUFFIX=fota``).
+* The Matter shell (``CONFIG_CHIP_LIB_SHELL``) and the Matter test shell are disabled to avoid option-parsing conflicts with the Zigbee shell.
+* The memory footprint is tuned empirically for ``nrf54lm20dk/nrf54lm20a/cpuapp``; porting to other targets requires revisiting the libc heap, ZBOSS thread, system work queue and partition sizes used by :file:`prj_matter_fota.conf`.

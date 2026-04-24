@@ -13,6 +13,7 @@ You can use it together with the :ref:`Zigbee Network coordinator <zigbee_networ
 
 This sample supports the optional `Sleepy End Device behavior`_ and :ref:`zigbee_light_switch_sample_nus`.
 It also supports :ref:`lib_zigbee_fota` for nRF52840, nRF5340, nRF54L15, nRF54L10 and nRF54LM20 SoCs.
+Additionally, as a proof of concept, it supports the optional :ref:`zigbee_light_switch_sample_matter`, which lets the same firmware start as a Zigbee end device and migrate to a Matter device after Matter commissioning.
 See :ref:`zigbee_light_switch_activating_variants` for details about how to enable these variants.
 
 Requirements
@@ -88,6 +89,34 @@ Transmitting and receiving data when using this example does not break connectio
 
 For more information about the multiprotocol feature, see `Multiprotocol support`_ in the |NCS| documentation.
 
+.. _zigbee_light_switch_sample_matter:
+
+Matter extension
+================
+
+This optional extension is a **proof of concept** of a combined Matter + Zigbee build on a single SoC.
+The ZBOSS stack and OpenThread (used by Matter) share the same 802.15.4 radio, with ownership handed over at commissioning time by the ``zigbee_matter_coexistence`` library.
+For Thread networking in Matter mode, the light switch acts as an OpenThread Minimal Thread Device (MTD).
+It is supported only on the ``nrf54lm20dk/nrf54lm20a/cpuapp`` board target.
+
+Protocol selection is time-separated and persisted across reboots:
+
+* On first boot, Zigbee owns the 802.15.4 radio and the device behaves as a standard :ref:`Zigbee End Device <zigbee_roles>` (Dimmer Switch).
+  In parallel, the Matter stack advertises for commissioning over Bluetooth LE (CHIPoBLE) for the duration configured by ``CONFIG_CHIP_BLE_ADVERTISING_DURATION`` (60 s by default).
+* When a Matter commissioner completes commissioning (first CASE session established while Thread is not yet attached), the coexistence layer stops the Zigbee stack, hands the radio over to OpenThread, and persists the selected protocol.
+  From this point on, the device operates as a Matter Dimmer Switch that controls remote Matter lights through the client-side binding cluster.
+* On subsequent boots, if the persisted protocol is Matter, the Zigbee stack is skipped entirely and the radio goes directly to OpenThread.
+* A Matter factory reset wipes the Zigbee network information, resets the persisted protocol back to Zigbee, and reboots the device as a fresh, commissioning-ready Zigbee End Device.
+
+Onboarding data (discriminator, passcode, QR code) is produced by the Matter factory data module (``CONFIG_CHIP_FACTORY_DATA_BUILD``) at build time.
+
+.. _zigbee_light_switch_matter_limitations:
+
+Matter extension limitations
+----------------------------
+
+.. include:: /includes/matter_extension_limitations.txt
+
 .. _zigbee_light_switch_configuration:
 
 Configuration
@@ -134,6 +163,12 @@ For example, when building from the command line, use the following command:
    :class: highlight
 
    west build samples/light_switch -b *board_target* -- -DEXTRA_CONF_FILE='overlay-multiprotocol_ble.conf'
+
+.. |sample matter ref| replace:: :ref:`zigbee_light_switch_sample_matter`
+.. |sample matter limitations ref| replace:: :ref:`zigbee_light_switch_matter_limitations`
+.. |sample dir| replace:: samples/light_switch
+
+.. include:: /includes/matter_extension_activation.txt
 
 For the board name to use instead of the ``board_target``, see `Programming board names`_.
 
@@ -429,6 +464,31 @@ In nRF Toolbox, tap the buttons you assigned to perform the test:
 
 You can now control the devices either with the buttons on the development kits or with the NUS UART command buttons in the nRF Toolbox application.
 
+.. _zigbee_light_switch_testing_matter:
+
+Testing the Matter extension
+----------------------------
+
+See :ref:`zigbee_light_switch_sample_matter` for the runtime behavior driving the steps below.
+
+To test the extension, you need:
+
+* A light switch built with the Matter extension (see :ref:`zigbee_light_switch_activating_variants`).
+* The standard Zigbee test setup (Network coordinator and a Zigbee light bulb) to verify Zigbee operation before commissioning.
+* A Matter controller that can commission a Thread device over Bluetooth LE, for example `CHIP Tool`_ or an ecosystem app (Apple Home, Google Home, Amazon Alexa).
+* A Thread Border Router reachable by the Matter fabric.
+* Optionally, a Matter light commissioned to the same Thread fabric to be bound to the light switch (for example, a Matter Light Bulb sample).
+
+Complete the following steps to exercise the full Zigbee-to-Matter flow:
+
+1. Verify Zigbee operation by following the standard `Testing`_ procedure.
+   While the device is still a Zigbee End Device, it also advertises for Matter commissioning over Bluetooth LE.
+#. Commission the device using the onboarding payload produced by the Matter factory data build (QR code or manual pairing code).
+   After the Matter CASE session is established, the light switch hands the radio over to Thread and stops participating in the Zigbee network.
+#. Bind the light switch to a Matter light (for example, with ``chip-tool binding write binding …``) and use the dimmer button to toggle or dim the bound light over Thread.
+#. To return the device to Zigbee operation, trigger a Matter factory reset from the controller (for example, ``chip-tool pairing unpair …``).
+   The device reboots as a fresh Zigbee End Device with Matter Bluetooth LE advertising active again.
+
 Sample output
 -------------
 
@@ -470,3 +530,10 @@ The following dependencies are added by the multiprotocol Bluetooth LE extension
   * ``include/bluetooth/hci.h``
   * ``include/bluetooth/uuid.h``
   * ``include/bluetooth/services/nus.h``
+
+The following dependencies are added by the :ref:`zigbee_light_switch_sample_matter`:
+
+* The Matter stack (``CONFIG_CHIP``) shipped with the |NCS|, including the Binding and Identify clusters and the Matter factory data module.
+* OpenThread (used by Matter on 802.15.4) and the `SoftDevice Controller`_ (used for CHIPoBLE commissioning).
+* The ``zigbee_matter_coexistence`` and ``zigbee_matter_protocol_state`` libraries, which orchestrate the 802.15.4 radio hand-over and persist the selected protocol.
+* The ``nrf_802154_callbacks_dispatcher`` (``CONFIG_NRF_802154_CALLBACKS_DISPATCHER``) with runtime re-init (``CONFIG_NRF_802154_DRV_REINIT_ENABLED``).

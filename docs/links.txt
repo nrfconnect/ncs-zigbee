@@ -45,6 +45,8 @@
 .. _`Known issues for the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-3.1.0/page/nrf/releases_and_maturity/known_issues.html
 .. _`Release notes for the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-3.1.0/page/nrf/releases_and_maturity/release_notes.html
 
+.. _`CHIP Tool`: https://docs.nordicsemi.com/bundle/ncs-latest/page/matter/chip_tool_guide.html
+
 .. _`DFU over Zigbee`: https://docs.nordicsemi.com/bundle/nrfutil/page/guides-nrf5sdk/dfu_performing.html#dfu-over-zigbee
 
 .. _`How to build an application`: https://docs.nordicsemi.com/bundle/nrf-connect-vscode/page/get_started/build_app_ncs.html

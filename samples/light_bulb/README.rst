@@ -11,6 +11,8 @@ This sample demonstrates a simple light bulb whose brightness can be adjusted by
 
 You can use this sample with the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` and :ref:`Zigbee Light switch <zigbee_light_switch_sample>` samples to set up a basic Zigbee network.
 
+As a proof of concept, the sample also supports the optional :ref:`zigbee_light_bulb_sample_matter`, which lets the same firmware start as a Zigbee Router and migrate to a Matter Dimmable Light after Matter commissioning.
+
 Requirements
 ************
 
@@ -32,6 +34,31 @@ Overview
 The Zigbee light bulb sample takes the :ref:`Zigbee Router <zigbee_roles>` role and implements the Dimmable Light device specification, as defined in the Zigbee Home Automation public application profile.
 This profile allows changing the brightness level of the light bulb's LED.
 
+.. _zigbee_light_bulb_sample_matter:
+
+Matter extension
+================
+
+This optional extension is a **proof of concept** of a combined Matter + Zigbee build on a single SoC, sharing the 802.15.4 radio between the ZBOSS stack and OpenThread (used by Matter).
+For Thread networking in Matter mode, the light bulb acts as an OpenThread Full Thread Device (FTD).
+It is supported only on the ``nrf54lm20dk/nrf54lm20a/cpuapp`` board target.
+
+The sample-specific behavior is:
+
+* On first boot, the device is a standard :ref:`Zigbee Router <zigbee_roles>` exposing the Dimmable Light device, while the Matter stack advertises for commissioning over Bluetooth LE (CHIPoBLE).
+* After successful Matter commissioning, the device is converted to a Matter Dimmable Light endpoint that serves the On/Off and Level Control clusters and drives the same LED through PWM.
+  It can then be controlled by any device on the Matter fabric bound to it (for example, the :ref:`zigbee_light_switch_sample` built with the :ref:`zigbee_light_switch_sample_matter`).
+* On subsequent boots, the device starts directly as a Matter Dimmable Light; a Matter factory reset reverts it to a fresh Zigbee Router.
+
+The radio hand-over, persistent protocol state, factory-reset behavior and onboarding-data generation are common to both combined samples and are described in detail in the :ref:`zigbee_light_switch_sample_matter` section of the Light switch sample.
+
+.. _zigbee_light_bulb_matter_limitations:
+
+Matter extension limitations
+----------------------------
+
+.. include:: /includes/matter_extension_limitations.txt
+
 Configuration
 *************
 
@@ -42,6 +69,17 @@ Configuration
   ===========
 
   .. include:: /includes/sample_fem_support.txt
+
+.. _zigbee_light_bulb_activating_variants:
+
+Configuration files for sample extensions
+=========================================
+
+.. |sample matter ref| replace:: :ref:`zigbee_light_bulb_sample_matter`
+.. |sample matter limitations ref| replace:: :ref:`zigbee_light_bulb_matter_limitations`
+.. |sample dir| replace:: samples/light_bulb
+
+.. include:: /includes/matter_extension_activation.txt
 
 User interface
 **************
@@ -158,6 +196,35 @@ After programming the sample to your development kits, complete the following st
 
 You can now use buttons on the light switch to control the light bulb, as described in the :ref:`zigbee_light_switch_user_interface` section of the Light switch sample page.
 
+.. _zigbee_light_bulb_testing_matter:
+
+Testing the Matter extension
+----------------------------
+
+See :ref:`zigbee_light_bulb_sample_matter` for the runtime behavior driving the steps below.
+
+To test the extension, you need:
+
+* A light bulb built with the Matter extension (see :ref:`zigbee_light_bulb_activating_variants`).
+* The standard Zigbee test setup (Network coordinator and a Zigbee light switch) to verify Zigbee operation before commissioning.
+* A Matter controller that can commission a Thread device over Bluetooth LE, for example `CHIP Tool`_ or an ecosystem app (Apple Home, Google Home, Amazon Alexa).
+* A Thread Border Router reachable by the Matter fabric.
+* Optionally, a Matter switch on the same Thread fabric to be bound to the light bulb (for example, the :ref:`zigbee_light_switch_sample` built with the :ref:`zigbee_light_switch_sample_matter`).
+
+Complete the following steps to exercise the full Zigbee-to-Matter flow:
+
+1. Verify Zigbee operation by following the standard `Testing`_ procedure.
+   While the device is still a Zigbee Router, it also advertises for Matter commissioning over Bluetooth LE.
+#. Commission the device using the onboarding payload produced by the Matter factory data build (QR code or manual pairing code).
+   After the Matter CASE session is established, the light bulb hands the radio over to Thread and stops participating in the Zigbee network.
+#. Drive the light bulb from a Matter peer:
+
+   * From the controller directly, with ``chip-tool onoff toggle …`` or ``chip-tool levelcontrol move-to-level …``.
+   * Or by binding a Matter switch to the light bulb and using the switch's dimmer button.
+
+#. To return the device to Zigbee operation, trigger a Matter factory reset from the controller (for example, ``chip-tool pairing unpair …``).
+   The device reboots as a fresh Zigbee Router with Matter Bluetooth LE advertising active again.
+
 Dependencies
 ************
 
@@ -181,3 +248,10 @@ In addition, it uses the following Zephyr libraries:
 * :file:`include/device.h`
 * `Logging`_
 * `Pulse Width Modulation (PWM)`_
+
+The following dependencies are added by the :ref:`zigbee_light_bulb_sample_matter`:
+
+* The Matter stack (``CONFIG_CHIP``) shipped with the |NCS|, including the On/Off, Level Control and Identify clusters and the Matter factory data module.
+* OpenThread (used by Matter on 802.15.4) and the `SoftDevice Controller`_ (used for CHIPoBLE commissioning).
+* The ``zigbee_matter_coexistence`` and ``zigbee_matter_protocol_state`` libraries, which orchestrate the 802.15.4 radio hand-over and persist the selected protocol.
+* The ``nrf_802154_callbacks_dispatcher`` (``CONFIG_NRF_802154_CALLBACKS_DISPATCHER``) with runtime re-init (``CONFIG_NRF_802154_DRV_REINIT_ENABLED``).
