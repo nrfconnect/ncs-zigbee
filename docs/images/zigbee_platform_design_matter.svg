@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="7.5in" height="4.44in" viewBox="0 0 540 320"
+     xml:space="preserve" class="st18">
+  <style type="text/css"><![CDATA[
+    .st1  {fill:#6ad1e3;stroke:#feffff;stroke-width:1}
+    .st3  {fill:#333f48;font-family:Calibri;font-size:24px}
+    .st4  {fill:#0033a0;stroke:none}
+    .st5  {fill:#feffff;font-family:Calibri;font-size:18px}
+    .st6  {fill:#00a9ce;stroke:none}
+    .st7  {fill:#ffffff;font-family:Calibri;font-size:14px}
+    .st8  {fill:#ffffff;font-family:Calibri;font-size:12px}
+    .st12 {fill:#0077c8;stroke:none}
+    .st16 {fill:#feffff;font-family:Calibri;font-size:12px}
+    .st18 {fill:none;fill-rule:evenodd;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+  ]]></style>
+
+  <rect x="1" y="1" width="538" height="318" class="st1"/>
+
+  <rect x="10" y="10" width="520" height="32" class="st4"/>
+  <text x="270" y="32" text-anchor="middle" class="st5">Application</text>
+
+  <rect x="10" y="50" width="170" height="125" class="st6"/>
+  <text x="95" y="67" text-anchor="middle" class="st7">Bluetooth® LE stack</text>
+  <rect x="20" y="80" width="150" height="45" class="st12"/>
+  <text x="95" y="100" text-anchor="middle" class="st16">Bluetooth LE host</text>
+  <text x="95" y="117" text-anchor="middle" class="st16">(L2CAP, ATT, GATT, GAP, SM)</text>
+  <rect x="20" y="130" width="150" height="30" class="st12"/>
+  <text x="95" y="149" text-anchor="middle" class="st16">HCI</text>
+
+  <rect x="185" y="50" width="170" height="125" class="st6"/>
+  <text x="270" y="67" text-anchor="middle" class="st7">Zigbee stack (ZBOSS)</text>
+  <rect x="195" y="80" width="150" height="25" class="st12"/>
+  <text x="270" y="97" text-anchor="middle" class="st16">Zigbee app layer (ZCL)</text>
+  <rect x="195" y="110" width="150" height="25" class="st12"/>
+  <text x="270" y="127" text-anchor="middle" class="st16">Zigbee PRO + Green Power</text>
+  <rect x="195" y="140" width="150" height="25" class="st12"/>
+  <text x="270" y="157" text-anchor="middle" class="st16">IEEE 802.15.4 MAC</text>
+
+  <rect x="360" y="50" width="170" height="125" class="st6"/>
+  <text x="445" y="67" text-anchor="middle" class="st7">Matter stack</text>
+  <rect x="370" y="80" width="150" height="25" class="st12"/>
+  <text x="445" y="97" text-anchor="middle" class="st16">Matter data model</text>
+  <rect x="370" y="110" width="150" height="25" class="st12"/>
+  <text x="445" y="127" text-anchor="middle" class="st16">Matter core</text>
+  <rect x="370" y="140" width="150" height="25" class="st12"/>
+  <text x="445" y="157" text-anchor="middle" class="st16">OpenThread</text>
+
+  <rect x="185" y="185" width="345" height="26" class="st4"/>
+  <text x="357" y="203" text-anchor="middle" class="st7">Radio coexistence layer</text>
+
+  <rect x="185" y="217" width="345" height="52" class="st6"/>
+  <text x="357" y="231" text-anchor="middle" class="st8">nRF IEEE 802.15.4 radio driver</text>
+  <rect x="195" y="236" width="325" height="28" class="st12"/>
+  <text x="357" y="254" text-anchor="middle" class="st16">IEEE 802.15.4 PHY</text>
+
+  <rect x="10" y="185" width="170" height="32" class="st12"/>
+  <text x="95" y="206" text-anchor="middle" class="st8">nRF Bluetooth® LE Controller</text>
+
+  <rect x="10" y="280" width="390" height="30" class="st6"/>
+  <text x="205" y="300" text-anchor="middle" class="st8">Multiprotocol Service Layer (MPSL)</text>
+
+  <text x="480" y="305" text-anchor="middle" class="st3">nRF SoC</text>
+</svg>
