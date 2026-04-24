@@ -276,7 +276,7 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	zb_uint16_t cmd_id;
 	zb_ret_t zb_err_code;
 
-#ifdef CONFIG_CHIP
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
 	if (!protocol_is_zigbee_active()) {
 		return;
 	}
@@ -358,7 +358,7 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	}
 }
 
-#ifdef CONFIG_CHIP
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
 void zb_button_handler(uint32_t button_state, uint32_t has_changed)
 {
 	zb_button_handler_impl(button_state, has_changed);
@@ -395,7 +395,7 @@ static void configure_gpio(void)
 	}
 #endif
 }
-#endif /* CONFIG_CHIP */
+#endif /* CONFIG_ZIGBEE_MATTER_COEXISTENCE */
 
 static void alarm_timers_init(void)
 {
@@ -979,4 +979,6 @@ int ZigbeeStart(void)
 	while (1) {
 		k_sleep(K_FOREVER);
 	}
+
+	return 0;
 }

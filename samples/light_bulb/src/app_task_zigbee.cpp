@@ -11,7 +11,7 @@
 
 #include "app_task_zigbee.h"
 
-#ifdef CONFIG_CHIP
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
 #include <zigbee/matter_protocol_state.h>
 #endif
 
@@ -204,7 +204,7 @@ static void start_identifying(zb_bufid_t bufid) {
  * keep full ownership of the buttons.
  */
 static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed) {
-#ifdef CONFIG_CHIP
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
   if (!protocol_is_zigbee_active()) {
     return;
   }
@@ -230,15 +230,16 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed) 
   check_factory_reset_button(button_state, has_changed);
 }
 
-#ifdef CONFIG_CHIP
-void zb_button_handler(uint32_t button_state, uint32_t has_changed) {
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
+extern "C" void zb_button_handler(uint32_t button_state, uint32_t has_changed) {
   zb_button_handler_impl(button_state, has_changed);
 }
 
-void zb_register_button_handler(void) {
-  static struct button_handler handler;
+extern "C" void zb_register_button_handler(void) {
+  static struct button_handler handler = {
+      .cb = zb_button_handler,
+  };
 
-  handler.cb = zb_button_handler;
   dk_button_handler_add(&handler);
 }
 #else
@@ -270,7 +271,7 @@ static void configure_gpio(void) {
 
   pwm_led_init();
 }
-#endif /* CONFIG_CHIP */
+#endif /* CONFIG_ZIGBEE_MATTER_COEXISTENCE */
 
 /**@brief Sets brightness of bulb luminous executive element
  *
@@ -494,7 +495,7 @@ void zboss_signal_handler(zb_bufid_t bufid) {
   }
 }
 
-int ZigbeeStart(void) {
+extern "C" int ZigbeeStart(void) {
   int blink_status = 0;
   int err;
 
@@ -509,7 +510,7 @@ int ZigbeeStart(void) {
   }
   register_factory_reset_button(FACTORY_RESET_BUTTON);
 
-#endif /* CONFIG_CHIP */
+#endif /* CONFIG_ZIGBEE_MATTER_COEXISTENCE */
 
   /* Register callback for handling ZCL commands. */
   ZB_ZCL_REGISTER_DEVICE_CB(zcl_device_cb);
@@ -541,4 +542,6 @@ int ZigbeeStart(void) {
     dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
     k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
   }
+
+  return 0;
 }

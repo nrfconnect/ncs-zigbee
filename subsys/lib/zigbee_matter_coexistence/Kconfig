@@ -1,0 +1,50 @@
+#
+# Copyright (c) 2026 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+menuconfig ZIGBEE_MATTER_COEXISTENCE
+	bool "Matter + Zigbee coexistence runtime for combined applications"
+	depends on CHIP && SETTINGS && ZIGBEE_ADD_ON
+	depends on BT && CHIP_ENABLE_PAIRING_AUTOSTART
+	depends on CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
+	select ZIGBEE_MATTER_PROTOCOL_STATE
+	default y
+	help
+	  Shared orchestration layer for samples that host both Matter and
+	  Zigbee stacks on the same 802.15.4 radio. Owns the Zigbee and
+	  Matter worker threads, the radio handover on first Matter
+	  commissioning, and updates the persistent protocol state across
+	  reboots and factory resets.
+
+	  Requires Matter BLE commissioning: the Zigbee worker waits for
+	  Matter to start BLE advertising so the buttons library is ready
+	  before the sample chains its Zigbee button handler onto it.
+
+	  On last-fabric removal the device reboots and the
+	  Zigbee-first boot path restores Zigbee operation.
+
+if ZIGBEE_MATTER_COEXISTENCE
+
+config ZIGBEE_MATTER_COEXISTENCE_ZIGBEE_THREAD_STACK_SIZE
+	int "Zigbee worker thread stack size (bytes)"
+	default 2048
+
+config ZIGBEE_MATTER_COEXISTENCE_ZIGBEE_THREAD_PRIORITY
+	int "Zigbee worker thread priority"
+	default 3
+
+config ZIGBEE_MATTER_COEXISTENCE_MATTER_THREAD_STACK_SIZE
+	int "Matter worker thread stack size (bytes)"
+	default 3072
+
+config ZIGBEE_MATTER_COEXISTENCE_MATTER_THREAD_PRIORITY
+	int "Matter worker thread priority"
+	default 3
+
+module = ZIGBEE_MATTER_COEXISTENCE
+module-str = Matter/Zigbee coexistence
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+endif # ZIGBEE_MATTER_COEXISTENCE
