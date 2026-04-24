@@ -1,0 +1,16 @@
+To activate the |sample matter ref|, build the sample with ``FILE_SUFFIX=matter_fota``.
+This selects the :file:`prj_matter_fota.conf` configuration, which enables Matter (``CONFIG_CHIP``), the ``CONFIG_ZIGBEE_MATTER_COEXISTENCE`` orchestration layer, and the matching static partition layout.
+
+.. parsed-literal::
+   :class: highlight
+
+   west build |sample dir| -b nrf54lm20dk/nrf54lm20a/cpuapp -- -DFILE_SUFFIX=matter_fota
+
+To produce a size-optimized release build (no logging, console or shell), add :file:`matter_fota_release.conf` as an extra overlay:
+
+.. parsed-literal::
+   :class: highlight
+
+   west build |sample dir| -b nrf54lm20dk/nrf54lm20a/cpuapp -- -DFILE_SUFFIX=matter_fota -DEXTRA_CONF_FILE='matter_fota_release.conf'
+
+See |sample matter limitations ref| for supported board targets and incompatible options.
