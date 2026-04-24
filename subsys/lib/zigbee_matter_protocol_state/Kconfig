@@ -6,7 +6,7 @@
 
 menuconfig ZIGBEE_MATTER_PROTOCOL_STATE
 	bool "Persistent protocol state for combined Matter + Zigbee applications"
-	depends on CHIP && SETTINGS && ZIGBEE_ADD_ON
+	depends on ZIGBEE_MATTER_COEXISTENCE && SETTINGS
 	default y
 	help
 	  Small settings-backed module that tracks which protocol (Zigbee or
