@@ -15,7 +15,7 @@ extern "C" {
 
 int ZigbeeStart(void);
 
-#ifdef CONFIG_CHIP
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
 /**
  * @brief Button handler for Zigbee in combined Matter+Zigbee builds.
  *
@@ -35,7 +35,7 @@ void zb_button_handler(uint32_t button_state, uint32_t has_changed);
  * so that dk_button_handler_add() finds an initialised subsystem.
  */
 void zb_register_button_handler(void);
-#endif /* CONFIG_CHIP */
+#endif /* CONFIG_ZIGBEE_MATTER_COEXISTENCE */
 
 #ifdef __cplusplus
 }
