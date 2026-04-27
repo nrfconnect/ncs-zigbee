@@ -7,7 +7,8 @@
 menuconfig ZIGBEE_SCENES
 	bool "Enable Zigbee scenes extension"
 	select SETTINGS
-	imply NVS
+	imply NVS if !SOC_FLASH_NRF_RRAM
+	imply ZMS if SOC_FLASH_NRF_RRAM
 
 if ZIGBEE_SCENES
 
