@@ -20,7 +20,9 @@
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#ifdef CONFIG_ZIGBEE_SCENES
 #include <zephyr/settings/settings.h>
+#endif
 #include <zephyr/types.h>
 
 extern "C" {
@@ -32,7 +34,9 @@ extern "C" {
 #include <zboss_api_addons.h>
 #include <zigbee/zigbee_app_utils.h>
 #include <zigbee/zigbee_error_handler.h>
+#ifdef CONFIG_ZIGBEE_SCENES
 #include <zigbee/zigbee_zcl_scenes.h>
+#endif
 }
 
 #define RUN_STATUS_LED DK_LED1
@@ -463,9 +467,13 @@ static void zcl_device_cb(zb_bufid_t bufid) {
     break;
 
   default:
+#ifdef CONFIG_ZIGBEE_SCENES
     if (zcl_scenes_cb(bufid) == ZB_FALSE) {
       device_cb_param->status = RET_NOT_IMPLEMENTED;
     }
+#else
+    device_cb_param->status = RET_NOT_IMPLEMENTED;
+#endif
     break;
   }
 
@@ -497,17 +505,21 @@ void zboss_signal_handler(zb_bufid_t bufid) {
 
 extern "C" int ZigbeeStart(void) {
   int blink_status = 0;
+#ifdef CONFIG_ZIGBEE_SCENES
   int err;
+#endif
 
   LOG_INF("Starting Zigbee R23 Light Bulb example");
 
   /* Initialize Buttons and Leds only if not using Matter */
-#ifndef CONFIG_CHIP
+#ifndef CONFIG_ZIGBEE_MATTER_COEXISTENCE
   configure_gpio();
+#ifdef CONFIG_ZIGBEE_SCENES
   err = settings_subsys_init();
   if (err) {
     LOG_ERR("settings initialization failed");
   }
+#endif
   register_factory_reset_button(FACTORY_RESET_BUTTON);
 
 #endif /* CONFIG_ZIGBEE_MATTER_COEXISTENCE */
@@ -524,6 +536,7 @@ extern "C" int ZigbeeStart(void) {
   /* Register handler to identify notifications. */
   ZB_AF_SET_IDENTIFY_NOTIFICATION_HANDLER(DIMMABLE_LIGHT_ENDPOINT, identify_cb);
 
+#ifdef CONFIG_ZIGBEE_SCENES
   /* Initialize ZCL scene table */
   zcl_scenes_init();
 
@@ -532,6 +545,7 @@ extern "C" int ZigbeeStart(void) {
   if (err) {
     LOG_ERR("settings loading failed");
   }
+#endif
 
   /* Start Zigbee default thread */
   zigbee_enable();
