@@ -12,6 +12,7 @@ This sample demonstrates a simple light bulb whose brightness can be adjusted by
 You can use this sample with the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` and :ref:`Zigbee Light switch <zigbee_light_switch_sample>` samples to set up a basic Zigbee network.
 
 As a proof of concept, the sample also supports the optional :ref:`zigbee_light_bulb_sample_matter`, which lets the same firmware start as a Zigbee Router and migrate to a Matter Dimmable Light after Matter commissioning.
+This combined Matter build also enables :ref:`Touchlink <zigbee_commissioning_modes_touchlink>` target support, so it can be commissioned by a nearby Touchlink initiator without a Zigbee Coordinator on the network.
 
 Requirements
 ************
@@ -51,6 +52,19 @@ The sample-specific behavior is:
 * On subsequent boots, the device starts directly as a Matter Dimmable Light; a Matter factory reset reverts it to a fresh Zigbee Router.
 
 The radio hand-over, persistent protocol state, factory-reset behavior and onboarding-data generation are common to both combined samples and are described in detail in the :ref:`zigbee_light_switch_sample_matter` section of the Light switch sample.
+
+.. _zigbee_light_bulb_sample_touchlink:
+
+Touchlink commissioning
+-----------------------
+
+The combined Matter build enables the light bulb as a Touchlink target (``CONFIG_ZIGBEE_TOUCHLINK_TARGET``).
+This lets a nearby Touchlink initiator (for example, the :ref:`zigbee_light_switch_sample` built with the :ref:`zigbee_light_switch_sample_matter`) commission the device directly and form a distributed-security Zigbee network without a Zigbee Coordinator.
+No dedicated button action is required on the light bulb to enable this role; the device responds to Touchlink scans whenever it is powered and not yet joined to a network.
+
+.. note::
+   Touchlink in the |addon| for the |NCS| is provided as an experimental feature with basic functionality.
+   See :ref:`zigbee_commissioning_modes_touchlink` for details.
 
 .. _zigbee_light_bulb_matter_limitations:
 
@@ -206,14 +220,23 @@ See :ref:`zigbee_light_bulb_sample_matter` for the runtime behavior driving the 
 To test the extension, you need:
 
 * A light bulb built with the Matter extension (see :ref:`zigbee_light_bulb_activating_variants`).
-* The standard Zigbee test setup (Network coordinator and a Zigbee light switch) to verify Zigbee operation before commissioning.
+* A Zigbee test setup to verify Zigbee operation before Matter commissioning.
+  You can use either the standard setup (a Network coordinator and a Zigbee light switch) or, alternatively, only a Touchlink-capable light switch (for example, the :ref:`zigbee_light_switch_sample` built with the Matter extension), in which case the Zigbee Coordinator is not needed.
 * A Matter controller that can commission a Thread device over Bluetooth LE, for example `CHIP Tool`_ or an ecosystem app (Apple Home, Google Home, Amazon Alexa).
 * A Thread Border Router reachable by the Matter fabric.
 * Optionally, a Matter switch on the same Thread fabric to be bound to the light bulb (for example, the :ref:`zigbee_light_switch_sample` built with the :ref:`zigbee_light_switch_sample_matter`).
 
 Complete the following steps to exercise the full Zigbee-to-Matter flow:
 
-1. Verify Zigbee operation by following the standard `Testing`_ procedure.
+1. Verify Zigbee operation in one of the following ways:
+
+   * Follow the standard `Testing`_ procedure with a Zigbee Network coordinator and a Zigbee light switch.
+   * Or, skip the Zigbee Coordinator and pair the light bulb directly with a Touchlink-capable light switch:
+
+     a. Power the light bulb (Touchlink target).
+     #. Power the light switch and press its Touchlink button (see :ref:`zigbee_light_switch_sample_touchlink`).
+        The two devices form a distributed-security Zigbee network without a Zigbee Coordinator, and the light switch finds and controls the light bulb.
+
    While the device is still a Zigbee Router, it also advertises for Matter commissioning over Bluetooth LE.
 #. Commission the device using the onboarding payload produced by the Matter factory data build (QR code or manual pairing code).
    After the Matter CASE session is established, the light bulb hands the radio over to Thread and stops participating in the Zigbee network.
