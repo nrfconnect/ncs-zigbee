@@ -14,6 +14,7 @@ You can use it together with the :ref:`Zigbee Network coordinator <zigbee_networ
 This sample supports the optional `Sleepy End Device behavior`_ and :ref:`zigbee_light_switch_sample_nus`.
 It also supports :ref:`lib_zigbee_fota` for nRF52840, nRF5340, nRF54L15, nRF54L10 and nRF54LM20 SoCs.
 Additionally, as a proof of concept, it supports the optional :ref:`zigbee_light_switch_sample_matter`, which lets the same firmware start as a Zigbee end device and migrate to a Matter device after Matter commissioning.
+This combined Matter build also enables :ref:`Touchlink <zigbee_commissioning_modes_touchlink>` initiator support, so it can commission a nearby Touchlink target without a Zigbee Coordinator on the network.
 See :ref:`zigbee_light_switch_activating_variants` for details about how to enable these variants.
 
 Requirements
@@ -109,6 +110,24 @@ Protocol selection is time-separated and persisted across reboots:
 * A Matter factory reset wipes the Zigbee network information, resets the persisted protocol back to Zigbee, and reboots the device as a fresh, commissioning-ready Zigbee End Device.
 
 Onboarding data (discriminator, passcode, QR code) is produced by the Matter factory data module (``CONFIG_CHIP_FACTORY_DATA_BUILD``) at build time.
+
+.. _zigbee_light_switch_sample_touchlink:
+
+Touchlink commissioning
+-----------------------
+
+The combined Matter build enables the light switch as a Touchlink initiator (``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR``).
+This lets the device commission directly with a nearby Touchlink target (for example, the :ref:`zigbee_light_bulb_sample` built with the :ref:`zigbee_light_bulb_sample_matter`) and form a distributed-security Zigbee network without a Zigbee Coordinator.
+
+.. tabs::
+
+   .. group-tab:: nRF54 DKs
+
+      Press **Button 2** during normal operation to start Touchlink commissioning.
+
+.. note::
+   Touchlink in the |addon| for the |NCS| is provided as an experimental feature with basic functionality.
+   See :ref:`zigbee_commissioning_modes_touchlink` for details.
 
 .. _zigbee_light_switch_matter_limitations:
 
@@ -305,6 +324,17 @@ Sleepy End Device behavior assignments
       Button 3:
           When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
 
+Matter extension Touchlink assignments
+======================================
+
+.. tabs::
+
+   .. group-tab:: nRF54 DKs
+
+      Button 2:
+          When the sample is built with the Matter extension and pressed during normal operation (after boot), it starts Touchlink commissioning as initiator.
+          See :ref:`zigbee_light_switch_sample_touchlink`.
+
 Multiprotocol Bluetooth LE extension assignments
 ================================================
 
@@ -474,14 +504,23 @@ See :ref:`zigbee_light_switch_sample_matter` for the runtime behavior driving th
 To test the extension, you need:
 
 * A light switch built with the Matter extension (see :ref:`zigbee_light_switch_activating_variants`).
-* The standard Zigbee test setup (Network coordinator and a Zigbee light bulb) to verify Zigbee operation before commissioning.
+* A Zigbee test setup to verify Zigbee operation before Matter commissioning.
+  You can use either the standard setup (a Network coordinator and a Zigbee light bulb) or, alternatively, only a Touchlink-capable light bulb (for example, the :ref:`zigbee_light_bulb_sample` built with the Matter extension), in which case the Zigbee Coordinator is not needed.
 * A Matter controller that can commission a Thread device over Bluetooth LE, for example `CHIP Tool`_ or an ecosystem app (Apple Home, Google Home, Amazon Alexa).
 * A Thread Border Router reachable by the Matter fabric.
 * Optionally, a Matter light commissioned to the same Thread fabric to be bound to the light switch (for example, a Matter Light Bulb sample).
 
 Complete the following steps to exercise the full Zigbee-to-Matter flow:
 
-1. Verify Zigbee operation by following the standard `Testing`_ procedure.
+1. Verify Zigbee operation in one of the following ways:
+
+   * Follow the standard `Testing`_ procedure with a Zigbee Network coordinator and a Zigbee light bulb.
+   * Or, skip the Zigbee Coordinator and pair the light switch directly with a Touchlink-capable light bulb:
+
+     a. Power the light bulb (Touchlink target).
+     #. Power the light switch and press the Touchlink button (see :ref:`zigbee_light_switch_sample_touchlink`).
+        The two devices form a distributed-security Zigbee network and the light switch finds the bulb to control, without a Zigbee Coordinator on the network.
+
    While the device is still a Zigbee End Device, it also advertises for Matter commissioning over Bluetooth LE.
 #. Commission the device using the onboarding payload produced by the Matter factory data build (QR code or manual pairing code).
    After the Matter CASE session is established, the light switch hands the radio over to Thread and stops participating in the Zigbee network.
