@@ -43,6 +43,18 @@ config ZIGBEE_FOTA_ENDPOINT
 config ZIGBEE_FOTA_PROGRESS_EVT
 	bool "Emit progress event upon receiving a download fragment"
 
+config ZIGBEE_FOTA_DOWNLOAD_RESUME
+	bool "Resume interrupted Zigbee FOTA downloads"
+	depends on DFU_TARGET_MCUBOOT
+	select DFU_MULTI_IMAGE_SAVE_PROGRESS
+	select DFU_TARGET_STREAM_SAVE_PROGRESS
+	select SETTINGS
+	help
+	  Store the Zigbee OTA and DFU multi-image progress in non-volatile
+	  settings so an interrupted download can continue after a device reset.
+	  A settings backend, such as NVS or ZMS, must also be enabled by the
+	  application.
+
 config ZIGBEE_FOTA_MANUFACTURER_ID
 	hex "Manufacturer ID"
 	default 0x127F
