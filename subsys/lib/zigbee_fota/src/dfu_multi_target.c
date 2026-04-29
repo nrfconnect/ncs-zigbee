@@ -30,6 +30,10 @@ union dfu_multi_target_ver {
 
 static int dfu_multi_target_open(int image_id, size_t image_size);
 static int dfu_multi_target_write(const uint8_t *chunk, size_t chunk_size);
+#ifdef CONFIG_DFU_MULTI_IMAGE_SAVE_PROGRESS
+static int dfu_multi_target_offset(size_t *offset);
+#endif
+static int dfu_multi_target_reset(void);
 static int dfu_multi_target_done_0(bool success);
 #if CONFIG_UPDATEABLE_IMAGE_NUMBER > 1
 static int dfu_multi_target_done_1(bool success);
@@ -49,7 +53,11 @@ static struct dfu_image_writer dfu_multi_target_writer_0 = {
 	.image_id = 0,
 	.open = dfu_multi_target_open,
 	.write = dfu_multi_target_write,
-	.close = dfu_multi_target_done_0
+	.close = dfu_multi_target_done_0,
+#ifdef CONFIG_DFU_MULTI_IMAGE_SAVE_PROGRESS
+	.offset = dfu_multi_target_offset,
+#endif
+	.reset = dfu_multi_target_reset,
 };
 
 #if CONFIG_UPDATEABLE_IMAGE_NUMBER > 1
@@ -58,7 +66,11 @@ static struct dfu_image_writer dfu_multi_target_writer_1 = {
 	.image_id = 1,
 	.open = dfu_multi_target_open,
 	.write = dfu_multi_target_write,
-	.close = dfu_multi_target_done_1
+	.close = dfu_multi_target_done_1,
+#ifdef CONFIG_DFU_MULTI_IMAGE_SAVE_PROGRESS
+	.offset = dfu_multi_target_offset,
+#endif
+	.reset = dfu_multi_target_reset,
 };
 #endif
 
@@ -68,7 +80,11 @@ static struct dfu_image_writer dfu_multi_target_writer_2 = {
 	.image_id = 2,
 	.open = dfu_multi_target_open,
 	.write = dfu_multi_target_write,
-	.close = dfu_multi_target_done_2
+	.close = dfu_multi_target_done_2,
+#ifdef CONFIG_DFU_MULTI_IMAGE_SAVE_PROGRESS
+	.offset = dfu_multi_target_offset,
+#endif
+	.reset = dfu_multi_target_reset,
 };
 #endif
 
@@ -88,6 +104,18 @@ static int dfu_multi_target_write(const uint8_t *chunk, size_t chunk_size)
 	LOG_DBG("Write next %d bytes", chunk_size);
 
 	return dfu_target_write(chunk, chunk_size);
+}
+
+#ifdef CONFIG_DFU_MULTI_IMAGE_SAVE_PROGRESS
+static int dfu_multi_target_offset(size_t *offset)
+{
+	return dfu_target_offset_get(offset);
+}
+#endif
+
+static int dfu_multi_target_reset(void)
+{
+	return dfu_target_reset();
 }
 
 static int dfu_multi_target_done_0(bool success)
