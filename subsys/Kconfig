@@ -33,10 +33,16 @@ if ZIGBEE_ADD_ON
 
 rsource "lib/Kconfig"
 
-if SOC_NRF52840
+# Settings backend selection
+config NVS
+	default y if !(SOC_FLASH_NRF_RRAM) && (ZIGBEE_FOTA_DOWNLOAD_RESUME || ZIGBEE_SCENES)
+
+config ZMS
+	default y if (SOC_FLASH_NRF_RRAM) && (ZIGBEE_FOTA_DOWNLOAD_RESUME || ZIGBEE_SCENES)
+
+# Flash partial erase configuration
 config SOC_FLASH_NRF_PARTIAL_ERASE_MS
-	default 6
-endif
+	default 6 if SOC_NRF52840
 
 # Override libc implementation
 choice LIBC_IMPLEMENTATION
