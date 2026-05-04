@@ -51,6 +51,8 @@ If all values are accepted, the OTA Upgrade Client downloads the first fragment 
 
 Once the download is started, all received data fragments are passed to the `DFU multi-image`_ library.
 The library takes care of where the upgrade candidate is stored, depending on the image type that is being downloaded.
+If the ``CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME`` Kconfig option is enabled, the client stores the information required to resume an interrupted download after a device reset.
+The library stores the Zigbee OTA session metadata and uses the `DFU multi-image`_ progress state to continue the transfer from the last saved offset after the device rejoins the network.
 
 When the download is completed, the download client sends an appropriate event.
 At this point, the received firmware is tagged as an upgrade candidate and the OTA server is queried for an update time.
@@ -71,6 +73,7 @@ To configure the Zigbee FOTA library, use the following options:
 * ``CONFIG_ZIGBEE_FOTA_DATA_BLOCK_SIZE``
 * ``CONFIG_ZIGBEE_FOTA_ENDPOINT``
 * ``CONFIG_ZIGBEE_FOTA_PROGRESS_EVT``
+* ``CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME``
 * ``CONFIG_ZIGBEE_FOTA_MANUFACTURER_ID``
 * ``CONFIG_ZIGBEE_FOTA_IMAGE_TYPE``
 * ``CONFIG_ZIGBEE_FOTA_COMMENT``
@@ -82,6 +85,10 @@ To configure the Zigbee FOTA library, use the following options:
 * ``CONFIG_ZIGBEE_FOTA_IMAGE_QUERY_INTERVAL_MIN``
 
 For detailed steps about configuring the library in a Zigbee sample or application, see :ref:`ug_zigbee_configuring_components_ota`.
+
+The ``CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME`` Kconfig option is opt-in and disabled by default.
+When enabled, it selects ``CONFIG_DFU_MULTI_IMAGE_SAVE_PROGRESS``, ``CONFIG_DFU_TARGET_STREAM_SAVE_PROGRESS``, and ``CONFIG_SETTINGS``, and the Zigbee add-on automatically defaults a settings backend to ``y`` for the target SoC: ``CONFIG_NVS`` on non-RRAM SoCs and ``CONFIG_ZMS`` on RRAM SoCs.
+The application can override that choice by setting ``CONFIG_NVS`` or ``CONFIG_ZMS`` explicitly.
 
 .. _lib_zigbee_fota_limitations:
 

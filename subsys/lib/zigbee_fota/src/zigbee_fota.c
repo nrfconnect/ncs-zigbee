@@ -11,6 +11,10 @@
 #include <zigbee/zigbee_error_handler.h>
 #include <zb_nrf_platform.h>
 #include <zigbee/zigbee_fota.h>
+#include <string.h>
+#ifdef CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME
+#include <zephyr/settings/settings.h>
+#endif
 #include "dfu_multi_target.h"
 #include "zigbee_ota.h"
 
@@ -21,6 +25,23 @@ LOG_MODULE_REGISTER(zigbee_fota, CONFIG_ZIGBEE_FOTA_LOG_LEVEL);
 #define TOTAL_HEADER_LEN       (MANDATORY_HEADER_LEN + OPTIONAL_HEADER_LEN)
 #define SUBELEMENT_HEADER_SIZE sizeof(zb_zcl_ota_upgrade_sub_element_hdr_t)
 
+#ifdef CONFIG_DFU_TARGET_STREAM_SYNCHRONOUS
+#if defined(CONFIG_DFU_MULTI_IMAGE_ALIGN) && (CONFIG_DFU_MULTI_IMAGE_ALIGN > 0)
+#define ZIGBEE_FOTA_STREAM_WRITE_ALIGN ((uint32_t)CONFIG_DFU_MULTI_IMAGE_ALIGN)
+#else
+#define ZIGBEE_FOTA_STREAM_WRITE_ALIGN ((uint32_t)sizeof(uint32_t))
+#endif
+#endif
+
+#ifdef CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME
+#define ZIGBEE_FOTA_SETTINGS_NAME "zigbee_fota"
+#define ZIGBEE_FOTA_RESUME_SETTINGS_NAME "resume"
+#define ZIGBEE_FOTA_RESUME_SETTINGS_FULL_NAME \
+	ZIGBEE_FOTA_SETTINGS_NAME "/" ZIGBEE_FOTA_RESUME_SETTINGS_NAME
+#define ZIGBEE_FOTA_RESUME_MAGIC 0x5a464f54
+#define ZIGBEE_FOTA_RESUME_VERSION 2
+#endif
+
 struct zb_ota_dfu_context {
 	uint32_t        ota_header_size;
 	uint32_t        bin_size;
@@ -29,6 +50,7 @@ struct zb_ota_dfu_context {
 	uint32_t        ota_header_fill_level;
 	uint32_t        ota_subelement_fill_level;
 	uint32_t        ota_image_processed;
+	uint32_t        target_file_version;
 	bool            mandatory_header_finished;
 	bool            process_optional_header;
 	bool            process_subelement_header;
@@ -65,6 +87,25 @@ struct zb_ota_client_ctx {
 static struct zb_ota_dfu_context ota_ctx;
 static struct zb_ota_client_ctx dev_ctx;
 static zigbee_fota_callback_t callback;
+
+#ifdef CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME
+struct zigbee_fota_resume_state {
+	uint32_t magic;
+	uint16_t version;
+	zb_uint16_t server_addr;
+	zb_ieee_addr_t upgrade_server;
+	uint32_t target_file_version;
+	uint32_t target_file_size;
+	uint32_t current_file_version;
+	uint32_t ota_header_size;
+	uint32_t ota_image_processed;
+	uint32_t bin_size;
+	zb_uint8_t server_ep;
+};
+
+static bool resume_settings_ready;
+static bool resume_state_loaded;
+#endif
 
 /* Declare attribute list for Basic cluster. */
 ZB_ZCL_DECLARE_BASIC_ATTRIB_LIST(ota_basic_attr_list,
@@ -115,6 +156,301 @@ static void send_progress(zb_uint8_t progress)
 #endif /* CONFIG_ZIGBEE_FOTA_PROGRESS_EVT */
 }
 
+static uint32_t ota_file_offset(void)
+{
+	uint32_t offset = ota_ctx.ota_header_fill_level +
+			  ota_ctx.ota_subelement_fill_level +
+			  ota_ctx.ota_image_processed;
+
+	if (ota_ctx.process_bin_image) {
+		offset += dfu_multi_image_offset();
+	}
+
+	return offset;
+}
+
+static void ota_dfu_reset(void)
+{
+	memset(&ota_ctx, 0, sizeof(ota_ctx));
+	ota_ctx.target_file_version =
+		ZB_ZCL_OTA_UPGRADE_DOWNLOADED_FILE_VERSION_DEF_VALUE;
+}
+
+#ifdef CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME
+struct ota_resume_load_ctx {
+	struct zigbee_fota_resume_state state;
+	bool loaded;
+};
+
+static void ota_resume_storage_init(void)
+{
+	int err;
+
+	if (resume_settings_ready) {
+		return;
+	}
+
+	err = settings_subsys_init();
+	if (err) {
+		LOG_WRN("Unable to initialize settings for Zigbee FOTA resume: %d", err);
+		return;
+	}
+
+	resume_settings_ready = true;
+}
+
+static bool ota_resume_server_params_are_valid(zb_uint16_t server_addr,
+					       zb_uint8_t server_ep)
+{
+	return server_addr != ZB_ZCL_OTA_UPGRADE_SERVER_ADDR_DEF_VALUE &&
+	       server_ep != ZB_ZCL_OTA_UPGRADE_SERVER_ENDPOINT_DEF_VALUE &&
+	       server_ep != 0;
+}
+
+static void ota_resume_get_server_params(zb_uint16_t *server_addr,
+					 zb_uint8_t *server_ep)
+{
+	zb_uint16_t ctx_server_addr =
+		ZB_ZCL_PARSED_HDR_SHORT_DATA(&ZCL_CTX().ota_cli.cmd_info_2)
+			.source.u.short_addr;
+	zb_uint8_t ctx_server_ep =
+		ZB_ZCL_PARSED_HDR_SHORT_DATA(&ZCL_CTX().ota_cli.cmd_info_2)
+			.src_endpoint;
+
+	if (ota_resume_server_params_are_valid(ctx_server_addr, ctx_server_ep)) {
+		*server_addr = ctx_server_addr;
+		*server_ep = ctx_server_ep;
+	} else {
+		*server_addr = dev_ctx.ota_attr.server_addr;
+		*server_ep = dev_ctx.ota_attr.server_ep;
+	}
+}
+
+static bool ota_resume_is_valid(const struct zigbee_fota_resume_state *state)
+{
+	return state->magic == ZIGBEE_FOTA_RESUME_MAGIC &&
+	       state->version == ZIGBEE_FOTA_RESUME_VERSION &&
+	       state->current_file_version == dev_ctx.ota_attr.file_version &&
+	       state->target_file_version !=
+		       ZB_ZCL_OTA_UPGRADE_DOWNLOADED_FILE_VERSION_DEF_VALUE &&
+	       state->target_file_size > 0 &&
+	       state->ota_header_size <= state->target_file_size &&
+	       state->ota_image_processed <= state->target_file_size &&
+	       state->bin_size > 0 &&
+	       ota_resume_server_params_are_valid(state->server_addr,
+						  state->server_ep);
+}
+
+static bool ota_resume_can_save(void)
+{
+	return ota_ctx.target_file_version !=
+		       ZB_ZCL_OTA_UPGRADE_DOWNLOADED_FILE_VERSION_DEF_VALUE &&
+	       ota_ctx.total_size > 0 &&
+	       dev_ctx.ota_attr.image_status ==
+		       ZB_ZCL_OTA_UPGRADE_IMAGE_STATUS_DOWNLOADING &&
+	       ota_ctx.mandatory_header_finished &&
+	       ota_ctx.process_bin_image;
+}
+
+static void ota_resume_save(void)
+{
+	struct zigbee_fota_resume_state state;
+	int err;
+
+	if (!resume_settings_ready || !ota_resume_can_save()) {
+		return;
+	}
+
+	/* Zero the whole struct so padding bytes are deterministic before
+	 * the blob is persisted to flash.
+	 */
+	memset(&state, 0, sizeof(state));
+
+	state.magic = ZIGBEE_FOTA_RESUME_MAGIC;
+	state.version = ZIGBEE_FOTA_RESUME_VERSION;
+	ota_resume_get_server_params(&state.server_addr, &state.server_ep);
+	state.target_file_version = ota_ctx.target_file_version;
+	state.target_file_size = ota_ctx.total_size;
+	state.current_file_version = dev_ctx.ota_attr.file_version;
+	state.ota_header_size = ota_ctx.ota_header_size;
+	state.ota_image_processed = ota_ctx.ota_image_processed;
+	state.bin_size = ota_ctx.bin_size;
+	ZB_MEMCPY(state.upgrade_server, dev_ctx.ota_attr.upgrade_server,
+		  sizeof(state.upgrade_server));
+
+	err = settings_save_one(ZIGBEE_FOTA_RESUME_SETTINGS_FULL_NAME,
+				&state, sizeof(state));
+	if (err) {
+		LOG_WRN("Unable to store Zigbee FOTA resume state: %d", err);
+	}
+}
+
+static void ota_resume_clear(void)
+{
+	int err;
+
+	resume_state_loaded = false;
+
+	if (!resume_settings_ready) {
+		return;
+	}
+
+	err = settings_delete(ZIGBEE_FOTA_RESUME_SETTINGS_FULL_NAME);
+	if (err && err != -ENOENT) {
+		LOG_WRN("Unable to clear Zigbee FOTA resume state: %d", err);
+	}
+}
+
+static int ota_resume_load_cb(const char *key, size_t len,
+			      settings_read_cb read_cb, void *cb_arg, void *param)
+{
+	struct ota_resume_load_ctx *ctx = param;
+	ssize_t rc;
+
+	if (strcmp(key, ZIGBEE_FOTA_RESUME_SETTINGS_NAME) != 0) {
+		return 0;
+	}
+
+	if (len != sizeof(ctx->state)) {
+		LOG_WRN("Ignoring invalid Zigbee FOTA resume state size: %zu", len);
+		return 0;
+	}
+
+	rc = read_cb(cb_arg, &ctx->state, sizeof(ctx->state));
+	if (rc != (ssize_t)sizeof(ctx->state)) {
+		LOG_WRN("Unable to read Zigbee FOTA resume state: %d", (int)rc);
+		return 0;
+	}
+
+	ctx->loaded = true;
+	return 1;
+}
+
+static void ota_resume_restore_zboss_context(void)
+{
+	zb_zcl_ota_set_file_size(CONFIG_ZIGBEE_FOTA_ENDPOINT, ota_ctx.total_size);
+	ZCL_CTX().ota_cli.ota_dfv = ota_ctx.target_file_version;
+}
+
+static bool ota_resume_server_is_valid(void)
+{
+	return ota_resume_server_params_are_valid(dev_ctx.ota_attr.server_addr,
+						  dev_ctx.ota_attr.server_ep);
+}
+
+static void ota_resume_restart_after_rejoin(void)
+{
+	ota_resume_restore_zboss_context();
+
+	if (ota_resume_server_is_valid()) {
+		zb_ret_t err;
+
+		err = zb_zcl_ota_upgrade_start_client(dev_ctx.ota_attr.server_ep,
+						      dev_ctx.ota_attr.server_addr);
+		if (err != RET_OK) {
+			LOG_WRN("Unable to restart Zigbee FOTA client for server 0x%04x ep %u: %d",
+				dev_ctx.ota_attr.server_addr,
+				dev_ctx.ota_attr.server_ep, err);
+		}
+	} else {
+		LOG_WRN("Resuming Zigbee FOTA without a known OTA server address");
+	}
+
+	zb_zcl_ota_restart_after_rejoin(CONFIG_ZIGBEE_FOTA_ENDPOINT);
+}
+
+static void ota_resume_restore_ota_context(const struct zigbee_fota_resume_state *state)
+{
+	memset(&ota_ctx, 0, sizeof(ota_ctx));
+
+	ota_ctx.ota_header_size = state->ota_header_size;
+	ota_ctx.ota_header_fill_level = state->ota_header_size;
+	ota_ctx.ota_image_processed = state->ota_image_processed;
+	ota_ctx.bin_size = state->bin_size;
+	ota_ctx.total_size = state->target_file_size;
+	ota_ctx.target_file_version = state->target_file_version;
+	ota_ctx.mandatory_header_finished = true;
+	ota_ctx.process_bin_image = true;
+}
+
+static int ota_resume_load(void)
+{
+	struct ota_resume_load_ctx load_ctx = {0};
+	uint32_t offset;
+	int err;
+
+	resume_state_loaded = false;
+
+	if (!resume_settings_ready) {
+		return 0;
+	}
+
+	err = settings_load_subtree_direct(ZIGBEE_FOTA_SETTINGS_NAME,
+					   ota_resume_load_cb, &load_ctx);
+	if (err) {
+		LOG_WRN("Unable to load Zigbee FOTA resume state: %d", err);
+		return err;
+	}
+
+	if (!load_ctx.loaded) {
+		return 0;
+	}
+
+	if (!ota_resume_is_valid(&load_ctx.state)) {
+		LOG_WRN("Ignoring stale Zigbee FOTA resume state");
+		ota_resume_clear();
+		return 0;
+	}
+
+	ota_resume_restore_ota_context(&load_ctx.state);
+	ZB_MEMCPY(dev_ctx.ota_attr.upgrade_server, load_ctx.state.upgrade_server,
+		  sizeof(dev_ctx.ota_attr.upgrade_server));
+	dev_ctx.ota_attr.server_addr = load_ctx.state.server_addr;
+	dev_ctx.ota_attr.server_ep = load_ctx.state.server_ep;
+
+	err = dfu_multi_target_init_default();
+	if (err) {
+		LOG_WRN("Unable to restore DFU multi-image state: %d", err);
+		ota_resume_clear();
+		return err;
+	}
+
+	offset = ota_file_offset();
+	if (offset > ota_ctx.total_size) {
+		LOG_WRN("Ignoring inconsistent Zigbee FOTA resume offset");
+		ota_resume_clear();
+		return -EINVAL;
+	}
+
+	dev_ctx.ota_attr.file_offset = offset;
+	dev_ctx.ota_attr.image_status =
+		ZB_ZCL_OTA_UPGRADE_IMAGE_STATUS_DOWNLOADING;
+	resume_state_loaded = true;
+
+	LOG_INF("Restored Zigbee FOTA download at offset %u of %u",
+		dev_ctx.ota_attr.file_offset, ota_ctx.total_size);
+
+	return 0;
+}
+#else
+static void ota_resume_save(void)
+{
+}
+
+static void ota_resume_clear(void)
+{
+}
+#endif /* CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME */
+
+static void ota_dfu_cancel(void)
+{
+	ota_dfu_reset();
+	ota_resume_clear();
+	if (dfu_multi_image_reset() != 0) {
+		LOG_ERR("Unable to reset DFU multi image transfer");
+	}
+}
+
 /**@brief Function for initializing all OTA clusters attributes.
  *
  * @note This function shall be called after the dfu initialization.
@@ -144,11 +480,6 @@ static void ota_client_attr_init(void)
 	dev_ctx.ota_attr.image_type = CONFIG_ZIGBEE_FOTA_IMAGE_TYPE;
 	dev_ctx.ota_attr.min_block_reque = 0;
 	dev_ctx.ota_attr.image_stamp = ZB_ZCL_OTA_UPGRADE_IMAGE_STAMP_MIN_VALUE;
-}
-
-static void ota_dfu_reset(void)
-{
-	memset(&ota_ctx, 0, sizeof(ota_ctx));
 }
 
 static zb_uint8_t ota_process_mandatory_header(zb_uint8_t *data, uint32_t len,
@@ -260,6 +591,7 @@ static zb_uint8_t ota_process_subelement_header(zb_uint8_t *data, uint32_t len,
 			if (err != 0) {
 				return ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;
 			}
+			ota_resume_save();
 		} else {
 			/* Skip unknown subelement payload. */
 			ota_ctx.ota_image_processed += hdr->length;
@@ -273,26 +605,32 @@ static zb_uint8_t ota_process_subelement_header(zb_uint8_t *data, uint32_t len,
 static zb_uint8_t ota_process_firmware(zb_uint32_t offset, zb_uint8_t *data, uint32_t len,
 				       uint32_t *bytes_copied)
 {
+	uint32_t write_len = len;
 	int err = 0;
 
-	LOG_DBG("Process firmware.");
-	LOG_DBG("Bytes left: %d copy: %d", ota_ctx.bin_size - offset, len);
-
-	err = dfu_multi_image_write(offset, data, len);
-	if (err != 0) {
-		LOG_ERR("dfu_multi_image_write err %d offset: %d len: %d", err, offset, len);
-
-		err = dfu_multi_image_done(false);
-		if (err != 0) {
-			LOG_ERR("Unable to cancel DFU image transfer");
+#ifdef CONFIG_DFU_TARGET_STREAM_SYNCHRONOUS
+	if (offset + write_len < ota_ctx.bin_size) {
+		write_len -= write_len % ZIGBEE_FOTA_STREAM_WRITE_ALIGN;
+		if (write_len == 0) {
+			*bytes_copied = 0;
+			return ZB_ZCL_OTA_UPGRADE_STATUS_OK;
 		}
+	}
+#endif
+
+	err = dfu_multi_image_write(offset, data, write_len);
+	if (err != 0) {
+		LOG_ERR("dfu_multi_image_write err: %d offset: %d len: %d bin_size: %d",
+			err, offset, write_len, ota_ctx.bin_size);
+
+		ota_dfu_cancel();
 
 		*bytes_copied = 0;
 		return ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;
 	}
 
-	*bytes_copied = len;
-	offset += len;
+	*bytes_copied = write_len;
+	offset += write_len;
 
 	if (ota_ctx.bin_size == offset) {
 		LOG_INF("Firmware downloaded.");
@@ -322,21 +660,18 @@ static zb_uint8_t ota_process_chunk(
 	uint8_t ret = ZB_ZCL_OTA_UPGRADE_STATUS_OK;
 	uint32_t bytes_consumed = 0;
 	uint32_t bytes_copied = 0;
-	zb_uint32_t current_offset = (
-		ota_ctx.ota_header_fill_level
-		+ ota_ctx.ota_subelement_fill_level
-		+ ota_ctx.ota_image_processed);
+	zb_uint32_t current_offset = ota_file_offset();
 
-	/* Add the offset provided by the dfu_multi_image library. */
-	if (ota_ctx.process_bin_image) {
-		current_offset += dfu_multi_image_offset();
-	}
-
-	if (ota->upgrade.receive.file_offset != current_offset) {
-		LOG_WRN("Unaligned OTA transfer. Expected: %d, received: %d",
+	if (ota->upgrade.receive.file_offset > current_offset) {
+		LOG_WRN("OTA transfer gap. Expected: %d, received: %d",
 			current_offset,
 			ota->upgrade.receive.file_offset);
 		return ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;
+	}
+
+	if (ota->upgrade.receive.file_offset < current_offset) {
+		bytes_consumed = MIN(current_offset - ota->upgrade.receive.file_offset,
+				     ota->upgrade.receive.data_length);
 	}
 
 	/* Process image header and save it in the memory. */
@@ -397,15 +732,7 @@ static zb_uint8_t ota_process_chunk(
 
 	/* Update the current file offset. */
 	if (bytes_consumed > 0) {
-		current_offset = (
-			ota_ctx.ota_header_fill_level
-			+ ota_ctx.ota_subelement_fill_level
-			+ ota_ctx.ota_image_processed);
-
-		/* Add the offset provided by the dfu_multi_image library. */
-		if (ota_ctx.process_bin_image) {
-			current_offset += dfu_multi_image_offset();
-		}
+		current_offset = ota_file_offset();
 
 		ZB_ZCL_SET_ATTRIBUTE(
 			CONFIG_ZIGBEE_FOTA_ENDPOINT,
@@ -450,9 +777,7 @@ static void ota_server_discovery_handler(struct k_timer *work)
 void zigbee_fota_abort(void)
 {
 	LOG_INF("ABORT Zigbee DFU");
-	/* Reset the context. */
-	ota_dfu_reset();
-	dfu_multi_image_done(false);
+	ota_dfu_cancel();
 }
 
 
@@ -465,6 +790,12 @@ int zigbee_fota_init(zigbee_fota_callback_t client_callback)
 
 	callback = client_callback;
 	ota_client_attr_init();
+#ifdef CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME
+	ota_resume_storage_init();
+	if (ota_resume_load() != 0) {
+		LOG_INF("Zigbee FOTA resume is unavailable for this boot");
+	}
+#endif
 
 	/* Initialize periodic OTA server discovery. */
 	k_timer_init(&dev_ctx.alarm, ota_server_discovery_handler, NULL);
@@ -486,6 +817,11 @@ void zigbee_fota_signal_handler(zb_bufid_t bufid)
 		if (status == RET_OK) {
 			k_timer_start(&dev_ctx.alarm, K_NO_WAIT,
 				K_HOURS(CONFIG_ZIGBEE_FOTA_SERVER_DISOVERY_INTERVAL_HRS));
+#ifdef CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME
+			if (resume_state_loaded) {
+				ota_resume_restart_after_rejoin();
+			}
+#endif
 		}
 		break;
 	default:
@@ -533,7 +869,14 @@ void zigbee_fota_zcl_cb(zb_bufid_t bufid)
 		 */
 		} else if (ota_upgrade_value->upgrade.start.file_version
 			 > dev_ctx.ota_attr.file_version) {
-			ota_dfu_reset();
+			/* Cancel any in-flight transfer first. A QueryNextImageResponse
+			 * can arrive after ota_resume_load() has already staged a
+			 * resume, in which case the stored dfu_multi_image state must
+			 * be torn down before the new image begins.
+			 */
+			ota_dfu_cancel();
+			ota_ctx.target_file_version =
+				ota_upgrade_value->upgrade.start.file_version;
 			ota_upgrade_value->upgrade_status =
 				ZB_ZCL_OTA_UPGRADE_STATUS_OK;
 		} else {
@@ -551,6 +894,7 @@ void zigbee_fota_zcl_cb(zb_bufid_t bufid)
 
 	case ZB_ZCL_OTA_UPGRADE_STATUS_CHECK:
 		LOG_INF("New OTA image downloaded.");
+		ota_resume_clear();
 		if (dfu_multi_image_done(true)) {
 			LOG_ERR("Unable to verify the update");
 			ota_upgrade_value->upgrade_status =

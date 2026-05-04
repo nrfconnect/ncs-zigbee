@@ -7,7 +7,6 @@
 menuconfig ZIGBEE_SCENES
 	bool "Enable Zigbee scenes extension"
 	select SETTINGS
-	imply NVS
 
 if ZIGBEE_SCENES
 
