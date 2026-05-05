@@ -55,6 +55,11 @@ struct zb_ota_dfu_context {
 	bool            process_optional_header;
 	bool            process_subelement_header;
 	bool            process_bin_image;
+#ifdef CONFIG_DFU_TARGET_STREAM_SYNCHRONOUS
+	uint8_t         stream_carry[ZIGBEE_FOTA_STREAM_WRITE_ALIGN];
+	uint32_t        stream_carry_offset;
+	uint32_t        stream_carry_len;
+#endif
 };
 
 struct zb_ota_upgrade_attr {
@@ -164,6 +169,9 @@ static uint32_t ota_file_offset(void)
 
 	if (ota_ctx.process_bin_image) {
 		offset += dfu_multi_image_offset();
+#ifdef CONFIG_DFU_TARGET_STREAM_SYNCHRONOUS
+		offset += ota_ctx.stream_carry_len;
+#endif
 	}
 
 	return offset;
@@ -583,15 +591,81 @@ static zb_uint8_t ota_process_firmware(zb_uint32_t offset, zb_uint8_t *data, uin
 	int err = 0;
 
 #ifdef CONFIG_DFU_TARGET_STREAM_SYNCHRONOUS
-	if (offset + write_len < ota_ctx.bin_size) {
-		write_len -= write_len % ZIGBEE_FOTA_STREAM_WRITE_ALIGN;
-		if (write_len == 0) {
+	uint32_t bytes_consumed = 0;
+	uint32_t end_offset = offset + len;
+	bool final_chunk = end_offset >= ota_ctx.bin_size;
+
+	if (ota_ctx.stream_carry_len > 0) {
+		if (offset != ota_ctx.stream_carry_offset + ota_ctx.stream_carry_len) {
+			LOG_ERR("Unexpected stream carry offset: %d expected: %d",
+				offset,
+				ota_ctx.stream_carry_offset + ota_ctx.stream_carry_len);
+			ota_dfu_cancel();
 			*bytes_copied = 0;
-			return ZB_ZCL_OTA_UPGRADE_STATUS_OK;
+			return ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;
+		}
+
+		write_len = MIN(len, ZIGBEE_FOTA_STREAM_WRITE_ALIGN - ota_ctx.stream_carry_len);
+		memcpy(&ota_ctx.stream_carry[ota_ctx.stream_carry_len], data, write_len);
+		ota_ctx.stream_carry_len += write_len;
+		bytes_consumed += write_len;
+
+		if ((ota_ctx.stream_carry_len == ZIGBEE_FOTA_STREAM_WRITE_ALIGN) || final_chunk) {
+			err = dfu_multi_image_write(ota_ctx.stream_carry_offset,
+						    ota_ctx.stream_carry,
+						    ota_ctx.stream_carry_len);
+			if (err != 0) {
+				LOG_ERR("dfu_multi_image_write err: %d offset: %d len: %d bin_size: %d",
+					err, ota_ctx.stream_carry_offset,
+					ota_ctx.stream_carry_len, ota_ctx.bin_size);
+
+				ota_dfu_cancel();
+
+				*bytes_copied = 0;
+				return ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;
+			}
+
+			ota_ctx.stream_carry_len = 0;
 		}
 	}
-#endif
 
+	if (bytes_consumed < len) {
+		offset += bytes_consumed;
+		data += bytes_consumed;
+		write_len = len - bytes_consumed;
+
+		if (!final_chunk) {
+			write_len -= write_len % ZIGBEE_FOTA_STREAM_WRITE_ALIGN;
+		}
+
+		if (write_len > 0) {
+			err = dfu_multi_image_write(offset, data, write_len);
+			if (err != 0) {
+				LOG_ERR("dfu_multi_image_write err: %d offset: %d len: %d bin_size: %d",
+					err, offset, write_len, ota_ctx.bin_size);
+
+				ota_dfu_cancel();
+
+				*bytes_copied = 0;
+				return ZB_ZCL_OTA_UPGRADE_STATUS_ERROR;
+			}
+
+			bytes_consumed += write_len;
+		}
+
+		if (bytes_consumed < len) {
+			ota_ctx.stream_carry_offset = offset + write_len;
+			ota_ctx.stream_carry_len = len - bytes_consumed;
+			memcpy(ota_ctx.stream_carry,
+			       &data[write_len],
+			       ota_ctx.stream_carry_len);
+			bytes_consumed = len;
+		}
+	}
+
+	*bytes_copied = bytes_consumed;
+	offset = end_offset;
+#else
 	err = dfu_multi_image_write(offset, data, write_len);
 	if (err != 0) {
 		LOG_ERR("dfu_multi_image_write err: %d offset: %d len: %d bin_size: %d",
@@ -605,6 +679,7 @@ static zb_uint8_t ota_process_firmware(zb_uint32_t offset, zb_uint8_t *data, uin
 
 	*bytes_copied = write_len;
 	offset += write_len;
+#endif
 
 	if (ota_ctx.bin_size == offset) {
 		LOG_INF("Firmware downloaded.");
