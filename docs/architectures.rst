@@ -26,7 +26,7 @@ This design has the following advantages:
 * Lowest power consumption
 * Lowest complexity
 
-It also has the following disadvantages:
+It also has the following trade-offs:
 
 * For some uses, the nRF SoC's MCU can be too slow to handle both the application and the network stack load.
 * The application and the network stack share flash and RAM space.
@@ -59,7 +59,7 @@ This design has the following advantages:
 
 * It allows to run Zigbee and Bluetooth LE simultaneously on a single chip, which reduces the overall BOM cost.
 
-It also has the following disadvantages:
+It also has the following trade-offs:
 
 * Bluetooth LE activity can degradate the connectivity on Zigbee if not implemented with efficiency in mind.
 
@@ -88,7 +88,7 @@ This design has the following advantages:
 * Commissioning over Bluetooth LE (CHIPoBLE) runs concurrently with normal Zigbee operation, so no dedicated Matter build or separate commissioning device is needed on the field.
 * Persistent protocol state makes Matter-commissioned devices skip the Zigbee stack entirely on subsequent boots, removing the Zigbee footprint from the hot path.
 
-It also has the following disadvantages:
+It also has the following trade-offs:
 
 * The 802.15.4 radio is used by one stack at a time, so Zigbee operation pauses once the device switches to Matter.
   Returning to Zigbee is done through a Matter factory reset, which also clears the Matter commissioning data.
@@ -132,7 +132,7 @@ The NCP design has the following advantages:
 * Access to the :ref:`full feature set of ZBOSS <zigbee_about>`.
 * Lower memory footprint on the connectivity side (as compared with single-SoC Zigbee applications).
 
-It also has the following disadvantages:
+It also has the following trade-offs:
 
 * The host part of the stack must be built and run for every individual host processor in use.
   However, Nordic Semiconductor provides reference implementation for Linux-based platforms in the ZBOSS NCP Host package.
