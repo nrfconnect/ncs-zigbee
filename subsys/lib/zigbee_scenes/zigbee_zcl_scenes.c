@@ -7,6 +7,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/settings/settings.h>
 #include <zb_nrf_platform.h>
+#include <zigbee/zigbee_settings_subsys.h>
 #include <zigbee/zigbee_zcl_scenes.h>
 
 LOG_MODULE_REGISTER(zigbee_zcl_scenes, CONFIG_ZIGBEE_SCENES_LOG_LEVEL);
@@ -54,7 +55,7 @@ static int scenes_table_set(const char *name, size_t len, settings_read_cb read_
 	const char *next;
 	int rc;
 
-	if (settings_name_steq(name, "scenes_table", &next) && !next) {
+	if (settings_name_steq(name, ZIGBEE_SETTINGS_KEY_SCENES_TABLE, &next) && !next) {
 		if (len != sizeof(scenes_table)) {
 			return -EINVAL;
 		}
@@ -67,16 +68,17 @@ static int scenes_table_set(const char *name, size_t len, settings_read_cb read_
 		return rc;
 	}
 
-	return -ENOENT;
+	return 0;
 }
 
 static void scenes_table_save(void)
 {
-	settings_save_one("scenes/scenes_table", scenes_table, sizeof(scenes_table));
+	settings_save_one(ZIGBEE_SETTINGS_FULL_NAME_SCENES_TABLE,
+			  scenes_table, sizeof(scenes_table));
 }
 
 struct settings_handler scenes_conf = {
-	.name = "scenes",
+	.name = ZIGBEE_SETTINGS_SUBSYS_NAME,
 	.h_set = scenes_table_set
 };
 
