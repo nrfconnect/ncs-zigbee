@@ -13,6 +13,7 @@
 #include <zigbee/zigbee_fota.h>
 #include <string.h>
 #ifdef CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME
+#include <zigbee/zigbee_settings_subsys.h>
 #include <zephyr/settings/settings.h>
 #endif
 #include "dfu_multi_target.h"
@@ -34,10 +35,6 @@ LOG_MODULE_REGISTER(zigbee_fota, CONFIG_ZIGBEE_FOTA_LOG_LEVEL);
 #endif
 
 #ifdef CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME
-#define ZIGBEE_FOTA_SETTINGS_NAME "zigbee_fota"
-#define ZIGBEE_FOTA_RESUME_SETTINGS_NAME "resume"
-#define ZIGBEE_FOTA_RESUME_SETTINGS_FULL_NAME \
-	ZIGBEE_FOTA_SETTINGS_NAME "/" ZIGBEE_FOTA_RESUME_SETTINGS_NAME
 #define ZIGBEE_FOTA_RESUME_MAGIC 0x5a464f54
 #define ZIGBEE_FOTA_RESUME_VERSION 1
 #endif
@@ -287,7 +284,7 @@ static void ota_resume_save(void)
 	ZB_MEMCPY(state.upgrade_server, dev_ctx.ota_attr.upgrade_server,
 		  sizeof(state.upgrade_server));
 
-	err = settings_save_one(ZIGBEE_FOTA_RESUME_SETTINGS_FULL_NAME,
+	err = settings_save_one(ZIGBEE_SETTINGS_FULL_NAME_FOTA_RESUME,
 				&state, sizeof(state));
 	if (err) {
 		LOG_WRN("Unable to store Zigbee FOTA resume state: %d", err);
@@ -304,7 +301,7 @@ static void ota_resume_clear(void)
 		return;
 	}
 
-	err = settings_delete(ZIGBEE_FOTA_RESUME_SETTINGS_FULL_NAME);
+	err = settings_delete(ZIGBEE_SETTINGS_FULL_NAME_FOTA_RESUME);
 	if (err && err != -ENOENT) {
 		LOG_WRN("Unable to clear Zigbee FOTA resume state: %d", err);
 	}
@@ -316,7 +313,7 @@ static int ota_resume_load_cb(const char *key, size_t len,
 	struct ota_resume_load_ctx *ctx = param;
 	ssize_t rc;
 
-	if (strcmp(key, ZIGBEE_FOTA_RESUME_SETTINGS_NAME) != 0) {
+	if (strcmp(key, ZIGBEE_SETTINGS_KEY_FOTA_RESUME) != 0) {
 		return 0;
 	}
 
@@ -367,7 +364,7 @@ static int ota_resume_load(void)
 		return 0;
 	}
 
-	err = settings_load_subtree_direct(ZIGBEE_FOTA_SETTINGS_NAME,
+	err = settings_load_subtree_direct(ZIGBEE_SETTINGS_SUBSYS_NAME,
 					   ota_resume_load_cb, &load_ctx);
 	if (err) {
 		LOG_WRN("Unable to load Zigbee FOTA resume state: %d", err);
