@@ -5,61 +5,55 @@
  */
 
 #include <zigbee/matter_protocol_state.h>
+#include <zigbee/zigbee_settings_subsys.h>
 
 #include <stdint.h>
 
 #include <zephyr/kernel.h>
+#include <zephyr/sys/util.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/settings/settings.h>
 #include <zephyr/sys/atomic.h>
 
 LOG_MODULE_REGISTER(matter_protocol_state, CONFIG_ZIGBEE_MATTER_PROTOCOL_STATE_LOG_LEVEL);
 
-/* Settings namespace dedicated to the Matter + Zigbee combined application.
- * Kept short and distinct from Matter's own subtrees ("mt/", "g/") and from
- * OpenThread's ("ot/") to avoid any accidental collision.
- */
-#define PROTOCOL_STATE_SUBTREE "zb_mt"
-#define PROTOCOL_STATE_KEY_NAME "proto"
-#define PROTOCOL_STATE_KEY PROTOCOL_STATE_SUBTREE "/" PROTOCOL_STATE_KEY_NAME
-
 static atomic_t active_protocol = ATOMIC_INIT(PROTOCOL_ZIGBEE);
 static atomic_t state_initialized = ATOMIC_INIT(0);
 static K_MUTEX_DEFINE(init_mutex);
 
-static int protocol_state_settings_set(const char *name, size_t len,
-				       settings_read_cb read_cb, void *cb_arg)
+static int protocol_state_load_direct_cb(const char *key, size_t len,
+					 settings_read_cb read_cb, void *cb_arg,
+					 void *param)
 {
 	const char *next;
 	uint8_t value;
 	ssize_t rc;
 
-	if (!settings_name_steq(name, PROTOCOL_STATE_KEY_NAME, &next) || next) {
-		return -ENOENT;
+	ARG_UNUSED(param);
+
+	if (!settings_name_steq(key, ZIGBEE_SETTINGS_KEY_MATTER_PROTOCOL_STATE, &next) || next) {
+		return 0;
 	}
 
 	if (len != sizeof(value)) {
 		LOG_WRN("Unexpected persisted protocol state size: %zu", len);
-		return -EINVAL;
+		return 0;
 	}
 
 	rc = read_cb(cb_arg, &value, sizeof(value));
 	if (rc < 0) {
 		LOG_ERR("Failed to read persisted protocol state: %d", (int)rc);
-		return (int)rc;
+		return 0;
 	}
 
 	if (value != PROTOCOL_ZIGBEE && value != PROTOCOL_MATTER) {
 		LOG_WRN("Discarding invalid persisted protocol value: %u", value);
-		return -EINVAL;
+		return 0;
 	}
 
 	atomic_set(&active_protocol, (atomic_val_t)value);
 	return 0;
 }
-
-SETTINGS_STATIC_HANDLER_DEFINE(matter_protocol_state, PROTOCOL_STATE_SUBTREE, NULL,
-			       protocol_state_settings_set, NULL, NULL);
 
 int protocol_state_init(void)
 {
@@ -82,13 +76,8 @@ int protocol_state_init(void)
 		return rc;
 	}
 
-	rc = settings_load_subtree(PROTOCOL_STATE_SUBTREE);
-	if (rc) {
-		/* No persisted entry is not an error: we keep the default
-		 * (Zigbee) so the device boots ready to be commissioned.
-		 */
-		LOG_WRN("settings_load_subtree failed: %d (using default)", rc);
-	}
+	(void)settings_load_subtree_direct(ZIGBEE_SETTINGS_SUBSYS_NAME,
+					   protocol_state_load_direct_cb, NULL);
 
 	atomic_set(&state_initialized, 1);
 
@@ -123,7 +112,7 @@ void protocol_state_set(active_protocol_t protocol)
 	}
 
 	uint8_t value = (uint8_t)protocol;
-	int rc = settings_save_one(PROTOCOL_STATE_KEY, &value, sizeof(value));
+	int rc = settings_save_one(ZIGBEE_SETTINGS_FULL_NAME_MATTER_PROTOCOL_STATE, &value, sizeof(value));
 
 	if (rc) {
 		LOG_ERR("Failed to persist protocol state: %d", rc);
