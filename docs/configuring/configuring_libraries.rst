@@ -87,6 +87,26 @@ Because the Zigbee OTA DFU performs the upgrade using the `DFU target`_ library,
 
 Configuring these options and updating the default values (at least updating the ``image_version`` to the application version) allows you to use Zigbee FOTA in the :ref:`zigbee_light_switch_sample` sample.
 
+Configuring MCUboot image compression
+=====================================
+
+You can enable `MCUboot image compression`_ for Zigbee FOTA updates to reduce the size of the image transferred over the Zigbee network.
+When compression is enabled, the generated Zigbee update file contains a compressed MCUboot image, and MCUboot decompresses it while applying the update.
+
+To enable compressed updates, set the following Kconfig options in the application's sysbuild configuration file:
+
+* ``SB_CONFIG_MCUBOOT_MODE_OVERWRITE_ONLY``
+* ``SB_CONFIG_MCUBOOT_COMPRESSED_IMAGE_SUPPORT``
+
+This setting reduces the update image size, but the MCUboot must run in the overwrite-only mode, so the device cannot revert to the previous image after the update is applied.
+
+The decompression support increases the size of the MCUboot image.
+Make sure that the bootloader partition is large enough for the generated MCUboot image, especially if you enable compression on a custom board or application.
+
+The secondary application slot does not have to be resized to use compressed Zigbee FOTA updates.
+You can reduce the secondary slot to save flash space, but only if your application's compressed update image always fits in the smaller slot.
+For more information about partitioning requirements and limitations, see `MCUboot image compression`_.
+
 Enabling Zigbee FOTA in an application
 ======================================
 

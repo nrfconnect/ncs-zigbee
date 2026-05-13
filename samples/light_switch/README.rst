@@ -121,10 +121,19 @@ For example, when building from the command line, use the following command:
 
    west build samples/light_switch -b  *board_target* -- -DFILE_SUFFIX=fota
 
+The FOTA variant enables `MCUboot image compression`_.
+The generated Zigbee update file contains a compressed MCUboot image, and MCUboot decompresses it while applying the update.
+This setting reduces the update image size, but the MCUboot must run in the overwrite-only mode, so the device cannot revert to the previous image after the update is applied.
+
 Alternatively, you can :ref:`configure Zigbee FOTA manually <ug_zigbee_configuring_components_ota>`.
 
 .. note::
    You can use the :file:`prj_fota.conf` file only with a development kit that contains the nRF52840, nRF5340, nRF54L15 or nRF54L10 SoC.
+
+.. note::
+   The decompression support increases the size of the MCUboot image.
+   When adapting this FOTA configuration to a custom board or application, make sure that the MCUboot partition is large enough for the generated bootloader image.
+   The sample keeps the primary and secondary application slots the same size; resizing the secondary slot is optional and depends on the compression ratio of your application image.
 
 To activate the Multiprotocol Bluetooth LE extension, set :makevar:`EXTRA_CONF_FILE` to the :file:`overlay-multiprotocol_ble.conf`.
 For example, when building from the command line, use the following command:

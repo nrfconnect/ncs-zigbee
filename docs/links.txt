@@ -16,6 +16,7 @@
 .. _`Building an application`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/app_dev/config_and_build/building.html
 .. _`Programming an application`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/app_dev/programming.html
 .. _`Secure bootloader chain`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/app_dev/bootloaders_dfu/mcuboot_nsib/bootloader.html
+.. _`MCUboot image compression`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/app_dev/bootloaders_dfu/mcuboot_image_compression.html
 .. _`Configuring devicetree`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/app_dev/config_and_build/hardware/index.html
 .. _`Programming board names`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/app_dev/board_support/board_names.html#programming-board-names
 
