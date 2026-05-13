@@ -112,7 +112,11 @@ static const struct pwm_dt_spec led_pwm = PWM_DT_SPEC_GET(PWM_DK_LED_NODE);
 /* Button to start Factory Reset */
 #define FACTORY_RESET_BUTTON IDENTIFY_MODE_BUTTON
 
+#if IS_ENABLED(CONFIG_CHIP)
+LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
+#else
 LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
+#endif
 
 /* Main application customizable context.
  * Stores all settings and static values.
