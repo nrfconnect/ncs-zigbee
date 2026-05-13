@@ -21,10 +21,6 @@
 
 #include <zigbee/matter_coexistence.h>
 
-#include <zephyr/logging/log.h>
-
-LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
-
 namespace
 {
 
