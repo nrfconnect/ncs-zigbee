@@ -41,6 +41,10 @@ jobs:
         west --version
         west init -l zigbee --mf west.yml &&
         west update -n -o=--depth=1 --path-cache /workdir/
+    - name: Install Python deps for Matter (codegen + factory data)
+      run: |
+        pip3 install -r nrf/scripts/requirements-extra.txt
+        pip3 install -r modules/lib/matter/scripts/setup/requirements.nrfconnect.txt
     - name: Twister build samples
       run: |
         source zephyr/zephyr-env.sh
