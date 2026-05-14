@@ -95,8 +95,8 @@ For more information about the multiprotocol feature, see `Multiprotocol support
 Matter extension
 ================
 
-This optional extension is a **proof of concept** of a combined Matter + Zigbee build on a single SoC.
-The ZBOSS stack and OpenThread (used by Matter) share the same 802.15.4 radio, with ownership handed over at commissioning time by the ``zigbee_matter_coexistence`` library.
+This optional extension is a proof of concept of a combined Matter and Zigbee build on a single SoC.
+The ZBOSS stack and OpenThread (used by Matter) share the same 802.15.4 radio, with ownership handed over at commissioning time by the :file`zigbee_matter_coexistence` library.
 For Thread networking in Matter mode, the light switch acts as an OpenThread Minimal Thread Device (MTD).
 It is supported only on the ``nrf54lm20dk/nrf54lm20a/cpuapp`` board target.
 
@@ -341,7 +341,7 @@ Matter extension Touchlink assignments
    .. group-tab:: nRF54 DKs
 
       Button 2:
-          When the sample is built with the Matter extension and pressed during normal operation (after boot), it starts Touchlink commissioning as initiator.
+          When you are building the sample with the Matter extension and press the button during normal operation (after boot), it starts Touchlink commissioning as initiator.
           See :ref:`zigbee_light_switch_sample_touchlink`.
 
 Multiprotocol Bluetooth LE extension assignments
@@ -579,9 +579,9 @@ The following dependencies are added by the multiprotocol Bluetooth LE extension
   * ``include/bluetooth/uuid.h``
   * ``include/bluetooth/services/nus.h``
 
-The following dependencies are added by the :ref:`zigbee_light_switch_sample_matter`:
+If you are using the optional :ref:`zigbee_light_switch_sample_matter`, this sample requires the following dependencies:
 
 * The Matter stack (``CONFIG_CHIP``) shipped with the |NCS|, including the Binding and Identify clusters and the Matter factory data module.
 * OpenThread (used by Matter on 802.15.4) and the `SoftDevice Controller`_ (used for CHIPoBLE commissioning).
-* The ``zigbee_matter_coexistence`` and ``zigbee_matter_protocol_state`` libraries, which orchestrate the 802.15.4 radio hand-over and persist the selected protocol.
-* The ``nrf_802154_callbacks_dispatcher`` (``CONFIG_NRF_802154_CALLBACKS_DISPATCHER``) with runtime re-init (``CONFIG_NRF_802154_DRV_REINIT_ENABLED``).
+* The :file:`zigbee_matter_coexistence` and :file:`zigbee_matter_protocol_state` libraries, which orchestrate the 802.15.4 radio hand-over and persist the selected protocol.
+* The :file:`nrf_802154_callbacks_dispatcher` (``CONFIG_NRF_802154_CALLBACKS_DISPATCHER``) with runtime re-init (``CONFIG_NRF_802154_DRV_REINIT_ENABLED``).
