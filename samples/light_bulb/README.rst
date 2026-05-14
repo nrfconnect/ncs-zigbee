@@ -40,7 +40,7 @@ This profile allows changing the brightness level of the light bulb's LED.
 Matter extension
 ================
 
-This optional extension is a **proof of concept** of a combined Matter + Zigbee build on a single SoC, sharing the 802.15.4 radio between the ZBOSS stack and OpenThread (used by Matter).
+This optional extension is a proof of concept of a combined Matter and Zigbee build on a single SoC, sharing the 802.15.4 radio between the ZBOSS stack and OpenThread (used by Matter).
 For Thread networking in Matter mode, the light bulb acts as an OpenThread Full Thread Device (FTD).
 It is supported only on the ``nrf54lm20dk/nrf54lm20a/cpuapp`` board target.
 
@@ -49,7 +49,8 @@ The sample-specific behavior is:
 * On first boot, the device is a standard :ref:`Zigbee Router <zigbee_roles>` exposing the Dimmable Light device, while the Matter stack advertises for commissioning over Bluetooth LE (CHIPoBLE).
 * After successful Matter commissioning, the device is converted to a Matter Dimmable Light endpoint that serves the On/Off and Level Control clusters and drives the same LED through PWM.
   It can then be controlled by any device on the Matter fabric bound to it (for example, the :ref:`zigbee_light_switch_sample` built with the :ref:`zigbee_light_switch_sample_matter`).
-* On subsequent boots, the device starts directly as a Matter Dimmable Light; a Matter factory reset reverts it to a fresh Zigbee Router.
+* On subsequent boots, the device starts directly as a Matter Dimmable Light. 
+  A Matter factory reset reverts it to a fresh Zigbee Router.
 
 The radio hand-over, persistent protocol state, factory-reset behavior and onboarding-data generation are common to both combined samples and are described in detail in the :ref:`zigbee_light_switch_sample_matter` section of the Light switch sample.
 
@@ -60,7 +61,8 @@ Touchlink commissioning
 
 The combined Matter build enables the light bulb as a Touchlink target (``CONFIG_ZIGBEE_TOUCHLINK_TARGET``).
 This lets a nearby Touchlink initiator (for example, the :ref:`zigbee_light_switch_sample` built with the :ref:`zigbee_light_switch_sample_matter`) commission the device directly and form a distributed-security Zigbee network without a Zigbee Coordinator.
-No dedicated button action is required on the light bulb to enable this role; the device responds to Touchlink scans whenever it is powered and not yet joined to a network.
+No dedicated button action is required on the light bulb to enable this role.
+The device responds to Touchlink scans whenever it is powered and not yet joined to a network.
 
 .. note::
    Touchlink in the |addon| for the |NCS| is provided as an experimental feature with basic functionality.
@@ -273,9 +275,9 @@ In addition, it uses the following Zephyr libraries:
 * `Logging`_
 * `Pulse Width Modulation (PWM)`_
 
-The following dependencies are added by the :ref:`zigbee_light_bulb_sample_matter`:
+If you are using the optional :ref:`zigbee_light_bulb_sample_matter`, this sample requires the following dependencies:
 
 * The Matter stack (``CONFIG_CHIP``) shipped with the |NCS|, including the On/Off, Level Control and Identify clusters and the Matter factory data module.
 * OpenThread (used by Matter on 802.15.4) and the `SoftDevice Controller`_ (used for CHIPoBLE commissioning).
-* The ``zigbee_matter_coexistence`` and ``zigbee_matter_protocol_state`` libraries, which orchestrate the 802.15.4 radio hand-over and persist the selected protocol.
+* The :file:`zigbee_matter_coexistence` and :file:`zigbee_matter_protocol_state` libraries, which orchestrate the 802.15.4 radio hand-over and persist the selected protocol.
 * The ``nrf_802154_callbacks_dispatcher`` (``CONFIG_NRF_802154_CALLBACKS_DISPATCHER``) with runtime re-init (``CONFIG_NRF_802154_DRV_REINIT_ENABLED``).

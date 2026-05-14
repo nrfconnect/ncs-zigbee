@@ -92,25 +92,32 @@ Single-chip, combined Matter + Zigbee (SoC)
 In this design, the Zigbee (ZBOSS) and Matter over Thread (OpenThread) stacks run on the same nRF SoC and share the single 802.15.4 radio through a coexistence layer, while a `SoftDevice Controller`_ instance handles Bluetooth LE (CHIPoBLE) commissioning.
 Radio ownership is time-separated and persisted across reboots: the device boots as a Zigbee node, advertises for Matter commissioning over Bluetooth LE in parallel, and hands the 802.15.4 radio over to OpenThread once the first Matter CASE session is established.
 
-This design has the following advantages:
+.. list-table::
+   :header-rows: 1
+   :widths: 20 40 40
 
-* The same firmware image can start as a Zigbee device and migrate to a Matter device after Matter commissioning, without reflashing the node.
-* Commissioning over Bluetooth LE (CHIPoBLE) runs concurrently with normal Zigbee operation, so no dedicated Matter build or separate commissioning device is needed on the field.
-* Persistent protocol state makes Matter-commissioned devices skip the Zigbee stack entirely on subsequent boots, removing the Zigbee footprint from the hot path.
-
-It also has the following trade-offs:
-
-* The 802.15.4 radio is used by one stack at a time, so Zigbee operation pauses once the device switches to Matter.
-  Returning to Zigbee is done through a Matter factory reset, which also clears the Matter commissioning data.
-* The combined build has a larger memory footprint than either stack alone, and the partition layout and resource sizing are tuned for the supported target.
-* Sharing the 802.15.4 radio between two stacks requires some additional orchestration (the ``zigbee_matter_coexistence`` library and the ``nrf_802154_callbacks_dispatcher``), which is not needed in Zigbee-only or Matter-only builds.
+   * - Aspect
+     - Advantage
+     - Trade-off
+   * - Deployment model
+     - A single firmware image can start as Zigbee and migrate to Matter after commissioning, without reflashing.
+     - Switching back to Zigbee requires a Matter factory reset, which clears Matter commissioning data.
+   * - Radio usage
+     - Bluetooth LE commissioning (CHIPoBLE) runs concurrently with Zigbee operation, so no separate commissioning device is needed.
+     - The 802.15.4 radio is used by one stack at a time. Zigbee operation pauses once the device switches to Matter.
+   * - Footprint
+     - After Matter commissioning, the Zigbee stack is skipped on subsequent boots, removing it from the hot path.
+     - The combined build has a larger memory footprint than either stack alone, and the partition layout is tuned for the supported target.
+   * - Implementation
+     - Reuses standard ZBOSS, OpenThread, and SoftDevice Controller components.
+     - Requires additional orchestration through the :file:`zigbee_matter_coexistence` library and :file:`nrf_802154_callbacks_dispatcher`, which is not needed in Zigbee-only or Matter-only builds.
 
 .. figure:: images/zigbee_platform_design_matter.svg
    :alt: Combined Matter + Zigbee architecture on a single SoC
 
    Combined Matter + Zigbee architecture on a single SoC
 
-This platform design is currently provided as a proof of concept and is supported on the following development kit only:
+This platform design is currently provided as a proof of concept and is supported on the following development kit:
 
 * nRF54LM20 DK (``nrf54lm20dk/nrf54lm20a/cpuapp``)
 
