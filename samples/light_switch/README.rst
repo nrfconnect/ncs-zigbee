@@ -98,7 +98,7 @@ Matter extension
 This optional extension is a proof of concept of a combined Matter and Zigbee build on a single SoC.
 The ZBOSS stack and OpenThread (used by Matter) share the same 802.15.4 radio, with ownership handed over at commissioning time by the :file`zigbee_matter_coexistence` library.
 For Thread networking in Matter mode, the light switch acts as an OpenThread Minimal Thread Device (MTD).
-It is supported only on the ``nrf54lm20dk/nrf54lm20a/cpuapp`` board target.
+It is supported only on the ``nrf54lm20dk/nrf54lm20a/cpuapp`` and ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
 
 Protocol selection is time-separated and persisted across reboots:
 
