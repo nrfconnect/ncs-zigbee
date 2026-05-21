@@ -232,7 +232,7 @@ Values are provided in kilobytes (KB).
 
    .. group-tab:: nRF54LM20
 
-      The following table lists memory requirements for samples running on the `nRF54LM20 DK <Board support_>`_ (`nrf54lm20dk`_).
+      The following table lists memory requirements for samples running on the `nRF54LM20 DK <Board support_>`_ (`nrf54lm20dk`_) with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
 
       +------------------------------------------------------------------------------------------------------------------------+--------------------------+---------------------------+----------------------------------+-----------------------------+-------------+--------------------------+-------------+
       | Sample                                                                                                                 | ROM, ZBOSS stack + App   | ROM, MCUboot bootloader   | ROM, ZBOSS non-volatile memory   | ROM, ZBOSS product config   | Total ROM   | RAM, ZBOSS stack + App   | Total RAM   |
@@ -326,7 +326,7 @@ Values are provided in bytes (B).
 
    .. group-tab:: nRF54LM20
 
-      The following table lists memory requirements for the `nRF54L Series <Developing with nRF54L Series_>`_ device.
+      The following table lists stack usage for samples running on the `nRF54LM20 DK <Board support_>`_ with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board target.
 
       +----------------------------------------------------------------+-------------------------------+------------------------------+--------------------------------+-------------------------------+
       | Sample                                                         | ``main`` thread stack usage   | ``main`` thread stack size   | ``zboss`` thread stack usage   | ``zboss`` thread stack size   |

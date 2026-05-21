@@ -119,7 +119,7 @@ Radio ownership is time-separated and persisted across reboots: the device boots
 
 This platform design is currently provided as a proof of concept and is supported on the following development kit:
 
-* nRF54LM20 DK (``nrf54lm20dk/nrf54lm20a/cpuapp``)
+* nRF54LM20 DK (``nrf54lm20dk/nrf54lm20a/cpuapp`` and ``nrf54lm20dk/nrf54lm20b/cpuapp``)
 
 .. _ug_zigbee_platform_design_ncp:
 

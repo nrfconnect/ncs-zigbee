@@ -25,4 +25,6 @@
    * - `nRF54LM20 DK <Developing with nRF54L Series_>`_
      - PCA10184
      - `nrf54lm20dk`_
-     - ``nrf54lm20dk/nrf54lm20a/cpuapp``
+     - | ``nrf54lm20dk/nrf54lm20a/cpuapp``
+       | ``nrf54lm20dk/nrf54lm20b/cpuapp``
+
