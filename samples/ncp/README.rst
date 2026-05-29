@@ -226,9 +226,10 @@ For more configuration options, see :ref:`Zigbee stack logs <zigbee_ug_logging_s
   To use the same MCUboot configuration as in `Communication through USB`_, you need to provide MCUboot with the Kconfig options included in the :file:`sysbuild/mcuboot_usb.conf` file.
   See `Image-specific variables`_ in the |NCS| documentations to learn how to set the required options.
 
-  MCUboot with the USB DFU requires a larger partition.  
-  To increase the partition, define the :makevar:`PM_STATIC_YML_FILE` variable that provides the path to the :file:`pm_static_<board>_<suffix>.yml` static configuration file for the board target of your choice.
-  This is done automatically when building the sample with the ``-DFILE_SUFFIX=<suffix>`` flag.
+  MCUboot with the USB DFU requires a larger partition.
+  To increase the partition, adjust the ``boot_partition`` size in a board-specific devicetree overlay file (for example, :file:`boards/<board_target>_usb.overlay`).
+  If your configuration uses MCUboot, provide a matching overlay under :file:`sysbuild/mcuboot/boards/` and set ``zephyr,code-partition`` to ``&boot_partition``.
+  See :ref:`zigbee_ug_static_partition` in the |addon| documentation and `Migrating partition configuration from Partition Manager to devicetree (DTS)`_ in the |NCS| documentation for details.
 
   For instructions on how to set these additional options and configuration at build time, see `Providing CMake options`_ and `Configuring and building`_ in the |NCS| documentation.
 

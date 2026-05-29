@@ -14,6 +14,84 @@ Values are provided for :ref:`ZBOSS libraries <zigbee_zboss>`.
 Samples were built using the available :ref:`zigbee_zboss`.
 Unless stated otherwise, the default :file:`prj.conf` was used.
 
+Memory layout in DTS
+********************
+
+The :ref:`zigbee_samples` define flash partitions in Devicetree (DTS).
+The |addon| ships ready-made partition files under :file:`dts/` in the |addon| repository.
+Use them as-is, or copy and adjust them for your board.
+
+Each layout starts with a base :file:`.dtsi` file for your SoC.
+To use MCUboot, FOTA, or Matter together, include a matching :file:`.dtsi` file after the base file.
+Some :file:`.dtsi` files apply to any board with a given SoC.
+Others apply only to a specific development kit (DK).
+
+Every base layout reserves the end of internal flash for:
+
+* ``storage_partition`` - Zephyr settings storage
+* ``zboss_nvram`` - ZBOSS non-volatile data
+* ``zboss-product-config`` - ZBOSS product configuration
+
+The following table lists the available files, which targets they cover, and when to use each variant:
+
+.. list-table:: DTS partition layout variants
+   :header-rows: 1
+
+   * - Variant
+     - Path
+     - Targets
+     - When to use
+
+   * - Base
+     - :file:`dts/<soc>_partitions.dtsi`
+     - | nRF52833 (SoC)
+       | nRF52840 (SoC)
+       | nRF52840 Dongle (DK only)
+       | nRF5340 application and network cores (SoC)
+       | nRF54L05 (SoC)
+       | nRF54L10 (SoC)
+       | nRF54L15 (SoC)
+       | nRF54LM20 (SoC)
+     - Required starting point for any Zigbee application.
+
+   * - MCUboot (USB transport)
+     - :file:`dts/mcuboot_usb_transport/<soc>_partitions.dtsi`
+     - | nRF52833 (SoC)
+       | nRF52840 (SoC)
+       | nRF5340 application core (SoC)
+       | nRF54LM20 (SoC)
+     - Adds ``boot_partition`` (MCUboot) and resizes ``slot0_partition`` to fit.
+       Use with sysbuild when the bootloader is updated over USB.
+
+   * - Matter and Zigbee
+     - :file:`dts/matter/<board>_partitions.dtsi`
+     - nRF54LM20 DK (DK only)
+     - Adds ``boot_partition``, ``slot1_partition``, and ``factory_data_partition``, and resizes ``slot0_partition``.
+       Use when Matter and Zigbee share the same device.
+
+   * - External flash (FOTA)
+     - :file:`dts/ext_flash/<board>_partitions.dtsi`
+     - | nRF52833 DK (DK only)
+       | nRF52840 DK (DK only)
+       | nRF5340 DK (DK only)
+       | nRF54L10 DK (DK only)
+       | nRF54L15 DK (DK only)
+       | nRF54LM20 DK (DK only)
+     - Keeps the primary image on internal flash and places the secondary upgrade slot (``slot1_partition``) on external flash.
+       Adds ``boot_partition`` (MCUboot) and resizes ``slot0_partition`` to fit.
+       On the nRF5340 DK, external flash can also hold ``image-3``.
+       Reference layout for :ref:`lib_zigbee_fota` over external flash.
+
+To add an overlay file to your application, add an ``#include`` line to :file:`app.overlay` or to a board overlay in :file:`boards/`.
+Always include the base :file:`.dtsi` first, then any optional overlay.
+
+See an example for the nRF54LM20 DK with external-flash FOTA in the :file:`boards/nrf54lm20dk_nrf54lm20a_cpuapp.overlay` file:
+
+.. code-block:: dts
+
+   #include <nrf54lm20_cpuapp_partitions.dtsi>
+   #include <ext_flash/nrf54lm20dk_cpuapp_partitions.dtsi>
+
 RAM and flash memory requirements
 *********************************
 

@@ -39,6 +39,7 @@
 .. _`RAM power-down`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/libraries/others/ram_pwrdn.html
 
 .. _`Static and dynamic configuration`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/scripts/partition_manager/partition_manager.html#ug-pm-static
+.. _`Migrating partition configuration from Partition Manager to devicetree (DTS)`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/releases_and_maturity/migration/migration_partitions.html
 
 .. _`Repository types`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/dev_model_and_contributions/code_base.html#repository_types
 
@@ -46,7 +47,7 @@
 .. _`Known issues for the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/releases_and_maturity/known_issues.html
 .. _`Release notes for the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/releases_and_maturity/release_notes.html
 
-.. _`CHIP Tool`: https://docs.nordicsemi.com/bundle/ncs-latest/page/matter/chip_tool_guide.html
+.. _`CHIP Tool`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/matter/chip_tool_guide.html
 
 .. _`DFU over Zigbee`: https://docs.nordicsemi.com/bundle/nrfutil/page/guides-nrf5sdk/dfu_performing.html#dfu-over-zigbee
 
