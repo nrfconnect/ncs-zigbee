@@ -4,16 +4,43 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include <pm_config.h>
-#include <zephyr/storage/flash_map.h>
+#include <string.h>
+
 #include <zephyr/logging/log.h>
+#include <zephyr/storage/flash_map.h>
+#include <zephyr/sys/util.h>
+
+#ifdef CONFIG_PARTITION_MANAGER_ENABLED
+#include <pm_config.h>
+#endif
 
 #include <zboss_api.h>
 
 #ifdef ZB_USE_NVRAM
 
+/* RRAM (nRF54) requires write offset and length aligned to write block size (16 B) */
+#define NVRAM_MAX_WRITE_BLOCK_SIZE 16
+
+#ifdef CONFIG_PARTITION_MANAGER_ENABLED
+#define ZBOSS_NVRAM_PARTITION_SIZE PM_ZBOSS_NVRAM_SIZE
+#define ZBOSS_NVRAM_FLASH_AREA_ID  PM_ZBOSS_NVRAM_ID
+#define ZBOSS_PRODUCT_CONFIG_FLASH_AREA_ID PM_ZBOSS_PRODUCT_CONFIG_ID
+#else
+#define ZBOSS_NVRAM_PARTITION_SIZE	      PARTITION_SIZE(zboss_nvram)
+#define ZBOSS_NVRAM_FLASH_AREA_ID	      PARTITION_ID(zboss_nvram)
+#define ZBOSS_PRODUCT_CONFIG_FLASH_AREA_ID    PARTITION_ID(zboss_product_config)
+
+BUILD_ASSERT(FIXED_PARTITION_EXISTS(zboss_nvram),
+	     "Devicetree must define fixed partition node zboss_nvram when Partition Manager is disabled.");
+#ifdef ZB_PRODUCTION_CONFIG
+BUILD_ASSERT(FIXED_PARTITION_EXISTS(zboss_product_config),
+	     "Devicetree must define fixed partition node zboss_product_config for production config "
+	     "when Partition Manager is disabled.");
+#endif
+#endif
+
 /* Size of logical ZBOSS NVRAM page in bytes. */
-#define ZBOSS_NVRAM_PAGE_SIZE (PM_ZBOSS_NVRAM_SIZE / CONFIG_ZIGBEE_NVRAM_PAGE_COUNT)
+#define ZBOSS_NVRAM_PAGE_SIZE (ZBOSS_NVRAM_PARTITION_SIZE / CONFIG_ZIGBEE_NVRAM_PAGE_COUNT)
 #define PHYSICAL_PAGE_SIZE 0x1000
 BUILD_ASSERT((ZBOSS_NVRAM_PAGE_SIZE % PHYSICAL_PAGE_SIZE) == 0,
 	     "The size must be a multiply of physical page size.");
@@ -36,13 +63,13 @@ void zb_osif_nvram_init(const zb_char_t *name)
 	ARG_UNUSED(name);
 	int ret;
 
-	ret = flash_area_open(PM_ZBOSS_NVRAM_ID, &fa);
+	ret = flash_area_open(ZBOSS_NVRAM_FLASH_AREA_ID, &fa);
 	if (ret) {
 		LOG_ERR("Can't open ZBOSS NVRAM flash area");
 	}
 
 #ifdef ZB_PRODUCTION_CONFIG
-	ret = flash_area_open(PM_ZBOSS_PRODUCT_CONFIG_ID, &fa_pc);
+	ret = flash_area_open(ZBOSS_PRODUCT_CONFIG_FLASH_AREA_ID, &fa_pc);
 	if (ret) {
 		LOG_ERR("Can't open product config flash area");
 	}
@@ -62,6 +89,49 @@ zb_uint8_t zb_get_nvram_page_count(void)
 static zb_uint32_t get_page_base_offset(int page_num)
 {
 	return (page_num * zb_get_nvram_page_length());
+}
+
+static int nvram_flash_write(const struct flash_area *area, off_t off,
+			     const void *data, size_t len)
+{
+	uint32_t write_block = flash_area_align(area);
+	const uint8_t *src = data;
+	uint8_t block_buf[NVRAM_MAX_WRITE_BLOCK_SIZE];
+	int err;
+
+	if (write_block <= 1) {
+		return flash_area_write(area, off, data, len);
+	}
+
+	__ASSERT_NO_MSG(write_block <= sizeof(block_buf));
+
+	while (len > 0) {
+		off_t block_start = off & ~(write_block - 1);
+		off_t block_off = off - block_start;
+		size_t chunk = MIN(len, write_block - block_off);
+
+		if (block_off == 0 && chunk == write_block) {
+			err = flash_area_write(area, block_start, src, write_block);
+		} else {
+			err = flash_area_read(area, block_start, block_buf, write_block);
+			if (err) {
+				return err;
+			}
+
+			memcpy(block_buf + block_off, src, chunk);
+			err = flash_area_write(area, block_start, block_buf, write_block);
+		}
+
+		if (err) {
+			return err;
+		}
+
+		off += chunk;
+		src += chunk;
+		len -= chunk;
+	}
+
+	return 0;
 }
 
 zb_ret_t zb_osif_nvram_read(zb_uint8_t page, zb_uint32_t pos, zb_uint8_t *buf,
@@ -124,7 +194,7 @@ zb_ret_t zb_osif_nvram_write(zb_uint8_t page, zb_uint32_t pos, void *buf,
 	LOG_DBG("Function: %s, page: %d, pos: %d, len: %d",
 		__func__, page, pos, len);
 
-	int err = flash_area_write(fa, flash_addr, buf, len);
+	int err = nvram_flash_write(fa, flash_addr, buf, len);
 
 	if (err) {
 		LOG_ERR("Write error: %d", err);

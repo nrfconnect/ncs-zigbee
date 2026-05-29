@@ -469,6 +469,8 @@ config APP_LINK_WITH_ZIGBEE
 	help
 	  Link application with Zigbee subsystem
 
+if PARTITION_MANAGER_ENABLED
+
 partition=ZBOSS_NVRAM
 if SOC_NRF52833
 partition-size=0x4000
@@ -482,5 +484,7 @@ endif
 partition=ZBOSS_PRODUCT_CONFIG
 partition-size=0x1000
 source "${ZEPHYR_BASE}/../nrf/subsys/partition_manager/Kconfig.template.partition_config"
+
+endif #PARTITION_MANAGER_ENABLED
 
 endif #ZIGBEE_ADD_ON
