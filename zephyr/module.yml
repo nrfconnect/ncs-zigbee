@@ -12,3 +12,7 @@ build:
   cmake: .
   # Entry point for the CMake build system.
   sysbuild-cmake: sysbuild
+  # Switch dts to ncs-zigbee/dts directory to fetch the common partition maps.
+  settings:
+    dts_root: .
+    snippet_root: .
