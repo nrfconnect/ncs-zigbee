@@ -102,6 +102,7 @@ This setting reduces the update image size, but the MCUboot must run in the over
 
 The decompression support increases the size of the MCUboot image.
 Make sure that the bootloader partition is large enough for the generated MCUboot image, especially if you enable compression on a custom board or application.
+For ZBOSS NVRAM placement and the devicetree-based flash layout, see :ref:`zigbee_ug_static_partition`.
 
 The secondary application slot does not have to be resized to use compressed Zigbee FOTA updates.
 You can reduce the secondary slot to save flash space, but only if your application's compressed update image always fits in the smaller slot.

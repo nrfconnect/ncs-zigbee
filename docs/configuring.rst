@@ -271,7 +271,27 @@ This library is also used for `Power saving during sleep`_.
 Upgrading Zigbee application
 ****************************
 
-When upgrading the Zigbee application, use the `Static and dynamic configuration`_ of the Partition Manager to ensure that ZBOSS' NVRAM is placed in the same area of flash.
+When upgrading the Zigbee application, use Zephyr's devicetree-based flash partitioning to ensure that ZBOSS' NVRAM is placed in the same area of flash.
 This is because enabling additional features (for example, Zephyr's `Non-Volatile Storage (NVS)`_) can change the placement of the partition in the flash and the ZBOSS settings can be lost, as the application is not able to find the partition.
 
-The static configuration is required regardless of the application version and the upgrading method (:ref:`lib_zigbee_fota` or `Secure bootloader chain`).
+The Partition Manager is deprecated in the |NCS|.
+New Zigbee designs and migrated applications should define fixed flash partitions in devicetree instead of using :file:`pm_static*.yml` files.
+See `Migrating partition configuration from Partition Manager to devicetree (DTS)`_ in the |NCS| documentation for the general migration workflow.
+
+When Partition Manager is disabled (``SB_CONFIG_PARTITION_MANAGER=n``), the Zigbee add-on requires the following devicetree partition nodes:
+
+* ``zboss_nvram`` — Stores ZBOSS non-volatile settings.
+* ``zboss_product_config`` — Stores ZBOSS production configuration (if production config is enabled).
+
+The add-on provides base partition :file:`.dtsi` files in the :file:`dts/` directory of the |addon| repository (for example, :file:`nrf5340_cpuapp_partitions.dtsi` and :file:`nrf54lm20_cpuapp_partitions.dtsi`).
+Include the appropriate file from a board-specific devicetree overlay (for example, :file:`boards/<board_target>.overlay`) and adjust partition sizes and addresses as needed.
+Samples that use MCUboot also provide matching overlays under :file:`sysbuild/mcuboot/boards/`.
+
+If you are migrating from an existing Partition Manager configuration, use the :file:`scripts/pm_to_dts.py` helper script from the |NCS| to generate devicetree overlays from a configured build directory.
+After migration, remove the corresponding :file:`pm_static*.yml` files from your project.
+
+.. note::
+   If devices are already deployed in the field, the partition addresses and sizes in the new devicetree overlays must match the layout previously defined in the Partition Manager static configuration.
+   Mismatched partition addresses break backwards compatibility and can prevent DFU from working between old and new firmware images.
+
+The fixed partition layout is required regardless of the application version and the upgrading method (:ref:`lib_zigbee_fota` or `Secure bootloader chain`).

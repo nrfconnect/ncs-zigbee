@@ -183,6 +183,7 @@ Alternatively, you can :ref:`configure Zigbee FOTA manually <ug_zigbee_configuri
    The decompression support increases the size of the MCUboot image.
    When adapting this FOTA configuration to a custom board or application, make sure that the MCUboot partition is large enough for the generated bootloader image.
    The sample keeps the primary and secondary application slots the same size; resizing the secondary slot is optional and depends on the compression ratio of your application image.
+   The FOTA variant uses devicetree-based partitioning with Partition Manager disabled; see :ref:`zigbee_ug_static_partition` for the partition layout requirements.
 
 To activate the Multiprotocol Bluetooth LE extension, set :makevar:`EXTRA_CONF_FILE` to the :file:`overlay-multiprotocol_ble.conf`.
 For example, when building from the command line, use the following command:
