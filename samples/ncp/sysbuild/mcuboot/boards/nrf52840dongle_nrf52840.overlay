@@ -1,0 +1,20 @@
+/*
+ * Copyright (c) 2026 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+#include <nrf52840dongle_partitions.dtsi>
+
+/ {
+	chosen {
+		zephyr,code-partition = &boot_partition;
+		ncs,zigbee-uart = &cdc_acm_uart0;
+	};
+};
+
+&zephyr_udc0 {
+	cdc_acm_uart0: cdc_acm_uart {
+		compatible = "zephyr,cdc-acm-uart";
+	};
+};

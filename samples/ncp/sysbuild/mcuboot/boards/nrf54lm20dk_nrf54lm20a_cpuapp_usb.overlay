@@ -1,0 +1,21 @@
+/*
+ * Copyright (c) 2025 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+#include <nrf54lm20_cpuapp_partitions.dtsi>
+#include <mcuboot_usb_transport/nrf54lm20_cpuapp_partitions.dtsi>
+
+/ {
+	chosen {
+		ncs,zigbee-uart = &cdc_acm_uart0;
+		zephyr,code-partition = &boot_partition;
+	};
+};
+
+&zephyr_udc0 {
+	cdc_acm_uart0: cdc_acm_uart {
+		compatible = "zephyr,cdc-acm-uart";
+	};
+};

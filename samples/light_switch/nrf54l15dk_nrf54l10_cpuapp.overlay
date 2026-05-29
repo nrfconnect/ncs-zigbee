@@ -1,0 +1,22 @@
+&cpuapp_rram {
+	partitions {
+		slot0_partition: partition@0 {
+			compatible = "zephyr,mapped-partition";
+			label = "image-0";
+			reg = <0x0 0xf4000>;
+		};
+
+		zboss_nvram: partition@f4000 {
+			compatible = "zephyr,mapped-partition";
+			label = "zboss-nvram";
+			reg = <0xf4000 0x8000>;
+		};
+
+		zboss_product_config: partition@fc000 {
+			compatible = "zephyr,mapped-partition";
+			label = "zboss-product-config";
+			reg = <0xfc000 0x1000>;
+		};
+	};
+};
+

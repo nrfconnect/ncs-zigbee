@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#include <nrf52840_partitions.dtsi>
+
 / {
 	pwmleds {
 		pwm_led3: pwm_led_3 {

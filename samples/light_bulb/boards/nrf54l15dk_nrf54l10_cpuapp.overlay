@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#include <nrf54l10_cpuapp_partitions.dtsi>
+
 / {
 	chosen {
 		ncs,zigbee-timer = &timer20;
