@@ -365,7 +365,7 @@ config ZIGBEE_UART_TX_BUF_LEN
 
 endif #ZIGBEE_HAVE_ASYNC_SERIAL
 
-config NRF_SECURITY
+config PSA_CRYPTO
 	default y
 
 if NRF_SECURITY

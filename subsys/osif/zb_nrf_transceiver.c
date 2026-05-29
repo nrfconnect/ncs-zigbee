@@ -18,7 +18,7 @@
 #include "zb_nrf_platform.h"
 
 #if defined(CONFIG_NRF_802154_CALLBACKS_DISPATCHER)
-#include <nrf_802154_callbacks_dispatcher.h>
+#include <net/nrf_802154_callbacks_dispatcher.h>
 #endif
 
 #if defined(CONFIG_NRF_802154_SER_HOST)

@@ -12,7 +12,7 @@
 
 #include <app/matter_event_handler.h>
 
-#include <nrf_802154_callbacks_dispatcher.h>
+#include <net/nrf_802154_callbacks_dispatcher.h>
 
 extern "C" {
 #include <zb_nrf_platform.h>
