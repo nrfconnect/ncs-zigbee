@@ -4,10 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#include <nrf54l10_cpuapp_partitions.dtsi>
+#include <ext_flash/nrf54l15dk_cpuapp_partitions.dtsi>
+
 / {
 	chosen {
 		ncs,zigbee-timer = &timer20;
-		nordic,pm-ext-flash = &mx25r64;
 	};
 
 	pwmleds {
@@ -17,26 +19,6 @@
 			pwms = <&pwm20 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
 		};
 	};
-};
-
-// Delete and redefine storage_partition to fix memory boundaries
-/delete-node/ &storage_partition;
-
-// restore full RRAM and SRAM space - by default some parts are dedicated to FLPR
-&cpuapp_rram {
-	reg = <0x0 DT_SIZE_K(1012)>;
-
-	partitions {
-		storage_partition: partition@f6000 {
-			label = "storage";
-			reg = <0xF6000 DT_SIZE_K(28)>;
-		};
-	};
-};
-
-&cpuapp_sram {
-	reg = <0x20000000 DT_SIZE_K(192)>;
-	ranges = <0x0 0x20000000 DT_SIZE_K(192)>;
 };
 
 &pwm20 {
@@ -59,10 +41,6 @@
 			low-power-enable;
 		};
 	};
-};
-
-&mx25r64 {
-	status = "okay";
 };
 
 &timer20 {

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#include <nrf52840dongle_partitions.dtsi>
+
 / {
 	chosen {
 		ncs,zigbee-uart = &board_cdc_acm_uart;

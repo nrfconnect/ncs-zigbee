@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#include <nrf5340_cpuapp_partitions.dtsi>
+
 &uart1 {
 	status = "okay";
 	pinctrl-0 = <&uart1_default_alt>;

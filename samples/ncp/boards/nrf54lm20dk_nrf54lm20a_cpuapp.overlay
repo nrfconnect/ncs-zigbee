@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#include <nrf54lm20_cpuapp_partitions.dtsi>
+
 / {
 	chosen {
 		zephyr,zigbee-timer = &timer24;
@@ -11,15 +13,6 @@
 		zephyr,console = &uart21;
 		zephyr,shell-uart = &uart21;
 	};
-};
-
-/* Restore full RRAM and SRAM */
-&cpuapp_rram {
-	reg = <0x0 DT_SIZE_K(2036)>;
-};
-
-&cpuapp_sram {
-	reg = <0x20000000 DT_SIZE_K(512)>;
 };
 
 &pinctrl {

@@ -3,9 +3,26 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
+
+#include <nrf52840dongle_partitions.dtsi>
+
 / {
 	chosen {
 		ncs,zigbee-timer = &timer2;
+		ncs,zigbee-uart = &board_cdc_acm_uart;
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+
+		rst_button0: rst_button_0 {
+			gpios = <&gpio0 19 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "Reset button";
+		};
+	};
+
+	aliases {
+		rst0 = &rst_button0;
 	};
 };
 

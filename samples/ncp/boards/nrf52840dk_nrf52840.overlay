@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#include <nrf52840_partitions.dtsi>
+
 &uart1 {
 	pinctrl-0 = <&uart1_default_alt>;
 	pinctrl-1 = <&uart1_sleep_alt>;
