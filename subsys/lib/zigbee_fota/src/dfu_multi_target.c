@@ -9,8 +9,18 @@
 #include <zephyr/dfu/mcuboot.h>
 #include <dfu/dfu_target.h>
 #include <dfu/dfu_target_mcuboot.h>
-#include <pm_config.h>
 #include "dfu_multi_target.h"
+
+#ifdef CONFIG_PARTITION_MANAGER_ENABLED
+#include <pm_config.h>
+#define DFU_MULTI_TARGET_PRIMARY_FLASH_AREA_ID PM_MCUBOOT_PRIMARY_ID
+#else
+#include <zephyr/storage/flash_map.h>
+#define DFU_MULTI_TARGET_PRIMARY_FLASH_AREA_ID PARTITION_ID(slot0_partition)
+
+BUILD_ASSERT(FIXED_PARTITION_EXISTS(slot0_partition),
+	     "Devicetree must define fixed partition node slot0_partition when Partition Manager is disabled.");
+#endif
 
 #ifdef CONFIG_ZIGBEE_FOTA_FILE_VERSION_STACK
 #include <zb_version.h>
@@ -163,7 +173,7 @@ uint32_t dfu_multi_target_get_version(void)
 	struct mcuboot_img_header mcuboot_header;
 	union dfu_multi_target_ver image_ver = {0};
 
-	int err = boot_read_bank_header(PM_MCUBOOT_PRIMARY_ID,
+	int err = boot_read_bank_header(DFU_MULTI_TARGET_PRIMARY_FLASH_AREA_ID,
 					&mcuboot_header,
 					sizeof(mcuboot_header));
 	if (err) {
