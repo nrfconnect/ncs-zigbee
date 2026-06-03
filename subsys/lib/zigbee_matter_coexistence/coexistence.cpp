@@ -37,6 +37,11 @@ atomic_t g_switch_press_active = ATOMIC_INIT(0);
 void switch_to_thread_radio(void);
 void switch_to_zigbee_radio(void);
 
+void matter_board_init_signal(void)
+{
+	k_sem_give(&matter_init_done_sem);
+}
+
 void protocol_switch_work_handler(struct k_work *work)
 {
 	ARG_UNUSED(work);
@@ -140,12 +145,14 @@ void matter_event_handler(const chip::DeviceLayer::ChipDeviceEvent *event, intpt
 	ARG_UNUSED(arg);
 
 	switch (event->Type) {
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE
 	case chip::DeviceLayer::DeviceEventType::kCHIPoBLEAdvertisingChange:
 		if (event->CHIPoBLEAdvertisingChange.Result ==
 		    chip::DeviceLayer::kActivity_Started) {
-			k_sem_give(&matter_init_done_sem);
+			matter_board_init_signal();
 		}
 		break;
+#endif /* CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE */
 	case chip::DeviceLayer::DeviceEventType::kSecureSessionEstablished:
 		if (protocol_state_get() == PROTOCOL_ZIGBEE &&
 		    !chip::DeviceLayer::ThreadStackMgr().IsThreadAttached()) {
@@ -180,6 +187,11 @@ void matter_event_handler(const chip::DeviceLayer::ChipDeviceEvent *event, intpt
 }
 
 } /* namespace */
+
+extern "C" void zigbee_matter_coexistence_signal_matter_board_init(void)
+{
+	matter_board_init_signal();
+}
 
 extern "C" int zigbee_matter_coexistence_run(const struct zigbee_matter_coexistence_callbacks *cb)
 {

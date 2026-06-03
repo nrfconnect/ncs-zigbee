@@ -43,8 +43,11 @@ struct zigbee_matter_coexistence_callbacks {
 	 */
 	int (*zigbee_start)(void);
 
-	/** Hook run on the Zigbee worker thread once the Matter board has
-	 *  finished initialisation (first CHIPoBLE advertising-started event).
+	/** Hook run on the Zigbee worker thread once Matter is ready for the
+	 *  Zigbee phase (CHIPoBLE advertising started when
+	 *  @kconfig{CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE},
+	 *  otherwise after the sample calls
+	 *  @ref zigbee_matter_coexistence_signal_matter_board_init).
 	 *  Typically used to register a chained Zigbee button handler with
 	 *  the DK buttons library after @c dk_buttons_init() has completed.
 	 *  May be NULL.
@@ -68,6 +71,16 @@ struct zigbee_matter_coexistence_callbacks {
  * @retval 0 on success
  */
 int zigbee_matter_coexistence_run(const struct zigbee_matter_coexistence_callbacks *cb);
+
+/** @brief Notify the coexistence runtime that Matter board init is complete.
+ *
+ * Call from the Matter worker thread after @c Nrf::Matter::StartServer()
+ * returns successfully when
+ * @kconfig{CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE} is
+ * disabled. Unblocks the Zigbee worker so it can chain button handlers and
+ * start the Zigbee stack.
+ */
+void zigbee_matter_coexistence_signal_matter_board_init(void);
 
 /** @brief Process button events for user-triggered protocol switching.
  *

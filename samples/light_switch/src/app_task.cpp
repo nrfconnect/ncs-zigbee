@@ -15,6 +15,11 @@
 
 #include <setup_payload/OnboardingCodesUtil.h>
 
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE) && \
+	!defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE)
+#include <zigbee/matter_coexistence.h>
+#endif
+
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -157,7 +162,14 @@ CHIP_ERROR AppTask::Init()
 
 	ReturnErrorOnFailure(sIdentifyCluster.Init());
 
-	return Nrf::Matter::StartServer();
+	ReturnErrorOnFailure(Nrf::Matter::StartServer());
+
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE) && \
+	!defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE)
+	zigbee_matter_coexistence_signal_matter_board_init();
+#endif
+
+	return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AppTask::StartApp()
