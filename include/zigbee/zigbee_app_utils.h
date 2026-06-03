@@ -40,6 +40,23 @@ extern "C" {
  */
 void zigbee_erase_persistent_storage(zb_bool_t erase);
 
+/** @brief Whether a Zigbee network join/commissioning procedure is active.
+ *
+ * True only while top-level BDB commissioning (initialization, steering,
+ * formation, Touchlink, or Trust Center rejoin) is running on the radio.
+ * False when the device is idle and not joined, including between automatic
+ * rejoin attempts.
+ */
+bool zigbee_network_join_commissioning_active(void);
+
+/** @brief Mark Zigbee network join/commissioning as active or idle.
+ *
+ * Samples should set this to true before starting Touchlink or other
+ * application-triggered commissioning not covered by the default signal
+ * handler.
+ */
+void zigbee_network_join_commissioning_set_active(bool active);
+
 /**@brief Function for converting an input buffer to a hex string.
  *
  * @param[out] out       Pointer to the output buffer.
