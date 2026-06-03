@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stddef.h>
+#include <zephyr/sys/atomic.h>
 #include <zephyr/sys/util.h>
 
 #include <dk_buttons_and_leds.h>
@@ -40,6 +41,35 @@
 #endif /* CONFIG_ZIGBEE_FACTORY_RESET */
 
 LOG_MODULE_REGISTER(zigbee_app_utils, CONFIG_ZIGBEE_APP_UTILS_LOG_LEVEL);
+
+static atomic_t g_network_join_commissioning_active;
+
+bool zigbee_network_join_commissioning_active(void)
+{
+	return atomic_get(&g_network_join_commissioning_active) != 0;
+}
+
+void zigbee_network_join_commissioning_set_active(bool active)
+{
+	atomic_set(&g_network_join_commissioning_active, active ? 1 : 0);
+}
+
+static zb_bool_t bdb_start_commissioning_tracked(zb_uint8_t mode_mask)
+{
+	zb_bool_t started = bdb_start_top_level_commissioning(mode_mask);
+
+	if (started == ZB_TRUE) {
+		zigbee_network_join_commissioning_set_active(true);
+	}
+
+	return started;
+}
+
+static void restart_network_formation(zb_uint8_t param)
+{
+	ZVUNUSED(param);
+	(void)bdb_start_commissioning_tracked(ZB_BDB_NETWORK_FORMATION);
+}
 
 /* Rejoin-procedure related variables. */
 static bool stack_initialised;
@@ -255,8 +285,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 			zb_zcl_set_backward_compatible_statuses_mode(ZB_ZCL_STATUSES_ZCL8_MODE));
 		stack_initialised = true;
 		LOG_INF("Zigbee stack initialized");
-		comm_status = bdb_start_top_level_commissioning(
-			ZB_BDB_INITIALIZATION);
+		comm_status = bdb_start_commissioning_tracked(ZB_BDB_INITIALIZATION);
 		break;
 
 	case ZB_BDB_SIGNAL_DEVICE_FIRST_START:
@@ -280,7 +309,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 				start_network_rejoin();
 			} else {
 				LOG_INF("Start network formation");
-				comm_status = bdb_start_top_level_commissioning(
+				comm_status = bdb_start_commissioning_tracked(
 					ZB_BDB_NETWORK_FORMATION);
 			}
 		} else {
@@ -304,6 +333,8 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 			zb_ext_pan_id_t extended_pan_id;
 			char ieee_addr_buf[IEEE_ADDR_BUF_SIZE] = { 0 };
 			int addr_len;
+
+			zigbee_network_join_commissioning_set_active(false);
 
 			zb_get_extended_pan_id(extended_pan_id);
 			addr_len = ieee_addr_to_str(ieee_addr_buf,
@@ -344,6 +375,8 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 		 *    status if the device implements Zigbee coordinator,
 		 *    (see BDB specification section 8.2).
 		 */
+		zigbee_network_join_commissioning_set_active(false);
+
 		if (status == RET_OK) {
 			zb_ext_pan_id_t extended_pan_id;
 			char ieee_addr_buf[IEEE_ADDR_BUF_SIZE] = { 0 };
@@ -395,6 +428,8 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 		 *  - If the device implements Zigbee router or end device,
 		 *    this signal is not expected.
 		 */
+		zigbee_network_join_commissioning_set_active(false);
+
 		if (status == RET_OK) {
 			zb_ext_pan_id_t extended_pan_id;
 			char ieee_addr_buf[IEEE_ADDR_BUF_SIZE] = { 0 };
@@ -411,16 +446,13 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 			LOG_INF("Network formed successfully, start network steering (Extended PAN ID: %s, PAN ID: 0x%04hx)",
 				ieee_addr_buf,
 				ZB_PIBCACHE_PAN_ID());
-			comm_status = bdb_start_top_level_commissioning(
+			comm_status = bdb_start_commissioning_tracked(
 				ZB_BDB_NETWORK_STEERING);
 		} else {
 			LOG_INF("Restart network formation (status: %d)",
 				status);
-			ret_code = ZB_SCHEDULE_APP_ALARM(
-				(zb_callback_t)
-				bdb_start_top_level_commissioning,
-				ZB_BDB_NETWORK_FORMATION,
-				ZB_TIME_ONE_SECOND);
+			ret_code = ZB_SCHEDULE_APP_ALARM(restart_network_formation, 0,
+							 ZB_TIME_ONE_SECOND);
 		}
 		break;
 
@@ -453,7 +485,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 				/* For coordinator node,
 				 * start network formation.
 				 */
-				comm_status = bdb_start_top_level_commissioning(
+				comm_status = bdb_start_commissioning_tracked(
 					ZB_BDB_NETWORK_FORMATION);
 			} else {
 				/* Start network rejoin procedure. */
@@ -463,6 +495,12 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 			LOG_ERR("Unable to leave network (status: %d)", status);
 		}
 		break;
+
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR) || defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
+	case ZB_BDB_SIGNAL_TOUCHLINK:
+		zigbee_network_join_commissioning_set_active(false);
+		break;
+#endif
 
 	case ZB_ZDO_SIGNAL_LEAVE_INDICATION: {
 		/* This signal is generated on the parent to indicate, that one
@@ -668,6 +706,8 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 		 *            end device, and the Trust Center Rejoin has failed,
 		 *            perform restart the generic rejoin procedure.
 		 */
+		zigbee_network_join_commissioning_set_active(false);
+
 		if (IS_ENABLED(CONFIG_ZIGBEE_TC_REJOIN_ENABLED)) {
 			if (status == RET_OK) {
 				zb_ext_pan_id_t extended_pan_id;
@@ -760,7 +800,7 @@ void zigbee_led_status_update(zb_bufid_t bufid, uint32_t led_idx)
 static void start_network_steering(zb_uint8_t param)
 {
 	ZVUNUSED(param);
-	ZVUNUSED(bdb_start_top_level_commissioning(ZB_BDB_NETWORK_STEERING));
+	ZVUNUSED(bdb_start_commissioning_tracked(ZB_BDB_NETWORK_STEERING));
 }
 
 /**@brief Process rejoin procedure. To be called in signal handler.
@@ -796,7 +836,8 @@ static void rejoin_the_network(zb_uint8_t param)
 
 			if (IS_ENABLED(CONFIG_ZIGBEE_TC_REJOIN_ENABLED)) {
 				if ((timeout_s > TC_REJOIN_INTERVAL_THRESHOLD_S)
-					&& !zb_bdb_is_factory_new()) {
+				    && !zb_bdb_is_factory_new()) {
+					zigbee_network_join_commissioning_set_active(true);
 					alarm_cb = zb_bdb_initiate_tc_rejoin;
 					alarm_cb_param = ZB_UNDEFINED_BUFFER;
 				}
@@ -892,6 +933,7 @@ static void stop_network_rejoin(zb_uint8_t was_scheduled)
 			ZB_ALARM_ANY_PARAM);
 		if (zb_err_code == RET_OK) {
 			/* Stop rejoin procedure */
+			zigbee_network_join_commissioning_set_active(false);
 			is_rejoin_procedure_started = false;
 			is_rejoin_stop_requested = false;
 #if defined CONFIG_ZIGBEE_ROLE_END_DEVICE
@@ -1109,8 +1151,8 @@ static void zigbee_touchlink_target_request_network_steering(void)
 {
 	zb_set_bdb_commissioning_mode(ZB_BDB_NETWORK_STEERING);
 
-	if (bdb_start_top_level_commissioning(ZB_BDB_NETWORK_STEERING) != ZB_TRUE) {
-		LOG_WRN("Network steering: bdb_start_top_level_commissioning rejected");
+	if (bdb_start_commissioning_tracked(ZB_BDB_NETWORK_STEERING) != ZB_TRUE) {
+		LOG_WRN("Network steering: commissioning start rejected");
 	}
 }
 
@@ -1121,8 +1163,10 @@ static bool zigbee_touchlink_target_request(void)
 	zb_zdo_touchlink_set_rssi_threshold((zb_int8_t)-64);
 	zb_set_bdb_commissioning_mode(ZB_BDB_TOUCHLINK_TARGET);
 
+	zigbee_network_join_commissioning_set_active(true);
 	zret = zb_buf_get_out_delayed(bdb_touchlink_target_start);
 	if (zret != RET_OK) {
+		zigbee_network_join_commissioning_set_active(false);
 		LOG_WRN("Touchlink target: zb_buf_get_out_delayed failed (%d)", zret);
 		return false;
 	}
