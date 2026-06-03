@@ -43,6 +43,15 @@ config ZIGBEE_MATTER_COEXISTENCE_MATTER_THREAD_PRIORITY
 	int "Matter worker thread priority"
 	default 3
 
+config ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS
+	int "Protocol-switch button hold time (seconds)"
+	range 1 30
+	default 5
+	help
+	  Hold time required when pressing the protocol-switch button.
+	  When the timer expires, the coexistence runtime attempts to switch
+	  to the other protocol unless pairing or commissioning is in progress.
+
 module = ZIGBEE_MATTER_COEXISTENCE
 module-str = Matter/Zigbee coexistence
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"

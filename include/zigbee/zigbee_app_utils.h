@@ -10,8 +10,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <zboss_api.h>
-
 /** @file zigbee_app_utils.h
  *
  * @defgroup zigbee_app_utils Zigbee application utilities library.
@@ -26,6 +24,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <zboss_api.h>
 
 /**@brief Function for setting the Erase persistent storage,
  *        depending on the erase pin.

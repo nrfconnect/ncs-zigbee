@@ -6,6 +6,7 @@
 
 #include <zigbee/matter_coexistence.h>
 #include <zigbee/matter_protocol_state.h>
+#include <zigbee/zigbee_app_utils.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
@@ -20,6 +21,7 @@ extern "C" {
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/reboot.h>
 
 LOG_MODULE_REGISTER(zigbee_matter_coexistence, CONFIG_ZIGBEE_MATTER_COEXISTENCE_LOG_LEVEL);
 
@@ -29,6 +31,38 @@ namespace
 const struct zigbee_matter_coexistence_callbacks *g_cb;
 
 K_SEM_DEFINE(matter_init_done_sem, 0, 1);
+
+atomic_t g_switch_press_active = ATOMIC_INIT(0);
+
+void switch_to_thread_radio(void);
+void switch_to_zigbee_radio(void);
+
+void protocol_switch_work_handler(struct k_work *work)
+{
+	ARG_UNUSED(work);
+
+	if (atomic_get(&g_switch_press_active) == 0) {
+		return;
+	}
+
+	atomic_set(&g_switch_press_active, 0);
+
+	if (protocol_state_get() == PROTOCOL_ZIGBEE) {
+		if (zigbee_network_join_commissioning_active()) {
+			LOG_WRN("Protocol switch blocked: Zigbee join commissioning in progress");
+			return;
+		}
+
+		LOG_INF("Switching to Matter");
+		switch_to_thread_radio();
+		return;
+	}
+
+	LOG_INF("Switching to Zigbee, rebooting");
+	switch_to_zigbee_radio();
+}
+
+K_WORK_DELAYABLE_DEFINE(protocol_switch_work, protocol_switch_work_handler);
 
 void zigbee_thread_fn()
 {
@@ -47,6 +81,12 @@ void zigbee_thread_fn()
 
 		ret = nrf_802154_callbacks_dispatcher_switch("openthread");
 		__ASSERT(ret == 0, "Failed to switch 802.15.4 radio to Thread: %d", ret);
+
+		/* Still chain sample button handlers after Matter board init. */
+		(void)k_sem_take(&matter_init_done_sem, K_FOREVER);
+		if (g_cb->post_matter_board_init != NULL) {
+			g_cb->post_matter_board_init();
+		}
 		return;
 	}
 
@@ -88,6 +128,13 @@ void switch_to_thread_radio(void)
 	__ASSERT(ret == 0, "Failed to switch 802.15.4 radio to Thread: %d", ret);
 }
 
+void switch_to_zigbee_radio(void)
+{
+	protocol_state_set(PROTOCOL_ZIGBEE);
+	LOG_INF("Protocol switched to Zigbee, rebooting");
+	sys_reboot(SYS_REBOOT_COLD);
+}
+
 void matter_event_handler(const chip::DeviceLayer::ChipDeviceEvent *event, intptr_t arg)
 {
 	ARG_UNUSED(arg);
@@ -105,7 +152,7 @@ void matter_event_handler(const chip::DeviceLayer::ChipDeviceEvent *event, intpt
 			switch_to_thread_radio();
 		}
 		break;
-	case chip::DeviceLayer::DeviceEventType::kFactoryReset:
+	case chip::DeviceLayer::DeviceEventType::kFactoryReset: {
 		/*
 		 * Only touch Zigbee storage if the stack was actually brought
 		 * up on this boot. When we skipped Zigbee init (persisted
@@ -119,14 +166,14 @@ void matter_event_handler(const chip::DeviceLayer::ChipDeviceEvent *event, intpt
 #endif
 		}
 		/*
-		 * Reset the persisted protocol so the device reboots as a
-		 * fresh, commissioning-ready Zigbee device. Matter's own
-		 * factory reset will additionally wipe ZMS (via
-		 * CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS), which is
-		 * consistent with this default.
+		 * Reset the persisted protocol to the configured default so the
+		 * device reboots in the same state as a factory-fresh unit.
+		 * Matter's own factory reset will additionally wipe ZMS (via
+		 * CONFIG_CHIP_FACTORY_RESET_ERASE_SETTINGS).
 		 */
-		protocol_state_set(PROTOCOL_ZIGBEE);
+		protocol_state_set(protocol_state_get_default());
 		break;
+	}
 	default:
 		break;
 	}
@@ -155,4 +202,28 @@ extern "C" int zigbee_matter_coexistence_run(const struct zigbee_matter_coexiste
 	k_thread_start(matter_thread_id);
 
 	return 0;
+}
+
+extern "C" void zigbee_matter_coexistence_process_switch_button(uint32_t button_state,
+								uint32_t has_changed,
+								uint32_t switch_button)
+{
+	if (switch_button == 0U) {
+		return;
+	}
+
+	const bool pressed = (has_changed & switch_button) && (button_state & switch_button);
+	const bool released = (has_changed & switch_button) && !(button_state & switch_button);
+	const bool press_active = atomic_get(&g_switch_press_active) != 0;
+
+	if (!press_active && pressed) {
+		atomic_set(&g_switch_press_active, 1);
+		LOG_INF("Protocol switch press started (mask 0x%08x)", switch_button);
+		k_work_reschedule(&protocol_switch_work,
+				  K_SECONDS(CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS));
+	} else if (press_active && released) {
+		LOG_INF("Protocol switch press canceled before timeout");
+		atomic_set(&g_switch_press_active, 0);
+		(void)k_work_cancel_delayable(&protocol_switch_work);
+	}
 }
