@@ -15,6 +15,29 @@ menuconfig ZIGBEE_MATTER_PROTOCOL_STATE
 
 if ZIGBEE_MATTER_PROTOCOL_STATE
 
+choice ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_PROTOCOL
+	prompt "Default protocol on first boot"
+	default ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_ZIGBEE
+	help
+	  Applied when no protocol state has been stored yet (factory-fresh
+	  device), after a Matter factory reset, or after the settings entry
+	  was erased. Subsequent boots use the persisted value until one of
+	  those events applies the default again.
+
+config ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_ZIGBEE
+	bool "Zigbee"
+	help
+	  Start on Zigbee: bring up the Zigbee stack and hand the 802.15.4
+	  radio to ZBOSS unless a previous run already persisted Matter.
+
+config ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_MATTER
+	bool "Matter"
+	help
+	  Start on Matter: skip Zigbee stack start and hand the 802.15.4 radio
+	  to OpenThread unless a previous run already persisted Zigbee.
+
+endchoice
+
 module = ZIGBEE_MATTER_PROTOCOL_STATE
 module-str = Matter/Zigbee protocol state
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"

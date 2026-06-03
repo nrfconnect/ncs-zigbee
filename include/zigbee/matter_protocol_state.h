@@ -14,10 +14,12 @@
  * @brief Persistent "which protocol is active" state for samples that host
  * both Matter and Zigbee on the same 802.15.4 radio.
  *
- * The application boots on Zigbee by default. Once Matter commissioning
- * completes, the state flips to Matter and is persisted so that subsequent
- * reboots resume Matter directly (and Zigbee stack initialization is skipped).
- * A factory reset resets the state back to Zigbee.
+ * The default protocol on first boot is selected by Kconfig (see
+ * @kconfig{CONFIG_ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_PROTOCOL}). Once Matter
+ * commissioning completes, the state flips to Matter and is persisted so that
+ * subsequent reboots resume Matter directly (and Zigbee stack initialization
+ * is skipped). A Matter factory reset resets the persisted protocol to the
+ * value selected by @kconfig{CONFIG_ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_PROTOCOL}.
  */
 
 #include <stdbool.h>
@@ -42,6 +44,17 @@ typedef enum {
  * @retval <0 negative errno on unrecoverable storage failure
  */
 int protocol_state_init(void);
+
+/**
+ * @brief Get the configured default protocol.
+ *
+ * Returns the value selected by
+ * @kconfig{CONFIG_ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_PROTOCOL}. Used on
+ * first boot when no state is stored yet and after a Matter factory reset.
+ *
+ * @return PROTOCOL_ZIGBEE or PROTOCOL_MATTER
+ */
+active_protocol_t protocol_state_get_default(void);
 
 /**
  * @brief Get the currently active protocol.
