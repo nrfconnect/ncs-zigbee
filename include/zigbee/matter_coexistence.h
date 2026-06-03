@@ -23,6 +23,9 @@
  * and calling @ref zigbee_matter_coexistence_run from @c main().
  */
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -47,6 +50,7 @@ struct zigbee_matter_coexistence_callbacks {
 	 *  May be NULL.
 	 */
 	void (*post_matter_board_init)(void);
+
 };
 
 /** @brief Start the coexistence runtime.
@@ -64,6 +68,21 @@ struct zigbee_matter_coexistence_callbacks {
  * @retval 0 on success
  */
 int zigbee_matter_coexistence_run(const struct zigbee_matter_coexistence_callbacks *cb);
+
+/** @brief Process button events for user-triggered protocol switching.
+ *
+ * Detects a long press on @p switch_button and requests a protocol switch
+ * when @kconfig{CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS}
+ * expires.
+ *
+ * Call this before other sample-specific button checks.
+ *
+ * @param button_state Current button state bitmask.
+ * @param has_changed  Button-change bitmask from DK callback.
+ * @param switch_button Bitmask of the switch button (one DK button).
+ */
+void zigbee_matter_coexistence_process_switch_button(uint32_t button_state, uint32_t has_changed,
+						     uint32_t switch_button);
 
 #ifdef __cplusplus
 }
