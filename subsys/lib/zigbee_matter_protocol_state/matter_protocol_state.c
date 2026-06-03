@@ -19,6 +19,7 @@ LOG_MODULE_REGISTER(matter_protocol_state, CONFIG_ZIGBEE_MATTER_PROTOCOL_STATE_L
 
 static atomic_t active_protocol = ATOMIC_INIT(PROTOCOL_ZIGBEE);
 static atomic_t state_initialized = ATOMIC_INIT(0);
+static bool protocol_loaded_from_settings;
 static K_MUTEX_DEFINE(init_mutex);
 
 static int protocol_state_load_direct_cb(const char *key, size_t len,
@@ -51,6 +52,7 @@ static int protocol_state_load_direct_cb(const char *key, size_t len,
 		return 0;
 	}
 
+	protocol_loaded_from_settings = true;
 	atomic_set(&active_protocol, (atomic_val_t)value);
 	return 0;
 }
@@ -79,6 +81,10 @@ int protocol_state_init(void)
 	(void)settings_load_subtree_direct(ZIGBEE_SETTINGS_SUBSYS_NAME,
 					   protocol_state_load_direct_cb, NULL);
 
+	if (!protocol_loaded_from_settings) {
+		atomic_set(&active_protocol, (atomic_val_t)protocol_state_get_default());
+	}
+
 	atomic_set(&state_initialized, 1);
 
 	LOG_INF("Boot protocol: %s",
@@ -86,6 +92,15 @@ int protocol_state_init(void)
 
 	k_mutex_unlock(&init_mutex);
 	return 0;
+}
+
+active_protocol_t protocol_state_get_default(void)
+{
+#if defined(CONFIG_ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_MATTER)
+	return PROTOCOL_MATTER;
+#else
+	return PROTOCOL_ZIGBEE;
+#endif
 }
 
 active_protocol_t protocol_state_get(void)
