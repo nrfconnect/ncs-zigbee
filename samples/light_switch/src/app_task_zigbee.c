@@ -13,6 +13,7 @@
 #include "app_task_zigbee.h"
 
 #include <zigbee/matter_protocol_state.h>
+#include <zigbee/matter_coexistence.h>
 
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
@@ -89,8 +90,13 @@
 #define BUTTON_SLEEPY              DK_BTN3_MSK
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
-/* Button 3: start Touchlink initiator at runtime (same pin as BUTTON_SLEEPY). */
+/* Start Touchlink initiator at runtime (same pin as BUTTON_SLEEPY). */
 #define BUTTON_TOUCHLINK           DK_BTN3_MSK
+#endif
+
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH)
+/* Long-press to switch active protocol. */
+#define PROTOCOL_SWITCH_BUTTON     DK_BTN3_MSK
 #endif
 
 /* Button to start Factory Reset */
@@ -258,6 +264,7 @@ static void light_switch_touchlink_initiator_start_cb(zb_bufid_t bufid)
 	ZVUNUSED(bufid);
 
 	LOG_INF("Starting Touchlink initiator");
+	zigbee_network_join_commissioning_set_active(true);
 	zigbee_touchlink_initiator_prepare_scan_channels();
 	if (!bdb_start_top_level_commissioning(ZB_BDB_TOUCHLINK_COMMISSIONING)) {
 		LOG_WRN("Touchlink commissioning rejected (already in progress?)");
@@ -277,6 +284,11 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	zb_ret_t zb_err_code;
 
 #ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH
+	(void)zigbee_matter_coexistence_process_switch_button(button_state, has_changed,
+							       PROTOCOL_SWITCH_BUTTON);
+#endif
+
 	if (!protocol_is_zigbee_active()) {
 		return;
 	}
@@ -287,7 +299,7 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 
 	check_factory_reset_button(button_state, has_changed);
 
-#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR) && !defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE)
 	if ((has_changed & BUTTON_TOUCHLINK) && (button_state & BUTTON_TOUCHLINK)) {
 		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
 		return;
@@ -548,6 +560,12 @@ static void find_light_bulb_cb(zb_bufid_t bufid)
  */
 static void find_light_bulb_alarm(struct k_timer *timer)
 {
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
+	if (!protocol_is_zigbee_active()) {
+		return;
+	}
+#endif
+
 	ZB_ERROR_CHECK(zb_buf_get_out_delayed(find_light_bulb));
 }
 

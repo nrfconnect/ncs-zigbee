@@ -12,6 +12,7 @@
 #include "app_task_zigbee.h"
 
 #ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
+#include <zigbee/matter_coexistence.h>
 #include <zigbee/matter_protocol_state.h>
 #endif
 
@@ -87,6 +88,11 @@ extern "C" {
  * purposes only.
  */
 #define BULB_LED DK_LED4
+
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH)
+/* Long-press to switch active protocol. */
+#define PROTOCOL_SWITCH_BUTTON DK_BTN3_MSK
+#endif
 
 /* Button used to enter the Bulb into the Identify mode. */
 #define IDENTIFY_MODE_BUTTON DK_BTN4_MSK
@@ -213,6 +219,11 @@ static void start_identifying(zb_bufid_t bufid) {
  */
 static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed) {
 #ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH
+  (void)zigbee_matter_coexistence_process_switch_button(
+      button_state, has_changed, PROTOCOL_SWITCH_BUTTON);
+#endif
+
   if (!protocol_is_zigbee_active()) {
     return;
   }
