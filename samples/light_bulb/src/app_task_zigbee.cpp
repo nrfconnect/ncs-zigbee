@@ -21,6 +21,7 @@
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/util.h>
 #ifdef CONFIG_ZIGBEE_SCENES
 #include <zephyr/settings/settings.h>
 #endif
