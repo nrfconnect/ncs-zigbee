@@ -116,7 +116,7 @@
 LOG_MODULE_REGISTER(zb_lightswitch, LOG_LEVEL_INF);
 
 /* Helper functions for LED control in low power mode */
-#if CONFIG_LIGHT_SWITCH_LOW_POWER
+#if defined(CONFIG_LIGHT_SWITCH_LOW_POWER)
 static inline void led_set(uint32_t led, uint32_t val) { ARG_UNUSED(led); ARG_UNUSED(val); }
 static inline void led_set_on(uint32_t led) { ARG_UNUSED(led); }
 static inline void led_set_off(uint32_t led) { ARG_UNUSED(led); }
@@ -388,7 +388,7 @@ static void configure_gpio(void)
 		LOG_ERR("Cannot init buttons (err: %d)", err);
 	}
 
-#if !CONFIG_LIGHT_SWITCH_LOW_POWER
+#if !defined(CONFIG_LIGHT_SWITCH_LOW_POWER)
 	err = dk_leds_init();
 	if (err) {
 		LOG_ERR("Cannot init LEDs (err: %d)", err);
@@ -923,7 +923,7 @@ int ZigbeeStart(void)
 	/* Check if sleepy button is pressed during Zigbee initialization
 	 * and enable sleepy behavior. In low power mode, always enable sleepy behavior.
 	 */
-#if CONFIG_LIGHT_SWITCH_LOW_POWER
+#if defined(CONFIG_LIGHT_SWITCH_LOW_POWER)
 	bool enable_sleepy = true;
 #elif defined(CONFIG_CHIP)
 	bool enable_sleepy = false;

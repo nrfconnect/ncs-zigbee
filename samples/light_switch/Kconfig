@@ -52,7 +52,8 @@ config LIGHT_SWITCH_TX_POWER
 
 config LIGHT_SWITCH_LOW_POWER
 	bool "Low power mode"
-	default n
+	default y
+	depends on PM_DEVICE
 	help
 		Enable low power mode for the Light Switch sample.
 		This enables sleepy behavior and disables LEDs for power savings.
