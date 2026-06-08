@@ -6,6 +6,7 @@
 menu "Zigbee libraries"
 
 rsource "zigbee_fota/Kconfig"
+rsource "zigbee_bt_dfu/Kconfig"
 rsource "zigbee_app_utils/Kconfig"
 rsource "zigbee_logger_ep/Kconfig"
 rsource "zigbee_matter_coexistence/Kconfig"

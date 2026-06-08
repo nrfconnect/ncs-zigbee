@@ -1,0 +1,88 @@
+#
+# Copyright (c) 2026 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+config ZIGBEE_BT_DFU
+	bool "Enable DFU over Bluetooth LE SMP feature set"
+	depends on !CHIP
+	select BOOTLOADER_MCUBOOT
+	select BT
+	select BT_PERIPHERAL
+	select MCUMGR
+	select MCUMGR_TRANSPORT_BT
+	select IMG_MANAGER
+	select STREAM_FLASH
+	select ZCBOR
+	select MCUMGR_GRP_IMG
+	select MCUMGR_GRP_OS
+	select MCUMGR_GRP_IMG_STATUS_HOOKS
+	# Enable custom SMP request to erase settings partition.
+	select MCUMGR_GRP_ZBASIC
+	select MCUMGR_GRP_ZBASIC_STORAGE_ERASE
+	select MCUMGR_TRANSPORT_BT_REASSEMBLY
+	help
+	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
+	  the set of options related to that feature.
+
+	  Cannot be combined with Matter (CONFIG_CHIP), as it requires different Bluetooth LE orchestration.
+	  Use Matter's CONFIG_CHIP_DFU_OVER_BT_SMP instead.
+
+if ZIGBEE_BT_DFU
+
+config BT_MAX_CONN
+	default 1
+
+# MCU Manager and SMP configuration
+choice MCUMGR_TRANSPORT_BT_PERM
+	default MCUMGR_TRANSPORT_BT_PERM_RW
+endchoice
+		
+config MCUMGR_TRANSPORT_NETBUF_COUNT
+	default 6
+
+config MCUMGR_MGMT_NOTIFICATION_HOOKS
+	bool
+	default y
+		
+config MCUMGR_GRP_IMG_UPLOAD_CHECK_HOOK
+	bool
+	default y
+		
+config MCUMGR_SMP_COMMAND_STATUS_HOOKS
+	bool
+	default y
+		
+# Increase BT MTU and RX buffer sizes to improve DFU throughput
+config BT_L2CAP_TX_MTU
+	default 498
+		
+config BT_BUF_ACL_RX_SIZE
+	default 502
+		
+# Increase MCUMGR_TRANSPORT_NETBUF_SIZE, as it must be big enough to fit MAX MTU + overhead and for single-image DFU default is 384 B
+config MCUMGR_TRANSPORT_NETBUF_SIZE
+	default 1024
+		
+# Increase system workqueue size, as SMP is processed within it
+config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 2800
+		
+if SOC_SERIES_NRF53
+		
+# Enable custom SMP request to erase settings partition.
+config MCUMGR_GRP_ZBASIC
+	default y
+		
+config MCUMGR_GRP_ZBASIC_STORAGE_ERASE
+	default y
+		
+endif # SOC_SERIES_NRF53
+
+module = ZIGBEE_BT_DFU
+module-str = Zigbee Bluetooth LE DFU
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+endif # ZIGBEE_BT_DFU
+

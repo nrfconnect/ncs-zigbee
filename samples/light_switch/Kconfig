@@ -57,3 +57,10 @@ config LIGHT_SWITCH_LOW_POWER
 	help
 		Enable low power mode for the Light Switch sample.
 		This enables sleepy behavior and disables LEDs for power savings.
+
+if ZIGBEE_BT_DFU
+
+config BT_DEVICE_NAME
+	default "Zigbee_Switch"
+
+endif # ZIGBEE_BT_DFU

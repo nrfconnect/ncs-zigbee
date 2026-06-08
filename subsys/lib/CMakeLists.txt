@@ -5,6 +5,7 @@
 #
 
 add_subdirectory_ifdef(CONFIG_ZIGBEE_FOTA zigbee_fota)
+add_subdirectory_ifdef(CONFIG_ZIGBEE_BT_DFU zigbee_bt_dfu)
 add_subdirectory_ifdef(CONFIG_ZIGBEE_APP_UTILS zigbee_app_utils)
 add_subdirectory_ifdef(CONFIG_ZIGBEE_LOGGER_EP zigbee_logger_ep)
 add_subdirectory_ifdef(CONFIG_ZIGBEE_MATTER_COEXISTENCE zigbee_matter_coexistence)
