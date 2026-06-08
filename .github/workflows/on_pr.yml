@@ -1,5 +1,5 @@
 name: Build zigbee samples on pr
-on: 
+on:
   pull_request:
     paths-ignore:
       - 'docs/**'
@@ -20,37 +20,98 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: zigbee-samples-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+  CCACHE_COMPILERCHECK: content
+  CCACHE_MAXSIZE: 2G
+  CCACHE_SLOPPINESS: file_macro,time_macros,include_file_mtime,include_file_ctime
+  WEST_PATH_CACHE: ${{ github.workspace }}/west-path-cache
+
 jobs:
   Build-samples:
     runs-on: ubuntu-24.04
     container: ghcr.io/nrfconnect/sdk-nrf-toolchain:v3.4.0-rc1
+    strategy:
+      fail-fast: false
+      matrix:
+        subset: [1, 2, 3, 4]
     defaults:
       run:
         # Bash shell is needed to set toolchain related environment variables in docker container
         # It is a workaround for GitHub Actions limitation https://github.com/actions/runner/issues/1964
         shell: bash
-    steps: 
+    steps:
     - name: Checkout repository code
       uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2 # v4
       with:
-        fetch-depth: 0
+        fetch-depth: 1
         path: zigbee
+
+    - name: Restore west module path cache
+      uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4
+      with:
+        path: west-path-cache
+        key: west-path-cache-${{ hashFiles('zigbee/west.yml') }}
+        restore-keys: |
+          west-path-cache-
+
+    - name: Restore ccache
+      uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4
+      with:
+        path: .ccache
+        key: ccache-zigbee-${{ hashFiles('zigbee/west.yml') }}-${{ github.base_ref }}
+        restore-keys: |
+          ccache-zigbee-${{ hashFiles('zigbee/west.yml') }}-
+          ccache-zigbee-
+
+    - name: Restore pip cache
+      uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4
+      with:
+        path: ~/.cache/pip
+        key: pip-zigbee-${{ hashFiles('zigbee/west.yml') }}
+
     - name: prepare west project
       run: |
         rm -rf .west
         west --version
-        west init -l zigbee --mf west.yml &&
-        west update -n -o=--depth=1 --path-cache /workdir/
+        west init -l zigbee --mf west.yml
+        west update -n -o=--depth=1 --path-cache "${WEST_PATH_CACHE}"
+
     - name: Install Python deps for Matter (codegen + factory data)
       run: |
         pip3 install -r nrf/scripts/requirements-extra.txt
         pip3 install -r modules/lib/matter/scripts/setup/requirements.nrfconnect.txt
+
+    - name: Set up ccache
+      run: |
+        mkdir -p "${CCACHE_DIR}"
+        ccache -z
+        ccache -s
+
     - name: Twister build samples
+      # --integration limits each scenario to integration_platforms.
+      # Scenarios tagged no_integration are excluded from PR CI (see sample.yaml).
+      # Quarantine trims platform×scenario pairs for time; keep both layers.
       run: |
         source zephyr/zephyr-env.sh
-        zephyr/scripts/twister --inline-logs --build-only -N --verbose -T zigbee/samples --all -x CONFIG_ZBOSS_HALT_ON_ASSERT=y -x CONFIG_RESET_ON_FATAL_ERROR=n -x CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS=2
+        zephyr/scripts/twister --build-only -N --inline-logs --verbose \
+          -T zigbee/samples \
+          --integration \
+          -e no_integration \
+          --subset ${{ matrix.subset }}/${{ strategy.job-total }} \
+          -j "$(nproc)" \
+          -M pass \
+          -x CONFIG_ZBOSS_HALT_ON_ASSERT=y \
+          -x CONFIG_RESET_ON_FATAL_ERROR=n \
+          -x CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS=2
+
     - name: Store hex files
       uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4
       with:
-        name: hexes
+        name: hexes-${{ matrix.subset }}
         path: twister-out/**/*.hex
+        if-no-files-found: ignore

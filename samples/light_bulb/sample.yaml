@@ -1,6 +1,12 @@
 sample:
   description: Zigbee Light control - light bulb sample
   name: Zigbee Light control
+common:
+  tags:
+    - ci_build
+    - smoke
+    - sysbuild
+    - ci_samples_zigbee
 tests:
   sample.zigbee.light_bulb.matter:
     sysbuild: true
@@ -10,17 +16,11 @@ tests:
       - SNIPPET=matter_fota_ext_flash
     integration_platforms:
       - nrf54l15dk/nrf54l15/cpuapp
-      - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
     platform_allow:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
-    tags:
-      - ci_build
-      - smoke
-      - sysbuild
-      - ci_samples_zigbee
   sample.zigbee.light_bulb.matter.int_flash:
     sysbuild: true
     build_only: true
@@ -29,12 +29,8 @@ tests:
     integration_platforms:
       - nrf54lm20dk/nrf54lm20b/cpuapp
     platform_allow:
+      - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
-    tags:
-      - ci_build
-      - smoke
-      - sysbuild
-      - ci_samples_zigbee
   sample.zigbee.light_bulb.matter.release:
     sysbuild: true
     build_only: true
@@ -42,28 +38,19 @@ tests:
       - FILE_SUFFIX=matter_fota
       - SNIPPET=matter_fota_ext_flash
       - EXTRA_CONF_FILE=matter_fota_release.conf
-    integration_platforms:
-      - nrf54l15dk/nrf54l15/cpuapp
-      - nrf54lm20dk/nrf54lm20a/cpuapp
-      - nrf54lm20dk/nrf54lm20b/cpuapp
     platform_allow:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
     tags:
-      - ci_build
-      - smoke
-      - sysbuild
-      - ci_samples_zigbee
+      - no_integration
   sample.zigbee.light_bulb:
     sysbuild: true
     build_only: true
     integration_platforms:
       - nrf52840dk/nrf52840
       - nrf5340dk/nrf5340/cpuapp
-      - nrf54l15dk/nrf54l10/cpuapp
       - nrf54l15dk/nrf54l15/cpuapp
-      - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
     platform_allow:
       - nrf52840dk/nrf52840
@@ -72,11 +59,6 @@ tests:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
-    tags:
-      - ci_build
-      - smoke
-      - sysbuild
-      - ci_samples_zigbee
   sample.zigbee.light_bulb.with_shell:
     sysbuild: true
     build_only: true
@@ -86,13 +68,6 @@ tests:
       - CONFIG_ZIGBEE_LOGGER_EP=n
       - CONFIG_ZIGBEE_SHELL_ENDPOINT=10
       - CONFIG_LOG_MODE_DEFERRED=y
-    integration_platforms:
-      - nrf52840dk/nrf52840
-      - nrf5340dk/nrf5340/cpuapp
-      - nrf54l15dk/nrf54l10/cpuapp
-      - nrf54l15dk/nrf54l15/cpuapp
-      - nrf54lm20dk/nrf54lm20a/cpuapp
-      - nrf54lm20dk/nrf54lm20b/cpuapp
     platform_allow:
       - nrf52840dk/nrf52840
       - nrf5340dk/nrf5340/cpuapp
@@ -101,7 +76,5 @@ tests:
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
     tags:
-      - ci_build
+      - no_integration
       - shell
-      - sysbuild
-      - ci_samples_zigbee
