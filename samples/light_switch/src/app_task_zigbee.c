@@ -38,11 +38,20 @@
 #if CONFIG_ZIGBEE_FOTA
 #include <zigbee/zigbee_fota.h>
 #include <zephyr/sys/reboot.h>
-#include <zephyr/dfu/mcuboot.h>
+#endif /* CONFIG_ZIGBEE_FOTA */
 
+#if defined(CONFIG_ZIGBEE_FOTA) || defined(CONFIG_ZIGBEE_BT_DFU)
+#include <zephyr/dfu/mcuboot.h>
+#endif
+
+#if CONFIG_ZIGBEE_FOTA
 /* LED indicating OTA Client Activity. */
 #define OTA_ACTIVITY_LED          DK_LED2
 #endif /* CONFIG_ZIGBEE_FOTA */
+
+#ifdef CONFIG_ZIGBEE_BT_DFU
+#include <zigbee/zigbee_bt_dfu.h>
+#endif
 
 #if CONFIG_BT_NUS
 #include "nus_cmd.h"
@@ -642,7 +651,7 @@ static void light_switch_button_handler(struct k_timer *timer)
 	}
 }
 
-#ifdef CONFIG_ZIGBEE_FOTA
+#if defined(CONFIG_ZIGBEE_FOTA) || defined(CONFIG_ZIGBEE_BT_DFU)
 static void confirm_image(void)
 {
 	if (!boot_is_img_confirmed()) {
@@ -655,7 +664,9 @@ static void confirm_image(void)
 		}
 	}
 }
+#endif
 
+#ifdef CONFIG_ZIGBEE_FOTA
 static void ota_evt_handler(const struct zigbee_fota_evt *evt)
 {
 	switch (evt->id) {
@@ -959,16 +970,22 @@ int ZigbeeStart(void)
 		power_down_unused_ram();
 	}
 
+#if defined(CONFIG_ZIGBEE_FOTA) || defined(CONFIG_ZIGBEE_BT_DFU)
+	/* Mark the current firmware as valid. */
+	confirm_image();
+#endif
+
 #ifdef CONFIG_ZIGBEE_FOTA
 	/* Initialize Zigbee FOTA download service. */
 	zigbee_fota_init(ota_evt_handler);
 
-	/* Mark the current firmware as valid. */
-	confirm_image();
-
 	/* Register callback for handling ZCL commands. */
 	ZB_ZCL_REGISTER_DEVICE_CB(zcl_device_cb);
 #endif /* CONFIG_ZIGBEE_FOTA */
+
+#ifdef CONFIG_ZIGBEE_BT_DFU
+	zigbee_bt_dfu_init();
+#endif
 
 	/* Register dimmer switch device context (endpoints). */
 	ZB_AF_REGISTER_DEVICE_CTX(&dimmer_switch_ctx);

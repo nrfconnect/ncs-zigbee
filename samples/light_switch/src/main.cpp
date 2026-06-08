@@ -17,7 +17,7 @@
 
 #ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
 
-#include "app_task.h"
+#include "app_task_matter.h"
 
 #include <zigbee/matter_coexistence.h>
 
