@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2022 Nordic Semiconductor ASA
+ * Copyright (c) 2026 Nordic Semiconductor ASA
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include "app_task.h"
+#include "app_task_matter.h"
 
 #include "light_switch.h"
 

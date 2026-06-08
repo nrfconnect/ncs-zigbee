@@ -151,7 +151,11 @@ Source file setup
 
 This sample is split into the following source files:
 
-* The :file:`main` file to handle initialization and light switch basic behavior.
+* The :file:`main` file is the application entry point only.
+* The :file:`app_task_zigbee` file manages the application task flow, user input handling, and Zigbee-specific startup and control logic.
+* The :file:`app_task_matter` file is used in the Matter extension build only.
+  It implements the application tasks flow: button input, timers, and delegating control actions to bound lighting devices.
+* The :file:`light_switch` file to implement the light switch application logic and interaction with Zigbee clusters.
 * An additional :file:`nus_cmd` file for handling NUS commands.
 
 .. _zigbee_light_switch_activating_variants:

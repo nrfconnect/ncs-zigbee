@@ -31,7 +31,7 @@ if(CONFIG_CHIP)
 
 	target_sources(app PRIVATE
 		src/main.cpp
-		src/app_task.cpp
+		src/app_task_matter.cpp
 		src/app_task_zigbee.c
 		src/light_switch.cpp
 		src/shell_commands.cpp
