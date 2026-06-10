@@ -46,13 +46,15 @@ It is supported only on the ``nrf54lm20dk/nrf54lm20a/cpuapp`` and ``nrf54lm20dk/
 
 The sample-specific behavior is:
 
-* On first boot, the device is a standard :ref:`Zigbee Router <zigbee_roles>` exposing the Dimmable Light device, while the Matter stack advertises for commissioning over Bluetooth LE (CHIPoBLE).
+* On first boot, the device starts on the protocol selected by ``CONFIG_ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_PROTOCOL`` (Zigbee by default).
+  When Zigbee is active, it is a standard :ref:`Zigbee Router <zigbee_roles>` exposing the Dimmable Light device, while the Matter stack advertises for commissioning over Bluetooth LE (CHIPoBLE).
 * After successful Matter commissioning, the device is converted to a Matter Dimmable Light endpoint that serves the On/Off and Level Control clusters and drives the same LED through PWM.
   It can then be controlled by any device on the Matter fabric bound to it (for example, the :ref:`zigbee_light_switch_sample` built with the :ref:`zigbee_light_switch_sample_matter`).
-* On subsequent boots, the device starts directly as a Matter Dimmable Light. 
-  A Matter factory reset reverts it to a fresh Zigbee Router.
+* On subsequent boots, the device resumes the persisted protocol.
+  When Matter was selected, it starts directly as a Matter Dimmable Light.
+  A Matter factory reset resets the persisted protocol to the configured default and wipes Matter commissioning data.
 
-The radio hand-over, persistent protocol state, factory-reset behavior and onboarding-data generation are common to both combined samples and are described in detail in the :ref:`zigbee_light_switch_sample_matter` section of the Light switch sample.
+The radio hand-over, persistent protocol state, user-triggered protocol switch, factory-reset behavior and onboarding-data generation are common to both combined samples and are described in detail in the :ref:`zigbee_light_switch_sample_matter` section of the Light switch sample.
 
 .. _zigbee_light_bulb_sample_touchlink:
 
@@ -115,6 +117,9 @@ User interface
       LED 2:
           Turns on when the light bulb joins the network.
 
+      Button 2:
+          If ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH`` is enabled (default), it triggers a protocol switch after a long press (``CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS``, 5 s by default).
+          
       Button 3:
           Depending on how long the button is pressed:
 
@@ -241,6 +246,9 @@ Complete the following steps to exercise the full Zigbee-to-Matter flow:
         The two devices form a distributed-security Zigbee network without a Zigbee Coordinator, and the light switch finds and controls the light bulb.
 
    While the device is still a Zigbee Router, it also advertises for Matter commissioning over Bluetooth LE.
+#. Optionally, long-press Button 2 for ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS`` to switch to Matter.
+   The Zigbee stack is stopped and the radio is handed to OpenThread.
+   Skip the next step if you use this path and Matter was already commissioned in a previous session.
 #. Commission the device using the onboarding payload produced by the Matter factory data build (QR code or manual pairing code).
    After the Matter CASE session is established, the light bulb hands the radio over to Thread and stops participating in the Zigbee network.
 #. Drive the light bulb from a Matter peer:
@@ -248,8 +256,12 @@ Complete the following steps to exercise the full Zigbee-to-Matter flow:
    * From the controller directly, with ``chip-tool onoff toggle …`` or ``chip-tool levelcontrol move-to-level …``.
    * Or by binding a Matter switch to the light bulb and using the switch's dimmer button.
 
-#. To return the device to Zigbee operation, trigger a Matter factory reset from the controller (for example, ``chip-tool pairing unpair …``).
-   The device reboots as a fresh Zigbee Router with Matter Bluetooth LE advertising active again.
+#. To return the device to Zigbee operation, use one of the following:
+
+   * Long-press Button 2 for ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS``.
+     The device reboots and resumes as a Zigbee Router.
+   * Or trigger a Matter factory reset from the controller (for example, ``chip-tool pairing unpair …``).
+     The device reboots as a fresh Zigbee Router with Matter Bluetooth LE advertising active again, and Matter storage is cleared.
 
 Dependencies
 ************

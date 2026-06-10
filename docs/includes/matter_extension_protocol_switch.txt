@@ -1,0 +1,16 @@
+The default protocol on a factory-fresh device is selected by the ``CONFIG_ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_PROTOCOL`` Kconfig choice (Zigbee by default).
+A Matter factory reset (including last-fabric removal when ``CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT`` is enabled) applies the same default again and wipes Matter commissioning data.
+After the first run, the persisted protocol state in settings takes precedence until a factory reset or explicit protocol switch changes it.
+
+When ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH`` is enabled (the default), you can long-press the selected button to switch the active protocol.
+Configure the required hold time by setting the ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS`` Kconfig option. 
+By default, this option is set to 5 seconds.
+From Zigbee, the coexistence layer stops the ZBOSS stack and hands the 802.15.4 radio to OpenThread for Matter.
+From Matter, the device persists Zigbee as the active protocol and reboots.
+The protocol switch is ignored while the device is joining a Zigbee network or undergoing Matter commissioning.
+
+Other Kconfig options in the coexistence layer:
+
+* ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE`` (default enabled) — Matter may advertise for commissioning over Bluetooth LE while Zigbee owns the 802.15.4 radio.
+  When disabled, the sample must call ``zigbee_matter_coexistence_signal_matter_board_init()`` after Matter server init, and the Zigbee worker proceeds without waiting for CHIPoBLE advertising.
+* ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH`` — Enable or disable the button-triggered protocol switch.
