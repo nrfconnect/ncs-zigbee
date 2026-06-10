@@ -91,7 +91,7 @@ static volatile bool is_rejoin_start_scheduled;
 
 /* Forward declarations. */
 static void rejoin_the_network(zb_uint8_t param);
-static void start_network_rejoin(void);
+static void start_network_rejoin(bool force);
 static void stop_network_rejoin(zb_uint8_t was_scheduled);
 static void network_steering_timeout(zb_uint8_t param);
 static void tc_rejoin_timeout(zb_uint8_t param);
@@ -317,7 +317,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 		if (status == RET_OK) {
 			if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
 				LOG_INF("Start network steering");
-				start_network_rejoin();
+				start_network_rejoin(false);
 			} else {
 				LOG_INF("Start network formation");
 				comm_status = bdb_start_commissioning_tracked(
@@ -366,7 +366,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 		} else {
 			if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
 				LOG_INF("Unable to join the network, start network steering");
-				start_network_rejoin();
+				start_network_rejoin(true);
 			} else {
 				LOG_ERR("Failed to initialize Zigbee stack using NVRAM data (status: %d)",
 					status);
@@ -416,7 +416,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 			if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
 				LOG_INF("Network steering was not successful (status: %d)",
 					status);
-				start_network_rejoin();
+				start_network_rejoin(true);
 			} else {
 				LOG_INF("Network steering failed on Zigbee coordinator (status: %d)",
 					status);
@@ -427,7 +427,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 	case ZB_BDB_SIGNAL_STEERING_CANCELLED:
 		LOG_INF("ZB_BDB_SIGNAL_STEERING_CANCELLED (status: %d)", status);
 		rejoin_attempt_finished();
-		start_network_rejoin();
+		start_network_rejoin(true);
 		break;
 
 	case ZB_BDB_SIGNAL_FORMATION:
@@ -508,7 +508,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 					ZB_BDB_NETWORK_FORMATION);
 			} else {
 				/* Start network rejoin procedure. */
-				start_network_rejoin();
+				start_network_rejoin(false);
 			}
 		} else {
 			LOG_ERR("Unable to leave network (status: %d)", status);
@@ -756,7 +756,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 				if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
 					LOG_INF("TC Rejoin was not successful (status: %d)",
 						status);
-					is_rejoin_in_progress = false;
+					start_network_rejoin(true);
 				} else {
 					LOG_INF("TC Rejoin failed on Zigbee coordinator"
 							" (status: %d)", status);
@@ -928,19 +928,22 @@ static void rejoin_attempt_finished(void)
  *        schedule alarm to stop rejoin procedure after the timeout
  *        defined by CONFIG_ZIGBEE_DEV_REJOIN_TIMEOUT_MS.
  */
-static void start_network_rejoin(void)
+static void start_network_rejoin(bool force)
 {
+	/* When `force` is set (e.g. called from the ZB_BDB_SIGNAL_STEERING
+	 * failure path) we skip the `!ZB_JOINED()` gate. Reason: a BDB-level
+	 * commissioning failure can leave the NWK layer "joined" (secured
+	 * NWK key installed), but device_annce or TCLK verify never completed, so
+	 * ZB_JOINED()==true even though the device is not fully commissioned,
+	 * and must re-enter steering. */
 #if defined CONFIG_ZIGBEE_ROLE_END_DEVICE
-	if (!ZB_JOINED() && stack_initialised && !wait_for_user_input) {
+	if ((force || !ZB_JOINED()) && stack_initialised && !wait_for_user_input) {
 #else
-	if (!ZB_JOINED() && stack_initialised) {
+	if ((force || !ZB_JOINED()) && stack_initialised) {
 #endif
-		is_rejoin_in_progress = false;
-
 		if (!is_rejoin_procedure_started) {
 			is_rejoin_procedure_started = true;
 			is_rejoin_stop_requested = false;
-			is_rejoin_in_progress = false;
 			rejoin_attempt_cnt = 0;
 
 #if defined CONFIG_ZIGBEE_ROLE_END_DEVICE
@@ -1005,6 +1008,7 @@ static void stop_network_rejoin(zb_uint8_t was_scheduled)
 			zigbee_network_join_commissioning_set_active(false);
 			is_rejoin_procedure_started = false;
 			is_rejoin_stop_requested = false;
+			is_rejoin_in_progress = false;
 #if defined CONFIG_ZIGBEE_ROLE_END_DEVICE
 			LOG_INF("Network rejoin procedure stopped as %sscheduled.",
 				(wait_for_user_input) ? "" : "not ");
@@ -1039,7 +1043,7 @@ static void start_network_rejoin_ED(zb_uint8_t param)
 		zb_ret_t zb_err_code;
 
 		wait_for_user_input = false;
-		start_network_rejoin();
+		start_network_rejoin(false);
 
 		zb_err_code = ZB_SCHEDULE_APP_ALARM(
 			rejoin_the_network,
