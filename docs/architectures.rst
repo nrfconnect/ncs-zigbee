@@ -90,7 +90,10 @@ Single-chip, combined Matter + Zigbee (SoC)
 ===========================================
 
 In this design, the Zigbee (ZBOSS) and Matter over Thread (OpenThread) stacks run on the same nRF SoC and share the single 802.15.4 radio through a coexistence layer, while a `SoftDevice Controller`_ instance handles Bluetooth LE (CHIPoBLE) commissioning.
-Radio ownership is time-separated and persisted across reboots: the device boots as a Zigbee node, advertises for Matter commissioning over Bluetooth LE in parallel, and hands the 802.15.4 radio over to OpenThread once the first Matter CASE session is established.
+Radio ownership is time-separated and persists across reboots. 
+The device boots on the configured default protocol (Zigbee by default).
+While Zigbee is active, Matter advertises for commissioning over Bluetooth LE in parallel.
+The 802.15.4 radio is handed over to OpenThread once Matter commissioning completes or you request a protocol switch.
 
 .. list-table::
    :header-rows: 1
@@ -100,8 +103,8 @@ Radio ownership is time-separated and persisted across reboots: the device boots
      - Advantage
      - Trade-off
    * - Deployment model
-     - A single firmware image can start as Zigbee and migrate to Matter after commissioning, without reflashing.
-     - Switching back to Zigbee requires a Matter factory reset, which clears Matter commissioning data.
+     - A single firmware image can start as Zigbee and migrate to Matter after commissioning or a button-triggered switch, without reflashing.
+     - Switching back to Zigbee is supported by a long button press. Removing the last Matter fabric or triggering a Matter factory reset clears Matter commissioning data and resets the persisted protocol to the configured default.
    * - Radio usage
      - Bluetooth LE commissioning (CHIPoBLE) runs concurrently with Zigbee operation, so no separate commissioning device is needed.
      - The 802.15.4 radio is used by one stack at a time. Zigbee operation pauses once the device switches to Matter.
