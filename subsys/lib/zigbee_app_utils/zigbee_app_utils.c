@@ -32,6 +32,13 @@
  * instead of a secure rejoin.
  */
 #define TC_REJOIN_INTERVAL_THRESHOLD_S (2 * 60)
+
+/* Timeout for network steering (safe guard if steering is stuck) */
+#define NETWORK_STEERING_TIMEOUT_S (10 * 60)
+
+/* Timeout for TC rejoin (safe guard if TC rejoin is stuck) */
+#define TC_REJOIN_TIMEOUT_S NETWORK_STEERING_TIMEOUT_S
+
 #define ZB_SECUR_PROVISIONAL_KEY 2
 
 #define IEEE_ADDR_BUF_SIZE       17
@@ -86,6 +93,10 @@ static volatile bool is_rejoin_start_scheduled;
 static void rejoin_the_network(zb_uint8_t param);
 static void start_network_rejoin(void);
 static void stop_network_rejoin(zb_uint8_t was_scheduled);
+static void network_steering_timeout(zb_uint8_t param);
+static void tc_rejoin_timeout(zb_uint8_t param);
+static void start_tc_rejoin(zb_uint8_t param);
+static void rejoin_attempt_finished(void);
 #if defined ZB_COORDINATOR_ROLE
 static void change_panid(zb_uint8_t param);
 #endif
@@ -329,6 +340,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 		 *            perform network steering for a node on a network,
 		 *            (see BDB specification section 8.2).
 		 */
+		rejoin_attempt_finished();
 		if (status == RET_OK) {
 			zb_ext_pan_id_t extended_pan_id;
 			char ieee_addr_buf[IEEE_ADDR_BUF_SIZE] = { 0 };
@@ -375,6 +387,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 		 *    status if the device implements Zigbee coordinator,
 		 *    (see BDB specification section 8.2).
 		 */
+		rejoin_attempt_finished();
 		zigbee_network_join_commissioning_set_active(false);
 
 		if (status == RET_OK) {
@@ -409,6 +422,12 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 					status);
 			}
 		}
+		break;
+
+	case ZB_BDB_SIGNAL_STEERING_CANCELLED:
+		LOG_INF("ZB_BDB_SIGNAL_STEERING_CANCELLED (status: %d)", status);
+		rejoin_attempt_finished();
+		start_network_rejoin();
 		break;
 
 	case ZB_BDB_SIGNAL_FORMATION:
@@ -709,6 +728,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 		zigbee_network_join_commissioning_set_active(false);
 
 		if (IS_ENABLED(CONFIG_ZIGBEE_TC_REJOIN_ENABLED)) {
+			rejoin_attempt_finished();
 			if (status == RET_OK) {
 				zb_ext_pan_id_t extended_pan_id;
 				char ieee_addr_buf[IEEE_ADDR_BUF_SIZE] = { 0 };
@@ -795,12 +815,47 @@ void zigbee_led_status_update(zb_bufid_t bufid, uint32_t led_idx)
 	}
 }
 
+static void network_steering_timeout(zb_uint8_t param)
+{
+	if (param == ZB_UNDEFINED_BUFFER) {
+		zb_buf_get_out_delayed(network_steering_timeout);
+	} else {
+		LOG_ERR("network_steering_timeout() is called, cancel steering");
+		bdb_cancel_joining(param);
+		/* When steering is cancelled, ZB_BDB_SIGNAL_STEERING_CANCELLED signal is sent */
+	}
+}
+
 /**@brief Start network steering.
  */
 static void start_network_steering(zb_uint8_t param)
 {
+	zb_bool_t ret;
+
 	ZVUNUSED(param);
-	ZVUNUSED(bdb_start_commissioning_tracked(ZB_BDB_NETWORK_STEERING));
+	ret = bdb_start_commissioning_tracked(ZB_BDB_NETWORK_STEERING);
+	if (ret) {
+		/* Safe-guard timer to cancel commissioning if it is stuck for some reason */
+		ZB_SCHEDULE_APP_ALARM(network_steering_timeout, ZB_UNDEFINED_BUFFER,
+			ZB_MILLISECONDS_TO_BEACON_INTERVAL(NETWORK_STEERING_TIMEOUT_S * 1000));
+	} else {
+		LOG_WRN("Couldn't start bdb_start_top_level_commissioning(), one is already in progress?");
+	}
+}
+
+static void tc_rejoin_timeout(zb_uint8_t param)
+{
+	ZVUNUSED(param);
+	LOG_ERR("tc_rejoin_timeout() is called, consider attempt finished, try again");
+	rejoin_attempt_finished();
+	rejoin_the_network(0);
+}
+
+static void start_tc_rejoin(zb_uint8_t param)
+{
+	zb_bdb_initiate_tc_rejoin(param);
+	ZB_SCHEDULE_APP_ALARM(tc_rejoin_timeout, ZB_UNDEFINED_BUFFER,
+			ZB_MILLISECONDS_TO_BEACON_INTERVAL(TC_REJOIN_TIMEOUT_S * 1000));
 }
 
 /**@brief Process rejoin procedure. To be called in signal handler.
@@ -838,7 +893,7 @@ static void rejoin_the_network(zb_uint8_t param)
 				if ((timeout_s > TC_REJOIN_INTERVAL_THRESHOLD_S)
 				    && !zb_bdb_is_factory_new()) {
 					zigbee_network_join_commissioning_set_active(true);
-					alarm_cb = zb_bdb_initiate_tc_rejoin;
+					alarm_cb = start_tc_rejoin;
 					alarm_cb_param = ZB_UNDEFINED_BUFFER;
 				}
 			}
@@ -852,6 +907,14 @@ static void rejoin_the_network(zb_uint8_t param)
 			is_rejoin_in_progress = true;
 		}
 	}
+}
+
+static void rejoin_attempt_finished(void)
+{
+	LOG_INF("rejoin attempt #%u finished", rejoin_attempt_cnt);
+	ZB_SCHEDULE_APP_ALARM_CANCEL(network_steering_timeout, ZB_ALARM_ANY_PARAM);
+	ZB_SCHEDULE_APP_ALARM_CANCEL(tc_rejoin_timeout, ZB_ALARM_ANY_PARAM);
+	is_rejoin_in_progress = false;
 }
 
 /**@brief Function for starting rejoin network procedure.
@@ -931,6 +994,12 @@ static void stop_network_rejoin(zb_uint8_t was_scheduled)
 		zb_err_code = ZB_SCHEDULE_APP_ALARM_CANCEL(
 			start_network_steering,
 			ZB_ALARM_ANY_PARAM);
+		/* If start_network_steering() was not scheduled, check if start_tc_rejoin() was */
+		if (zb_err_code == RET_NOT_FOUND) {
+			zb_err_code = ZB_SCHEDULE_APP_ALARM_CANCEL(
+					start_tc_rejoin,
+					ZB_ALARM_ANY_PARAM);
+		}
 		if (zb_err_code == RET_OK) {
 			/* Stop rejoin procedure */
 			zigbee_network_join_commissioning_set_active(false);
