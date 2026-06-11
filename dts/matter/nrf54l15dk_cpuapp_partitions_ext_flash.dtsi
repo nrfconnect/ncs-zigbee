@@ -1,0 +1,65 @@
+/*
+ * Copyright (c) 2026 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+/delete-node/ &boot_partition;
+/delete-node/ &slot0_partition;
+/delete-node/ &slot1_partition;
+/delete-node/ &storage_partition;
+
+&cpuapp_rram {
+	partitions {
+		boot_partition: partition@0 {
+			compatible = "zephyr,mapped-partition";
+			label = "mcuboot";
+			reg = <0x0 0x14000>;
+		};
+
+		slot0_partition: partition@14000 {
+			compatible = "zephyr,mapped-partition";
+			label = "image-0";
+			reg = <0x14000 0x15d000>;
+		};
+
+		factory_data_partition: partition@171000 {
+			compatible = "zephyr,mapped-partition";
+			label = "factory-data";
+			reg = <0x171000 0x1000>;
+		};
+
+		storage_partition: partition@172000 {
+			compatible = "zephyr,mapped-partition";
+			label = "storage";
+			reg = <0x172000 0x2000>;
+		};
+
+		zboss_nvram: partition@174000 {
+			compatible = "zephyr,mapped-partition";
+			label = "zboss-nvram";
+			reg = <0x174000 0x8000>;
+		};
+
+		zboss_product_config: partition@17c000 {
+			compatible = "zephyr,mapped-partition";
+			label = "zboss-product-config";
+			reg = <0x17c000 0x1000>;
+		};
+	};
+};
+
+&mx25r64 {
+	status = "okay";
+
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		slot1_partition: partition@0 {
+			label = "image-1";
+			reg = <0x00000000 0x15d000>;
+		};
+	};
+};

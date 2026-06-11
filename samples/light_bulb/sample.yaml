@@ -8,9 +8,11 @@ tests:
     extra_args:
       - FILE_SUFFIX=matter_fota
     integration_platforms:
+      - nrf54l15dk/nrf54l15/cpuapp
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
     platform_allow:
+      - nrf54l15dk/nrf54l15/cpuapp
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
     tags:
@@ -25,9 +27,11 @@ tests:
       - FILE_SUFFIX=matter_fota
       - EXTRA_CONF_FILE=matter_fota_release.conf
     integration_platforms:
+      - nrf54l15dk/nrf54l15/cpuapp
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
     platform_allow:
+      - nrf54l15dk/nrf54l15/cpuapp
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
     tags:
