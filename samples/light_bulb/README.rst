@@ -42,7 +42,7 @@ Matter extension
 
 This optional extension is a proof of concept of a combined Matter and Zigbee build on a single SoC, sharing the 802.15.4 radio between the ZBOSS stack and OpenThread (used by Matter).
 For Thread networking in Matter mode, the light bulb acts as an OpenThread Full Thread Device (FTD).
-It is supported only on the ``nrf54lm20dk/nrf54lm20a/cpuapp`` and ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
+It is supported on the ``nrf54l15dk/nrf54l15/cpuapp``, ``nrf54lm20dk/nrf54lm20a/cpuapp`` and ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
 
 The sample-specific behavior is:
 
