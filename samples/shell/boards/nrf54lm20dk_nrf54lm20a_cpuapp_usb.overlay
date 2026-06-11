@@ -5,7 +5,6 @@
  */
 
 #include <nrf54lm20_cpuapp_partitions.dtsi>
-#include <mcuboot_usb_transport/nrf54lm20_cpuapp_partitions.dtsi>
 
 / {
 	chosen {
