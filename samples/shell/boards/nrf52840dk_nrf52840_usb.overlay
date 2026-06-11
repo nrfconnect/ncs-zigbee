@@ -5,7 +5,6 @@
  */
 
 #include <nrf52840_partitions.dtsi>
-#include <mcuboot_usb_transport/nrf52840_partitions.dtsi>
 
 &zephyr_udc0 {
 	cdc_acm_uart0: cdc_acm_uart0 {
