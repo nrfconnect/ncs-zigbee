@@ -14,19 +14,19 @@
 		slot0_partition: partition@0 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-0";
-			reg = <0x0 0xf2000>;
+			reg = <0x0 0xf5000>;
 		};
 
-		storage_partition: partition@f2000 {
+		storage_partition: partition@f5000 {
 			compatible = "zephyr,mapped-partition";
 			label = "storage";
-			reg = <0xf2000 0x2000>;
+			reg = <0xf5000 0x2000>;
 		};
 
-		zboss_nvram: partition@f4000 {
+		zboss_nvram: partition@f7000 {
 			compatible = "zephyr,mapped-partition";
 			label = "zboss-nvram";
-			reg = <0xf4000 0x8000>;
+			reg = <0xf7000 0x8000>;
 		};
 
 		zboss_product_config: partition@ff000 {

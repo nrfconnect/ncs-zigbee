@@ -23,13 +23,13 @@
 		slot1_partition: partition@127000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-1";
-			reg = <0x127000 0xc0000>;
+			reg = <0x127000 0xca000>;
 		};
 
-		factory_data_partition: partition@1f0000 {
+		factory_data_partition: partition@1f1000 {
 			compatible = "zephyr,mapped-partition";
 			label = "factory-data";
-			reg = <0x1f0000 0x1000>;
+			reg = <0x1f1000 0x1000>;
 		};
 	};
 };
