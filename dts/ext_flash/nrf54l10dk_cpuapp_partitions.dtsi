@@ -11,13 +11,13 @@
 		boot_partition: partition@0 {
 			compatible = "zephyr,mapped-partition";
 			label = "mcuboot";
-			reg = <0x0 0x14000>;
+			reg = <0x0 DT_SIZE_K(80)>;
 		};
 
 		slot0_partition: partition@14000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-0";
-			reg = <0x14000 0xde000>;
+			reg = <0x14000 DT_SIZE_K(888)>;
 		};
 	};
 };
@@ -32,7 +32,7 @@
 
 		slot1_partition: partition@0 {
 			label = "image-1";
-			reg = <0x00000000 0xde000>;
+			reg = <0x00000000 DT_SIZE_K(888)>;
 		};
 	};
 };

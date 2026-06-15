@@ -26,7 +26,7 @@
 		s0_partition: partition@8800 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-0";
-			reg = <0x8800 0x37800>;
+			reg = <0x8800 DT_SIZE_K(222)>;
 		};
 	};
 };

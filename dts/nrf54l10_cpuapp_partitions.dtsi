@@ -13,25 +13,25 @@
 		slot0_partition: partition@0 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-0";
-			reg = <0x0 0xf2000>;
+			reg = <0x0 DT_SIZE_K(968)>;
 		};
 
 		storage_partition: partition@f2000 {
 			compatible = "zephyr,mapped-partition";
 			label = "storage";
-			reg = <0xf2000 0x2000>;
+			reg = <0xf2000 DT_SIZE_K(8)>;
 		};
 
 		zboss_nvram: partition@f4000 {
 			compatible = "zephyr,mapped-partition";
 			label = "zboss-nvram";
-			reg = <0xf4000 0x8000>;
+			reg = <0xf4000 DT_SIZE_K(32)>;
 		};
 
 		zboss_product_config: partition@fc000 {
 			compatible = "zephyr,mapped-partition";
 			label = "zboss-product-config";
-			reg = <0xfc000 0x1000>;
+			reg = <0xfc000 DT_SIZE_K(4)>;
 		};
 	};
 };
