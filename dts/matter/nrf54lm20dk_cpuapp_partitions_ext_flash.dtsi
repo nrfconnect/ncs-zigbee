@@ -7,6 +7,9 @@
 /delete-node/ &boot_partition;
 /delete-node/ &slot0_partition;
 /delete-node/ &slot1_partition;
+/delete-node/ &storage_partition;
+/delete-node/ &zboss_nvram;
+/delete-node/ &zboss_product_config;
 
 &cpuapp_rram {
 	partitions {
@@ -19,17 +22,22 @@
 		slot0_partition: partition@a000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-0";
-			reg = <0xa000 0x1e7000>;
+			reg = <0xa000 0x1e6000>;
 		};
 
-		factory_data_partition: partition@1f1000 {
+		factory_data_partition: partition@1f0000 {
 			compatible = "zephyr,mapped-partition";
 			label = "factory-data";
-			reg = <0x1f1000 0x1000>;
+			reg = <0x1f0000 0x1000>;
+		};
+
+		storage_partition: partition@1f1000 {
+			compatible = "zephyr,mapped-partition";
+			label = "storage";
+			reg = <0x1f1000 0xc000>;
 		};
 	};
 };
-
 
 &mx25r64 {
 	status = "okay";
@@ -41,7 +49,7 @@
 
 		slot1_partition: partition@0 {
 			label = "image-1";
-			reg = <0x00000000 0x1e7000>;
+			reg = <0x00000000 0x1e6000>;
 		};
 	};
 };
