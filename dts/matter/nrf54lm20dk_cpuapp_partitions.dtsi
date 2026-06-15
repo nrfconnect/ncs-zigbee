@@ -5,6 +5,7 @@
  */
 
 /delete-node/ &slot0_partition;
+/delete-node/ &storage_partition;
 
 &cpuapp_rram {
 	partitions {
@@ -23,13 +24,31 @@
 		slot1_partition: partition@127000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-1";
-			reg = <0x127000 0xca000>;
+			reg = <0x127000 0xc0000>;
 		};
 
-		factory_data_partition: partition@1f1000 {
+		factory_data_partition: partition@1e7000 {
 			compatible = "zephyr,mapped-partition";
 			label = "factory-data";
-			reg = <0x1f1000 0x1000>;
+			reg = <0x1e7000 0x1000>;
+		};
+
+		storage_partition: partition@1e8000 {
+			compatible = "zephyr,mapped-partition";
+			label = "storage";
+			reg = <0x1e8000 0xc000>;
+		};
+
+		zboss_nvram: partition@1f4000 {
+			compatible = "zephyr,mapped-partition";
+			label = "zboss-nvram";
+			reg = <0x1f4000 0x8000>;
+		};
+
+		zboss_product_config: partition@1fc000 {
+			compatible = "zephyr,mapped-partition";
+			label = "zboss-product-config";
+			reg = <0x1fc000 0x1000>;
 		};
 	};
 };
