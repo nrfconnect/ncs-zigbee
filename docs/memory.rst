@@ -65,10 +65,16 @@ The following table lists the available files, which targets they cover, and whe
 
    * - Matter and Zigbee
      - :file:`dts/matter/<board>_partitions.dtsi`
-     - | nRF54L15 DK (DK only)
-       | nRF54LM20 DK (DK only)
+     - | nRF54LM20 DK (DK only)
      - Adds ``boot_partition``, ``slot1_partition``, and ``factory_data_partition``, and resizes ``slot0_partition``.
        Use when Matter and Zigbee share the same device.
+
+   * - Matter and Zigbee (external flash)
+     - :file:`dts/matter/<board>_partitions_ext_flash.dtsi`
+     - | nRF54L15 DK (DK only)
+       | nRF54LM20 DK (DK only)
+     - Same as the Matter and Zigbee layout, but places ``slot1_partition`` on external flash and enlarges ``slot0_partition``.
+       Build with ``FILE_SUFFIX=matter_fota``, the ``matter_fota_ext_flash`` snippet on the application image, and the ``matter_fota_mcuboot_ext_flash`` snippet on the MCUboot image.
 
    * - External flash (FOTA)
      - :file:`dts/ext_flash/<board>_partitions.dtsi`

@@ -1,0 +1,14 @@
+#
+# Copyright (c) 2026 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+name: matter_fota_ext_flash
+boards:
+  nrf54l15dk/nrf54l15/cpuapp:
+    append:
+      EXTRA_DTC_OVERLAY_FILE: boards/nrf54l15dk_nrf54l15_cpuapp.overlay
+  /nrf54lm20dk/nrf54lm20[ab]/cpuapp/:
+    append:
+      EXTRA_DTC_OVERLAY_FILE: boards/nrf54lm20dk_nrf54lm20a_cpuapp.overlay
