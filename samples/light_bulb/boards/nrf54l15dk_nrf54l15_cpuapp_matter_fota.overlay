@@ -4,14 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include <matter/nrf54l15dk_cpuapp_partitions_ext_flash.dtsi>
+#include <matter/nrf54l15dk_cpuapp_partitions.dtsi>
 
 / {
 	chosen {
 		ncs,zigbee-timer = &timer20;
 		zephyr,code-partition = &slot0_partition;
 		zephyr,ieee802154 = &ieee802154;
-		nordic,pm-ext-flash = &mx25r64;
 	};
 
 	aliases {
