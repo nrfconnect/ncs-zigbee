@@ -8,29 +8,21 @@ This selects the :file:`prj_matter_fota.conf` configuration, which enables Matte
 
 The same configuration is supported on ``nrf54lm20dk/nrf54lm20a/cpuapp`` and ``nrf54lm20dk/nrf54lm20b/cpuapp``.
 
-To place the MCUboot secondary slot on external SPI NOR flash instead, apply the ``matter_fota_ext_flash`` and ``matter_fota_mcuboot_ext_flash`` snippets to the application and MCUboot images respectively.
 On the nRF54L15 DK, the combined Matter and Zigbee image requires this variant due to the available internal slot size.
+To place the MCUboot secondary slot on external SPI NOR flash instead, pass the ``matter_fota_ext_flash`` snippet.
 
 .. parsed-literal::
    :class: highlight
 
-   west build |sample dir| -b nrf54l15dk/nrf54l15/cpuapp --sysbuild -- \\
-     -DFILE_SUFFIX=matter_fota \\
-     -D|sample|_SNIPPET=matter_fota_ext_flash \\
-     -Dmcuboot_SNIPPET=matter_fota_mcuboot_ext_flash
-
-Replace ``|sample|`` with ``light_bulb`` or ``light_switch``.
+   west build |sample dir| -b nrf54l15dk/nrf54l15/cpuapp -S matter_fota_ext_flash -- -DFILE_SUFFIX=matter_fota
+   west build |sample dir| -b nrf54lm20dk/nrf54lm20a/cpuapp -S matter_fota_ext_flash -- -DFILE_SUFFIX=matter_fota
 
 To produce a size-optimized release build (no logging, console or shell), add :file:`matter_fota_release.conf` as an extra overlay:
 
 .. parsed-literal::
    :class: highlight
 
-   west build |sample dir| -b nrf54l15dk/nrf54l15/cpuapp --sysbuild -- \\
-     -DFILE_SUFFIX=matter_fota \\
-     -D|sample|_SNIPPET=matter_fota_ext_flash \\
-     -Dmcuboot_SNIPPET=matter_fota_mcuboot_ext_flash \\
-     -DEXTRA_CONF_FILE='matter_fota_release.conf'
+   west build |sample dir| -b nrf54l15dk/nrf54l15/cpuapp -S matter_fota_ext_flash -- -DFILE_SUFFIX=matter_fota -DEXTRA_CONF_FILE='matter_fota_release.conf'
 
 Use ``nrf54lm20dk/nrf54lm20b/cpuapp`` as the board target for the nRF54LM20B SoC variant.
 

@@ -7,8 +7,7 @@ tests:
     build_only: true
     extra_args:
       - FILE_SUFFIX=matter_fota
-      - light_bulb_SNIPPET=matter_fota_ext_flash
-      - mcuboot_SNIPPET=matter_fota_mcuboot_ext_flash
+      - SNIPPET=matter_fota_ext_flash
     integration_platforms:
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54lm20dk/nrf54lm20a/cpuapp
@@ -41,8 +40,7 @@ tests:
     build_only: true
     extra_args:
       - FILE_SUFFIX=matter_fota
-      - light_bulb_SNIPPET=matter_fota_ext_flash
-      - mcuboot_SNIPPET=matter_fota_mcuboot_ext_flash
+      - SNIPPET=matter_fota_ext_flash
       - EXTRA_CONF_FILE=matter_fota_release.conf
     integration_platforms:
       - nrf54l15dk/nrf54l15/cpuapp

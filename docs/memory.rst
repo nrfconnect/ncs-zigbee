@@ -74,7 +74,7 @@ The following table lists the available files, which targets they cover, and whe
      - | nRF54L15 DK (DK only)
        | nRF54LM20 DK (DK only)
      - Same as the Matter and Zigbee layout, but places ``slot1_partition`` on external flash and enlarges ``slot0_partition``.
-       Build with ``FILE_SUFFIX=matter_fota``, the ``matter_fota_ext_flash`` snippet on the application image, and the ``matter_fota_mcuboot_ext_flash`` snippet on the MCUboot image.
+       Build with ``FILE_SUFFIX=matter_fota`` and ``SNIPPET=matter_fota_ext_flash``.
 
    * - External flash (FOTA)
      - :file:`dts/ext_flash/<board>_partitions.dtsi`
