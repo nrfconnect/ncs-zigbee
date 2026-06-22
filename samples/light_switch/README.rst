@@ -169,28 +169,11 @@ You can find the configuration files in the :file:`samples/light_switch` directo
 Activating optional extensions
 ------------------------------
 
-To activate the :ref:`lib_zigbee_fota`, use the :file:`prj_fota.conf` configuration file.
-For example, when building from the command line, use the following command:
+.. |sample activating variants ref| replace:: :ref:`zigbee_light_switch_activating_variants`
+.. |sample zigbee bt dfu testing ref| replace:: :ref:`zigbee_light_switch_testing_zigbee_bt_dfu`
+.. |sample dir| replace:: samples/light_switch
 
-.. parsed-literal::
-   :class: highlight
-
-   west build samples/light_switch -b  *board_target* -- -DFILE_SUFFIX=fota
-
-The FOTA variant enables `MCUboot image compression`_.
-The generated Zigbee update file contains a compressed MCUboot image, and MCUboot decompresses it while applying the update.
-This setting reduces the update image size, but the MCUboot must run in the overwrite-only mode, so the device cannot revert to the previous image after the update is applied.
-
-Alternatively, you can :ref:`configure Zigbee FOTA manually <ug_zigbee_configuring_components_ota>`.
-
-.. note::
-   You can use the :file:`prj_fota.conf` file only with a development kit that contains the nRF52840, nRF5340, nRF54L15 or nRF54L10 SoC.
-
-.. note::
-   The decompression support increases the size of the MCUboot image.
-   When adapting this FOTA configuration to a custom board or application, make sure that the MCUboot partition is large enough for the generated bootloader image.
-   The sample keeps the primary and secondary application slots the same size; resizing the secondary slot is optional and depends on the compression ratio of your application image.
-   The FOTA variant uses devicetree-based partitioning with Partition Manager disabled; see :ref:`zigbee_ug_static_partition` for the partition layout requirements.
+.. include:: /includes/zigbee_bt_dfu_activation.txt
 
 To activate the Multiprotocol Bluetooth LE extension, set :makevar:`EXTRA_CONF_FILE` to the :file:`overlay-multiprotocol_ble.conf`.
 For example, when building from the command line, use the following command:
@@ -202,7 +185,9 @@ For example, when building from the command line, use the following command:
 
 .. |sample matter ref| replace:: :ref:`zigbee_light_switch_sample_matter`
 .. |sample matter limitations ref| replace:: :ref:`zigbee_light_switch_matter_limitations`
-.. |sample dir| replace:: samples/light_switch
+.. |sample matter bt dfu testing ref| replace:: :ref:`zigbee_light_switch_testing_matter_bt_dfu`
+.. |sample matter testing ref| replace:: :ref:`zigbee_light_switch_testing_matter`
+.. |sample matter activating variants ref| replace:: :ref:`zigbee_light_switch_activating_variants`
 
 .. include:: /includes/matter_extension_activation.txt
 
@@ -561,6 +546,28 @@ Complete the following steps to exercise the full Zigbee-to-Matter flow:
      The device reboots and resumes as a Zigbee End Device.
    * Or trigger a Matter factory reset from the controller (for example, ``chip-tool pairing unpair …``).
      The device reboots as a fresh Zigbee End Device with Matter Bluetooth LE advertising active again, and Matter storage is cleared.
+
+.. _zigbee_light_switch_testing_zigbee_bt_dfu:
+
+Testing Zigbee FOTA DFU over Bluetooth SMP
+------------------------------------------
+
+.. |zigbee bt device name| replace:: Zigbee_Switch
+.. |zigbee mcumgr smp upload| replace:: mcumgr --conntype ble --hci 0 --connstring peer_name='Zigbee_Switch' image upload build/light_switch/zephyr/zephyr.signed.bin
+
+.. include:: /includes/zigbee_bt_dfu_testing.txt
+
+.. _zigbee_light_switch_testing_matter_bt_dfu:
+
+Testing Matter extension DFU over Bluetooth SMP
+-----------------------------------------------
+
+.. |bt device name| replace:: MatterZigbeeSw
+.. |app name| replace:: light_switch
+.. |matter mcumgr smp upload| replace:: mcumgr --conntype ble --hci 0 --connstring peer_name='MatterZigbeeSw' image upload build/light_switch/zephyr/zephyr.signed.bin -n 0 -w 1
+.. |matter mcumgr net smp upload| replace:: mcumgr --conntype ble --hci 0 --connstring peer_name='MatterZigbeeSw' image upload build/signed_by_mcuboot_and_b0_ipc_radio.bin -n 1 -w 1
+
+.. include:: /includes/matter_extension_bt_dfu_testing.txt
 
 Sample output
 -------------

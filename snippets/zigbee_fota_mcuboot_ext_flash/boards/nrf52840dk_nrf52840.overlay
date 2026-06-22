@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2026 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+#include <nrf52840_partitions.dtsi>
+#include <ext_flash/nrf52840dk_partitions.dtsi>
+
+/ {
+	chosen {
+		zephyr,code-partition = &boot_partition;
+	};
+};

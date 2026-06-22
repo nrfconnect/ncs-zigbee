@@ -1,0 +1,49 @@
+To test DFU over Bluetooth LE SMP, complete the following steps:
+
+1. Build and flash the sample with the Matter extension (see |sample matter activating variants ref|).
+#. Confirm the device is running the Matter stack (see |sample matter testing ref|).
+#. Briefly press **Button 0** to start Bluetooth LE advertising for SMP.
+
+   The behavior depends on the device's commissioning state:
+
+   * If the device is not commissioned to a Matter fabric, this starts both Matter commissioning advertising and the SMP server.
+   * If the device is already commissioned, this re-enables only the SMP server for firmware transfer.
+
+   **LED 0** blinks while Bluetooth LE advertising for SMP is active.
+   The advertised device name is |bt device name|, set by the ``CONFIG_BT_DEVICE_NAME`` Kconfig option  in the :file:`prj_matter_fota.conf` file.
+
+#. Perform the update using one of the following methods:
+
+   .. tabs::
+
+      .. group-tab:: Smartphone
+
+         a. Install `nRF Connect Device Manager`_.
+         #. Use the :file:`dfu_application.zip` file from the build directory.
+
+         For detailed instructions, see `FOTA updates on nRF54L Series devices`_ (nRF54L15 and nRF54LM20 DKs) or `FOTA updates with nRF5340 DK`_ (nRF5340 DK) depending on the device you are using.
+
+      .. group-tab:: PC (mcumgr)
+
+         Upload the signed images from the build directory:
+
+         * On single-core SoCs (for example, nRF54L Series), upload the application image:
+
+           .. parsed-literal::
+              :class: highlight
+
+              |matter mcumgr smp upload|
+
+         * On dual-core SoCs (for example, nRF5340 DK), upload the application and network core images separately:
+
+           .. parsed-literal::
+              :class: highlight
+
+              |matter mcumgr smp upload|
+
+              |matter mcumgr net smp upload|
+
+         After uploading, list the images, mark each new slot as pending, and reset the device.
+         For the full procedure, see `Performing Device Firmware Upgrade in the nRF Connect examples`_.
+
+After the update completes, MCUboot applies the new image on the next reboot.

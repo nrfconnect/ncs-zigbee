@@ -17,6 +17,13 @@ endchoice
 
 endif # OPENTHREAD
 
+if ZIGBEE_BT_DFU
+
+config BT_DEVICE_NAME
+	default "Zigbee_Bulb"
+
+endif # ZIGBEE_BT_DFU
+
 config MPSL_THREAD_COOP_PRIO
 	default 8
 

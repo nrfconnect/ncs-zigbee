@@ -4,5 +4,5 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include <nrf54l10_cpuapp_partitions.dtsi>
-#include <ext_flash/nrf54l10dk_cpuapp_partitions.dtsi>
+#include <nrf52840_partitions.dtsi>
+#include <ext_flash/nrf52840dk_partitions.dtsi>
