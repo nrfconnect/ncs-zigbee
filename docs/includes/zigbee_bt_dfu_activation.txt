@@ -1,0 +1,39 @@
+Activating optional extensions
+------------------------------
+
+To activate the :ref:`lib_zigbee_fota`, use the :file:`prj_fota.conf` configuration file together with the ``zigbee_fota_ext_flash`` snippet.
+The snippet provides external-flash partition layouts, sysbuild MCUboot settings, and the matching MCUboot configuration (through ``zigbee_fota_mcuboot_ext_flash``).
+For example, when building from the command line, use the following command:
+
+.. parsed-literal::
+   :class: highlight
+
+   west build |sample dir| -b *board_target* -- -DFILE_SUFFIX=fota -DSNIPPET=zigbee_fota_ext_flash
+
+The FOTA variant enables `MCUboot image compression`_.
+The generated Zigbee update file contains a compressed MCUboot image, and MCUboot decompresses it while applying the update.
+This setting reduces the size of the update image.
+However, it requires MCUboot to run in overwrite-only mode, which means the device cannot revert to the previous image after an update is applied.
+
+Alternatively, you can :ref:`configure Zigbee FOTA manually <ug_zigbee_configuring_components_ota>`.
+
+.. note::
+   The decompression support increases the size of the MCUboot image.
+   When adapting this FOTA configuration to a custom board or application, make sure that the MCUboot partition is large enough for the generated bootloader image.
+   The FOTA variant uses devicetree-based partitioning with Partition Manager disabled; see :ref:`zigbee_ug_static_partition` for the partition layout requirements.
+
+Device firmware upgrade over Bluetooth SMP (Zigbee-only builds)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To additionally enable Device Firmware Upgrade (DFU) over Bluetooth LE using the Simple Management Protocol (SMP) in a Zigbee-only build, add ``CONFIG_ZIGBEE_BT_DFU=y`` to the FOTA build command:
+
+.. parsed-literal::
+   :class: highlight
+
+   west build |sample dir| -b *board_target* -- -DFILE_SUFFIX=fota -DSNIPPET=zigbee_fota_ext_flash -DCONFIG_ZIGBEE_BT_DFU=y
+
+This option enables the MCUmgr SMP server over Bluetooth LE alongside :ref:`lib_zigbee_fota`.
+It cannot be combined with the |sample matter ref| (``CONFIG_CHIP``).
+For Matter extension builds, SMP DFU is provided through ``CONFIG_CHIP_DFU_OVER_BT_SMP`` instead.
+
+See |sample zigbee bt dfu testing ref| for step-by-step testing instructions.

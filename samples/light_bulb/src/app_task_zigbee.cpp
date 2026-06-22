@@ -27,6 +27,12 @@
 #endif
 #include <zephyr/types.h>
 
+#if defined(CONFIG_ZIGBEE_FOTA) || defined(CONFIG_ZIGBEE_BT_DFU)
+#include <zephyr/dfu/mcuboot.h>
+#endif
+
+#include <ram_pwrdn.h>
+
 extern "C" {
 #include "zb_dimmable_light.h"
 #include <dk_buttons_and_leds.h>
@@ -39,7 +45,17 @@ extern "C" {
 #ifdef CONFIG_ZIGBEE_SCENES
 #include <zigbee/zigbee_zcl_scenes.h>
 #endif
+#if CONFIG_ZIGBEE_FOTA
+#include <zigbee/zigbee_fota.h>
+#endif
+#ifdef CONFIG_ZIGBEE_BT_DFU
+#include <zigbee/zigbee_bt_dfu.h>
+#endif
 }
+
+#if CONFIG_ZIGBEE_FOTA
+#include <zephyr/sys/reboot.h>
+#endif
 
 #define RUN_STATUS_LED DK_LED1
 #define RUN_LED_BLINK_INTERVAL 1000
@@ -89,6 +105,10 @@ extern "C" {
  * purposes only.
  */
 #define BULB_LED DK_LED4
+
+#if CONFIG_ZIGBEE_FOTA
+#define OTA_ACTIVITY_LED DK_LED2
+#endif
 
 #if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH)
 /* Long-press to switch active protocol. */
@@ -177,7 +197,18 @@ ZB_DECLARE_DIMMABLE_LIGHT_CLUSTER_LIST(dimmable_light_clusters, basic_attr_list,
 ZB_DECLARE_DIMMABLE_LIGHT_EP(dimmable_light_ep, DIMMABLE_LIGHT_ENDPOINT,
                              dimmable_light_clusters);
 
+#ifndef CONFIG_ZIGBEE_FOTA
 ZBOSS_DECLARE_DEVICE_CTX_1_EP(dimmable_light_ctx, dimmable_light_ep);
+#else
+
+#if DIMMABLE_LIGHT_ENDPOINT == CONFIG_ZIGBEE_FOTA_ENDPOINT
+#error "Light bulb and Zigbee OTA endpoints should be different."
+#endif
+
+extern zb_af_endpoint_desc_t zigbee_fota_client_ep;
+ZBOSS_DECLARE_DEVICE_CTX_2_EP(dimmable_light_ctx, zigbee_fota_client_ep,
+                              dimmable_light_ep);
+#endif /* CONFIG_ZIGBEE_FOTA */
 
 /**@brief Starts identifying the device.
  *
@@ -431,6 +462,46 @@ static void bulb_clusters_attr_init(void) {
       (zb_uint8_t *)&dev_ctx.level_control_attr.current_level, ZB_FALSE);
 }
 
+#if defined(CONFIG_ZIGBEE_FOTA) || defined(CONFIG_ZIGBEE_BT_DFU)
+static void confirm_image(void) {
+  if (!boot_is_img_confirmed()) {
+    int ret = boot_write_img_confirmed();
+
+    if (ret) {
+      LOG_ERR("Couldn't confirm image: %d", ret);
+    } else {
+      LOG_INF("Marked image as OK");
+    }
+  }
+}
+#endif
+
+#ifdef CONFIG_ZIGBEE_FOTA
+static void ota_evt_handler(const struct zigbee_fota_evt *evt) {
+  switch (evt->id) {
+  case ZIGBEE_FOTA_EVT_PROGRESS:
+    dk_set_led(OTA_ACTIVITY_LED, evt->dl.progress % 2);
+    break;
+
+  case ZIGBEE_FOTA_EVT_FINISHED:
+    LOG_INF("Reboot application.");
+    if (IS_ENABLED(CONFIG_RAM_POWER_DOWN_LIBRARY)) {
+      power_up_unused_ram();
+    }
+
+    sys_reboot(SYS_REBOOT_COLD);
+    break;
+
+  case ZIGBEE_FOTA_EVT_ERROR:
+    LOG_ERR("OTA image transfer failed.");
+    break;
+
+  default:
+    break;
+  }
+}
+#endif /* CONFIG_ZIGBEE_FOTA */
+
 /**@brief Callback function for handling ZCL commands.
  *
  * @param[in]   bufid   Reference to Zigbee stack buffer
@@ -448,6 +519,14 @@ static void zcl_device_cb(zb_bufid_t bufid) {
   device_cb_param->status = RET_OK;
 
   switch (device_cb_param->device_cb_id) {
+  case ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID:
+#ifdef CONFIG_ZIGBEE_FOTA
+    zigbee_fota_zcl_cb(bufid);
+#else
+    device_cb_param->status = RET_NOT_IMPLEMENTED;
+#endif
+    break;
+
   case ZB_ZCL_LEVEL_CONTROL_SET_VALUE_CB_ID:
     LOG_INF("Level control setting to %d",
             device_cb_param->cb_param.level_control_set_value_param.new_value);
@@ -502,6 +581,10 @@ static void zcl_device_cb(zb_bufid_t bufid) {
  *                      used to pass signal.
  */
 void zboss_signal_handler(zb_bufid_t bufid) {
+#ifdef CONFIG_ZIGBEE_FOTA
+  zigbee_fota_signal_handler(bufid);
+#endif
+
   /* Update network status LED. */
   zigbee_led_status_update(bufid, ZIGBEE_NETWORK_STATE_LED);
 
@@ -549,8 +632,23 @@ extern "C" int ZigbeeStart(void) {
   bulb_clusters_attr_init();
   level_control_set_value(dev_ctx.level_control_attr.current_level);
 
+#if defined(CONFIG_ZIGBEE_FOTA) || defined(CONFIG_ZIGBEE_BT_DFU)
+  confirm_image();
+#endif
+
+#ifdef CONFIG_ZIGBEE_FOTA
+  zigbee_fota_init(ota_evt_handler);
+#endif
+
+#ifdef CONFIG_ZIGBEE_BT_DFU
+  zigbee_bt_dfu_init();
+#endif
+
   /* Register handler to identify notifications. */
   ZB_AF_SET_IDENTIFY_NOTIFICATION_HANDLER(DIMMABLE_LIGHT_ENDPOINT, identify_cb);
+#ifdef CONFIG_ZIGBEE_FOTA
+  ZB_AF_SET_IDENTIFY_NOTIFICATION_HANDLER(CONFIG_ZIGBEE_FOTA_ENDPOINT, identify_cb);
+#endif
 
 #ifdef CONFIG_ZIGBEE_SCENES
   /* Initialize ZCL scene table */

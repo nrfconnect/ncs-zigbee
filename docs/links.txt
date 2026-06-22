@@ -48,6 +48,13 @@
 .. _`Release notes for the nRF Connect SDK`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/releases_and_maturity/release_notes.html
 
 .. _`CHIP Tool`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/matter/chip_tool_guide.html
+.. _`mcumgr`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/zephyr/services/device_mgmt/mcumgr.html
+.. _`Simple Management Protocol`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/zephyr/services/device_mgmt/smp_protocol.html
+.. _`nRF Connect Device Manager`: https://www.nordicsemi.com/Products/Development-tools/nrf-connect-device-manager
+.. _`FOTA updates on nRF54L Series devices`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/app_dev/device_guides/nrf54l/fota_update.html
+.. _`FOTA updates with nRF5340 DK`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/app_dev/device_guides/nrf53/fota_update_nrf5340.html
+.. _`MCUmgr Command-line tool`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/nrf/app_dev/bootloaders_dfu/dfu_tools_mcumgr_cli.html
+.. _`Performing Device Firmware Upgrade in the nRF Connect examples`: https://docs.nordicsemi.com/bundle/ncs-3.2.0/page/matter/nrfconnect_examples_software_update.html
 
 .. _`DFU over Zigbee`: https://docs.nordicsemi.com/bundle/nrfutil/page/guides-nrf5sdk/dfu_performing.html#dfu-over-zigbee
 

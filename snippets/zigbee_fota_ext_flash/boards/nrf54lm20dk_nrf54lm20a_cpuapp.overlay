@@ -1,0 +1,26 @@
+/*
+ * Copyright (c) 2026 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+#include <nrf54lm20_cpuapp_partitions.dtsi>
+#include <ext_flash/nrf54lm20dk_cpuapp_partitions.dtsi>
+
+/ {
+	chosen {
+		zephyr,code-partition = &slot0_partition;
+		zephyr,ieee802154 = &ieee802154;
+	};
+};
+
+&rram_controller {
+	cpuapp_rram: rram@0 {
+		reg = <0x0 DT_SIZE_K(2036)>;
+		ranges = <0x0 0x0 DT_SIZE_K(2036)>;
+	};
+};
+
+&cpuapp_sram {
+	reg = <0x20000000 DT_SIZE_K(511)>;
+};

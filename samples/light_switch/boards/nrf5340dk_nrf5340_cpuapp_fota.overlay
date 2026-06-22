@@ -9,7 +9,6 @@
 
 / {
 	chosen {
-		nordic,pm-ext-flash = &mx25r64;
 		ncs,zigbee-timer = &timer2;
 	};
 };

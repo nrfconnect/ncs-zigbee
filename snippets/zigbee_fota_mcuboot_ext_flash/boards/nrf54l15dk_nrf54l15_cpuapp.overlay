@@ -6,3 +6,9 @@
 
 #include <nrf54l15_cpuapp_partitions.dtsi>
 #include <ext_flash/nrf54l15dk_cpuapp_partitions.dtsi>
+
+/ {
+	chosen {
+		zephyr,code-partition = &boot_partition;
+	};
+};

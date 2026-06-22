@@ -26,4 +26,6 @@ To produce a size-optimized release build (no logging, console or shell), add :f
 
 Use ``nrf54lm20dk/nrf54lm20b/cpuapp`` as the board target for the nRF54LM20B SoC variant.
 
+.. include:: /includes/matter_extension_bt_dfu.txt
+
 See |sample matter limitations ref| for supported board targets and incompatible options.

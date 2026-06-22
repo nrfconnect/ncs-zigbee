@@ -1,0 +1,30 @@
+#
+# Copyright (c) 2026 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+name: zigbee_fota_ext_flash
+append:
+  SB_EXTRA_CONF_FILE: zigbee_fota_sysbuild.conf
+boards:
+  nrf52840dk/nrf52840:
+    append:
+      EXTRA_DTC_OVERLAY_FILE: boards/nrf52840dk_nrf52840.overlay
+      EXTRA_CONF_FILE: zigbee_fota_nrf52840.conf
+  nrf5340dk/nrf5340/cpuapp:
+    append:
+      EXTRA_DTC_OVERLAY_FILE: boards/nrf5340dk_nrf5340_cpuapp.overlay
+      EXTRA_CONF_FILE: zigbee_fota_nrf5340.conf
+  nrf54l15dk/nrf54l15/cpuapp:
+    append:
+      EXTRA_DTC_OVERLAY_FILE: boards/nrf54l15dk_nrf54l15_cpuapp.overlay
+      EXTRA_CONF_FILE: zigbee_fota_spi_nor.conf
+  nrf54l15dk/nrf54l10/cpuapp:
+    append:
+      EXTRA_DTC_OVERLAY_FILE: boards/nrf54l15dk_nrf54l10_cpuapp.overlay
+      EXTRA_CONF_FILE: zigbee_fota_spi_nor.conf
+  /nrf54lm20dk/nrf54lm20[ab]/cpuapp/:
+    append:
+      EXTRA_DTC_OVERLAY_FILE: boards/nrf54lm20dk_nrf54lm20a_cpuapp.overlay
+      EXTRA_CONF_FILE: zigbee_fota_spi_nor.conf

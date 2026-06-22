@@ -44,17 +44,6 @@ tests:
       - nrf54lm20dk/nrf54lm20b/cpuapp
     tags:
       - no_integration
-  sample.zigbee.light_switch.matter.bt_dfu:
-    sysbuild: true
-    build_only: true
-    extra_args:
-      - FILE_SUFFIX=matter_fota
-      - CONFIG_CHIP_DFU_OVER_BT_SMP=y
-    integration_platforms:
-      - nrf54lm20dk/nrf54lm20b/cpuapp
-    platform_allow:
-      - nrf54lm20dk/nrf54lm20a/cpuapp
-      - nrf54lm20dk/nrf54lm20b/cpuapp
   sample.zigbee.light_switch:
     sysbuild: true
     build_only: true
@@ -107,6 +96,7 @@ tests:
     build_only: true
     extra_args:
       - FILE_SUFFIX=fota
+      - SNIPPET=zigbee_fota_ext_flash
     integration_platforms:
       - nrf52840dk/nrf52840
       - nrf54l15dk/nrf54l15/cpuapp
@@ -123,6 +113,7 @@ tests:
     build_only: true
     extra_args:
       - FILE_SUFFIX=fota
+      - SNIPPET=zigbee_fota_ext_flash
       - OVERLAY_CONFIG=overlay-multiprotocol_ble.conf
     integration_platforms:
       - nrf5340dk/nrf5340/cpuapp
@@ -130,25 +121,6 @@ tests:
       - nrf54lm20dk/nrf54lm20b/cpuapp
     platform_allow:
       - nrf5340dk/nrf5340/cpuapp
-      - nrf54l15dk/nrf54l15/cpuapp
-      - nrf54lm20dk/nrf54lm20a/cpuapp
-      - nrf54lm20dk/nrf54lm20b/cpuapp
-  sample.zigbee.light_switch.fota_and_bt_dfu:
-    sysbuild: true
-    build_only: true
-    extra_args:
-      - FILE_SUFFIX=fota
-      - CONFIG_ZIGBEE_BT_DFU=y
-    integration_platforms:
-      - nrf52840dk/nrf52840
-      - nrf5340dk/nrf5340/cpuapp
-      - nrf54l15dk/nrf54l10/cpuapp
-      - nrf54l15dk/nrf54l15/cpuapp
-      - nrf54lm20dk/nrf54lm20b/cpuapp
-    platform_allow:
-      - nrf52840dk/nrf52840
-      - nrf5340dk/nrf5340/cpuapp
-      - nrf54l15dk/nrf54l10/cpuapp
       - nrf54l15dk/nrf54l15/cpuapp
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp

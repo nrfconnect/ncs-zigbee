@@ -19,6 +19,13 @@ config CHIP_ENABLE_ICD_SUPPORT
 
 endif # OPENTHREAD
 
+if ZIGBEE_BT_DFU
+
+config BT_DEVICE_NAME
+	default "Zigbee_Switch"
+
+endif # ZIGBEE_BT_DFU
+
 config MPSL_THREAD_COOP_PRIO
 	default 8
 
@@ -57,10 +64,3 @@ config LIGHT_SWITCH_LOW_POWER
 	help
 		Enable low power mode for the Light Switch sample.
 		This enables sleepy behavior and disables LEDs for power savings.
-
-if ZIGBEE_BT_DFU
-
-config BT_DEVICE_NAME
-	default "Zigbee_Switch"
-
-endif # ZIGBEE_BT_DFU

@@ -82,6 +82,17 @@ Configuration
 
 |config|
 
+Source file setup
+=================
+
+This sample is split into the following source files:
+
+* The :file:`main` file is the application entry point only.
+* The :file:`app_task_zigbee` file manages the application task flow, user input handling, and Zigbee-specific startup and control logic.
+  It also implements the dimmable light device behavior, including cluster handling and PWM-based brightness control.
+* The :file:`app_task_matter` file is used in the Matter extension build only.
+  It implements the Matter application task flow, button input, and On/Off and Level Control cluster state for the dimmable light endpoint.
+
 ..
   FEM support
   ===========
@@ -93,9 +104,19 @@ Configuration
 Configuration files for sample extensions
 =========================================
 
+The sample provides predefined configuration files for optional extensions.
+You can find the configuration files in the :file:`samples/light_bulb` directory.
+
 .. |sample matter ref| replace:: :ref:`zigbee_light_bulb_sample_matter`
 .. |sample matter limitations ref| replace:: :ref:`zigbee_light_bulb_matter_limitations`
+.. |sample matter bt dfu testing ref| replace:: :ref:`zigbee_light_bulb_testing_matter_bt_dfu`
+.. |sample matter testing ref| replace:: :ref:`zigbee_light_bulb_testing_matter`
+.. |sample matter activating variants ref| replace:: :ref:`zigbee_light_bulb_activating_variants`
+.. |sample activating variants ref| replace:: :ref:`zigbee_light_bulb_activating_variants`
+.. |sample zigbee bt dfu testing ref| replace:: :ref:`zigbee_light_bulb_testing_zigbee_bt_dfu`
 .. |sample dir| replace:: samples/light_bulb
+
+.. include:: /includes/zigbee_bt_dfu_activation.txt
 
 .. include:: /includes/matter_extension_activation.txt
 
@@ -262,6 +283,28 @@ Complete the following steps to exercise the full Zigbee-to-Matter flow:
      The device reboots and resumes as a Zigbee Router.
    * Or trigger a Matter factory reset from the controller (for example, ``chip-tool pairing unpair …``).
      The device reboots as a fresh Zigbee Router with Matter Bluetooth LE advertising active again, and Matter storage is cleared.
+
+.. _zigbee_light_bulb_testing_matter_bt_dfu:
+
+Testing Matter extension DFU over Bluetooth SMP
+-----------------------------------------------
+
+.. |bt device name| replace:: MatterZigbeeLb
+.. |app name| replace:: light_bulb
+.. |matter mcumgr smp upload| replace:: mcumgr --conntype ble --hci 0 --connstring peer_name='MatterZigbeeLb' image upload build/light_bulb/zephyr/zephyr.signed.bin -n 0 -w 1
+.. |matter mcumgr net smp upload| replace:: mcumgr --conntype ble --hci 0 --connstring peer_name='MatterZigbeeLb' image upload build/signed_by_mcuboot_and_b0_ipc_radio.bin -n 1 -w 1
+
+.. include:: /includes/matter_extension_bt_dfu_testing.txt
+
+.. _zigbee_light_bulb_testing_zigbee_bt_dfu:
+
+Testing Zigbee FOTA DFU over Bluetooth SMP
+------------------------------------------
+
+.. |zigbee bt device name| replace:: Zigbee_Bulb
+.. |zigbee mcumgr smp upload| replace:: mcumgr --conntype ble --hci 0 --connstring peer_name='Zigbee_Bulb' image upload build/light_bulb/zephyr/zephyr.signed.bin
+
+.. include:: /includes/zigbee_bt_dfu_testing.txt
 
 Dependencies
 ************
