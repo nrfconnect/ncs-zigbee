@@ -31,10 +31,6 @@
 #include "zb_mem_config_custom.h"
 #include "zb_dimmer_switch.h"
 
-#if defined(CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER)
-#include <osif/mac_platform.h>
-#endif
-
 #if CONFIG_ZIGBEE_FOTA
 #include <zigbee/zigbee_fota.h>
 #include <zephyr/sys/reboot.h>
@@ -920,7 +916,7 @@ void set_tx_power(void)
 {
 	zb_ret_t ret;
 	uint32_t channel_mask;
-	uint8_t channel = ZB_TRANSCEIVER_START_CHANNEL_NUMBER;
+	uint8_t channel = ZB_PAGE0_2_4_GHZ_CHANNEL_FROM;
 
 #if defined(CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_SINGLE)
 	channel_mask = 1 << CONFIG_ZIGBEE_CHANNEL;
@@ -931,7 +927,7 @@ void set_tx_power(void)
 	channel_mask |= zigbee_touchlink_initiator_zll_primary_channel_mask();
 #endif
 
-	for (; channel <= ZB_TRANSCEIVER_MAX_CHANNEL_NUMBER; channel++) {
+	for (; channel <= ZB_PAGE0_2_4_GHZ_CHANNEL_TO; channel++) {
 		if (channel_mask & (1 << channel)) {
 			LOG_INF("Setting tx power for channel %d: %d dBm", channel,
 				CONFIG_LIGHT_SWITCH_TX_POWER);
