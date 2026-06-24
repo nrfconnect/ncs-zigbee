@@ -126,7 +126,8 @@ This lets the device commission directly with a nearby Touchlink target (for exa
 
    .. group-tab:: nRF54 DKs
 
-      Press **Button 2** during normal operation to start Touchlink commissioning.
+      Short-press **Button 2** during normal operation to start Touchlink commissioning.
+      In the Matter extension build, a long press on the same button switches protocol instead; see :ref:`zigbee_light_switch_matter_limitations`.
 
 .. note::
    Touchlink in the |addon| for the |NCS| is provided as an experimental feature with basic functionality.
@@ -334,7 +335,7 @@ Matter extension Touchlink assignments
    .. group-tab:: nRF54 DKs
 
       Button 2:
-          When you are building the sample with the Matter extension and press the button during normal operation (after boot), it starts Touchlink commissioning as initiator.
+          When you are building the sample with the Matter extension, a short press during normal operation (after boot) starts Touchlink commissioning as initiator.
           See :ref:`zigbee_light_switch_sample_touchlink`.
 
 Matter extension protocol switch assignments
@@ -345,7 +346,7 @@ Matter extension protocol switch assignments
    .. group-tab:: nRF54 DKs
 
       Button 2:
-          If ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH`` is enabled (default), it triggers a protocol switch after a long press (``CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS``, 5 s by default).
+          If ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH`` is enabled (default), a long press (``CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS``, 5 s by default) triggers a protocol switch.
 
 Multiprotocol Bluetooth LE extension assignments
 ================================================

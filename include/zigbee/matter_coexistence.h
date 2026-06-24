@@ -86,15 +86,19 @@ void zigbee_matter_coexistence_signal_matter_board_init(void);
  *
  * Detects a long press on @p switch_button and requests a protocol switch
  * when @kconfig{CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS}
- * expires.
+ * expires. A release before that timeout is reported as a short press so the
+ * sample can assign another action to the same button (for example Touchlink).
  *
  * Call this before other sample-specific button checks.
  *
  * @param button_state Current button state bitmask.
  * @param has_changed  Button-change bitmask from DK callback.
  * @param switch_button Bitmask of the switch button (one DK button).
+ *
+ * @retval true  @p switch_button was released before the long-press timeout.
+ * @retval false Any other event (including press start or unrelated buttons).
  */
-void zigbee_matter_coexistence_process_switch_button(uint32_t button_state, uint32_t has_changed,
+bool zigbee_matter_coexistence_process_switch_button(uint32_t button_state, uint32_t has_changed,
 						     uint32_t switch_button);
 
 #ifdef __cplusplus
