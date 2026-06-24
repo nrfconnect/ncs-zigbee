@@ -100,12 +100,12 @@
 #define BUTTON_SLEEPY              DK_BTN3_MSK
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
-/* Start Touchlink initiator at runtime (same pin as BUTTON_SLEEPY). */
+/* Short press starts Touchlink. */
 #define BUTTON_TOUCHLINK           DK_BTN3_MSK
 #endif
 
 #if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH)
-/* Long-press to switch active protocol. */
+/* Long press switches protocol in coex builds. */
 #define PROTOCOL_SWITCH_BUTTON     DK_BTN3_MSK
 #endif
 
@@ -294,9 +294,15 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	zb_ret_t zb_err_code;
 
 #ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
-#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH)
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+	bool protocol_switch_short_release =
+		zigbee_matter_coexistence_process_switch_button(button_state, has_changed,
+								PROTOCOL_SWITCH_BUTTON);
+#else
 	(void)zigbee_matter_coexistence_process_switch_button(button_state, has_changed,
-							       PROTOCOL_SWITCH_BUTTON);
+							      PROTOCOL_SWITCH_BUTTON);
+#endif
 #endif
 
 	if (!protocol_is_zigbee_active()) {
@@ -309,11 +315,19 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 
 	check_factory_reset_button(button_state, has_changed);
 
-#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR) && !defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE)
+#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE) && \
+	defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH)
+	if (protocol_switch_short_release) {
+		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
+		return;
+	}
+#else
 	if ((has_changed & BUTTON_TOUCHLINK) && (button_state & BUTTON_TOUCHLINK)) {
 		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
 		return;
 	}
+#endif
 #endif
 
 	if (bulb_ctx.short_addr == 0xFFFF) {

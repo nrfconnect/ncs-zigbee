@@ -216,12 +216,12 @@ extern "C" int zigbee_matter_coexistence_run(const struct zigbee_matter_coexiste
 	return 0;
 }
 
-extern "C" void zigbee_matter_coexistence_process_switch_button(uint32_t button_state,
+extern "C" bool zigbee_matter_coexistence_process_switch_button(uint32_t button_state,
 								uint32_t has_changed,
 								uint32_t switch_button)
 {
 	if (switch_button == 0U) {
-		return;
+		return false;
 	}
 
 	const bool pressed = (has_changed & switch_button) && (button_state & switch_button);
@@ -233,9 +233,15 @@ extern "C" void zigbee_matter_coexistence_process_switch_button(uint32_t button_
 		LOG_INF("Protocol switch press started (mask 0x%08x)", switch_button);
 		k_work_reschedule(&protocol_switch_work,
 				  K_SECONDS(CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS));
-	} else if (press_active && released) {
+		return false;
+	}
+
+	if (press_active && released) {
 		LOG_INF("Protocol switch press canceled before timeout");
 		atomic_set(&g_switch_press_active, 0);
 		(void)k_work_cancel_delayable(&protocol_switch_work);
+		return true;
 	}
+
+	return false;
 }
