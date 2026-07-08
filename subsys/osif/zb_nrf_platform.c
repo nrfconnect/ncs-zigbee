@@ -741,6 +741,10 @@ uint32_t zigbee_event_poll(uint32_t timeout_us)
 
 void zigbee_enable(void)
 {
+#if IS_ENABLED(CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22)
+	zboss_use_r22_behavior();
+#endif
+
 	zboss_tid = k_thread_create(&zboss_thread_data,
 				    zboss_stack_area,
 				    K_THREAD_STACK_SIZEOF(zboss_stack_area),
