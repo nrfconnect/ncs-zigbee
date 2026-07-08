@@ -11,11 +11,6 @@
 
 #include "app_task_zigbee.h"
 
-#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
-#include <zigbee/matter_coexistence.h>
-#include <zigbee/matter_protocol_state.h>
-#endif
-
 #include <soc.h>
 #include <zephyr/device.h>
 #include <zephyr/drivers/pwm.h>
@@ -110,11 +105,6 @@ extern "C" {
 #define OTA_ACTIVITY_LED DK_LED2
 #endif
 
-#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH)
-/* Long-press to switch active protocol. */
-#define PROTOCOL_SWITCH_BUTTON DK_BTN3_MSK
-#endif
-
 /* Button used to enter the Bulb into the Identify mode. */
 #define IDENTIFY_MODE_BUTTON DK_BTN4_MSK
 
@@ -139,11 +129,7 @@ static const struct pwm_dt_spec led_pwm = PWM_DT_SPEC_GET(PWM_DK_LED_NODE);
 /* Button to start Factory Reset */
 #define FACTORY_RESET_BUTTON IDENTIFY_MODE_BUTTON
 
-#if IS_ENABLED(CONFIG_CHIP)
-LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
-#else
 LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
-#endif
 
 /* Main application customizable context.
  * Stores all settings and static values.
@@ -243,24 +229,8 @@ static void start_identifying(zb_bufid_t bufid) {
   }
 }
 
-/**@brief Implementation of button event handling for the Zigbee bulb.
- *
- * In combined Matter+Zigbee builds the handler returns early when Matter is
- * the active protocol so Matter's own handlers (registered by Board::Init())
- * keep full ownership of the buttons.
- */
-static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed) {
-#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
-#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH
-  (void)zigbee_matter_coexistence_process_switch_button(
-      button_state, has_changed, PROTOCOL_SWITCH_BUTTON);
-#endif
-
-  if (!protocol_is_zigbee_active()) {
-    return;
-  }
-#endif
-
+/**@brief Callback wrapper for button events. */
+static void button_changed(uint32_t button_state, uint32_t has_changed) {
   if (IDENTIFY_MODE_BUTTON & has_changed) {
     if (IDENTIFY_MODE_BUTTON & button_state) {
       /* Button changed its state to pressed */
@@ -279,24 +249,6 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed) 
   }
 
   check_factory_reset_button(button_state, has_changed);
-}
-
-#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
-extern "C" void zb_button_handler(uint32_t button_state, uint32_t has_changed) {
-  zb_button_handler_impl(button_state, has_changed);
-}
-
-extern "C" void zb_register_button_handler(void) {
-  static struct button_handler handler = {
-      .cb = zb_button_handler,
-  };
-
-  dk_button_handler_add(&handler);
-}
-#else
-/**@brief Callback wrapper for button events (Zigbee-only builds). */
-static void button_changed(uint32_t button_state, uint32_t has_changed) {
-  zb_button_handler_impl(button_state, has_changed);
 }
 
 /**@brief Function for initializing additional PWM leds. */
@@ -322,7 +274,6 @@ static void configure_gpio(void) {
 
   pwm_led_init();
 }
-#endif /* CONFIG_ZIGBEE_MATTER_COEXISTENCE */
 
 /**@brief Sets brightness of bulb luminous executive element
  *
@@ -592,10 +543,6 @@ void zboss_signal_handler(zb_bufid_t bufid) {
   zigbee_touchlink_target_signal_handler(bufid);
 #endif
 
-#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
-  zigbee_matter_coexistence_handle_zboss_signal(bufid);
-#endif
-
   ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
 
   /* All callbacks should either reuse or free passed buffers.
@@ -614,8 +561,6 @@ extern "C" int ZigbeeStart(void) {
 
   LOG_INF("Starting Zigbee R23 Light Bulb example");
 
-  /* Initialize Buttons and Leds only if not using Matter */
-#ifndef CONFIG_ZIGBEE_MATTER_COEXISTENCE
   configure_gpio();
 #ifdef CONFIG_ZIGBEE_SCENES
   err = settings_subsys_init();
@@ -624,8 +569,6 @@ extern "C" int ZigbeeStart(void) {
   }
 #endif
   register_factory_reset_button(FACTORY_RESET_BUTTON);
-
-#endif /* CONFIG_ZIGBEE_MATTER_COEXISTENCE */
 
   /* Register callback for handling ZCL commands. */
   ZB_ZCL_REGISTER_DEVICE_CB(zcl_device_cb);

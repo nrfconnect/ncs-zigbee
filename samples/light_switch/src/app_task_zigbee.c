@@ -5,15 +5,12 @@
  */
 
 /** @file
- * @brief Dimmer switch for HA profile (Zigbee stack entry; Matter build shares the radio).
+ * @brief Dimmer switch for HA profile (Zigbee stack entry).
  *
  * Implemented in C because ZBOSS public macros use void * in ways that are not C++-compatible.
  */
 
 #include "app_task_zigbee.h"
-
-#include <zigbee/matter_protocol_state.h>
-#include <zigbee/matter_coexistence.h>
 
 #include <zephyr/kernel.h>
 #include <zephyr/sys/util.h>
@@ -98,11 +95,6 @@
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
 /* Short press starts Touchlink. */
 #define BUTTON_TOUCHLINK           DK_BTN3_MSK
-#endif
-
-#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH)
-/* Long press switches protocol in coex builds. */
-#define PROTOCOL_SWITCH_BUTTON     DK_BTN3_MSK
 #endif
 
 /* Button to start Factory Reset */
@@ -284,27 +276,10 @@ static void light_switch_touchlink_initiator_start_cb(zb_bufid_t bufid)
  * @param[in]   has_changed   Bitmask containing buttons that has
  *                            changed their state.
  */
-static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
+static void button_handler(uint32_t button_state, uint32_t has_changed)
 {
 	zb_uint16_t cmd_id;
 	zb_ret_t zb_err_code;
-
-#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
-#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH)
-#if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
-	bool protocol_switch_short_release =
-		zigbee_matter_coexistence_process_switch_button(button_state, has_changed,
-								PROTOCOL_SWITCH_BUTTON);
-#else
-	(void)zigbee_matter_coexistence_process_switch_button(button_state, has_changed,
-							      PROTOCOL_SWITCH_BUTTON);
-#endif
-#endif
-
-	if (!protocol_is_zigbee_active()) {
-		return;
-	}
-#endif
 
 	/* Inform default signal handler about user input at the device. */
 	user_input_indicate();
@@ -312,18 +287,10 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	check_factory_reset_button(button_state, has_changed);
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
-#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE) && \
-	defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH)
-	if (protocol_switch_short_release) {
-		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
-		return;
-	}
-#else
 	if ((has_changed & BUTTON_TOUCHLINK) && (button_state & BUTTON_TOUCHLINK)) {
 		ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_initiator_start_cb, 0);
 		return;
 	}
-#endif
 #endif
 
 	if (bulb_ctx.short_addr == 0xFFFF) {
@@ -390,26 +357,6 @@ static void zb_button_handler_impl(uint32_t button_state, uint32_t has_changed)
 	}
 }
 
-#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
-void zb_button_handler(uint32_t button_state, uint32_t has_changed)
-{
-	zb_button_handler_impl(button_state, has_changed);
-}
-
-void zb_register_button_handler(void)
-{
-	static struct button_handler handler = {
-		.cb = zb_button_handler,
-	};
-	dk_button_handler_add(&handler);
-}
-#else
-/**@brief Callback wrapper for button events (non-Matter builds). */
-static void button_handler(uint32_t button_state, uint32_t has_changed)
-{
-	zb_button_handler_impl(button_state, has_changed);
-}
-
 /**@brief Function for initializing LEDs and Buttons. */
 static void configure_gpio(void)
 {
@@ -427,7 +374,6 @@ static void configure_gpio(void)
 	}
 #endif
 }
-#endif /* CONFIG_ZIGBEE_MATTER_COEXISTENCE */
 
 static void alarm_timers_init(void)
 {
@@ -580,11 +526,7 @@ static void find_light_bulb_cb(zb_bufid_t bufid)
  */
 static void find_light_bulb_alarm(struct k_timer *timer)
 {
-#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
-	if (!protocol_is_zigbee_active()) {
-		return;
-	}
-#endif
+	ARG_UNUSED(timer);
 
 	ZB_ERROR_CHECK(zb_buf_get_out_delayed(find_light_bulb));
 }
@@ -739,10 +681,6 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	/* Pass signal to the OTA client implementation. */
 	zigbee_fota_signal_handler(bufid);
 #endif /* CONFIG_ZIGBEE_FOTA */
-
-#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
-	zigbee_matter_coexistence_handle_zboss_signal(bufid);
-#endif
 
 	switch (sig) {
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
@@ -950,10 +888,8 @@ int ZigbeeStart(void)
 {
 	LOG_INF("Starting Zigbee R23 Light Switch example");
 
-#ifndef CONFIG_CHIP
 	configure_gpio();
 	register_factory_reset_button(FACTORY_RESET_BUTTON);
-#endif
 
 	alarm_timers_init();
 
@@ -969,8 +905,6 @@ int ZigbeeStart(void)
 	 */
 #if defined(CONFIG_LIGHT_SWITCH_LOW_POWER)
 	bool enable_sleepy = true;
-#elif defined(CONFIG_CHIP)
-	bool enable_sleepy = false;
 #else
 	bool enable_sleepy = (dk_get_buttons() & BUTTON_SLEEPY) ? true : false;
 #endif

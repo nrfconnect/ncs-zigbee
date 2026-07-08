@@ -11,15 +11,6 @@ config NRF_DEFAULT_IPC_RADIO
 config NETCORE_IPC_RADIO_IEEE802154
 	default y if SOC_SERIES_NRF53
 
-if MATTER
-
-#### Bootloader
-choice BOOTLOADER
-	default BOOTLOADER_MCUBOOT
-endchoice
-
-endif # MATTER
-
 if BOOTLOADER_MCUBOOT
 
 #### DFU multi-image support
