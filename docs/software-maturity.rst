@@ -50,13 +50,6 @@ The following table indicates the software maturity levels of the support for ea
 		  - --
 		  - --
 		  - Supported
-		* - **Zigbee + Matter**
-		  - --
-		  - --
-		  - --
-		  - --
-		  - --
-		  - --
 		* - **Zigbee + nRF21540 (GPIO)**
 		  - --
 		  - --
@@ -100,8 +93,6 @@ The following table indicates the software maturity levels of the support for ea
 		  - Supported
 		* - **Zigbee + Bluetooth LE multiprotocol**
 		  - Supported
-		* - **Zigbee + Matter**
-		  - --
 		* - **Zigbee + nRF21540 (GPIO)**
 		  - --
 		* - **Zigbee Coordinator**
@@ -143,13 +134,6 @@ The following table indicates the software maturity levels of the support for ea
 		  - --
 		  - Supported
 		  - Supported
-		  - Supported
-		  - Supported
-		* - **Zigbee + Matter**
-		  - --
-		  - --
-		  - --
-		  - --
 		  - Supported
 		  - Supported
 		* - **Zigbee + nRF21540 (GPIO)**
@@ -203,11 +187,6 @@ The following table indicates the software maturity levels of the support for ea
 		  - --
 		  - --
 		* - **Zigbee + Bluetooth LE multiprotocol**
-		  - --
-		  - --
-		  - --
-		  - --
-		* - **Zigbee + Matter**
 		  - --
 		  - --
 		  - --

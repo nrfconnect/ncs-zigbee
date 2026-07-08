@@ -13,8 +13,6 @@ You can use it together with the :ref:`Zigbee Network coordinator <zigbee_networ
 
 This sample supports the optional `Sleepy End Device behavior`_ and :ref:`zigbee_light_switch_sample_nus`.
 It also supports :ref:`lib_zigbee_fota` for nRF52840, nRF5340, nRF54L10, nRF54L15 and nRF54LM20 SoCs.
-Additionally, as a proof of concept, it supports the optional :ref:`zigbee_light_switch_sample_matter`, which lets the same firmware start as a Zigbee end device and migrate to a Matter device after Matter commissioning.
-This combined Matter build also enables :ref:`Touchlink <zigbee_commissioning_modes_touchlink>` initiator support, so it can commission a nearby Touchlink target without a Zigbee Coordinator on the network.
 See :ref:`zigbee_light_switch_activating_variants` for details about how to enable these variants.
 
 Requirements
@@ -90,55 +88,6 @@ Transmitting and receiving data when using this example does not break connectio
 
 For more information about the multiprotocol feature, see `Multiprotocol support`_ in the |NCS| documentation.
 
-.. _zigbee_light_switch_sample_matter:
-
-Matter extension
-================
-
-This optional extension is a proof of concept of a combined Matter and Zigbee build on a single SoC.
-The ZBOSS stack and OpenThread (used by Matter) share the same 802.15.4 radio, with ownership handed over at commissioning time by the :file`zigbee_matter_coexistence` library.
-For Thread networking in Matter mode, the light switch acts as an OpenThread Minimal Thread Device (MTD).
-It is supported on the ``nrf54l15dk/nrf54l15/cpuapp``, ``nrf54lm20dk/nrf54lm20a/cpuapp`` and ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
-
-Protocol selection is time-separated and persisted across reboots:
-
-* On first boot, the device starts on the protocol selected by ``CONFIG_ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_PROTOCOL`` (Zigbee by default) and behaves as a standard :ref:`Zigbee End Device <zigbee_roles>` (Dimmer Switch) when Zigbee is active.
-  In parallel, the Matter stack advertises for commissioning over Bluetooth LE (CHIPoBLE) for the duration configured by ``CONFIG_CHIP_BLE_ADVERTISING_DURATION`` (60 s by default).
-* When a Matter commissioner completes commissioning (first CASE session established while Thread is not yet attached), the coexistence layer stops the Zigbee stack, hands the radio over to OpenThread, and persists the selected protocol.
-  From this point on, the device operates as a Matter Dimmer Switch that controls remote Matter lights through the client-side binding cluster.
-* On subsequent boots, the device resumes the persisted protocol.
-  If Matter was selected, the Zigbee stack is skipped entirely and the radio goes directly to OpenThread.
-* A Matter factory reset wipes the Zigbee network information when Zigbee was active, resets the persisted protocol to the value selected by ``CONFIG_ZIGBEE_MATTER_PROTOCOL_STATE_DEFAULT_PROTOCOL``, wipes Matter commissioning data, and reboots the device in that default state.
-
-.. include:: /includes/matter_extension_protocol_switch.txt
-
-Onboarding data (discriminator, passcode, QR code) is produced by the Matter factory data module (``CONFIG_CHIP_FACTORY_DATA_BUILD``) at build time.
-
-.. _zigbee_light_switch_sample_touchlink:
-
-Touchlink commissioning
------------------------
-
-The combined Matter build enables the light switch as a Touchlink initiator (``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR``).
-This lets the device commission directly with a nearby Touchlink target (for example, the :ref:`zigbee_light_bulb_sample` built with the :ref:`zigbee_light_bulb_sample_matter`) and form a distributed-security Zigbee network without a Zigbee Coordinator.
-
-.. tabs::
-
-   .. group-tab:: nRF54 DKs
-
-      Short-press **Button 2** during normal operation to start Touchlink commissioning.
-      In the Matter extension build, a long press on the same button switches protocol instead; see :ref:`zigbee_light_switch_matter_limitations`.
-
-.. note::
-   Touchlink in the |addon| for the |NCS| is provided as an experimental feature with basic functionality.
-   See :ref:`zigbee_commissioning_modes_touchlink` for details.
-
-.. _zigbee_light_switch_matter_limitations:
-
-Matter extension limitations
-----------------------------
-
-.. include:: /includes/matter_extension_limitations.txt
 
 .. _zigbee_light_switch_configuration:
 
@@ -154,10 +103,7 @@ This sample is split into the following source files:
 
 * The :file:`main` file is the application entry point only.
 * The :file:`app_task_zigbee` file manages the application task flow, user input handling, and Zigbee-specific startup and control logic.
-* The :file:`app_task_matter` file is used in the Matter extension build only.
-  It implements the application tasks flow: button input, timers, and delegating control actions to bound lighting devices.
-* The :file:`light_switch` file to implement the light switch application logic and interaction with Zigbee clusters.
-* An additional :file:`nus_cmd` file for handling NUS commands.
+* An additional :file:`nus_cmd` file for handling NUS commands when the multiprotocol extension is enabled.
 
 .. _zigbee_light_switch_activating_variants:
 
@@ -183,14 +129,6 @@ For example, when building from the command line, use the following command:
    :class: highlight
 
    west build samples/light_switch -b *board_target* -- -DEXTRA_CONF_FILE='overlay-multiprotocol_ble.conf'
-
-.. |sample matter ref| replace:: :ref:`zigbee_light_switch_sample_matter`
-.. |sample matter limitations ref| replace:: :ref:`zigbee_light_switch_matter_limitations`
-.. |sample matter bt dfu testing ref| replace:: :ref:`zigbee_light_switch_testing_matter_bt_dfu`
-.. |sample matter testing ref| replace:: :ref:`zigbee_light_switch_testing_matter`
-.. |sample matter activating variants ref| replace:: :ref:`zigbee_light_switch_activating_variants`
-
-.. include:: /includes/matter_extension_activation.txt
 
 For the board name to use instead of the ``board_target``, see `Programming board names`_.
 
@@ -327,26 +265,6 @@ Sleepy End Device behavior assignments
       Button 3:
           When pressed while resetting the kit, enables the :ref:`zigbee_ug_sed`.
 
-Matter extension Touchlink assignments
-======================================
-
-.. tabs::
-
-   .. group-tab:: nRF54 DKs
-
-      Button 2:
-          When you are building the sample with the Matter extension, a short press during normal operation (after boot) starts Touchlink commissioning as initiator.
-          See :ref:`zigbee_light_switch_sample_touchlink`.
-
-Matter extension protocol switch assignments
-============================================
-
-.. tabs::
-
-   .. group-tab:: nRF54 DKs
-
-      Button 2:
-          If ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH`` is enabled (default), a long press (``CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS``, 5 s by default) triggers a protocol switch.
 
 Multiprotocol Bluetooth LE extension assignments
 ================================================
@@ -507,47 +425,6 @@ In nRF Toolbox, tap the buttons you assigned to perform the test:
 
 You can now control the devices either with the buttons on the development kits or with the NUS UART command buttons in the nRF Toolbox application.
 
-.. _zigbee_light_switch_testing_matter:
-
-Testing the Matter extension
-----------------------------
-
-See :ref:`zigbee_light_switch_sample_matter` for the runtime behavior driving the steps below.
-
-To test the extension, you need:
-
-* A light switch built with the Matter extension (see :ref:`zigbee_light_switch_activating_variants`).
-* A Zigbee test setup to verify Zigbee operation before Matter commissioning.
-  You can use either the standard setup (a Network coordinator and a Zigbee light bulb) or, alternatively, only a Touchlink-capable light bulb (for example, the :ref:`zigbee_light_bulb_sample` built with the Matter extension), in which case the Zigbee Coordinator is not needed.
-* A Matter controller that can commission a Thread device over Bluetooth LE, for example `CHIP Tool`_ or an ecosystem app (Apple Home, Google Home, Amazon Alexa).
-* A Thread Border Router reachable by the Matter fabric.
-* Optionally, a Matter light commissioned to the same Thread fabric to be bound to the light switch (for example, a Matter Light Bulb sample).
-
-Complete the following steps to exercise the full Zigbee-to-Matter flow:
-
-1. Verify Zigbee operation in one of the following ways:
-
-   * Follow the standard `Testing`_ procedure with a Zigbee Network coordinator and a Zigbee light bulb.
-   * Or, skip the Zigbee Coordinator and pair the light switch directly with a Touchlink-capable light bulb:
-
-     a. Power the light bulb (Touchlink target).
-     #. Power the light switch and press the Touchlink button (see :ref:`zigbee_light_switch_sample_touchlink`).
-        The two devices form a distributed-security Zigbee network and the light switch finds the bulb to control, without a Zigbee Coordinator on the network.
-
-   While the device is still a Zigbee End Device, it also advertises for Matter commissioning over Bluetooth LE if ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE`` is enabled.
-#. Optionally, long-press Button 2 for ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS`` to switch to Matter.
-   The Zigbee stack is stopped and the radio is handed to OpenThread.
-   Skip the next step if you use this path and Matter was already commissioned in a previous session.
-#. Commission the device using the onboarding payload produced by the Matter factory data build (QR code or manual pairing code).
-   After the Matter CASE session is established, the light switch hands the radio over to Thread and stops participating in the Zigbee network.
-#. Bind the light switch to a Matter light (for example, with ``chip-tool binding write binding …``) and use the dimmer button to toggle or dim the bound light over Thread.
-#. To return the device to Zigbee operation, use one of the following:
-
-   * Long-press Button 2 for ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_SWITCH_BUTTON_PRESS_TIME_SECONDS``.
-     The device reboots and resumes as a Zigbee End Device.
-   * Or trigger a Matter factory reset from the controller (for example, ``chip-tool pairing unpair …``).
-     The device reboots as a fresh Zigbee End Device with Matter Bluetooth LE advertising active again, and Matter storage is cleared.
-
 .. _zigbee_light_switch_testing_zigbee_bt_dfu:
 
 Testing Zigbee FOTA DFU over Bluetooth SMP
@@ -558,17 +435,6 @@ Testing Zigbee FOTA DFU over Bluetooth SMP
 
 .. include:: /includes/zigbee_bt_dfu_testing.txt
 
-.. _zigbee_light_switch_testing_matter_bt_dfu:
-
-Testing Matter extension DFU over Bluetooth SMP
------------------------------------------------
-
-.. |bt device name| replace:: MatterZigbeeSw
-.. |app name| replace:: light_switch
-.. |matter mcumgr smp upload| replace:: mcumgr --conntype ble --hci 0 --connstring peer_name='MatterZigbeeSw' image upload build/light_switch/zephyr/zephyr.signed.bin -n 0 -w 1
-.. |matter mcumgr net smp upload| replace:: mcumgr --conntype ble --hci 0 --connstring peer_name='MatterZigbeeSw' image upload build/signed_by_mcuboot_and_b0_ipc_radio.bin -n 1 -w 1
-
-.. include:: /includes/matter_extension_bt_dfu_testing.txt
 
 Sample output
 -------------
@@ -611,10 +477,3 @@ The following dependencies are added by the multiprotocol Bluetooth LE extension
   * ``include/bluetooth/hci.h``
   * ``include/bluetooth/uuid.h``
   * ``include/bluetooth/services/nus.h``
-
-If you are using the optional :ref:`zigbee_light_switch_sample_matter`, this sample requires the following dependencies:
-
-* The Matter stack (``CONFIG_CHIP``) shipped with the |NCS|, including the Binding and Identify clusters and the Matter factory data module.
-* OpenThread (used by Matter on 802.15.4) and the `SoftDevice Controller`_ (used for CHIPoBLE commissioning).
-* The :file:`zigbee_matter_coexistence` and :file:`zigbee_matter_protocol_state` libraries, which orchestrate the 802.15.4 radio hand-over and persist the selected protocol.
-* The :file:`nrf_802154_callbacks_dispatcher` (``CONFIG_NRF_802154_CALLBACKS_DISPATCHER``) with runtime re-init (``CONFIG_NRF_802154_DRV_REINIT_ENABLED``).

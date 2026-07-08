@@ -70,8 +70,7 @@ Touchlink
 
 .. note::
    The Touchlink mode is optional in Zigbee.
-   In the |addon| for the |NCS|, it is provided as an experimental feature with basic functionality, available in selected combined Matter sample variants through the ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` and ``CONFIG_ZIGBEE_TOUCHLINK_TARGET`` Kconfig options.
-   See :ref:`zigbee_light_switch_sample_matter` (initiator) and :ref:`zigbee_light_bulb_sample_matter` (target) for usage examples.
+   In the |addon| for the |NCS|, it is provided as an experimental feature with basic functionality through the ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` and ``CONFIG_ZIGBEE_TOUCHLINK_TARGET`` Kconfig options.
 
 The Touchlink mode allows commissioning of devices in close proximity to each other, which means that the key criterium for this mode is the signal strength.
 It involves an initiator device and a target device, where the initiator is a member of an existing Zigbee network or it can form a new network.
