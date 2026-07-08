@@ -23,7 +23,6 @@ function(${SYSBUILD_CURRENT_MODULE_NAME}_pre_cmake)
 
   # Extend this list as needed.
   set(app_mcuboot_snippet_pairs
-    matter_fota_ext_flash matter_fota_mcuboot_ext_flash
     zigbee_fota_ext_flash zigbee_fota_mcuboot_ext_flash
   )
 

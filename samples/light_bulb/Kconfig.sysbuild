@@ -11,48 +11,4 @@ config NRF_DEFAULT_IPC_RADIO
 config NETCORE_IPC_RADIO_IEEE802154
 	default y if SOC_SERIES_NRF53
 
-if MATTER
-
-#### Bootloader
-choice BOOTLOADER
-	default BOOTLOADER_MCUBOOT
-endchoice
-
-endif # MATTER
-
-if BOOTLOADER_MCUBOOT
-
-#### DFU multi-image support
-config DFU_MULTI_IMAGE_PACKAGE_BUILD
-	default y
-
-config DFU_MULTI_IMAGE_PACKAGE_APP
-	default y
-
-#### DFU dual core configuration
-if SOC_SERIES_NRF53
-
-config PM_EXTERNAL_FLASH_MCUBOOT_SECONDARY
-	default y
-
-config MCUBOOT_UPDATEABLE_IMAGES
-	default 2
-
-choice MCUBOOT_MODE
-	default MCUBOOT_MODE_OVERWRITE_ONLY
-endchoice
-
-config SECURE_BOOT_NETCORE
-	default y
-
-config NETCORE_APP_UPDATE
-	default y
-
-config DFU_MULTI_IMAGE_PACKAGE_NET
-	default y
-
-endif # SOC_SERIES_NRF53
-
-endif # BOOTLOADER_MCUBOOT
-
 source "${ZEPHYR_BASE}/share/sysbuild/Kconfig"

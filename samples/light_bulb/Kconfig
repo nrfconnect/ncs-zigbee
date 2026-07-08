@@ -4,19 +4,6 @@
 # SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
 #
 
-# Sample configuration used for Thread networking
-if OPENTHREAD
-
-choice OPENTHREAD_NORDIC_LIBRARY_CONFIGURATION
-	default OPENTHREAD_NORDIC_LIBRARY_FTD
-endchoice
-
-choice OPENTHREAD_DEVICE_TYPE
-	default OPENTHREAD_FTD
-endchoice
-
-endif # OPENTHREAD
-
 if ZIGBEE_BT_DFU
 
 config BT_DEVICE_NAME
@@ -26,11 +13,5 @@ endif # ZIGBEE_BT_DFU
 
 config MPSL_THREAD_COOP_PRIO
 	default 8
-
-if CHIP
-source "$(ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR)/config/nrfconnect/chip-module/Kconfig.features"
-source "$(ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR)/config/nrfconnect/chip-module/Kconfig.defaults"
-source "$(ZEPHYR_NRF_MODULE_DIR)/samples/matter/common/src/Kconfig"
-endif
 
 source "Kconfig.zephyr"
