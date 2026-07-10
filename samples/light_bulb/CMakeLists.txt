@@ -37,6 +37,7 @@ if(CONFIG_CHIP)
         src/main.cpp
         src/app_task_zigbee.cpp
         src/app_task_matter.cpp
+        src/zcl_callbacks.cpp
         ${CHIP_ROOT}/src/app/persistence/DeferredAttributePersistenceProvider.cpp
     )
     
