@@ -36,3 +36,9 @@ zephyr_library_compile_options($<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>)
 # Matter public headers use deprecated symbols in some CHIP releases; the
 # sample's own target_compile_options does not propagate here.
 zephyr_library_compile_options(-Wno-deprecated-declarations)
+
+# While Zigbee owns the 802.15.4 radio, OpenThread must not auto-start even
+# when a Thread dataset is already provisioned.  The coexistence runtime
+# starts Thread explicitly after switching the callbacks dispatcher to
+# OpenThread.
+zephyr_compile_definitions(CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART=0)

@@ -9,8 +9,34 @@ From Zigbee, the coexistence layer stops the ZBOSS stack and hands the 802.15.4 
 From Matter, the device persists Zigbee as the active protocol and reboots.
 The protocol switch is ignored while the device is joining a Zigbee network or undergoing Matter commissioning.
 
+Integrating the coexistence layer in ``AppTask::Init()`` requires two call sites:
+
+1. Pass ``zigbee_matter_coexistence_pre_server_init`` as ``mPreServerInitClbk`` in ``Nrf::Matter::InitData`` before calling ``Nrf::Matter::PrepareServer()``.
+   This temporarily transfers the 802.15.4 radio to OpenThread so that ``InitThreadStack()`` can initialize the OT radio platform safely while Zigbee owns the dispatcher.
+
+2. Call ``zigbee_matter_coexistence_on_server_started()`` immediately after ``Nrf::Matter::StartServer()`` succeeds.
+   This restores the 802.15.4 dispatcher to Zigbee, disables the OT IP6 interface so OpenThread does not access the radio while inactive, and unblocks the Zigbee worker thread.
+
+The following example shows the required structure:
+
+.. code-block:: cpp
+
+   Nrf::Matter::InitData initData{};
+   initData.mPostServerInitClbk = []() -> CHIP_ERROR {
+       /* sample-specific init */
+       return CHIP_NO_ERROR;
+   };
+   initData.mPreServerInitClbk  = []() -> CHIP_ERROR {
+       zigbee_matter_coexistence_pre_server_init();
+       return CHIP_NO_ERROR;
+   };
+   ReturnErrorOnFailure(Nrf::Matter::PrepareServer(initData));
+   // ...
+   ReturnErrorOnFailure(Nrf::Matter::StartServer());
+   zigbee_matter_coexistence_on_server_started();
+
 Other Kconfig options in the coexistence layer:
 
 * ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE`` (default enabled) — Matter may advertise for commissioning over Bluetooth LE while Zigbee owns the 802.15.4 radio.
-  When disabled, the sample must call ``zigbee_matter_coexistence_signal_matter_board_init()`` after Matter server init, and the Zigbee worker proceeds without waiting for CHIPoBLE advertising.
+  When disabled, the Zigbee worker is unblocked directly from ``zigbee_matter_coexistence_on_server_started()`` without waiting for CHIPoBLE advertising.
 * ``CONFIG_ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH`` — Enable or disable the button-triggered protocol switch.

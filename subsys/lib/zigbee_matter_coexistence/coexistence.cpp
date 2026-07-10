@@ -11,7 +11,13 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 
+#if defined(CONFIG_OPENTHREAD)
+#include <openthread/dataset.h>
+#include <openthread/ip6.h>
+#endif
+
 #include <app/matter_event_handler.h>
+#include <app/server/Server.h>
 
 #include <net/nrf_802154_callbacks_dispatcher.h>
 
@@ -31,8 +37,10 @@ namespace
 const struct zigbee_matter_coexistence_callbacks *g_cb;
 
 K_SEM_DEFINE(matter_init_done_sem, 0, 1);
+K_SEM_DEFINE(leave_done_sem, 0, 1);
 
 atomic_t g_switch_press_active = ATOMIC_INIT(0);
+atomic_t g_matter_switch_pending_leave = ATOMIC_INIT(0);
 
 void switch_to_thread_radio(void);
 void switch_to_zigbee_radio(void);
@@ -40,6 +48,36 @@ void switch_to_zigbee_radio(void);
 void matter_board_init_signal(void)
 {
 	k_sem_give(&matter_init_done_sem);
+}
+
+void start_thread_network_if_commissioned(void)
+{
+#if defined(CONFIG_OPENTHREAD)
+	using namespace chip::DeviceLayer;
+
+	ThreadStackMgr().LockThreadStack();
+	otInstance *const instance = ThreadStackMgrImpl().OTInstance();
+	otError ot_err = OT_ERROR_NONE;
+	bool commissioned = false;
+
+	if (instance != nullptr) {
+		commissioned = otDatasetIsCommissioned(instance);
+		if (commissioned && otThreadGetDeviceRole(instance) == OT_DEVICE_ROLE_DISABLED) {
+			ot_err = otIp6SetEnabled(instance, true);
+			if (ot_err == OT_ERROR_NONE) {
+				ot_err = otThreadSetEnabled(instance, true);
+			}
+		}
+	}
+
+	ThreadStackMgr().UnlockThreadStack();
+
+	if (ot_err != OT_ERROR_NONE) {
+		LOG_ERR("Failed to start Thread after radio handover: %d", ot_err);
+	} else if (commissioned) {
+		LOG_INF("Thread network started after radio handover to OpenThread");
+	}
+#endif
 }
 
 void protocol_switch_work_handler(struct k_work *work)
@@ -89,6 +127,7 @@ void zigbee_thread_fn()
 
 		/* Still chain sample button handlers after Matter board init. */
 		(void)k_sem_take(&matter_init_done_sem, K_FOREVER);
+		start_thread_network_if_commissioned();
 		if (g_cb->post_matter_board_init != NULL) {
 			g_cb->post_matter_board_init();
 		}
@@ -121,8 +160,36 @@ K_THREAD_DEFINE(matter_thread_id, CONFIG_ZIGBEE_MATTER_COEXISTENCE_MATTER_THREAD
 		matter_thread_fn, NULL, NULL, NULL,
 		CONFIG_ZIGBEE_MATTER_COEXISTENCE_MATTER_THREAD_PRIORITY, 0, K_TICKS_FOREVER);
 
+static void zboss_do_local_leave(zb_uint8_t param)
+{
+	ZVUNUSED(param);
+	/* Sends a NWK Leave frame (notifying the coordinator to remove this
+	 * device from its tables, including the unique TCLK) and then erases
+	 * ZBOSS NVRAM.  The ZB_ZDO_SIGNAL_LEAVE signal fires when done, which
+	 * is forwarded to zigbee_matter_coexistence_on_zboss_leave_signal(). */
+	zb_bdb_reset_via_local_action(0);
+}
+
 void switch_to_thread_radio(void)
 {
+	/* Ask ZBOSS to send a clean NWK Leave frame so the coordinator removes
+	 * this device's unique TCLK.  We wait up to 5 s; after that we proceed
+	 * regardless (coordinator may be unreachable). */
+	atomic_set(&g_matter_switch_pending_leave, 1);
+	k_sem_reset(&leave_done_sem);
+	zb_ret_t zb_ret = zigbee_schedule_callback(zboss_do_local_leave, 0);
+	if (zb_ret == RET_OK) {
+		if (k_sem_take(&leave_done_sem, K_SECONDS(5)) != 0) {
+			LOG_WRN("Leave confirmation not received within timeout; "
+				"coordinator may be unreachable");
+			k_sem_reset(&leave_done_sem);
+		}
+	} else {
+		LOG_WRN("Failed to schedule ZBOSS leave callback (%d), proceeding without leave",
+			zb_ret);
+	}
+	atomic_set(&g_matter_switch_pending_leave, 0);
+
 	k_thread_abort(zigbee_thread_id);
 	zigbee_deinit();
 
@@ -131,6 +198,8 @@ void switch_to_thread_radio(void)
 
 	int ret = nrf_802154_callbacks_dispatcher_switch("openthread");
 	__ASSERT(ret == 0, "Failed to switch 802.15.4 radio to Thread: %d", ret);
+
+	start_thread_network_if_commissioned();
 }
 
 void switch_to_zigbee_radio(void)
@@ -152,10 +221,24 @@ void matter_event_handler(const chip::DeviceLayer::ChipDeviceEvent *event, intpt
 			matter_board_init_signal();
 		}
 		break;
+	case chip::DeviceLayer::DeviceEventType::kServerReady:
+		/*
+		 * Fallback when operational DNS-SD comes up. After switching back
+		 * to Zigbee, DNS-SD often stays disabled while Thread is deferred,
+		 * so app_task_matter also signals once StartServer() returns.
+		 */
+		if (protocol_state_get() == PROTOCOL_ZIGBEE &&
+		    chip::Server::GetInstance().GetFabricTable().FabricCount() > 0) {
+			matter_board_init_signal();
+		}
+		break;
 #endif /* CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE */
 	case chip::DeviceLayer::DeviceEventType::kSecureSessionEstablished:
-		if (protocol_state_get() == PROTOCOL_ZIGBEE &&
-		    !chip::DeviceLayer::ThreadStackMgr().IsThreadAttached()) {
+		if (protocol_state_get() == PROTOCOL_ZIGBEE
+#if defined(CONFIG_OPENTHREAD)
+		    && !chip::DeviceLayer::ThreadStackMgr().IsThreadAttached()
+#endif
+		) {
 			switch_to_thread_radio();
 		}
 		break;
@@ -193,6 +276,66 @@ extern "C" void zigbee_matter_coexistence_signal_matter_board_init(void)
 	matter_board_init_signal();
 }
 
+extern "C" void zigbee_matter_coexistence_on_server_started(void)
+{
+#if defined(CONFIG_OPENTHREAD)
+	/* Restore the 802.15.4 dispatcher to Zigbee now that Matter server init
+	 * (including InitThreadStack()) has completed.  pre_server_init() switched
+	 * it to OpenThread so the OT radio platform could initialise safely.
+	 * Also disable the OT IP6 interface so OT does not scan or transmit on the
+	 * 802.15.4 channel while Zigbee owns the radio. */
+	if (protocol_state_get() == PROTOCOL_ZIGBEE) {
+		using namespace chip::DeviceLayer;
+		ThreadStackMgr().LockThreadStack();
+		otInstance *const inst = ThreadStackMgrImpl().OTInstance();
+		if (inst != nullptr && otIp6IsEnabled(inst)) {
+			otIp6SetEnabled(inst, false);
+		}
+		ThreadStackMgr().UnlockThreadStack();
+
+		int ret = nrf_802154_callbacks_dispatcher_switch("zigbee");
+		if (ret != 0) {
+			LOG_ERR("Failed to restore radio dispatcher to Zigbee: %d", ret);
+		} else {
+			LOG_INF("Radio dispatcher restored to Zigbee after Matter server init");
+		}
+	}
+#endif
+
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE
+	/* The Zigbee worker always waits on matter_init_done_sem, including in
+	 * the PROTOCOL_MATTER boot path (to synchronise with start_thread_network_if_commissioned).
+	 * In Zigbee mode with no fabrics the kCHIPoBLEAdvertisingChange event
+	 * unblocks the worker; in all other cases (Matter mode, or Zigbee mode
+	 * with existing fabrics that suppress advertising) signal explicitly. */
+	if (protocol_state_get() == PROTOCOL_MATTER ||
+	    chip::Server::GetInstance().GetFabricTable().FabricCount() > 0) {
+		matter_board_init_signal();
+	}
+#else
+	matter_board_init_signal();
+#endif
+}
+
+extern "C" void zigbee_matter_coexistence_pre_server_init(void)
+{
+#if defined(CONFIG_OPENTHREAD)
+	/* Switch the 802.15.4 dispatcher to OpenThread so that InitThreadStack()
+	 * can initialise the OT radio platform (otPlatRadioInit / nrf_802154_init)
+	 * without crashing.  Zigbee loses radio callbacks for the duration of
+	 * StartServer(); on_server_started() switches the dispatcher back. */
+	if (protocol_state_get() == PROTOCOL_ZIGBEE) {
+		int ret = nrf_802154_callbacks_dispatcher_switch("openthread");
+		if (ret != 0) {
+			LOG_ERR("Failed to switch radio dispatcher to OpenThread: %d", ret);
+		} else {
+			LOG_INF("Radio dispatcher switched to OpenThread for Matter server init");
+		}
+	}
+#endif
+}
+
+
 extern "C" int zigbee_matter_coexistence_run(const struct zigbee_matter_coexistence_callbacks *cb)
 {
 	__ASSERT(cb != NULL, "Null callback table");
@@ -214,6 +357,13 @@ extern "C" int zigbee_matter_coexistence_run(const struct zigbee_matter_coexiste
 	k_thread_start(matter_thread_id);
 
 	return 0;
+}
+
+extern "C" void zigbee_matter_coexistence_on_zboss_leave_signal(void)
+{
+	if (atomic_get(&g_matter_switch_pending_leave)) {
+		k_sem_give(&leave_done_sem);
+	}
 }
 
 extern "C" bool zigbee_matter_coexistence_process_switch_button(uint32_t button_state,

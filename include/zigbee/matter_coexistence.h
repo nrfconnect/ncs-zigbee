@@ -46,8 +46,8 @@ struct zigbee_matter_coexistence_callbacks {
 	/** Hook run on the Zigbee worker thread once Matter is ready for the
 	 *  Zigbee phase (CHIPoBLE advertising started when
 	 *  @kconfig{CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE},
-	 *  otherwise after the sample calls
-	 *  @ref zigbee_matter_coexistence_signal_matter_board_init).
+	 *  otherwise after @ref zigbee_matter_coexistence_on_server_started
+	 *  unblocks the Zigbee worker).
 	 *  Typically used to register a chained Zigbee button handler with
 	 *  the DK buttons library after @c dk_buttons_init() has completed.
 	 *  May be NULL.
@@ -72,15 +72,34 @@ struct zigbee_matter_coexistence_callbacks {
  */
 int zigbee_matter_coexistence_run(const struct zigbee_matter_coexistence_callbacks *cb);
 
-/** @brief Notify the coexistence runtime that Matter board init is complete.
+/** @brief Notify the coexistence runtime that @c Nrf::Matter::StartServer() has returned.
  *
- * Call from the Matter worker thread after @c Nrf::Matter::StartServer()
- * returns successfully when
- * @kconfig{CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE} is
- * disabled. Unblocks the Zigbee worker so it can chain button handlers and
- * start the Zigbee stack.
+ * Call unconditionally from the Matter worker thread's @c AppTask::Init()
+ * immediately after @c Nrf::Matter::StartServer() succeeds.  Internally
+ * handles all coexistence signaling variants:
+ *
+ * - When @kconfig{CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE} is
+ *   disabled: unblocks the Zigbee worker unconditionally.
+ * - When it is enabled: unblocks the Zigbee worker only on a Zigbee boot
+ *   that follows a prior Matter commissioning (i.e. the device already has
+ *   a fabric), because BLE advertising will not restart and the normal
+ *   @c kCHIPoBLEAdvertisingChange signal will never fire.
  */
-void zigbee_matter_coexistence_signal_matter_board_init(void);
+void zigbee_matter_coexistence_on_server_started(void);
+
+/**
+ * @brief Prepare 802.15.4 radio for safe Matter server initialization.
+ *
+ * Call this as @c mPreServerInitClbk in @c Nrf::Matter::InitData before
+ * calling @c Nrf::Matter::PrepareServer().  When the device boots in Zigbee
+ * mode, temporarily switches the 802.15.4 callbacks dispatcher to OpenThread
+ * so that @c InitThreadStack() can initialise the OT radio platform without
+ * crashing.  @ref zigbee_matter_coexistence_on_server_started restores the
+ * dispatcher to Zigbee once @c StartServer() returns.
+ *
+ * This function is a no-op when the device boots in Matter mode.
+ */
+void zigbee_matter_coexistence_pre_server_init(void);
 
 /** @brief Process button events for user-triggered protocol switching.
  *
@@ -100,6 +119,18 @@ void zigbee_matter_coexistence_signal_matter_board_init(void);
  */
 bool zigbee_matter_coexistence_process_switch_button(uint32_t button_state, uint32_t has_changed,
 						     uint32_t switch_button);
+
+
+/** @brief Notify the coexistence runtime that the local ZDO/NWK leave has completed.
+ *
+ * Must be called from the application's @c zboss_signal_handler when a
+ * @c ZB_ZDO_SIGNAL_LEAVE event with leave_type @c ZB_NWK_LEAVE_TYPE_RESET
+ * is received.  If a Matter protocol switch was deferred pending the leave,
+ * this call unblocks it so the radio hand-over to OpenThread can proceed.
+ *
+ * Safe to call unconditionally; it is a no-op when no switch is pending.
+ */
+void zigbee_matter_coexistence_on_zboss_leave_signal(void);
 
 #ifdef __cplusplus
 }

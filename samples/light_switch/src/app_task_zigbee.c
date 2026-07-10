@@ -779,6 +779,11 @@ void zboss_signal_handler(zb_bufid_t bufid)
 
 			if (leave_params->leave_type == ZB_NWK_LEAVE_TYPE_RESET) {
 				bulb_ctx.short_addr = 0xFFFF;
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
+				/* Unblock a pending Matter switch that was deferred
+				 * until the coordinator had been notified via Leave. */
+				zigbee_matter_coexistence_on_zboss_leave_signal();
+#endif
 			}
 		}
 		/* Call default signal handler. */
