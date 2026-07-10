@@ -22,8 +22,7 @@
 #include <app/server/Server.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
-#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE) && \
-	!defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE)
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE)
 #include <zigbee/matter_coexistence.h>
 #endif
 
@@ -198,13 +197,20 @@ void AppTask::InitPWMDDevice() {
 
 CHIP_ERROR AppTask::Init() {
   /* Initialize Matter stack */
-  ReturnErrorOnFailure(Nrf::Matter::PrepareServer(
-      Nrf::Matter::InitData{.mPostServerInitClbk = []() {
-        app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
-        gSimpleAttributePersistence.Init(
-            Nrf::Matter::GetPersistentStorageDelegate());
-        return CHIP_NO_ERROR;
-      }}));
+  Nrf::Matter::InitData initData{};
+  initData.mPostServerInitClbk = []() {
+    app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
+    gSimpleAttributePersistence.Init(
+        Nrf::Matter::GetPersistentStorageDelegate());
+    return CHIP_NO_ERROR;
+  };
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE)
+  initData.mPreServerInitClbk = []() -> CHIP_ERROR {
+    zigbee_matter_coexistence_pre_server_init();
+    return CHIP_NO_ERROR;
+  };
+#endif
+  ReturnErrorOnFailure(Nrf::Matter::PrepareServer(initData));
 
   if (!Nrf::GetBoard().Init(ButtonEventHandler)) {
     LOG_ERR("User interface initialization failed.");
@@ -220,9 +226,8 @@ CHIP_ERROR AppTask::Init() {
 
   ReturnErrorOnFailure(Nrf::Matter::StartServer());
 
-#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE) && \
-	!defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE)
-  zigbee_matter_coexistence_signal_matter_board_init();
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE)
+  zigbee_matter_coexistence_on_server_started();
 #endif
 
   return CHIP_NO_ERROR;

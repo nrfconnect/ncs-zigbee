@@ -15,8 +15,7 @@
 
 #include <setup_payload/OnboardingCodesUtil.h>
 
-#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE) && \
-	!defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE)
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE)
 #include <zigbee/matter_coexistence.h>
 #endif
 
@@ -142,10 +141,18 @@ void AppTask::UserTimerTimeoutCallback(k_timer *timer)
 CHIP_ERROR AppTask::Init()
 {
 	/* Initialize Matter stack */
-	ReturnErrorOnFailure(Nrf::Matter::PrepareServer(Nrf::Matter::InitData{ .mPostServerInitClbk = [] {
+	Nrf::Matter::InitData initData{};
+	initData.mPostServerInitClbk = [] {
 		LightSwitch::GetInstance().Init(kLightSwitchEndpointId);
 		return CHIP_NO_ERROR;
-	} }));
+	};
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE)
+	initData.mPreServerInitClbk = []() -> CHIP_ERROR {
+		zigbee_matter_coexistence_pre_server_init();
+		return CHIP_NO_ERROR;
+	};
+#endif
+	ReturnErrorOnFailure(Nrf::Matter::PrepareServer(initData));
 
 	/* Initialize application timers */
 	k_timer_init(&sDimmerPressKeyTimer, AppTask::UserTimerTimeoutCallback, nullptr);
@@ -164,9 +171,8 @@ CHIP_ERROR AppTask::Init()
 
 	ReturnErrorOnFailure(Nrf::Matter::StartServer());
 
-#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE) && \
-	!defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE)
-	zigbee_matter_coexistence_signal_matter_board_init();
+#if defined(CONFIG_ZIGBEE_MATTER_COEXISTENCE)
+	zigbee_matter_coexistence_on_server_started();
 #endif
 
 	return CHIP_NO_ERROR;

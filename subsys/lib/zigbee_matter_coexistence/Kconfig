@@ -35,12 +35,11 @@ config ZIGBEE_MATTER_COEXISTENCE_BT_ADV_WHILE_ZIGBEE
 
 	  Requires CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART in the application.
 
-	  When disabled, the sample must call
-	  zigbee_matter_coexistence_signal_matter_board_init() after Matter
-	  server init completes.
-	  The Zigbee worker then proceeds without waiting for Thread
-	  or DNS-SD. Set CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART=n if Matter
-	  commissioning over BLE is not needed until after a protocol switch.
+	  When disabled, the Zigbee worker is unblocked from within
+	  zigbee_matter_coexistence_on_server_started() without waiting
+	  for Thread or DNS-SD. Set CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART=n
+	  if Matter commissioning over BLE is not needed until after a
+	  protocol switch.
 
 config ZIGBEE_MATTER_COEXISTENCE_BUTTON_SWITCH
 	bool "Enable user protocol switch on button long press"
