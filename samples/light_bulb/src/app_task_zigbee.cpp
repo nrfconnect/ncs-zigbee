@@ -445,7 +445,7 @@ static void bulb_clusters_attr_init(void) {
       ZB_ZCL_IDENTIFY_IDENTIFY_TIME_DEFAULT_VALUE;
 
   /* On/Off cluster attributes data. */
-  dev_ctx.on_off_attr.on_off = (zb_bool_t)ZB_ZCL_ON_OFF_IS_ON;
+  dev_ctx.on_off_attr.on_off = (zb_bool_t)ZB_ZCL_ON_OFF_IS_OFF;
 
   dev_ctx.level_control_attr.current_level =
       ZB_ZCL_LEVEL_CONTROL_LEVEL_MAX_VALUE;
@@ -630,7 +630,12 @@ extern "C" int ZigbeeStart(void) {
   ZB_AF_REGISTER_DEVICE_CTX(&dimmable_light_ctx);
 
   bulb_clusters_attr_init();
-  level_control_set_value(dev_ctx.level_control_attr.current_level);
+
+  if (dev_ctx.on_off_attr.on_off) {
+    level_control_set_value(dev_ctx.level_control_attr.current_level);
+  } else {
+    level_control_set_value(0U);
+  }
 
 #if defined(CONFIG_ZIGBEE_FOTA) || defined(CONFIG_ZIGBEE_BT_DFU)
   confirm_image();
