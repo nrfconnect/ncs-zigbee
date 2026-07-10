@@ -740,6 +740,10 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	zigbee_fota_signal_handler(bufid);
 #endif /* CONFIG_ZIGBEE_FOTA */
 
+#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
+	zigbee_matter_coexistence_handle_zboss_signal(bufid);
+#endif
+
 	switch (sig) {
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
 	case ZB_BDB_SIGNAL_TOUCHLINK:
@@ -779,11 +783,6 @@ void zboss_signal_handler(zb_bufid_t bufid)
 
 			if (leave_params->leave_type == ZB_NWK_LEAVE_TYPE_RESET) {
 				bulb_ctx.short_addr = 0xFFFF;
-#ifdef CONFIG_ZIGBEE_MATTER_COEXISTENCE
-				/* Unblock a pending Matter switch that was deferred
-				 * until the coordinator had been notified via Leave. */
-				zigbee_matter_coexistence_on_zboss_leave_signal();
-#endif
 			}
 		}
 		/* Call default signal handler. */

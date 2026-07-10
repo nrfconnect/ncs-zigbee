@@ -166,7 +166,7 @@ static void zboss_do_local_leave(zb_uint8_t param)
 	/* Sends a NWK Leave frame (notifying the coordinator to remove this
 	 * device from its tables, including the unique TCLK) and then erases
 	 * ZBOSS NVRAM.  The ZB_ZDO_SIGNAL_LEAVE signal fires when done, which
-	 * is forwarded to zigbee_matter_coexistence_on_zboss_leave_signal(). */
+	 * is forwarded via zigbee_matter_coexistence_handle_zboss_signal(). */
 	zb_bdb_reset_via_local_action(0);
 }
 
@@ -359,10 +359,31 @@ extern "C" int zigbee_matter_coexistence_run(const struct zigbee_matter_coexiste
 	return 0;
 }
 
-extern "C" void zigbee_matter_coexistence_on_zboss_leave_signal(void)
+static void on_zboss_leave_signal(void)
 {
 	if (atomic_get(&g_matter_switch_pending_leave)) {
 		k_sem_give(&leave_done_sem);
+	}
+}
+
+extern "C" void zigbee_matter_coexistence_handle_zboss_signal(zb_bufid_t bufid)
+{
+	if (!bufid) {
+		return;
+	}
+
+	zb_zdo_app_signal_hdr_t *sig_handler = nullptr;
+	const zb_zdo_app_signal_type_t sig = zb_get_app_signal(bufid, &sig_handler);
+
+	if (sig != ZB_ZDO_SIGNAL_LEAVE || ZB_GET_APP_SIGNAL_STATUS(bufid) != RET_OK) {
+		return;
+	}
+
+	zb_zdo_signal_leave_params_t *const leave_params =
+		ZB_ZDO_SIGNAL_GET_PARAMS(sig_handler, zb_zdo_signal_leave_params_t);
+
+	if (leave_params->leave_type == ZB_NWK_LEAVE_TYPE_RESET) {
+		on_zboss_leave_signal();
 	}
 }
 
