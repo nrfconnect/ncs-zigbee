@@ -30,6 +30,8 @@
 extern "C" {
 #endif
 
+#include <zboss_api.h>
+
 /** @brief Callbacks supplied by the sample. */
 struct zigbee_matter_coexistence_callbacks {
 	/** Start the Matter application. Invoked from the Matter worker
@@ -121,16 +123,20 @@ bool zigbee_matter_coexistence_process_switch_button(uint32_t button_state, uint
 						     uint32_t switch_button);
 
 
-/** @brief Notify the coexistence runtime that the local ZDO/NWK leave has completed.
+/** @brief Forward selected ZBOSS application signals to the coexistence runtime.
  *
- * Must be called from the application's @c zboss_signal_handler when a
- * @c ZB_ZDO_SIGNAL_LEAVE event with leave_type @c ZB_NWK_LEAVE_TYPE_RESET
- * is received.  If a Matter protocol switch was deferred pending the leave,
- * this call unblocks it so the radio hand-over to OpenThread can proceed.
+ * Call from the application's @c zboss_signal_handler before
+ * @ref zigbee_default_signal_handler.  When @p bufid carries a successful
+ * @c ZB_ZDO_SIGNAL_LEAVE with leave_type @c ZB_NWK_LEAVE_TYPE_RESET, a
+ * pending Matter protocol switch is unblocked so the radio hand-over to
+ * OpenThread can proceed.
  *
- * Safe to call unconditionally; it is a no-op when no switch is pending.
+ * Safe to call unconditionally for any signal buffer; it is a no-op for
+ * unrelated signals and when no switch is pending.
+ *
+ * @param bufid ZBOSS application signal buffer, or @c 0 if invalid.
  */
-void zigbee_matter_coexistence_on_zboss_leave_signal(void);
+void zigbee_matter_coexistence_handle_zboss_signal(zb_bufid_t bufid);
 
 #ifdef __cplusplus
 }
