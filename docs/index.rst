@@ -10,6 +10,8 @@ The |addon| for the |NCS| provides support for developing Zigbee applications ba
 This stack is included as the :ref:`zigbee_zboss` library (version |zboss_version|).
 In combination with the |NCS|, the |addon| allows for development of low-power connected solutions.
 
+.. include:: /includes/zigbee_r22_certification_note.txt
+
 .. toctree::
    :maxdepth: 1
    :caption: Contents

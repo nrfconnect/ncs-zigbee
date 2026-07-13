@@ -1,0 +1,10 @@
+.. note::
+   Zigbee 3.0 product certification requires R22 mode on R23 platforms.
+
+   The Connectivity Standards Alliance (CSA) requires that Zigbee 3.0 devices built on Zigbee PRO R23 or R23.2 platforms run the core stack in R22 behavior mode during product certification.
+   In this mode, the stack disables R23-specific features (such as TLV-based ZDO, Network Commissioning, and Dynamic Link Key negotiation) and reports revision R22 in the Node descriptor.
+
+   The |addon| enables R22 mode by default.
+   The OSIF layer calls :c:func:`zboss_use_r22_behavior` from :c:func:`zigbee_enable` before the ZBOSS thread starts.
+   To use native R23 behavior instead, select R23 mode (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R23``) in Kconfig.
+   See :ref:`zigbee_ug_r22_behavior` and :ref:`zboss_certification_r22_mode` for details.
