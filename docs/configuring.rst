@@ -77,6 +77,25 @@ Optional configuration
 
 After enabling the Zigbee protocol and defining the Zigbee device role, you can enable additional options in Kconfig and modify `ZBOSS stack start options`_.
 
+.. _zigbee_ug_r22_behavior:
+
+Zigbee PRO core runtime behavior (R22 or R23 mode)
+==================================================
+
+The ZBOSS stack in the |addon| implements Zigbee PRO R23, but CSA requires Zigbee 3.0 products to run the core in R22 behavior mode during product certification.
+See :ref:`zboss_certification_r22_mode` for the certification background.
+
+By default, the add-on selects R22 mode (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22``).
+When you call :c:func:`zigbee_enable`, the OSIF layer invokes :c:func:`zboss_use_r22_behavior` before the ZBOSS thread starts.
+The stack then uses classic R22 joining (association and transport-key flow) instead of native R23 behavior (Network Commissioning followed by Dynamic Link Key negotiation).
+
+To keep native R23 behavior, select R23 mode (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R23``) in the Zigbee PRO core runtime behavior Kconfig choice.
+Use R23 mode only for evaluation of R23-specific features; it is not suitable for Zigbee 3.0 product certification.
+
+This Kconfig choice is not available when building with ``CONFIG_ZIGBEE_LIBRARY_NCP_DEV`` (NCP development libraries).
+
+For the underlying ZBOSS API, see `Runtime switch of R23 ZBOSS into R22 mode`_ in the ZBOSS API documentation.
+
 Device operational channel
 ==========================
 

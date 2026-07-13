@@ -54,6 +54,9 @@ You can also configure the following OSIF-related Kconfig options:
   Must be lower than ``CONFIG_ZBOSS_INIT_PRIORITY`` so the radio is ready before ZBOSS starts.
 * ``CONFIG_ZBOSS_INIT_PRIORITY`` - Initialization priority for the ZBOSS stack.
   Must be higher than ``CONFIG_ZBOSS_RADIO_INIT_PRIORITY``.
+* ``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22`` / ``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R23`` - Selects if :c:func:`zigbee_enable` calls :c:func:`zboss_use_r22_behavior` before starting the ZBOSS thread.
+  R22 mode is selected by default and is required for Zigbee 3.0 product certification.
+  See :ref:`zigbee_ug_r22_behavior`.
 
 Additionally, the following Kconfig option is available when setting :ref:`zigbee_ug_logging_logger_options`:
 
