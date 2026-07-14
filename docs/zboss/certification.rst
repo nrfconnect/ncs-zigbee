@@ -66,7 +66,7 @@ R22 behavior mode has the following known deviations from the Zigbee PRO Core R2
 * Automatic PAN ID conflict resolution is not performed. 
   The application is notified when a conflict is detected (R22 requires automatic resolution).
 
-After enabling R22 mode, DSR recommends running your product application through ZUTH certification tests before submitting for product certification.
+After enabling R22 mode, it is recommended to run your product application through ZUTH certification tests before submitting for product certification.
 
 Certification IDs
 *****************
