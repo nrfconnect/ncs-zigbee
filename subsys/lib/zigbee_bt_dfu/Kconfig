@@ -26,9 +26,6 @@ config ZIGBEE_BT_DFU
 	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
 	  the set of options related to that feature.
 
-	  Cannot be combined with Matter (CONFIG_CHIP), as it requires different Bluetooth LE orchestration.
-	  Use Matter's CONFIG_CHIP_DFU_OVER_BT_SMP instead.
-
 if ZIGBEE_BT_DFU
 
 config BT_MAX_CONN
