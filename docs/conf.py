@@ -43,6 +43,13 @@ exclude_patterns = ['_build_sphinx', '_build_doxygen', 'venv', 'Thumbs.db', '.DS
 
 html_theme = 'sphinx_ncs_theme'
 
+html_theme_options = {
+    'docsets': {},
+}
+
+# Copied into the HTML output for the hosted documentation version switcher.
+html_extra_path = ['versions.json']
+
 ## -- Options for Breathe ----------------------------------------------------
 # https://breathe.readthedocs.io/en/latest/index.html
 #
