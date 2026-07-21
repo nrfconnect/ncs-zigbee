@@ -1,0 +1,14 @@
+name: Load doc add-on config
+description: Load DOC_ADDON_NAME from .github/doc-addon.env into GITHUB_ENV
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        if [ ! -f .github/doc-addon.env ]; then
+          echo "::error::Missing .github/doc-addon.env" >&2
+          exit 1
+        fi
+        grep -E '^DOC_ADDON_NAME=' .github/doc-addon.env >> "$GITHUB_ENV"
