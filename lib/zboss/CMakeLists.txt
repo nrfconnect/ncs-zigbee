@@ -141,10 +141,23 @@ if ((NOT DEFINED CONFIG_ZBOSS_SOURCES_AVAILABLE) OR
     set(LIB_VARIANT ".ed")
   endif()
 
+  set(_zboss_lib_cfg "${ZBOSS_LIB_CONFIG_DIR}/libzboss_config${LIB_VARIANT}.h")
+  file(READ "${_zboss_lib_cfg}" _zboss_lib_cfg_contents)
+  if(_zboss_lib_cfg_contents MATCHES "#define CONFIG_ZBOSS_STACK_LTO")
+    if(NOT CONFIG_LTO)
+      message(FATAL_ERROR
+        "${_zboss_lib_cfg} defines CONFIG_ZBOSS_STACK_LTO; enable CONFIG_LTO for this image.")
+    endif()
+  elseif(CONFIG_LTO)
+    message(WARNING
+      "CONFIG_LTO is enabled but ${_zboss_lib_cfg} does not define CONFIG_ZBOSS_STACK_LTO "
+      "(expected for CONFIG_ZIGBEE_ENABLE_TRACES / non-LTO trace prebuilts).")
+  endif()
+
   # Include the static library to the ZBOSS interface definition and select
   # ZBOSS configuration header file by defining compile-time definition.
   target_link_libraries(zboss INTERFACE ${ZBOSS_LIB_PATH}/libzboss${LIB_VARIANT}.a)
-  target_compile_definitions(zboss INTERFACE LIBZBOSS_CONFIG_FILE="${ZBOSS_LIB_CONFIG_DIR}/libzboss_config${LIB_VARIANT}.h")
+  target_compile_definitions(zboss INTERFACE LIBZBOSS_CONFIG_FILE="${_zboss_lib_cfg}")
 
   # Include the selected subset of Zigbee Green Power functionalities
   if (CONFIG_ZIGBEE_ROLE_COORDINATOR OR CONFIG_ZIGBEE_ROLE_ROUTER)
