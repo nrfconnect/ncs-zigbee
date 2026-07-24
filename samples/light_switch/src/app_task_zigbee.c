@@ -25,7 +25,6 @@
 #include <zigbee/zigbee_app_utils.h>
 #include <zigbee/zigbee_error_handler.h>
 #include <zb_nrf_platform.h>
-#include "zb_mem_config_custom.h"
 #include "zb_dimmer_switch.h"
 
 #if CONFIG_ZIGBEE_FOTA

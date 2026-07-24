@@ -31,7 +31,6 @@
 extern "C" {
 #include "zb_dimmable_light.h"
 #include <dk_buttons_and_leds.h>
-#include <zb_mem_config_med.h>
 #include <zb_nrf_platform.h>
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
