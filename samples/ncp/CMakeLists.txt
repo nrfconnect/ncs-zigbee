@@ -13,5 +13,13 @@ project("ZBOSS NCP SoC firmware")
 # NORDIC SDK APP START
 target_sources(app PRIVATE
   src/main.c
+  src/zboss_mem_globals.c
 )
 # NORDIC SDK APP END
+
+if(CONFIG_LTO)
+	set_source_files_properties(
+		src/zboss_mem_globals.c
+		PROPERTIES COMPILE_OPTIONS -fno-lto
+	)
+endif()
