@@ -14,6 +14,20 @@
 
 
 /**
+ * Build ZBOSS libraries with link-time optimization (LTO)
+ *
+ * Compiles the Makefile-based ZBOSS static archives with GCC LTO. This
+ * selects CONFIG_LTO so the Zephyr GNU toolchain uses LTO-aware binutils
+ * (gcc-ar / gcc-ranlib) for ExternalProject make, matching the bytecode
+ * objects produced by the stack build.
+ *
+ * Any firmware that links those archives must also enable CONFIG_LTO
+ * Requires GNU GCC (not a bare "ar" archive of final
+ * machine code—LTO is finalized at the application link).
+ */
+#define CONFIG_ZBOSS_STACK_LTO y
+
+/**
  * Include NCP related code in ZBOSS library.
  *
  * Compile NCP related code in ZBOSS library.
@@ -304,8 +318,10 @@
 
 /**
  * Touchlink commissioning (experimental)
+ *
+ * Enable touchlink commissioning
  */
-/* #undef CONFIG_ZB_BDB_TOUCHLINK */
+#define CONFIG_ZB_BDB_TOUCHLINK y
 
 /**
  * Enable Zigbee MAC features, used by the verification framework - Enable API for sending inter-pan packets at non default channel

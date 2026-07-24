@@ -205,6 +205,7 @@ zb_transceiver_ctx_t;
 
 
 /*PHY tests specific API. Implement for PHY tests only.*/
+zb_phy_status_t zb_macll_cca(zb_int8_t *rssi);
 #define ZB_TRANSCEIVER_PERFORM_CCA(rssi)                 zb_macll_cca(rssi)
 #define ZB_TRANS_TX_CARRIER_DATA(channel, timeout_bi)    zb_macll_tx_carrier(channel, timeout_bi)
 
