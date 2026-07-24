@@ -13,6 +13,16 @@ project("Zigbee Light Bulb")
 target_sources(app PRIVATE
 	src/main.cpp
 	src/app_task_zigbee.cpp
+	src/zboss_mem_globals.c
 )
 
 target_include_directories(app PRIVATE include)
+
+# LTO link: zb_memconfig.o from prebuilts is plain ELF (weak gc_*); strong gc_*
+# in zb_mem_config_context.h must not be LTO bytecode or ld warns about symbol size.
+if(CONFIG_LTO)
+	set_source_files_properties(
+		src/zboss_mem_globals.c
+		PROPERTIES COMPILE_OPTIONS -fno-lto
+	)
+endif()

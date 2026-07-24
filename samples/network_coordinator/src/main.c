@@ -14,7 +14,6 @@
 #include <dk_buttons_and_leds.h>
 
 #include <zboss_api.h>
-#include <zb_mem_config_max.h>
 #include <zigbee/zigbee_error_handler.h>
 #include <zigbee/zigbee_app_utils.h>
 #include <zb_nrf_platform.h>
