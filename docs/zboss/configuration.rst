@@ -21,6 +21,19 @@ For a complete list of the ZBOSS configuration options, see the following files:
 * :file:`zboss/include/osif/libzboss_config.h` - Library for Coordinators and Routers
 * :file:`zboss/include/osif/libzboss_config.ed.h` - Library for End Devices
 
+Link-time optimization (LTO)
+****************************
+
+The add-on ships two sets of precompiled ZBOSS libraries.
+``CONFIG_ZIGBEE_ENABLE_TRACES`` selects which set is linked: when disabled, the release libraries under :file:`lib/zboss/lib/` are used; when enabled, the debug libraries under :file:`lib/zboss/trace/` are used (see :ref:`ug_zigbee_configuring_zboss_traces`).
+
+The release libraries are built with stack LTO enabled by default.
+This is recorded in :file:`lib/zboss/include/osif/libzboss_config*.h` as ``CONFIG_ZBOSS_STACK_LTO``.
+The debug libraries are built without stack LTO; their ``libzboss_config*.h`` files do not define ``CONFIG_ZBOSS_STACK_LTO``.
+
+When you link release prebuilts, the add-on enables ``CONFIG_LTO`` for the application image based on the selected ``libzboss_config`` header.
+The application LTO configuration must match the libraries LTO configuration.
+
 Configuration options
 *********************
 
