@@ -335,7 +335,7 @@ typedef struct zb_nwk_handle_s  /* do not pac for IAR */
                                                               * retransmission
                                                               table */
   zb_uint8_t brrt_cnt;
-  zb_uint8_t brrt_in_progress;                               /* Broadcast retransmission is in progress */
+  zb_uint8_t brrt_alarm_is_in_progress;                      /* Broadcast retransmission alarm is in progress */
   zb_rejoin_context_t rejoin_req_table[ZB_NWK_REJOIN_REQUEST_TABLE_SIZE];
 #endif
 
