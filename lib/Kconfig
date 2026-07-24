@@ -61,6 +61,12 @@ config APP_LINK_WITH_ZBOSS
 	help
 	  Link application with ZBOSS library
 
+config ZBOSS_PREBUILT_STACK_LTO
+	bool
+	default y if !ZIGBEE_ENABLE_TRACES && !ZBOSS_SOURCES_AVAILABLE
+	select LTO
+	select ISR_TABLES_LOCAL_DECLARATION
+
 endmenu
 
 endif #ZIGBEE_ADD_ON
