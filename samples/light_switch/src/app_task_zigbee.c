@@ -256,16 +256,41 @@ static void start_identifying(zb_bufid_t bufid)
 }
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+static bool touchlink_start_pending;
+
+static void light_switch_touchlink_begin(zb_uint8_t unused);
+
+static void light_switch_touchlink_cancel_then_begin(zb_uint8_t param)
+{
+	if (param == ZB_UNDEFINED_BUFFER) {
+		zb_buf_get_out_delayed(light_switch_touchlink_cancel_then_begin);
+		return;
+	}
+
+	touchlink_start_pending = true;
+	bdb_cancel_joining(param);
+}
+
+static void light_switch_touchlink_begin(zb_uint8_t unused)
+{
+	ZVUNUSED(unused);
+
+	LOG_INF("Starting Touchlink initiator");
+	zigbee_touchlink_initiator_prepare_scan_channels();
+	zigbee_network_join_commissioning_set_active(true);
+	if (!bdb_start_top_level_commissioning(ZB_BDB_TOUCHLINK_COMMISSIONING)) {
+		LOG_WRN("Touchlink commissioning rejected, cancelling active commissioning");
+		zigbee_network_join_commissioning_set_active(false);
+		zb_buf_get_out_delayed(light_switch_touchlink_cancel_then_begin);
+	}
+}
+
 static void light_switch_touchlink_initiator_start_cb(zb_bufid_t bufid)
 {
 	ZVUNUSED(bufid);
 
-	LOG_INF("Starting Touchlink initiator");
-	zigbee_network_join_commissioning_set_active(true);
-	zigbee_touchlink_initiator_prepare_scan_channels();
-	if (!bdb_start_top_level_commissioning(ZB_BDB_TOUCHLINK_COMMISSIONING)) {
-		LOG_WRN("Touchlink commissioning rejected (already in progress?)");
-	}
+	zigbee_network_rejoin_abort();
+	ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_begin, 0);
 }
 #endif
 
@@ -280,9 +305,6 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	zb_uint16_t cmd_id;
 	zb_ret_t zb_err_code;
 
-	/* Inform default signal handler about user input at the device. */
-	user_input_indicate();
-
 	check_factory_reset_button(button_state, has_changed);
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
@@ -291,6 +313,9 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 		return;
 	}
 #endif
+
+	/* Inform default signal handler about user input at the device. */
+	user_input_indicate();
 
 	if (bulb_ctx.short_addr == 0xFFFF) {
 		LOG_DBG("No bulb found yet.");
@@ -683,6 +708,15 @@ void zboss_signal_handler(zb_bufid_t bufid)
 
 	switch (sig) {
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
+	case ZB_BDB_SIGNAL_STEERING_CANCELLED:
+		if (touchlink_start_pending) {
+			touchlink_start_pending = false;
+			ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_begin, 0);
+			break;
+		}
+		ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+		break;
+
 	case ZB_BDB_SIGNAL_TOUCHLINK:
 		ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
 		if (status == RET_OK) {

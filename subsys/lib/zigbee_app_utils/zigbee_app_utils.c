@@ -917,6 +917,26 @@ static void rejoin_attempt_finished(void)
 	is_rejoin_in_progress = false;
 }
 
+void zigbee_network_rejoin_abort(void)
+{
+	ZB_SCHEDULE_APP_ALARM_CANCEL(network_steering_timeout, ZB_ALARM_ANY_PARAM);
+	ZB_SCHEDULE_APP_ALARM_CANCEL(tc_rejoin_timeout, ZB_ALARM_ANY_PARAM);
+	ZB_SCHEDULE_APP_ALARM_CANCEL(start_network_steering, ZB_ALARM_ANY_PARAM);
+	ZB_SCHEDULE_APP_ALARM_CANCEL(start_tc_rejoin, ZB_ALARM_ANY_PARAM);
+	ZB_SCHEDULE_APP_ALARM_CANCEL(rejoin_the_network, ZB_ALARM_ANY_PARAM);
+
+#if defined CONFIG_ZIGBEE_ROLE_END_DEVICE
+	wait_for_user_input = false;
+	is_rejoin_start_scheduled = false;
+#endif
+
+	is_rejoin_stop_requested = false;
+	is_rejoin_in_progress = false;
+	is_rejoin_procedure_started = false;
+	rejoin_attempt_cnt = 0;
+	zigbee_network_join_commissioning_set_active(false);
+}
+
 /**@brief Function for starting rejoin network procedure.
  *
  * @note  For Router device if stack is initialised, device is not joined
