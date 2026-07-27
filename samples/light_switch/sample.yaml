@@ -46,6 +46,7 @@ tests:
       - CONFIG_ZIGBEE_LOGGER_EP=n
       - CONFIG_ZIGBEE_SHELL_ENDPOINT=1
       - CONFIG_LOG_MODE_DEFERRED=y
+      - CONFIG_ZIGBEE_TOUCHLINK_INITIATOR=y
     platform_allow:
       - nrf52840dk/nrf52840
       - nrf5340dk/nrf5340/cpuapp
