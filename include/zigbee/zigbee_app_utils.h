@@ -57,6 +57,13 @@ bool zigbee_network_join_commissioning_active(void);
  */
 void zigbee_network_join_commissioning_set_active(bool active);
 
+/** @brief Stop automatic network rejoin/backoff and cancel pending rejoin alarms.
+ *
+ * Use before application-triggered commissioning (for example Touchlink) so
+ * steering/rejoin does not block @c bdb_start_top_level_commissioning().
+ */
+void zigbee_network_rejoin_abort(void);
+
 /**@brief Function for converting an input buffer to a hex string.
  *
  * @param[out] out       Pointer to the output buffer.
