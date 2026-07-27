@@ -805,6 +805,14 @@ void zigbee_led_status_update(zb_bufid_t bufid, uint32_t led_idx)
 		}
 		break;
 
+#if defined(CONFIG_ZB_BDB_TOUCHLINK) && defined(ZB_BDB_SIGNAL_TOUCHLINK_NWK)
+	case ZB_BDB_SIGNAL_TOUCHLINK_NWK:
+		if (status == RET_OK) {
+			dk_set_led_on(led_idx);
+		}
+		break;
+#endif
+
 	case ZB_ZDO_SIGNAL_LEAVE:
 		/* Update network status LED */
 		dk_set_led_off(led_idx);
