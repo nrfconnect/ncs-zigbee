@@ -1,0 +1,67 @@
+To test Touchlink commissioning on two development kits (no Zigbee Coordinator required), complete the following steps:
+
+1. Place the development kits within one meter of each other.
+#. Build and flash the :ref:`zigbee_light_bulb_sample` sample with the ``CONFIG_ZIGBEE_TOUCHLINK_TARGET`` Kconfig option enabled.
+   Wait until the UART log shows that the Touchlink target window is active.
+
+   For example:
+
+   .. parsed-literal::
+      :class: highlight
+
+      west build samples/light_bulb -b *board_target* -- -DCONFIG_ZIGBEE_TOUCHLINK_TARGET=y
+      west flash
+
+#. Build and flash the :ref:`zigbee_light_switch_sample` sample with the ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` Kconfig option enabled.
+#. Short-press the Touchlink button to start commissioning.
+
+   For example:
+
+   .. parsed-literal::
+      :class: highlight
+
+      west build samples/light_switch -b *board_target* -- -DCONFIG_ZIGBEE_TOUCHLINK_INITIATOR=y
+      west flash
+
+   .. tabs::
+
+      .. group-tab:: nRF54 DKs
+
+         Short-press **Button 2**.
+
+      .. group-tab:: nRF52 and nRF53 DKs
+
+         Short-press **Button 3**.
+
+   The switch aborts automatic network rejoin before starting Touchlink.
+   If Touchlink still fails, wait until ``Network rejoin procedure stopped as scheduled`` appears in the switch log (about three minutes after boot) and repeat the light switch build and flash.
+
+#. Confirm commissioning:
+
+   .. tabs::
+
+      .. group-tab:: nRF54 DKs
+
+         * Light bulb **LED 2** and light switch **LED 2** turn on when each device joins the Zigbee network.
+         * Light switch **LED 3** indicates that a light bulb was found.
+
+      .. group-tab:: nRF52 and nRF53 DKs
+
+         * Light bulb **LED 3** and light switch **LED 3** turn on when each device joins the Zigbee network.
+         * Light switch **LED 4** indicates that a light bulb was found.
+
+#. Use the buttons on the light switch to control the light bulb:
+
+   .. tabs::
+
+      .. group-tab:: nRF54 DKs
+
+         Use **Button 0** to turn the light bulb on and **Button 1** to turn it off.
+         **LED 1** indicates the dimmable light level.
+
+      .. group-tab:: nRF52 and nRF53 DKs
+
+         Use **Button 1** to turn the light bulb on and **Button 2** to turn it off.
+         **LED 4** indicates the dimmable light level.
+
+For more information on Touchlink commissioning, see :ref:`zigbee_commissioning_modes_touchlink`.

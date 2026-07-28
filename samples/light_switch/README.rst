@@ -122,6 +122,33 @@ Activating optional extensions
 
 .. include:: /includes/zigbee_bt_dfu_activation.txt
 
+.. _zigbee_light_switch_touchlink:
+
+Touchlink variant
+-----------------
+
+Enable the ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` Kconfig option when building the light switch sample.
+The device acts as a Touchlink initiator and can commission directly with a nearby Touchlink target (the :ref:`zigbee_light_bulb_sample` built with ``CONFIG_ZIGBEE_TOUCHLINK_TARGET=y``) without a Zigbee Coordinator.
+
+.. tabs::
+
+   .. group-tab:: nRF54 DKs
+
+      Short-press **Button 2** during normal operation to start Touchlink commissioning.
+
+      .. note::
+         **Button 2** also enables sleepy End Device behavior if you hold it down during reset.
+
+   .. group-tab:: nRF52 and nRF53 DKs
+
+      Short-press **Button 3** during normal operation to start Touchlink commissioning.
+
+      .. note::
+         **Button 3** also enables sleepy End Device behavior if you hold it down during reset.
+
+.. note::
+   Touchlink in the |addon| for the |NCS| is provided as an experimental feature with basic functionality.
+
 To activate the Multiprotocol Bluetooth LE extension, set :makevar:`EXTRA_CONF_FILE` to the :file:`overlay-multiprotocol_ble.conf`.
 For example, when building from the command line, use the following command:
 
@@ -356,6 +383,13 @@ After programming the sample to your development kits, complete the following st
          This LED indicates that the light switch found a light bulb to control.
 
 You can now use buttons on the development kit to control the light bulb, as described in :ref:`zigbee_light_switch_user_interface`.
+
+.. _zigbee_light_switch_testing_touchlink:
+
+Testing Touchlink commissioning
+-------------------------------
+
+.. include:: /includes/touchlink_testing.txt
 
 .. _zigbee_light_switch_testing_ble:
 

@@ -67,6 +67,16 @@ You can find the configuration files in the :file:`samples/light_bulb` directory
 
 .. include:: /includes/zigbee_bt_dfu_activation.txt
 
+.. _zigbee_light_bulb_touchlink:
+
+Touchlink variant
+-----------------
+
+Enable the ``CONFIG_ZIGBEE_TOUCHLINK_TARGET`` Kconfig option when building the light bulb sample.
+The device acts as a Touchlink target: after network steering fails on a factory-new device, it automatically opens a Touchlink target window so a nearby initiator (the :ref:`zigbee_light_switch_sample` built with ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR=y``) can commission it without a Zigbee Coordinator.
+
+.. note::
+   Touchlink in the |addon| for the |NCS| is provided as an experimental feature with basic functionality.
 
 User interface
 **************
@@ -183,6 +193,13 @@ After programming the sample to your development kits, complete the following st
          The result of using the buttons is reflected on the light bulb's **LED 4**.
 
 You can now use buttons on the light switch to control the light bulb, as described in the :ref:`zigbee_light_switch_user_interface` section of the Light switch sample page.
+
+.. _zigbee_light_bulb_testing_touchlink:
+
+Testing Touchlink commissioning
+-------------------------------
+
+.. include:: /includes/touchlink_testing.txt
 
 .. _zigbee_light_bulb_testing_zigbee_bt_dfu:
 
