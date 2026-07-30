@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2026 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+#include <nrf54lm20_cpuapp_partitions.dtsi>
+#include <ext_flash/nrf54lm20dk_cpuapp_partitions.dtsi>
+
+/ {
+	chosen {
+		zephyr,code-partition = &boot_partition;
+	};
+};
