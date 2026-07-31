@@ -9,7 +9,6 @@
 / {
 	chosen {
 		ncs,zigbee-timer = &timer2;
-		ncs,zigbee-uart = &board_cdc_acm_uart;
 	};
 
 	buttons {

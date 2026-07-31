@@ -4,16 +4,5 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include <nrf52840_partitions.dtsi>
-
-&zephyr_udc0 {
-	cdc_acm_uart0: cdc_acm_uart0 {
-		compatible = "zephyr,cdc-acm-uart";
-	};
-};
-
-/ {
-	chosen {
-		ncs,zigbee-uart = &cdc_acm_uart0;
-	};
-};
+#include "nrf52840dk_nrf52840.overlay"
+#include "../app_usb.overlay"
