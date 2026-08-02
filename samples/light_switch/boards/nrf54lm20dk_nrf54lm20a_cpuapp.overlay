@@ -12,7 +12,7 @@
 	};
 
 	chosen {
-		zephyr,zigbee-timer = &timer24;
+		ncs,zigbee-timer = &timer24;
 		zephyr,code-partition = &slot0_partition;
 		zephyr,ieee802154 = &ieee802154;
 	};

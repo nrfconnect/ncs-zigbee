@@ -13,7 +13,7 @@
 	};
 
 	chosen {
-		zephyr,zigbee-timer = &timer24;
+		ncs,zigbee-timer = &timer24;
 	};
 
 	pwmleds {
