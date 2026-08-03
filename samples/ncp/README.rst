@@ -202,8 +202,6 @@ To add a second instance for trace logs, complete the following steps:
           ncs,zboss-trace-uart = &cdc_acm_uart1;
       };
 
-#. Enable the composite USB device driver using the ``CONFIG_USB_COMPOSITE_DEVICE`` Kconfig option.
-
 With this configuration, you have two serial ports created by the NCP sample.
 Use the first one for NCP communication.
 Use the second serial port for collecting Zigbee stack logs.
