@@ -1257,6 +1257,53 @@ static void zigbee_touchlink_target_request_network_steering(void)
 	}
 }
 
+/* Detect that case so it can resume its own
+ * network instead of endlessly retrying Steering/Touchlink as if it was
+ * factory-new.
+ */
+static bool zigbee_touchlink_target_is_distributed_nwk_owner(void)
+{
+	zb_ext_pan_id_t ext_pan_id;
+	uint8_t i;
+
+	if (zb_get_network_role() != ZB_NWK_DEVICE_TYPE_ROUTER) {
+		return false;
+	}
+
+	if (!zb_is_network_distributed()) {
+		return false;
+	}
+
+	zb_get_extended_pan_id(ext_pan_id);
+	for (i = 0; i < sizeof(ext_pan_id); i++) {
+		if (ext_pan_id[i] != 0U) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/* Resume a previously formed distributed network instead of searching for
+ * one to join.
+ */
+static bool zigbee_touchlink_target_resume_distributed_nwk(void)
+{
+	if (!zigbee_touchlink_target_is_distributed_nwk_owner()) {
+		return false;
+	}
+
+	zb_bdb_enable_distributed_network_formation();
+	zigbee_network_join_commissioning_set_active(true);
+
+	if (bdb_start_commissioning_tracked(ZB_BDB_NETWORK_FORMATION) != ZB_TRUE) {
+		zigbee_network_join_commissioning_set_active(false);
+		return false;
+	}
+
+	return true;
+}
+
 static bool zigbee_touchlink_target_request(void)
 {
 	zb_ret_t zret;
@@ -1286,18 +1333,30 @@ void zigbee_touchlink_target_signal_handler(zb_bufid_t bufid)
 	zb_zdo_app_signal_type_t sig = zb_get_app_signal(bufid, NULL);
 	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(bufid);
 
+	if (sig == ZB_BDB_SIGNAL_DEVICE_REBOOT && status != RET_OK && !ZB_JOINED() &&
+	    zigbee_tl_target_state == ZIGBEE_TL_TARGET_STATE_IDLE) {
+		if (zigbee_touchlink_target_resume_distributed_nwk()) {
+			/* Wait for ZB_BDB_SIGNAL_FORMATION to confirm the result. */
+			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_STARTED;
+		}
+	}
+
 	if (sig == ZB_BDB_SIGNAL_STEERING && status != RET_OK && !ZB_JOINED() &&
 	    zigbee_tl_target_state == ZIGBEE_TL_TARGET_STATE_IDLE) {
 		zb_ret_t zr;
 
-		LOG_INF("Steering failed while not joined: schedule Touchlink target");
-		zr = ZB_SCHEDULE_APP_ALARM_CANCEL(zigbee_touchlink_target_delayed_start,
-						  ZB_ALARM_ANY_PARAM);
-		ZVUNUSED(zr);
-		zr = ZB_SCHEDULE_APP_ALARM(zigbee_touchlink_target_delayed_start, 0,
-					   ZIGBEE_TL_STEERING_TO_TARGET_DELAY_BI);
-		if (zr != RET_OK) {
-			LOG_WRN("Touchlink: schedule delayed start failed (%d)", zr);
+		if (zigbee_touchlink_target_resume_distributed_nwk()) {
+			/* Wait for ZB_BDB_SIGNAL_FORMATION to confirm the result. */
+			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_STARTED;
+		} else {
+			zr = ZB_SCHEDULE_APP_ALARM_CANCEL(zigbee_touchlink_target_delayed_start,
+							   ZB_ALARM_ANY_PARAM);
+			ZVUNUSED(zr);
+			zr = ZB_SCHEDULE_APP_ALARM(zigbee_touchlink_target_delayed_start, 0,
+						    ZIGBEE_TL_STEERING_TO_TARGET_DELAY_BI);
+			if (zr != RET_OK) {
+				LOG_WRN("Touchlink: schedule delayed start failed (%d)", zr);
+			}
 		}
 	}
 
@@ -1315,9 +1374,32 @@ void zigbee_touchlink_target_signal_handler(zb_bufid_t bufid)
 	case ZB_BDB_SIGNAL_TOUCHLINK_NWK:
 		LOG_INF("Touchlink: network started/joined as target (status %d)", status);
 		if (status == RET_OK) {
+			zb_ret_t nvram_status;
+
 			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_ON_NETWORK;
 			zigbee_network_join_commissioning_set_active(false);
 			stop_network_rejoin(ZB_FALSE);
+
+			/* Explicitly persist the NWK security material generated for this freshly formed
+			 * distributed network.
+			 */
+			nvram_status = zb_nvram_write_dataset(ZB_NVRAM_COMMON_DATA);
+			LOG_INF("Touchlink: persisted NWK security material to NVRAM"
+				" (status: %d)", nvram_status);
+		}
+		break;
+
+	case ZB_BDB_SIGNAL_FORMATION:
+		if (zb_get_network_role() != ZB_NWK_DEVICE_TYPE_ROUTER || !zb_is_network_distributed()) {
+			break;
+		}
+
+		if (status == RET_OK) {
+			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_ON_NETWORK;
+			zigbee_network_join_commissioning_set_active(false);
+			stop_network_rejoin(ZB_FALSE);
+		} else {
+			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_IDLE;
 		}
 		break;
 
