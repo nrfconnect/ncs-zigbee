@@ -360,7 +360,25 @@ void bdb_preinit(void)
 #if defined ZB_ROUTER_ROLE
     if (ZB_IS_DEVICE_ZR() && IS_DISTRIBUTED_SECURITY())
     {
+      zb_secur_material_set_t secur_material_set_backup[ZB_SECUR_N_SECUR_MATERIAL];
+      zb_uint8_t active_key_seq_number_backup = ZB_NIB().active_key_seq_number;
+      zb_uint8_t secur_material_set_valid_bitmask_backup = ZB_NIB().secur_material_set_valid_bitmask;
+      zb_uint8_t active_secur_material_i_backup = (zb_uint8_t)ZB_NIB().active_secur_material_i;
+
+      ZB_MEMCPY(secur_material_set_backup, ZB_NIB().secur_material_set,
+                sizeof(secur_material_set_backup));
+
       secur_tc_init();
+
+      ZB_MEMCPY(ZB_NIB().secur_material_set, secur_material_set_backup,
+                sizeof(secur_material_set_backup));
+      ZB_NIB().active_key_seq_number = active_key_seq_number_backup;
+      ZB_NIB().secur_material_set_valid_bitmask = secur_material_set_valid_bitmask_backup;
+      ZB_NIB().active_secur_material_i = active_secur_material_i_backup;
+
+#ifdef ZB_FORMATION
+      zdo_formation_force_link();
+#endif
     }
 #endif
   }
@@ -382,7 +400,7 @@ void bdb_preinit(void)
      if the target could be operating on a channel other than those defined in
      bdbcTLPrimaryChannelSet.
  */
-  ZB_BDB().bdb_ext_channel_scan = 1; /* ZB_ZLL_IS_FACTORY_NEW() */
+  ZB_BDB().bdb_ext_channel_scan = 1;
 #endif
 
   bdb_init_channel_sets();
