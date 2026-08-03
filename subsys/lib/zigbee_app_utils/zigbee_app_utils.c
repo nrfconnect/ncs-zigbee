@@ -1316,6 +1316,8 @@ void zigbee_touchlink_target_signal_handler(zb_bufid_t bufid)
 		LOG_INF("Touchlink: network started/joined as target (status %d)", status);
 		if (status == RET_OK) {
 			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_ON_NETWORK;
+			zigbee_network_join_commissioning_set_active(false);
+			stop_network_rejoin(ZB_FALSE);
 		}
 		break;
 

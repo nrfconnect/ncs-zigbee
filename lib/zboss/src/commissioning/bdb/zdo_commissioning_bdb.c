@@ -357,6 +357,12 @@ void bdb_preinit(void)
   if (joined)
   {
     zb_sync_distributed();
+#if defined ZB_ROUTER_ROLE
+    if (ZB_IS_DEVICE_ZR() && IS_DISTRIBUTED_SECURITY())
+    {
+      secur_tc_init();
+    }
+#endif
   }
 #endif
 
