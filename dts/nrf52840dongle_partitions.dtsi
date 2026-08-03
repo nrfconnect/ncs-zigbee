@@ -19,25 +19,33 @@
 		slot0_partition: partition@1000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-0";
-			reg = <0x1000 DT_SIZE_K(976)>;
+			reg = <0x1000 DT_SIZE_K(848)>;
 		};
 
-		storage_partition: partition@f5000 {
+		storage_partition: partition@d5000 {
 			compatible = "zephyr,mapped-partition";
 			label = "storage";
-			reg = <0xf5000 DT_SIZE_K(8)>;
+			reg = <0xd5000 DT_SIZE_K(8)>;
 		};
 
-		zboss_nvram: partition@f7000 {
+		zboss_nvram: partition@d7000 {
 			compatible = "zephyr,mapped-partition";
 			label = "zboss-nvram";
-			reg = <0xf7000 DT_SIZE_K(32)>;
+			reg = <0xd7000 DT_SIZE_K(32)>;
 		};
 
-		zboss_product_config: partition@ff000 {
+		zboss_product_config: partition@df000 {
 			compatible = "zephyr,mapped-partition";
 			label = "zboss-product-config";
-			reg = <0xff000 DT_SIZE_K(4)>;
+			reg = <0xdf000 DT_SIZE_K(4)>;
 		};
+
+		/* Onboard USB bootloader <0xe0000 0x1c000>
+		 *
+		 * In addition, the last and second last flash pages are used by
+		 * the onboard USB bootloader and MBR to store settings. Nothing
+		 * above 0xe0000 may be claimed here: writing it makes the
+		 * bootloader reject the application and stay in DFU mode.
+		 */
 	};
 };
