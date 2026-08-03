@@ -357,28 +357,14 @@ void bdb_preinit(void)
   if (joined)
   {
     zb_sync_distributed();
-#if defined ZB_ROUTER_ROLE
+#if defined ZB_ROUTER_ROLE && defined ZB_FORMATION
+    /* A ZR in a distributed network has no Trust Center to relay child
+       authentication to, and nothing re-links Formation logic after the NVRAM
+       restore, so APS_SELECTOR().authenticate_child_directly stays NULL and the
+       next child (re)join asserts. Re-link it here. */
     if (ZB_IS_DEVICE_ZR() && IS_DISTRIBUTED_SECURITY())
     {
-      zb_secur_material_set_t secur_material_set_backup[ZB_SECUR_N_SECUR_MATERIAL];
-      zb_uint8_t active_key_seq_number_backup = ZB_NIB().active_key_seq_number;
-      zb_uint8_t secur_material_set_valid_bitmask_backup = ZB_NIB().secur_material_set_valid_bitmask;
-      zb_uint8_t active_secur_material_i_backup = (zb_uint8_t)ZB_NIB().active_secur_material_i;
-
-      ZB_MEMCPY(secur_material_set_backup, ZB_NIB().secur_material_set,
-                sizeof(secur_material_set_backup));
-
-      secur_tc_init();
-
-      ZB_MEMCPY(ZB_NIB().secur_material_set, secur_material_set_backup,
-                sizeof(secur_material_set_backup));
-      ZB_NIB().active_key_seq_number = active_key_seq_number_backup;
-      ZB_NIB().secur_material_set_valid_bitmask = secur_material_set_valid_bitmask_backup;
-      ZB_NIB().active_secur_material_i = active_secur_material_i_backup;
-
-#ifdef ZB_FORMATION
-      zdo_formation_force_link();
-#endif
+      zb_bdb_enable_distributed_network_formation();
     }
 #endif
   }
