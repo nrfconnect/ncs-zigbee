@@ -356,7 +356,7 @@ int main(void)
 	/* Start Zigbee default thread */
 	zigbee_enable();
 
-	LOG_INF("Zigbee R23 Coordinator example started");
+	LOG_INF("Zigbee Coordinator example started");
 
 	while (1) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);

@@ -222,7 +222,7 @@ int main(void)
 	/* Start Zigbee default thread */
 	zigbee_enable();
 
-	LOG_INF("Zigbee R23 Network Co-processor sample started");
+	LOG_INF("Zigbee Network Co-processor sample started");
 
 	return 0;
 }

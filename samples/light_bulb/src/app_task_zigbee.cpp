@@ -634,7 +634,7 @@ extern "C" int ZigbeeStart(void) {
   /* Start Zigbee default thread */
   zigbee_enable();
 
-  LOG_INF("Zigbee R23 Light Bulb example started");
+  LOG_INF("Zigbee Light Bulb example started");
 
   while (1) {
     dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);

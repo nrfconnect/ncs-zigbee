@@ -247,7 +247,7 @@ int main(void)
 	/* Register handlers to identify notifications */
 	ZB_AF_SET_IDENTIFY_NOTIFICATION_HANDLER(APP_ZIGBEE_ENDPOINT, identify_cb);
 
-	LOG_INF("Zigbee R23 shell application started");
+	LOG_INF("Zigbee shell application started");
 
 	return 0;
 }
