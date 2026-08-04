@@ -1,0 +1,186 @@
+.stack-viz-board-outer,
+.stack-viz-board-outer.docutils.container {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.stack-viz-board {
+  margin: 1.5rem 0 2.5rem;
+  width: 100%;
+  max-width: calc(100% - var(--ncs-right-toc-width, 0px) - 3rem);
+  container-type: inline-size;
+  container-name: stack-viz-board;
+}
+
+.stack-viz-board-inner,
+.stack-viz-samples,
+.stack-viz-chart-header,
+.stack-viz-sample-row {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stack-viz-chart-header,
+.stack-viz-chart-header.docutils.container,
+.stack-viz-sample-row,
+.stack-viz-sample-row.docutils.container {
+  display: grid;
+  grid-template-columns:
+    14rem
+    minmax(0, var(--stack-viz-main-fr, 2048fr))
+    minmax(0, var(--stack-viz-zboss-fr, 5120fr));
+  gap: 0.5rem 0.75rem;
+  align-items: start;
+}
+
+.stack-viz-chart-header,
+.stack-viz-chart-header.docutils.container {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.stack-viz-header-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.stack-viz-samples {
+  display: flex;
+  flex-direction: column;
+}
+
+.stack-viz-sample-row {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+  overflow: visible;
+}
+
+.stack-viz-sample-row:last-child {
+  border-bottom: none;
+}
+
+.stack-viz-sample-row > .memory-viz-sample-label {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.stack-viz-board .docutils.container {
+  width: 100%;
+  max-width: none;
+}
+
+@container stack-viz-board (max-width: 50rem) {
+  .stack-viz-board {
+    max-width: 100%;
+  }
+
+  .stack-viz-chart-header,
+  .stack-viz-chart-header.docutils.container,
+  .stack-viz-sample-row,
+  .stack-viz-sample-row.docutils.container {
+    grid-template-columns:
+      minmax(0, var(--stack-viz-main-fr, 2048fr))
+      minmax(0, var(--stack-viz-zboss-fr, 5120fr));
+    width: 100%;
+  }
+
+  .stack-viz-chart-header,
+  .stack-viz-chart-header.docutils.container {
+    grid-template-areas: "main zboss";
+  }
+
+  .stack-viz-chart-header .memory-viz-panel-title-sample {
+    display: none;
+  }
+
+  .stack-viz-chart-header > .stack-viz-header-thread:first-of-type {
+    grid-area: main;
+  }
+
+  .stack-viz-chart-header > .stack-viz-header-thread:last-of-type {
+    grid-area: zboss;
+  }
+
+  .stack-viz-sample-row,
+  .stack-viz-sample-row.docutils.container {
+    grid-template-areas:
+      "sample sample"
+      "main zboss";
+    gap: 0.5rem 0.75rem;
+  }
+
+  .stack-viz-sample-row > .memory-viz-sample-label {
+    grid-area: sample;
+    margin-bottom: 0.1rem;
+  }
+
+  .stack-viz-sample-row > .memory-viz-bar-wrap:nth-of-type(1) {
+    grid-area: main;
+  }
+
+  .stack-viz-sample-row > .memory-viz-bar-wrap:nth-of-type(2) {
+    grid-area: zboss;
+  }
+}
+
+@media (max-width: 900px) {
+  .stack-viz-board {
+    max-width: 100%;
+  }
+
+  .stack-viz-chart-header,
+  .stack-viz-chart-header.docutils.container,
+  .stack-viz-sample-row,
+  .stack-viz-sample-row.docutils.container {
+    grid-template-columns:
+      minmax(0, var(--stack-viz-main-fr, 2048fr))
+      minmax(0, var(--stack-viz-zboss-fr, 5120fr));
+    width: 100%;
+  }
+
+  .stack-viz-chart-header,
+  .stack-viz-chart-header.docutils.container {
+    grid-template-areas: "main zboss";
+    gap: 0.5rem 0.75rem;
+  }
+
+  .stack-viz-chart-header .memory-viz-panel-title-sample {
+    display: none;
+  }
+
+  .stack-viz-chart-header > .stack-viz-header-thread:first-of-type {
+    grid-area: main;
+  }
+
+  .stack-viz-chart-header > .stack-viz-header-thread:last-of-type {
+    grid-area: zboss;
+  }
+
+  .stack-viz-sample-row,
+  .stack-viz-sample-row.docutils.container {
+    grid-template-areas:
+      "sample sample"
+      "main zboss";
+    gap: 0.5rem 0.75rem;
+  }
+
+  .stack-viz-sample-row > .memory-viz-sample-label {
+    grid-area: sample;
+    margin-bottom: 0.1rem;
+  }
+
+  .stack-viz-sample-row > .memory-viz-bar-wrap:nth-of-type(1) {
+    grid-area: main;
+  }
+
+  .stack-viz-sample-row > .memory-viz-bar-wrap:nth-of-type(2) {
+    grid-area: zboss;
+  }
+}

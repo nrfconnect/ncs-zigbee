@@ -1,0 +1,172 @@
+# Memory requirement data for nRF5340 DK.
+# Partition sizes are derived from dts/*.dtsi.
+# Sample usage is generated from Twister build logs.
+
+board:
+  name: nRF5340 DK
+  nvm_total_kb: 1024
+  ram_total_kb: 448
+legend_threshold_kb: 4
+layouts:
+  base:
+    source: dts/nrf5340_cpuapp_partitions.dtsi
+    partitions:
+      - id: slot0
+        label: Application
+        size_kb: 980
+        order: 0
+        offset: 0
+      - id: storage
+        label: Storage
+        size_kb: 8
+        order: 1
+        offset: 1003520
+      - id: zboss_nvram
+        label: ZBOSS NVRAM
+        size_kb: 32
+        order: 2
+        offset: 1011712
+      - id: zboss_product_config
+        label: ZBOSS product config
+        size_kb: 4
+        order: 3
+        offset: 1044480
+        legend_only: true
+  ext_flash:
+    source: dts/ext_flash/nrf5340dk_cpuapp_partitions.dtsi
+    extends: base
+    partitions:
+      - id: boot
+        label: MCUboot
+        size_kb: 64
+        order: 0
+        offset: 0
+      - id: slot0
+        label: Application
+        size_kb: 916
+        order: 1
+        offset: 65536
+    external:
+      nvm_total_kb: 8192
+      partitions:
+        - id: slot1_ext
+          label: Upgrade slot (external)
+          size_kb: 916
+          order: 0
+          offset: 0
+        - id: slot3_ext
+          label: Net core upgrade slot (external)
+          size_kb: 256
+          order: 1
+          offset: 937984
+  mcuboot_usb:
+    source: dts/mcuboot_usb_transport/nrf5340_cpuapp_partitions.dtsi
+    extends: base
+    partitions:
+      - id: boot
+        label: MCUboot
+        size_kb: 64
+        order: 0
+        offset: 0
+      - id: slot0
+        label: Application
+        size_kb: 916
+        order: 1
+        offset: 65536
+samples:
+  - label: ':ref:`Network coordinator <zigbee_network_coordinator_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 336
+      ram_used_kb: 81
+    stack:
+      main:
+        used_b: 812
+        size_b: 2048
+      zboss:
+        used_b: 1312
+        size_b: 5120
+  - label: ':ref:`Light bulb <zigbee_light_bulb_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 359
+      ram_used_kb: 61
+    stack:
+      main:
+        used_b: 828
+        size_b: 2048
+      zboss:
+        used_b: 1216
+        size_b: 5120
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 269
+      ram_used_kb: 51
+    stack:
+      main:
+        used_b: 796
+        size_b: 2048
+      zboss:
+        used_b: 1296
+        size_b: 5120
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`lib_zigbee_fota`'
+    layout: ext_flash
+    usage:
+      nvm:
+        boot: 38
+        slot0: 293
+      ram_used_kb: 58
+      external:
+        slot1_ext: 174
+        slot3_ext: 159
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`zigbee_light_switch_sample_nus`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 333
+      ram_used_kb: 68
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`zigbee_light_switch_sample_nus` and :ref:`lib_zigbee_fota`'
+    layout: ext_flash
+    usage:
+      nvm:
+        boot: 38
+        slot0: 357
+      ram_used_kb: 80
+      external:
+        slot1_ext: 208
+        slot3_ext: 159
+  - label: ':ref:`NCP <zigbee_ncp_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 357
+      ram_used_kb: 99
+  - label: ':ref:`NCP with USB transport <zigbee_ncp_sample>`'
+    layout: mcuboot_usb
+    usage:
+      nvm:
+        boot: 57
+        slot0: 382
+      ram_used_kb: 106
+  - label: ':ref:`Zigbee application template <zigbee_template_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 335
+      ram_used_kb: 71
+  - label: ':ref:`Zigbee shell <zigbee_shell_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 417
+      ram_used_kb: 87
+  - label: ':ref:`Zigbee shell over USB <zigbee_shell_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 442
+      ram_used_kb: 95

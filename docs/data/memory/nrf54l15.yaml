@@ -1,0 +1,142 @@
+# Memory requirement data for nRF54L15 DK.
+# Partition sizes are derived from dts/*.dtsi.
+# Sample usage is generated from Twister build logs.
+
+board:
+  name: nRF54L15 DK
+  nvm_total_kb: 1524
+  ram_total_kb: 256
+legend_threshold_kb: 4
+layouts:
+  base:
+    source: dts/nrf54l15_cpuapp_partitions.dtsi
+    partitions:
+      - id: slot0
+        label: Application
+        size_kb: 1480
+        order: 0
+        offset: 0
+      - id: storage
+        label: Storage
+        size_kb: 8
+        order: 1
+        offset: 1515520
+      - id: zboss_nvram
+        label: ZBOSS NVRAM
+        size_kb: 32
+        order: 2
+        offset: 1523712
+      - id: zboss_product_config
+        label: ZBOSS product config
+        size_kb: 4
+        order: 3
+        offset: 1556480
+        legend_only: true
+  ext_flash:
+    source: dts/ext_flash/nrf54l15dk_cpuapp_partitions.dtsi
+    extends: base
+    partitions:
+      - id: boot
+        label: MCUboot
+        size_kb: 80
+        order: 0
+        offset: 0
+      - id: slot0
+        label: Application
+        size_kb: 1400
+        order: 1
+        offset: 81920
+    external:
+      nvm_total_kb: 8192
+      partitions:
+        - id: slot1_ext
+          label: Upgrade slot (external)
+          size_kb: 1400
+          order: 0
+          offset: 0
+samples:
+  - label: ':ref:`Network coordinator <zigbee_network_coordinator_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 362
+      ram_used_kb: 73
+    stack:
+      main:
+        used_b: 696
+        size_b: 3584
+      zboss:
+        used_b: 1776
+        size_b: 5120
+  - label: ':ref:`Light bulb <zigbee_light_bulb_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 387
+      ram_used_kb: 53
+    stack:
+      main:
+        used_b: 784
+        size_b: 3584
+      zboss:
+        used_b: 1784
+        size_b: 5120
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 294
+      ram_used_kb: 43
+    stack:
+      main:
+        used_b: 688
+        size_b: 3584
+      zboss:
+        used_b: 1600
+        size_b: 5120
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`lib_zigbee_fota`'
+    layout: ext_flash
+    usage:
+      nvm:
+        boot: 56
+        slot0: 317
+      ram_used_kb: 46
+      external:
+        slot1_ext: 190
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`zigbee_light_switch_sample_nus`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 397
+      ram_used_kb: 59
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`zigbee_light_switch_sample_nus` and :ref:`lib_zigbee_fota`'
+    layout: ext_flash
+    usage:
+      nvm:
+        boot: 56
+        slot0: 420
+      ram_used_kb: 67
+      external:
+        slot1_ext: 251
+  - label: ':ref:`NCP <zigbee_ncp_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 384
+      ram_used_kb: 90
+  - label: ':ref:`NCP with USB transport <zigbee_ncp_sample>`'
+    not_applicable: true
+  - label: ':ref:`Zigbee application template <zigbee_template_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 362
+      ram_used_kb: 62
+  - label: ':ref:`Zigbee shell <zigbee_shell_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 443
+      ram_used_kb: 79
+  - label: ':ref:`Zigbee shell over USB <zigbee_shell_sample>`'
+    not_applicable: true

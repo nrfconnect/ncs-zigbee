@@ -1,0 +1,75 @@
+# Memory requirement data for nRF52840 Dongle DK.
+# Partition sizes are derived from dts/*.dtsi.
+# Sample usage is generated from Twister build logs.
+
+board:
+  name: nRF52840 Dongle DK
+  nvm_total_kb: 1024
+  ram_total_kb: 256
+legend_threshold_kb: 4
+layouts:
+  base:
+    source: dts/nrf52840dongle_partitions.dtsi
+    partitions:
+      - id: mbr
+        label: nRF5 MBR
+        size_kb: 4
+        order: 0
+        offset: 0
+      - id: slot0
+        label: Application
+        size_kb: 848
+        order: 1
+        offset: 4096
+      - id: storage
+        label: Storage
+        size_kb: 8
+        order: 2
+        offset: 872448
+      - id: zboss_nvram
+        label: ZBOSS NVRAM
+        size_kb: 32
+        order: 3
+        offset: 880640
+      - id: zboss_product_config
+        label: ZBOSS product config
+        size_kb: 4
+        order: 4
+        offset: 913408
+        legend_only: true
+      - id: nrf5_bootloader
+        label: nRF5 bootloader (reserved)
+        size_kb: 128
+        order: 5
+        offset: 917504
+samples:
+  - label: ':ref:`Network coordinator <zigbee_network_coordinator_sample>`'
+    not_applicable: true
+  - label: ':ref:`Light bulb <zigbee_light_bulb_sample>`'
+    not_applicable: true
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>`'
+    not_applicable: true
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`lib_zigbee_fota`'
+    not_applicable: true
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`zigbee_light_switch_sample_nus`'
+    not_applicable: true
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`zigbee_light_switch_sample_nus` and :ref:`lib_zigbee_fota`'
+    not_applicable: true
+  - label: ':ref:`NCP <zigbee_ncp_sample>`'
+    not_applicable: true
+  - label: ':ref:`NCP with USB transport <zigbee_ncp_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 409
+      ram_used_kb: 97
+  - label: ':ref:`Zigbee application template <zigbee_template_sample>`'
+    not_applicable: true
+  - label: ':ref:`Zigbee shell <zigbee_shell_sample>`'
+    not_applicable: true
+  - label: ':ref:`Zigbee shell over USB <zigbee_shell_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 469
+      ram_used_kb: 86
