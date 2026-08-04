@@ -406,6 +406,25 @@ config ZIGBEE_NVRAM_PAGE_SIZE
 	int "The size of a single ZBOSS NVRAM page"
 	default 512
 
+config ZIGBEE_NVRAM_WRITE_CACHE_SIZE
+	int "Size of the ZBOSS NVRAM write cache"
+	default 512 if SOC_FLASH_NRF_RADIO_SYNC_MPSL || SOC_FLASH_NRF_RADIO_SYNC_RPC
+	default 0
+	help
+	  ZBOSS stores a dataset as a long sequence of small, contiguous writes and
+	  marks its end by calling zb_osif_nvram_flush(). Consecutive writes are
+	  gathered in a RAM cache of this size and committed to flash as a single
+	  operation, which matters on SoCs where each flash operation has to be
+	  arbitrated against the radio: paying that cost once per dataset instead of
+	  once per field keeps the radio available, so a parent device does not miss
+	  MAC acknowledgments while storing a child that has just joined.
+	  This is why the cache is enabled by default only where flash writes are
+	  synchronized with the radio; where they are not, such as on a SoC that
+	  runs the radio on a separate core, a write costs tens of microseconds and
+	  the cache would only spend RAM.
+	  Writes that do not continue the cached range, and writes that do not fit
+	  in the cache, commit the cache first. Set to 0 to write directly to flash.
+
 config ZIGBEE_TOUCHLINK_INITIATOR
 	bool "Enable Touchlink initiator role [EXPERIMENTAL]"
 	select EXPERIMENTAL
