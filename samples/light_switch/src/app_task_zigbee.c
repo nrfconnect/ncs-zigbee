@@ -991,7 +991,7 @@ int ZigbeeStart(void)
 	nus_cmd_init(on_nus_connect, on_nus_disconnect, commands);
 #endif /* CONFIG_BT_NUS */
 
-	LOG_INF("Zigbee R23 Light Switch example started");
+	LOG_INF("Zigbee Light Switch example started");
 
 	while (1) {
 		k_sleep(K_FOREVER);

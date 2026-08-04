@@ -241,7 +241,7 @@ int main(void)
 	/* Start Zigbee default thread */
 	zigbee_enable();
 
-	LOG_INF("Zigbee R23 application template started");
+	LOG_INF("Zigbee application template started");
 
 	return 0;
 }
