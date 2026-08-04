@@ -99,29 +99,32 @@ static int nvram_flash_write(const struct flash_area *area, off_t off,
 	uint8_t block_buf[NVRAM_MAX_WRITE_BLOCK_SIZE];
 	int err;
 
+	/* Trivial case: alignment does not matter. */	
 	if (write_block <= 1) {
 		return flash_area_write(area, off, data, len);
 	}
 
 	__ASSERT_NO_MSG(write_block <= sizeof(block_buf));
 
-	while (len > 0) {
+	/* Unaligned start: flash requires writes on block boundaries (4 B or 16 B).
+	 Read-modify-write one block.
+	 */
+	if (off & (write_block - 1)) {
 		off_t block_start = off & ~(write_block - 1);
-		off_t block_off = off - block_start;
+		size_t block_off = off - block_start;
 		size_t chunk = MIN(len, write_block - block_off);
 
-		if (block_off == 0 && chunk == write_block) {
-			err = flash_area_write(area, block_start, src, write_block);
-		} else {
-			err = flash_area_read(area, block_start, block_buf, write_block);
-			if (err) {
-				return err;
-			}
-
-			memcpy(block_buf + block_off, src, chunk);
-			err = flash_area_write(area, block_start, block_buf, write_block);
+		/* Read the full block from flash. */
+		err = flash_area_read(area, block_start, block_buf, write_block);
+		if (err) {
+			return err;
 		}
 
+		/* Patch in the new bytes at the correct offset. */
+		memcpy(block_buf + block_off, src, chunk);
+
+		/* Write the whole block back. */
+		err = flash_area_write(area, block_start, block_buf, write_block);
 		if (err) {
 			return err;
 		}
@@ -129,6 +132,37 @@ static int nvram_flash_write(const struct flash_area *area, off_t off,
 		off += chunk;
 		src += chunk;
 		len -= chunk;
+	}
+
+	size_t aligned_len = len & ~((size_t)write_block - 1);
+
+	/* Aligned middle: write the largest contiguous aligned chunk in one
+	 * flash_area_write(). This avoids the need to read-modify-write multiple
+	 * blocks.
+	 */
+	if (aligned_len) {
+		err = flash_area_write(area, off, src, aligned_len);
+		if (err) {
+			return err;
+		}
+
+		off += aligned_len;
+		src += aligned_len;
+		len -= aligned_len;
+	}
+
+	/* Unaligned tail: same read-modify-write as the head. */
+	if (len) {
+		err = flash_area_read(area, off, block_buf, write_block);
+		if (err) {
+			return err;
+		}
+
+		memcpy(block_buf, src, len);
+		err = flash_area_write(area, off, block_buf, write_block);
+		if (err) {
+			return err;
+		}
 	}
 
 	return 0;
