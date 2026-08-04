@@ -37,6 +37,9 @@ LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
 #define VENDOR_SPECIFIC_IND_LEN (1U)
 #define VENDOR_SPECIFIC_IND_DELAY (ZB_TIME_ONE_SECOND * 3)
 
+#define DTR_POLL_INTERVAL_MS (100U)
+#define HOST_SETTLE_TIME_MS (1000U)
+
 
 /* The state of a led controlled by ncp custom commands */
 static zb_uint8_t vendor_specific_led_state = VENDOR_SPECIFIC_LED_ACTION_OFF;
@@ -161,11 +164,57 @@ static void ncp_vendor_specific_init(void)
 						  VENDOR_SPECIFIC_IND_DELAY);
 }
 
+#if CONFIG_ZIGBEE_UART_SUPPORTS_FLOW_CONTROL
+/* Hold the stack back until the host has opened the NCP port.
+ *
+ * A co-processor whose transport is a CDC ACM port has nowhere to send until then, and the
+ * sample starts talking on its own as soon as its custom indication alarm expires, so
+ * starting earlier only spends that exchange on a port nobody is reading.
+ */
+static int wait_for_host(void)
+{
+	const struct device *uart_dev = DEVICE_DT_GET(DT_CHOSEN(ncs_zigbee_uart));
+	uint32_t dtr = 0U;
+
+	if (!device_is_ready(uart_dev)) {
+		LOG_ERR("NCP UART device not ready");
+		return -ENODEV;
+	}
+
+	while (!dtr) {
+		if (uart_line_ctrl_get(uart_dev, UART_LINE_CTRL_DTR, &dtr)) {
+			LOG_ERR("Couldn't read DTR, continuing without waiting for the host");
+			return 0;
+		}
+		k_sleep(K_MSEC(DTR_POLL_INTERVAL_MS));
+	}
+
+	(void)uart_line_ctrl_set(uart_dev, UART_LINE_CTRL_DCD, 1);
+	(void)uart_line_ctrl_set(uart_dev, UART_LINE_CTRL_DSR, 1);
+
+	k_sleep(K_MSEC(HOST_SETTLE_TIME_MS));
+
+	return 0;
+}
+#else
+static int wait_for_host(void)
+{
+	return 0;
+}
+#endif /* CONFIG_ZIGBEE_UART_SUPPORTS_FLOW_CONTROL */
+
 int main(void)
 {
+	int err;
+
 	LOG_INF("Starting Zigbee R23 Network Co-processor sample");
 
 	zb_osif_ncp_set_nvram_filter();
+
+	err = wait_for_host();
+	if (err) {
+		return err;
+	}
 
 	/* Setup ncp custom command handling */
 	ncp_vendor_specific_init();
