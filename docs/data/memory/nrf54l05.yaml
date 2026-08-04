@@ -1,0 +1,41 @@
+# Memory requirement data for nRF54L05 (nRF54L15 DK emulation).
+# Partition sizes are derived from dts/*.dtsi.
+# Sample usage is generated from Twister build logs.
+
+board:
+  name: nRF54L05 (nRF54L15 DK emulation)
+  nvm_total_kb: 500
+  ram_total_kb: 96
+legend_threshold_kb: 4
+layouts:
+  base:
+    source: dts/nrf54l05_cpuapp_partitions.dtsi
+    partitions:
+      - id: slot0
+        label: Application
+        size_kb: 456
+        order: 0
+        offset: 0
+      - id: storage
+        label: Storage
+        size_kb: 8
+        order: 1
+        offset: 466944
+      - id: zboss_nvram
+        label: ZBOSS NVRAM
+        size_kb: 32
+        order: 2
+        offset: 475136
+      - id: zboss_product_config
+        label: ZBOSS product config
+        size_kb: 4
+        order: 3
+        offset: 507904
+        legend_only: true
+samples:
+  - label: ':ref:`NCP <zigbee_ncp_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 384
+      ram_used_kb: 90

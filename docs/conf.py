@@ -30,6 +30,9 @@ extensions = [
     'sphinx_togglebutton',
     'sphinx_copybutton',
     'page_filter',
+    'memory_data',
+    'memory_viz',
+    'stack_viz',
 ]
 
 # The root document.

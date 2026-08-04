@@ -1,0 +1,80 @@
+# Memory requirement data for nRF52833 DK.
+# Partition sizes are derived from dts/*.dtsi.
+# Sample usage is generated from Twister build logs.
+
+board:
+  name: nRF52833 DK
+  nvm_total_kb: 512
+  ram_total_kb: 128
+legend_threshold_kb: 4
+layouts:
+  base:
+    source: dts/nrf52833_partitions.dtsi
+    partitions:
+      - id: slot0
+        label: Application
+        size_kb: 484
+        order: 0
+        offset: 0
+      - id: storage
+        label: Storage
+        size_kb: 8
+        order: 1
+        offset: 495616
+      - id: zboss_nvram
+        label: ZBOSS NVRAM
+        size_kb: 16
+        order: 2
+        offset: 503808
+      - id: zboss_product_config
+        label: ZBOSS product config
+        size_kb: 4
+        order: 3
+        offset: 520192
+        legend_only: true
+  mcuboot_usb:
+    source: dts/mcuboot_usb_transport/nrf52833_partitions.dtsi
+    extends: base
+    partitions:
+      - id: boot
+        label: MCUboot
+        size_kb: 64
+        order: 0
+        offset: 0
+      - id: slot0
+        label: Application
+        size_kb: 420
+        order: 1
+        offset: 65536
+samples:
+  - label: ':ref:`Network coordinator <zigbee_network_coordinator_sample>`'
+    not_applicable: true
+  - label: ':ref:`Light bulb <zigbee_light_bulb_sample>`'
+    not_applicable: true
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>`'
+    not_applicable: true
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`lib_zigbee_fota`'
+    not_applicable: true
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`zigbee_light_switch_sample_nus`'
+    not_applicable: true
+  - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`zigbee_light_switch_sample_nus` and :ref:`lib_zigbee_fota`'
+    not_applicable: true
+  - label: ':ref:`NCP <zigbee_ncp_sample>`'
+    layout: base
+    usage:
+      nvm:
+        slot0: 367
+      ram_used_kb: 86
+  - label: ':ref:`NCP with USB transport <zigbee_ncp_sample>`'
+    layout: mcuboot_usb
+    usage:
+      nvm:
+        boot: 51
+        slot0: 393
+      ram_used_kb: 94
+  - label: ':ref:`Zigbee application template <zigbee_template_sample>`'
+    not_applicable: true
+  - label: ':ref:`Zigbee shell <zigbee_shell_sample>`'
+    not_applicable: true
+  - label: ':ref:`Zigbee shell over USB <zigbee_shell_sample>`'
+    not_applicable: true
