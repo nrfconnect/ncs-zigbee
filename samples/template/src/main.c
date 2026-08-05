@@ -224,7 +224,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
 
 int main(void)
 {
-	LOG_INF("Starting Zigbee R23 application template example");
+	LOG_INF("Starting Zigbee R23 Template application");
 
 	/* Initialize */
 	configure_gpio();
@@ -241,7 +241,7 @@ int main(void)
 	/* Start Zigbee default thread */
 	zigbee_enable();
 
-	LOG_INF("Zigbee application template started");
+	LOG_INF("Zigbee R23 Template application started");
 
 	return 0;
 }

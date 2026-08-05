@@ -576,7 +576,7 @@ extern "C" int ZigbeeStart(void) {
   int err;
 #endif
 
-  LOG_INF("Starting Zigbee R23 Light Bulb example");
+  LOG_INF("Starting Zigbee R23 Light Bulb application");
 
   configure_gpio();
 #ifdef CONFIG_ZIGBEE_SCENES
@@ -634,7 +634,7 @@ extern "C" int ZigbeeStart(void) {
   /* Start Zigbee default thread */
   zigbee_enable();
 
-  LOG_INF("Zigbee Light Bulb example started");
+  LOG_INF("Zigbee R23 Light Bulb application started");
 
   while (1) {
     dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
