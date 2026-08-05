@@ -1,0 +1,17 @@
+# Patterns matched against PR changed files in smart-home addon repositories.
+# If all changed files match, twister may skip or run a reduced scope.
+.gitignore
+.checkpatch.conf
+.clang-format
+.editorconfig
+CODEOWNERS
+LICENSE
+README.md
+Jenkinsfile
+docs/*
+*.rst
+*.md
+.github/*
+scripts/ci/sample_build_plan.yaml
+scripts/ci/tags.yaml
+scripts/ci/twister_ignore.txt

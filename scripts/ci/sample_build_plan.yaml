@@ -1,0 +1,270 @@
+version: 1
+
+# On-demand full variant runs via PR comment:
+#   /zigbee.<sample_dir>.<variant>
+# Example: /zigbee.light_switch.fota runs all integration_platforms from that scenario in sample.yaml,
+# in addition to the normal selective plan for the PR.
+#
+# Twister defaults used when generating a selective build plan.
+# scenario_prefix is prepended to each sample's scenario name (unless scenario already contains '.').
+twister:
+  integration: true
+  testcase_root: samples
+  scenario_prefix: sample.zigbee.
+  # Optional. Kconfig options added to every twister build as -x/--extra-args.
+  extra_args:
+    - CONFIG_ZBOSS_HALT_ON_ASSERT=y
+    - CONFIG_RESET_ON_FATAL_ERROR=n
+    - CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS=2
+
+# Scenarios always included in PR builds (in addition to path trigger matches).
+# The scenarios here must reflect the integration scope of the project.
+# platform: [] or omitted means all platforms allowed by the scenario in sample.yaml.
+always_build:
+  - scenario: template
+    platform:
+      - nrf54l15dk/nrf54l10/cpuapp
+      - nrf54lm20dk/nrf54lm20a/cpuapp
+
+# Changes to these paths trigger a full integration build of all samples.
+full_build_paths:
+  - west.yml
+  - .github/**
+  - CMakeLists.txt
+  - Kconfig
+  - Kconfig.*
+  - lib/**
+
+# Map changed paths to one or more samples/variants/platforms.
+path_triggers:
+  # ---------------------------------------------------------------------------
+  # Sample path triggers
+  # ---------------------------------------------------------------------------
+  light-bulb-sample:
+    paths:
+      - samples/light_bulb/**/*.{c,h,cpp,hpp,yml,yaml,conf}
+    samples:
+      - scenario: light_bulb
+        platform:
+          - nrf52840dk/nrf52840
+          - nrf5340dk/nrf5340/cpuapp
+          - nrf54l15dk/nrf54l15/cpuapp
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+      - scenario: light_bulb
+        variants:
+          - fota_and_bt_dfu
+        platform:
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  light-switch-sample:
+    paths:
+      - samples/light_switch/**/*.{c,h,cpp,hpp,yml,yaml,conf}
+    samples:
+      - scenario: light_switch
+        platform:
+          - nrf52840dk/nrf52840
+          - nrf54l15dk/nrf54l15/cpuapp
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+      - scenario: light_switch
+        variants:
+          - multiprotocol
+        platform:
+          - nrf5340dk/nrf5340/cpuapp
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  light-switch-fota:
+    paths:
+      - samples/light_switch/prj_fota.conf
+    samples:
+      - scenario: light_switch
+        variants:
+          - fota
+        platform:
+          - nrf52840dk/nrf52840
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+      - scenario: light_switch
+        variants:
+          - fota_and_multiprotocol
+        platform:
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  light-switch-low-power:
+    paths:
+      - snippets/low_power/**
+    samples:
+      - scenario: light_switch
+        variants:
+          - low_power
+        platform:
+          - nrf52840dk/nrf52840
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  ncp-sample:
+    paths:
+      - samples/ncp/**/*.{c,h,cpp,hpp,yml,yaml,conf}
+    samples:
+      - scenario: ncp
+        platform:
+          - nrf52833dk/nrf52833
+          - nrf52840dk/nrf52840
+          - nrf54l15dk/nrf54l05/cpuapp
+      - scenario: ncp
+        variants:
+          - usb
+        platform:
+          - nrf52840dk/nrf52840
+      - scenario: ncp
+        variants:
+          - dongle
+        platform:
+          - nrf52840dongle/nrf52840
+
+  network-coordinator-sample:
+    paths:
+      - samples/network_coordinator/**/*.{c,h,cpp,hpp,yml,yaml,conf}
+    samples:
+      - scenario: network_coordinator
+        platform:
+          - nrf5340dk/nrf5340/cpuapp
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  shell-sample:
+    paths:
+      - samples/shell/**/*.{c,h,cpp,hpp,yml,yaml,conf}
+    samples:
+      - scenario: shell
+        platform:
+          - nrf52840dk/nrf52840
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+      - scenario: shell
+        variants:
+          - usb
+        platform:
+          - nrf52840dongle/nrf52840
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  template-sample:
+    paths:
+      - samples/template/**/*.{c,h,cpp,hpp,yml,yaml,conf}
+    samples:
+      - scenario: template
+        platform:
+          - nrf54l15dk/nrf54l10/cpuapp
+          - nrf54lm20dk/nrf54lm20a/cpuapp
+
+  # ---------------------------------------------------------------------------
+  # Snippet path triggers
+  # ---------------------------------------------------------------------------
+  snippet-fota-ext-flash:
+    paths:
+      - snippets/zigbee_fota_ext_flash/**
+      - snippets/zigbee_fota_mcuboot_ext_flash/**
+    samples:
+      - scenario: light_bulb
+        variants:
+          - fota_and_bt_dfu
+        platform:
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+      - scenario: light_switch
+        variants:
+          - fota
+        platform:
+          - nrf52840dk/nrf52840
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  # ---------------------------------------------------------------------------
+  # Subsys path triggers — one representative sample per subsys area
+  # ---------------------------------------------------------------------------
+  subsys-common:
+    paths:
+      - subsys/CMakeLists.txt
+      - subsys/Kconfig
+      - subsys/osif/**
+      - subsys/partition_manager/**
+    samples:
+      - scenario: template
+        platform:
+          - nrf52840dk/nrf52840
+          - nrf5340dk/nrf5340/cpuapp
+          - nrf54l15dk/nrf54l15/cpuapp
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  subsys-lib-zigbee-fota:
+    paths:
+      - subsys/lib/zigbee_fota/**
+    samples:
+      - scenario: light_bulb
+        variants:
+          - fota_and_bt_dfu
+        platform:
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+      - scenario: light_switch
+        variants:
+          - fota
+        platform:
+          - nrf54l15dk/nrf54l15/cpuapp
+
+  subsys-lib-zigbee-bt-dfu:
+    paths:
+      - subsys/lib/zigbee_bt_dfu/**
+    samples:
+      - scenario: light_bulb
+        variants:
+          - fota_and_bt_dfu
+        platform:
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  subsys-lib-zigbee-app-utils:
+    paths:
+      - subsys/lib/zigbee_app_utils/**
+    samples:
+      - scenario: template
+        platform:
+          - nrf54l15dk/nrf54l10/cpuapp
+      - scenario: network_coordinator
+        platform:
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  subsys-lib-zigbee-logger-ep:
+    paths:
+      - subsys/lib/zigbee_logger_ep/**
+    samples:
+      - scenario: light_bulb
+        platform:
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  subsys-lib-zigbee-scenes:
+    paths:
+      - subsys/lib/zigbee_scenes/**
+    samples:
+      - scenario: light_bulb
+        platform:
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+  subsys-lib-zigbee-shell:
+    paths:
+      - subsys/lib/zigbee_shell/**
+    samples:
+      - scenario: shell
+        platform:
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+      - scenario: light_switch
+        variants:
+          - with_shell
+        platform:
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
+# PR label behavior. Labels are matched case-insensitively.
+labels:
+  ci-all-test:
+    action: full_build
+  ci-disabled:
+    action: skip
+
+# Branch, tag, and scheduled builds run the full integration scope by default.
+non_pr:
+  action: full_build
+
+# When a PR has changes but no path trigger matches, still build always_build scenarios.
+fallback:
+  action: always_build
