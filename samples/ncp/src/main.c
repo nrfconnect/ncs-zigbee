@@ -207,7 +207,7 @@ int main(void)
 {
 	int err;
 
-	LOG_INF("Starting Zigbee R23 Network Co-processor sample");
+	LOG_INF("Starting Zigbee R23 Network Co-processor application");
 
 	zb_osif_ncp_set_nvram_filter();
 
@@ -222,7 +222,7 @@ int main(void)
 	/* Start Zigbee default thread */
 	zigbee_enable();
 
-	LOG_INF("Zigbee Network Co-processor sample started");
+	LOG_INF("Zigbee R23 Network Co-processor application started");
 
 	return 0;
 }

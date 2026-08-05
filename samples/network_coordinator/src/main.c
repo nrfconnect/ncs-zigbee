@@ -339,7 +339,7 @@ int main(void)
 {
 	int blink_status = 0;
 
-	LOG_INF("Starting Zigbee R23 Coordinator example");
+	LOG_INF("Starting Zigbee R23 Network Coordinator application");
 
 	/* Initialize */
 	configure_gpio();
@@ -356,7 +356,7 @@ int main(void)
 	/* Start Zigbee default thread */
 	zigbee_enable();
 
-	LOG_INF("Zigbee Coordinator example started");
+	LOG_INF("Zigbee R23 Network Coordinator application started");
 
 	while (1) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);

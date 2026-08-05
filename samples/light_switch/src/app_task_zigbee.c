@@ -919,7 +919,7 @@ void set_tx_power(void)
 
 int ZigbeeStart(void)
 {
-	LOG_INF("Starting Zigbee R23 Light Switch example");
+	LOG_INF("Starting Zigbee R23 Light Switch application");
 
 	configure_gpio();
 	register_factory_reset_button(FACTORY_RESET_BUTTON);
@@ -991,7 +991,7 @@ int ZigbeeStart(void)
 	nus_cmd_init(on_nus_connect, on_nus_disconnect, commands);
 #endif /* CONFIG_BT_NUS */
 
-	LOG_INF("Zigbee Light Switch example started");
+	LOG_INF("Zigbee R23 Light Switch application started");
 
 	while (1) {
 		k_sleep(K_FOREVER);
