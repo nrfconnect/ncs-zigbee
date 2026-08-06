@@ -39,6 +39,16 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 | 0.1.0             |                  |                       | N/A                 | 
 +-------------------+------------------+-----------------------+---------------------+
 
+|addon| vX.Y.Z - TBD
+***************************
+
+The following release is `supported <Software maturity levels_>`_.
+
+* Updated:
+
+  * Improved ZBOSS NVRAM storage by batching flash writes into fewer operations.
+    Cache size is controlled by ``CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE``.
+
 .. _zigbee_release:
 
 |addon| v1.4.0 - 04/08/2026
