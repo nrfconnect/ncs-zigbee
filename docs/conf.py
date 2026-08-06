@@ -10,9 +10,10 @@ import sys
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Zigbee R23 add-on for nRF Connect SDK'
-copyright = '2025, Nordic Semiconductor'
+copyright = '2026, Nordic Semiconductor'
 author = 'Nordic Semiconductor'
-release = '1.0.0'
+release = 'Latest'
+version = 'Latest'
 
 # Paths
 
@@ -48,9 +49,14 @@ html_theme = 'sphinx_ncs_theme'
 
 html_theme_options = {
     'docsets': {},
+    "ncs_url": "https://nrfconnectdocs.nordicsemi.com/ncs/latest/nrf/",
+    "ncs_label": "nRF Connect SDK Docs",
+    "addons_url": "https://nrfconnect.github.io/ncs-app-index/",
+    "bare_metal_url": "",
+    "logo_url": "https://docs.nordicsemi.com",
 }
 
-# Copied into the HTML output for the hosted documentation version switcher.
+html_show_sphinx = False
 html_extra_path = ['versions.json']
 
 ## -- Options for Breathe ----------------------------------------------------
