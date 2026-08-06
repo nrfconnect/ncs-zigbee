@@ -184,6 +184,7 @@ static int ble_utils_init(struct bt_nus_cb *nus_clbs,
 		goto end;
 	}
 
+
 end:
 	return ret;
 }
