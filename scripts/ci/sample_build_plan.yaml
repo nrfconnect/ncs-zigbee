@@ -19,7 +19,7 @@ twister:
 
 # Scenarios always included in PR builds (in addition to path trigger matches).
 # The scenarios here must reflect the integration scope of the project.
-# platform: [] or omitted means all platforms allowed by the scenario in sample.yaml.
+# platform: [] or omitted means all integration_platforms from sample.yaml for that scenario.
 always_build:
   - scenario: template
     platform:
@@ -36,6 +36,7 @@ full_build_paths:
   - lib/**
 
 # Map changed paths to one or more samples/variants/platforms.
+# Each scenario/variant platform list must be a subset of integration_platforms in that sample's sample.yaml.
 path_triggers:
   # ---------------------------------------------------------------------------
   # Sample path triggers
@@ -70,6 +71,7 @@ path_triggers:
           - multiprotocol
         platform:
           - nrf5340dk/nrf5340/cpuapp
+          - nrf54l15dk/nrf54l15/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
 
   light-switch-fota:
@@ -81,11 +83,14 @@ path_triggers:
           - fota
         platform:
           - nrf52840dk/nrf52840
+          - nrf54l15dk/nrf54l15/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
       - scenario: light_switch
         variants:
           - fota_and_multiprotocol
         platform:
+          - nrf5340dk/nrf5340/cpuapp
+          - nrf54l15dk/nrf54l15/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
 
   light-switch-low-power:
@@ -97,6 +102,8 @@ path_triggers:
           - low_power
         platform:
           - nrf52840dk/nrf52840
+          - nrf5340dk/nrf5340/cpuapp
+          - nrf54l15dk/nrf54l15/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
 
   ncp-sample:
@@ -112,6 +119,7 @@ path_triggers:
         variants:
           - usb
         platform:
+          - nrf52833dk/nrf52833
           - nrf52840dk/nrf52840
       - scenario: ncp
         variants:
@@ -126,6 +134,7 @@ path_triggers:
       - scenario: network_coordinator
         platform:
           - nrf5340dk/nrf5340/cpuapp
+          - nrf54l15dk/nrf54l15/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
 
   shell-sample:
@@ -135,12 +144,15 @@ path_triggers:
       - scenario: shell
         platform:
           - nrf52840dk/nrf52840
+          - nrf5340dk/nrf5340/cpuapp
+          - nrf54l15dk/nrf54l15/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
       - scenario: shell
         variants:
           - usb
         platform:
           - nrf52840dongle/nrf52840
+          - nrf5340dk/nrf5340/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
 
   template-sample:
@@ -170,6 +182,7 @@ path_triggers:
           - fota
         platform:
           - nrf52840dk/nrf52840
+          - nrf54l15dk/nrf54l15/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
 
   # ---------------------------------------------------------------------------
@@ -182,10 +195,12 @@ path_triggers:
       - subsys/osif/**
       - subsys/partition_manager/**
     samples:
-      - scenario: template
+      - scenario: light_bulb
         platform:
           - nrf52840dk/nrf52840
           - nrf5340dk/nrf5340/cpuapp
+      - scenario: light_switch
+        platform:
           - nrf54l15dk/nrf54l15/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
 
@@ -202,7 +217,9 @@ path_triggers:
         variants:
           - fota
         platform:
+          - nrf52840dk/nrf52840
           - nrf54l15dk/nrf54l15/cpuapp
+          - nrf54lm20dk/nrf54lm20b/cpuapp
 
   subsys-lib-zigbee-bt-dfu:
     paths:
@@ -246,11 +263,6 @@ path_triggers:
       - subsys/lib/zigbee_shell/**
     samples:
       - scenario: shell
-        platform:
-          - nrf54lm20dk/nrf54lm20b/cpuapp
-      - scenario: light_switch
-        variants:
-          - with_shell
         platform:
           - nrf54lm20dk/nrf54lm20b/cpuapp
 
