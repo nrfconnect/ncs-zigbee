@@ -10,8 +10,6 @@ Configuring Zigbee libraries
 The Zigbee protocol in the |addon| for the |NCS| can be customized by enabling and configuring several :ref:`Zigbee libraries <lib_zigbee>`.
 This page lists options and steps required for configuring each of them.
 
-|kconfig_search|
-
 .. _ug_zigbee_configuring_components_osif:
 
 Configuring ZBOSS OSIF
