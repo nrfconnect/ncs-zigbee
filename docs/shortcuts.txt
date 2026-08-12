@@ -29,9 +29,6 @@
 .. |sysbuild_autoenabled_ncs| replace:: When building `repository applications <Repository application_>`_ in the |addon| which is an `SDK repository <Repository types_>`_, building with sysbuild is `enabled by default <Sysbuild enabled by default_>`_.
    If you work with out-of-tree `freestanding applications <Freestanding application_>`_, you need to manually pass the ``--sysbuild`` parameter to every build command or `configure west to always use it <Configuring sysbuild usage in west_>`_.
 
-.. |kconfig_search| replace::
-   For details about the Kconfig options mentioned here, see the `Kconfig search`_ in the |NCS| documentation.
-
 .. ### Zigbee & ZBOSS shortcuts
 
 .. |zigbee_ncp_package_version| replace:: 3.7.0
