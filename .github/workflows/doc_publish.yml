@@ -2,6 +2,7 @@ name: Documentation Publish
 
 permissions:
   contents: read
+  actions: read
   pull-requests: write
 
 on:
@@ -77,6 +78,5 @@ jobs:
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ env.PR }}
-          body: |
-            You can find the documentation preview for this PR [here](${{ vars.NCS_DOC_PR_HOSTING_URL }}addons/${{ env.DOC_ADDON_NAME }}/PR-${{ env.PR }}/).
+          body-path: docs/comment.txt
           edit-mode: replace

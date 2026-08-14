@@ -44,6 +44,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
 
       - name: Load doc add-on config
         uses: ./.github/actions/load-doc-config
@@ -108,6 +109,47 @@ jobs:
 
           mv "${MONITOR}" "$PUBLISH"
           if [[ -f pr.txt ]]; then mv pr.txt "$PUBLISH"; fi
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            COMMENT="${PUBLISH}/comment.txt"
+            HOST="${{ vars.NCS_DOC_PR_HOSTING_URL }}"
+            if [ -z "${HOST}" ]; then
+              HOST="https://ncsbmdoc.z6.web.core.windows.net/"
+            fi
+            HOST="${HOST%/}/"
+            PREFIX="${HOST}addons/${{ env.DOC_ADDON_NAME }}/PR-${{ github.event.pull_request.number }}/"
+            CHANGED=$(git diff --name-only --diff-filter=d "${{ github.event.pull_request.base.sha }}..HEAD")
+
+            {
+              echo "You can find the documentation preview for this PR [here](${PREFIX})."
+
+              LINKS=""
+              while IFS= read -r file; do
+                [ -z "${file}" ] && continue
+                case "${file}" in
+                  docs/*.rst)
+                    html="${file#docs/}"
+                    html="${html%.rst}.html"
+                    ;;
+                  samples/*.rst)
+                    html="${file%.rst}.html"
+                    ;;
+                  *)
+                    continue
+                    ;;
+                esac
+                LINKS+="- [\`${file}\`](${PREFIX}${html})"$'\n'
+              done < <(echo "${CHANGED}" | grep -E '^(docs|samples)/.*\.rst$' || true)
+
+              if [ -n "${LINKS}" ]; then
+                echo ""
+                echo "Preview links for modified ${{ env.DOC_ADDON_NAME }} documents:"
+                echo ""
+                printf "%s" "${LINKS}"
+           
+              fi
+            } > "${COMMENT}"
+          fi
 
       - name: Store
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'external') || contains(github.event.pull_request.labels.*.name, 'CI-trusted-author') }}
