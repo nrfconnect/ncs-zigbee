@@ -34,6 +34,28 @@ A known issue can list one or both of the following entries:
 List of known issues
 ********************
 
+.. rst-class:: v1-4-0
+
+KRKNWK-22334: Zigbee Touchlink commissioning does not work reliably when Zigbee FOTA is enabled
+  When Zigbee Firmware-Over-the-Air (FOTA) is enabled, Zigbee Touchlink commissioning does not work reliably.
+  This issue is not observed when Zigbee FOTA is disabled.
+
+.. rst-class:: v1-4-0
+
+KRKNWK-22335: Zigbee Touchlink initiator is not always able to pair after single button activation
+  In some cases, pressing the dedicated button does not pair the :ref:`zigbee_light_switch_sample`, acting as Touchlink initiator, with the :ref:`zigbee_light_bulb_sample`, acting as Touchlink target.
+
+  **Workaround:** If the devices are not paired within 5–7 seconds after pressing the button, short-press the button once again on the light switch.
+
+.. rst-class:: v1-4-0
+
+KRKNWK-22343: Zigbee Touchlink initiator does not work when Zigbee Sleepy End Device behavior is enabled
+  Touchlink commissioning uses inter-PAN frames that require the Zigbee End Device to keep its radio receiver active.
+  Sleepy End Device behavior disables the receiver between polls to the parent, so Touchlink pairing fails when it is enabled.
+
+  **Workaround:** Do not enable both ``CONFIG_LIGHT_SWITCH_LOW_POWER`` and ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` Kconfig options at the same time.
+  Use Sleepy End Device behavior for low-power operation without Touchlink, or disable sleepy mode when building with Touchlink initiator support.
+
 .. rst-class:: v1-2-1 v1-2-0 v1-1-0 v1-0-0
 
 KRKNWK-21267: NCP crashes when migrating from the R22 to R23 firmware
