@@ -1273,6 +1273,29 @@ void zb_zcl_save_reported_value(zb_zcl_reporting_info_t *rep_info, zb_zcl_attr_t
         break;
       }
 
+      case ZB_ZCL_ATTR_TYPE_SINGLE:
+      {
+        /* memcpy: attribute storage is not guaranteed to be float-aligned */
+        ZB_MEMCPY(&rep_info->u.send_info.reported_value.single, attr_desc->data_p, sizeof(zb_single_t));
+        TRACE_MSG(TRACE_ZCL3, "reported SINGLE [%hd %hd %hd %hd]",
+                (FMT__H_H_H_H,
+                 rep_info->u.send_info.reported_value.data_buf[0], rep_info->u.send_info.reported_value.data_buf[1],
+                 rep_info->u.send_info.reported_value.data_buf[2], rep_info->u.send_info.reported_value.data_buf[3]));
+        break;
+      }
+
+      case ZB_ZCL_ATTR_TYPE_DOUBLE:
+      {
+        ZB_MEMCPY(rep_info->u.send_info.reported_value.data64, attr_desc->data_p, ZB_64BIT_SIZE);
+        TRACE_MSG(TRACE_ZCL3, "reported DOUBLE [%hd %hd %hd %hd %hd %hd %hd %hd]",
+                (FMT__H_H_H_H_H_H_H_H,
+                 rep_info->u.send_info.reported_value.data64[0], rep_info->u.send_info.reported_value.data64[1],
+                 rep_info->u.send_info.reported_value.data64[2], rep_info->u.send_info.reported_value.data64[3],
+                 rep_info->u.send_info.reported_value.data64[4], rep_info->u.send_info.reported_value.data64[5],
+                 rep_info->u.send_info.reported_value.data64[6], rep_info->u.send_info.reported_value.data64[7]));
+        break;
+      }
+
       case ZB_ZCL_ATTR_TYPE_U48:
       {
         rep_info->u.send_info.reported_value.u48 = *(zb_uint48_t*)attr_desc->data_p;
@@ -1416,6 +1439,43 @@ static zb_bool_t check_delta_value(zb_zcl_reporting_info_t *rep_info)
             break;
           }
 
+          case ZB_ZCL_ATTR_TYPE_SINGLE:
+          {
+            zb_single_t cur_value;
+            zb_single_t delta;
+
+            ZB_MEMCPY(&cur_value, attr_desc->data_p, sizeof(zb_single_t));
+            delta = ZB_ABS(cur_value - rep_info->u.send_info.reported_value.single);
+
+            TRACE_MSG(TRACE_ZCL3, "reported SINGLE [%hd %hd %hd %hd]",
+                      (FMT__H_H_H_H,
+                       rep_info->u.send_info.reported_value.data_buf[0], rep_info->u.send_info.reported_value.data_buf[1],
+                       rep_info->u.send_info.reported_value.data_buf[2], rep_info->u.send_info.reported_value.data_buf[3]));
+            ret = (delta >= rep_info->u.send_info.delta.single)?(RET_OK ):(RET_IGNORE );
+            break;
+          }
+
+          case ZB_ZCL_ATTR_TYPE_DOUBLE:
+          {
+            double cur_value;
+            double reported_value;
+            double min_delta;
+            double delta;
+
+            ZB_MEMCPY(&cur_value, attr_desc->data_p, sizeof(double));
+            ZB_MEMCPY(&reported_value, rep_info->u.send_info.reported_value.data64, sizeof(double));
+            ZB_MEMCPY(&min_delta, rep_info->u.send_info.delta.data64, sizeof(double));
+            delta = ZB_ABS(cur_value - reported_value);
+
+            TRACE_MSG(TRACE_ZCL3, "reported DOUBLE [%hd %hd %hd %hd %hd %hd %hd %hd]",
+                      (FMT__H_H_H_H_H_H_H_H,
+                       rep_info->u.send_info.reported_value.data64[0], rep_info->u.send_info.reported_value.data64[1],
+                       rep_info->u.send_info.reported_value.data64[2], rep_info->u.send_info.reported_value.data64[3],
+                       rep_info->u.send_info.reported_value.data64[4], rep_info->u.send_info.reported_value.data64[5],
+                       rep_info->u.send_info.reported_value.data64[6], rep_info->u.send_info.reported_value.data64[7]));
+            ret = (delta >= min_delta)?(RET_OK ):(RET_IGNORE );
+            break;
+          }
 
           case ZB_ZCL_ATTR_TYPE_U48:
           {

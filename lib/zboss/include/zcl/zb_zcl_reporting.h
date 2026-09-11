@@ -89,6 +89,8 @@ union zb_zcl_attr_var_u
   zb_uint32_t u32;
   zb_int32_t s32;
   zb_uint48_t u48;
+  zb_single_t single;
+  zb_64bit_data_t data64; /* DOUBLE, raw bytes: keeps the union 4-byte aligned */
   zb_uint8_t data_buf[4];
   zb_uint32_t data_buf_crc32;
 };
