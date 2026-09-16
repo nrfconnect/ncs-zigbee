@@ -27,6 +27,10 @@ Link-time optimization (LTO)
 The add-on ships two sets of precompiled ZBOSS libraries.
 ``CONFIG_ZIGBEE_ENABLE_TRACES`` selects which set is linked: when disabled, the release libraries under :file:`lib/zboss/lib/` are used; when enabled, the debug libraries under :file:`lib/zboss/trace/` are used (see :ref:`ug_zigbee_configuring_zboss_traces`).
 
+.. note::
+   The debug libraries under :file:`lib/zboss/trace/` are intended for development, testing, and evaluation purposes only and are not intended for use in production firmware or end products.
+   See :ref:`ug_zigbee_configuring_zboss_traces` for details.
+
 The release libraries are built with stack LTO enabled by default.
 This is recorded in :file:`lib/zboss/include/osif/libzboss_config*.h` as ``CONFIG_ZBOSS_STACK_LTO``.
 The debug libraries are built without stack LTO; their ``libzboss_config*.h`` files do not define ``CONFIG_ZBOSS_STACK_LTO``.
@@ -42,10 +46,8 @@ Enabling this library is required when configuring the Zigbee protocol in the |N
 
 To enable additional features in the ZBOSS libraries, you can use the following Kconfig options:
 
-..
-  * ``CONFIG_ZIGBEE_LIBRARY_NCP_DEV`` - With this option enabled, the application links with an additional library, which implements NCP commands.
-    This option is enabled by default in the :ref:`Zigbee NCP sample <zigbee_ncp_sample>`.
-    This option uses a production version of ZBOSS that has not been certified.
+* ``CONFIG_ZIGBEE_LIBRARY_NCP_DEV`` - With this option enabled, the application links with an additional library, which implements NCP commands.
+  This option is enabled by default in the :ref:`Zigbee NCP sample <zigbee_ncp_sample>`.
 
 * ``CONFIG_ZIGBEE_GP_CB`` - With this option enabled, the application can support the Green Power Combo feature, which implements the basic set of Green Power Proxy and Green Power Sink functionalities within a single device.
   This option can only be enabled for an application that is built from ZBOSS stack sources.

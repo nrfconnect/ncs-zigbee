@@ -157,6 +157,9 @@ config ZIGBEE_DEBUG_FUNCTIONS
 	  Include functions to suspend/resume ZBOSS thread.
 	  It may be helpful when debugging but using this functions can cause instability of the device.
 
+	  Intended for development, testing, and evaluation purposes only;
+	  not for production end products.
+
 # Configure default behavior of zb_osif_abort() function called as ZBOSS assert handler
 choice ZBOSS_ASSERT_HANDLER
 	prompt "Default behavior for ZBOSS stack internal assert handler"
