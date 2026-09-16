@@ -9,6 +9,9 @@ Tools
 
 The tools listed on this page can be helpful when developing your Zigbee application with the |addon| for the |NCS|.
 
+.. note::
+   The tools described on this page are intended for development, testing, and evaluation purposes only and are not intended for use in production end products.
+
 .. _ug_zigbee_tools_sniffer:
 
 nRF Sniffer for 802.15.4
@@ -16,6 +19,8 @@ nRF Sniffer for 802.15.4
 
 The nRF Sniffer for 802.15.4 is a tool for learning about and debugging applications that are using protocols based on IEEE 802.15.4, like Thread or Zigbee.
 It provides a near real-time display of 802.15.4 packets that are sent back and forth between devices, even when the link is encrypted.
+
+|zigbee_tool_dev_eval_only|
 
 See `nRF Sniffer for 802.15.4`_ for documentation.
 
@@ -33,6 +38,8 @@ The tool is available for download as a standalone :file:`zip` package using the
 
 |zigbee_ncp_package_more_info|
 
+|zigbee_ncp_host_dev_only|
+
 .. _ug_zigbee_tools_logger_endpoint:
 
 Zigbee endpoint logger
@@ -41,5 +48,7 @@ Zigbee endpoint logger
 .. include:: lib/zigbee_logger_eprxzcl.rst
     :start-after: zigbee_logger_endpoint_intro_start
     :end-before: zigbee_logger_endpoint_intro_end
+
+|zigbee_logger_dev_only|
 
 See :ref:`lib_zigbee_logger_endpoint` for documentation.

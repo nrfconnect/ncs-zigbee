@@ -9,6 +9,9 @@ Zigbee: Shell
 
 This Shell sample demonstrates a Zigbee router (with the possibility of being a coordinator) that uses the :ref:`lib_zigbee_shell` library for interaction.
 
+.. important::
+   |zigbee_samples_dev_only|
+
 You can use this sample for several purposes, including:
 
 * Initial configuration of the network - forming a network as coordinator, adding devices to the network with the install codes, setting the extended PAN ID.

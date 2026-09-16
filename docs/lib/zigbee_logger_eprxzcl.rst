@@ -15,6 +15,8 @@ You can use this endpoint handler function for parsing incoming ZCL frames and l
 The library can work as a partial replacement of `nRF Sniffer for 802.15.4`_ for debugging and testing purposes.
 Unlike the sniffer, it provides logging information only for incoming ZCL frames on a specific device.
 
+|zigbee_logger_dev_only|
+
 .. zigbee_logger_endpoint_intro_end
 
 .. _lib_zigbee_logger_endpoint_parsing:

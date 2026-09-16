@@ -14,6 +14,9 @@ For example, as shown in the `Testing`_ scenario, you can program a development 
 
 You can then use this sample together with the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` to set up a basic Zigbee network.
 
+.. important::
+   |zigbee_samples_dev_only|
+
 Requirements
 ************
 
@@ -33,6 +36,8 @@ To test this sample, you also need the following:
   * `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
 
   For more information, see also the `NCP Host documentation`_.
+
+  |zigbee_ncp_host_dev_only|
 * The :ref:`zigbee_light_bulb_sample` sample programmed on one separate device.
 
 This means that you need at least two development kits for testing this sample.
@@ -236,6 +241,9 @@ For more configuration options, see :ref:`Zigbee stack logs <zigbee_ug_logging_s
   After every reset, the sample first boots to MCUboot and then, after a couple of seconds, the NCP sample is booted.
   When booted to MCUboot, you can upload the new image with the `dfu-util tool`_.
   See the Testing section of the `USB DFU (Device Firmware Upgrade)`_ Zephyr sample for the list of required dfu-util commands.
+
+  .. note::
+     Using ``dfu-util`` in this sample flow is intended for development and testing of the USB variant only and is not described as a production firmware update mechanism for end products.
 
   To learn more about configuring bootloader for an application in |NCS|, see the `Secure bootloader chain` page in the |NCS| documentation.
 
