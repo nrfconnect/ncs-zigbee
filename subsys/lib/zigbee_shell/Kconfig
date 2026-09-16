@@ -8,6 +8,12 @@ menuconfig ZIGBEE_SHELL
 	bool "Enable Zigbee Shell"
 	depends on ZIGBEE_ADD_ON
 	imply SHELL
+	help
+	  Enable the Zigbee shell library for controlling device behavior and
+	  performing operations on a Zigbee network from a serial shell.
+
+	  Intended for development, testing, and evaluation purposes only;
+	  not for production end products.
 
 if ZIGBEE_SHELL
 
@@ -40,6 +46,8 @@ config ZIGBEE_SHELL_DEBUG_CMD
 	  - Command to suspend/resume Zigbee Stack execution.
 
 	  Note: These commands may be useful when debugging but can cause instability of the device.
+	  Intended for development, testing, and evaluation purposes only;
+	  not for production end products.
 
 config ZIGBEE_SHELL_ZCL_CMD_TIMEOUT
 	int "Amount of time in seconds after which the ZCL cmd commands time out if no response is received"
