@@ -26,6 +26,7 @@ You can also configure the following OSIF-related Kconfig options:
 
   .. note::
       These functions are useful for debugging, but they can cause instability of the device.
+      They are intended for development, testing, and evaluation purposes only and are not intended for use in production end products.
 
 * ``CONFIG_ZBOSS_RESET_ON_ASSERT`` - Configures the ZBOSS OSIF layer to reset the device when a ZBOSS assert occurs.
   This option is enabled by default.

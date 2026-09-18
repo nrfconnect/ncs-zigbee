@@ -56,6 +56,9 @@ config ZIGBEE_ENABLE_TRACES
 	  Those libraries do not include additional debug symbols, but they include
 	  extended set of ZBOSS binary traces, that allow Nordic's support team to debug issues.
 
+	  Intended for development, testing, and evaluation purposes only;
+	  not for production firmware or end products.
+
 config APP_LINK_WITH_ZBOSS
 	bool
 	help
