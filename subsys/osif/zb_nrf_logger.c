@@ -24,7 +24,7 @@ void zb_osif_logger_put_bytes(const zb_uint8_t *buf, zb_short_t len)
 
 #if defined(CONFIG_ZB_NRF_TRACE_RX_ENABLE)
 /* Function set UART RX callback function */
-void zb_osif_logger_set_uart_byte_received_cb(zb_callback_t cb)
+void zb_osif_logger_set_uart_byte_received_cb(zb_osif_uart_byte_received_cb_t cb)
 {
 	LOG_ERR("Command reception is not available through logger");
 }

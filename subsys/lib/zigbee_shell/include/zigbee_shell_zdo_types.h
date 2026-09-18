@@ -25,15 +25,15 @@ struct zdo_req_seq {
 struct zdo_req_info {
 	zb_bufid_t buffer_id;
 	zb_uint8_t ctx_timeout;
-	zb_uint8_t (*req_fn)(zb_uint8_t param, zb_callback_t cb_fn);
-	void (*timeout_cb_fn)(zb_bufid_t bufid);
-	void (*req_cb_fn)(zb_bufid_t bufid);
+	zb_uint8_t (*req_fn)(zb_bufid_t param, zb_callback_t cb_fn);
+	void (*timeout_cb_fn)(zb_cb_param_t param);
+	void (*req_cb_fn)(zb_cb_param_t param);
 };
 
 /* Structure used to store ZDO data in the context manager entry. */
 struct zdo_data {
 	bool is_broadcast;
-	bool (*app_cb_fn)(struct ctx_entry *ctx_entry, uint8_t param);
+	bool (*app_cb_fn)(struct ctx_entry *ctx_entry, zb_bufid_t bufid);
 	struct zdo_req_seq req_seq;
 	struct zdo_req_info zdo_req;
 };

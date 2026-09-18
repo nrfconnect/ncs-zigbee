@@ -77,7 +77,7 @@ void zb_osif_led_button_init(void)
 	}
 }
 
-void zb_osif_led_on(zb_uint8_t led_no)
+void zb_osif_led_on(zb_cb_param_t led_no)
 {
 	switch (led_no) {
 	case 0:
@@ -97,7 +97,7 @@ void zb_osif_led_on(zb_uint8_t led_no)
 	}
 }
 
-void zb_osif_led_off(zb_uint8_t led_no)
+void zb_osif_led_off(zb_cb_param_t led_no)
 {
 	switch (led_no) {
 	case 0:
@@ -171,9 +171,10 @@ void zb_osif_led_on_set_level(zb_uint8_t level)
 #endif /* CONFIG_ZIGBEE_USE_DIMMABLE_LED */
 
 #ifdef CONFIG_ZIGBEE_USE_BUTTONS
-void zb_osif_button_cb(zb_uint8_t arg)
+void zb_osif_button_cb(zb_cb_param_t arg)
 {
 	/* Intentionally left empty. */
+	ZVUNUSED(arg);
 }
 
 zb_bool_t zb_setup_buttons_cb(zb_callback_t cb)

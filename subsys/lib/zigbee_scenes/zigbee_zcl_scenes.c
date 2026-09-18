@@ -376,8 +376,10 @@ static void recall_scene(struct scene_table_on_off_entry *entry)
 	zb_buf_free(buf);
 }
 
-static void send_view_scene_resp(zb_bufid_t bufid, zb_uint16_t idx)
+static void send_view_scene_resp(zb_cb_param_t cb_param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(cb_param);
+	zb_uint16_t idx = (zb_uint16_t)ZB_UNPACK_USER_PARAM(cb_param);
 	zb_uint8_t *payload_ptr;
 	zb_uint8_t view_scene_status = ZB_ZCL_STATUS_NOT_FOUND;
 
@@ -425,8 +427,9 @@ static void send_view_scene_resp(zb_bufid_t bufid, zb_uint16_t idx)
 	LOG_DBG("<< %s", __func__);
 }
 
-static void send_get_scene_membership_resp(zb_bufid_t bufid)
+static void send_get_scene_membership_resp(zb_cb_param_t cb_param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(cb_param);
 	zb_uint8_t *payload_ptr;
 	zb_uint8_t *capacity_ptr;
 	zb_uint8_t *scene_count_ptr;

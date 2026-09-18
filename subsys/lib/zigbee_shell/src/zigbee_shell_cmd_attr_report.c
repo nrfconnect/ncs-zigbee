@@ -182,8 +182,10 @@ static void print_attr_update(zb_zcl_parsed_hdr_t *zcl_hdr, zb_bufid_t bufid)
  *
  * @returns ZB_TRUE if ZCL command was processed.
  */
-zb_uint8_t zb_shell_ep_handler_report(zb_bufid_t bufid)
+zb_uint8_t zb_shell_ep_handler_report(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	struct ctx_entry *entry;
 	zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(bufid, zb_zcl_parsed_hdr_t);
 
@@ -237,8 +239,10 @@ static void construct_reporting_frame(struct ctx_entry *entry)
  *
  * @param index   Index of the entry with frame to send in the context manager.
  */
-static void zb_zcl_send_attr_report_frame(zb_uint8_t index)
+static void zb_zcl_send_attr_report_frame(zb_cb_param_t param)
 {
+	zb_uint8_t index = (zb_uint8_t)param;
+
 	zb_ret_t zb_err_code;
 	struct zcl_packet_info *packet_info;
 	struct ctx_entry *entry = ctx_mgr_get_entry_by_index(index);

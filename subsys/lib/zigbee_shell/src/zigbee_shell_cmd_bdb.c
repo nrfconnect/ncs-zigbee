@@ -8,7 +8,7 @@
 #include <zephyr/shell/shell.h>
 
 #include <zboss_api.h>
-#include <zigbee/zigbee_error_handler.h>
+#include <zigbee/zigbee_app_utils.h>
 #include <zb_nrf_platform.h>
 #include <zigbee/zigbee_shell.h>
 #include "zigbee_shell_utils.h"
@@ -52,7 +52,8 @@
 
 /* Forward declarations. */
 #ifndef ZB_ED_ROLE
-static void zb_install_code_list_read(zb_uint8_t buffer, zb_uint16_t start_index);
+static void zb_install_code_list_read_impl(zb_bufid_t buffer, zb_uint16_t start_index);
+static void zb_install_code_list_read(zb_cb_param_t param);
 #endif
 
 /* Install code list entry structure. */
@@ -291,7 +292,7 @@ static int cmd_zb_start(const struct shell *shell, size_t argc, char **argv)
 	zb_uint8_t mode_mask = ZB_BDB_NETWORK_STEERING;
 
 	if ((!zigbee_is_stack_started())) {
-		channel = zb_get_bdb_primary_channel_set();
+		channel = zigbee_bdb_get_primary_channel_mask();
 
 		switch (default_role) {
 #ifndef ZB_ED_ROLE
@@ -321,7 +322,7 @@ static int cmd_zb_start(const struct shell *shell, size_t argc, char **argv)
 		 * and a new network needs to be formed.
 		 */
 		if ((default_role == ZB_NWK_DEVICE_TYPE_COORDINATOR) && !ZB_JOINED()) {
-			mode_mask = ZB_BDB_NETWORK_FORMATION;
+			mode_mask = ZB_BDB_NETWORK_FORMATION_ONLY;
 		}
 		ret = bdb_start_top_level_commissioning(mode_mask);
 	}
@@ -490,8 +491,8 @@ static int cmd_zb_channel(const struct shell *shell, size_t argc, char **argv)
 		int i;
 		int c;
 
-		chan[0] = zb_get_bdb_primary_channel_set();
-		chan[1] = zb_get_bdb_secondary_channel_set();
+		chan[0] = zigbee_bdb_get_primary_channel_mask();
+		chan[1] = zigbee_bdb_get_secondary_channel_mask();
 
 		/* Check for case in which channel mask can not be read. */
 		if (zigbee_is_nvram_initialised() && !zigbee_is_stack_started()
@@ -577,7 +578,7 @@ static int cmd_zb_channel(const struct shell *shell, size_t argc, char **argv)
 			channel_mask = 1 << channel_number;
 		}
 
-		if (zb_get_bdb_primary_channel_set() != channel_mask) {
+		if (zigbee_bdb_get_primary_channel_mask() != channel_mask) {
 			if (channel_number) {
 				shell_print(shell, "Setting channel to %d",
 					    channel_number);
@@ -587,14 +588,19 @@ static int cmd_zb_channel(const struct shell *shell, size_t argc, char **argv)
 					    channel_mask);
 			}
 
-			zb_set_bdb_primary_channel_set(channel_mask);
-			zb_set_bdb_secondary_channel_set(channel_mask);
+			zigbee_bdb_set_primary_channel_mask(channel_mask);
+			zigbee_bdb_set_secondary_channel_mask(channel_mask);
 			zb_set_channel_mask(channel_mask);
 		}
 
 		zb_shell_print_done(shell, ZB_FALSE);
 	}
 	return 0;
+}
+
+static void zb_shell_bdb_set_legacy_support(zb_cb_param_t param)
+{
+	zb_bdb_set_legacy_device_support((zb_uint8_t)param);
 }
 
 #if !defined(ZB_ED_ROLE)
@@ -614,7 +620,7 @@ static void zb_secur_ic_add_cb(zb_ret_t status)
  *
  * @param[in] param Unused param.
  */
-void zb_install_code_add(zb_uint8_t param)
+void zb_install_code_add(zb_cb_param_t param)
 {
 	ARG_UNUSED(param);
 
@@ -678,11 +684,12 @@ static void zb_install_code_list_print_row(struct zb_secur_ic_list_entry *ic, zb
  *
  * @param[in] buffer        Buffer ID.
  */
-static void zb_install_code_list_read_cb(zb_uint8_t buffer)
+static void zb_install_code_list_read_cb(zb_cb_param_t param)
 {
 	zb_uint8_t ic_entries_left_to_read = 0;
 	struct zb_secur_ic_list_entry *ic = NULL;
 	zb_secur_ic_get_list_resp_t *ic_list_resp = NULL;
+	zb_bufid_t buffer = ZB_UNPACK_BUF_REF(param);
 
 	if (ic_list_ctx.taken == false) {
 		goto exit;
@@ -730,7 +737,7 @@ static void zb_install_code_list_read_cb(zb_uint8_t buffer)
 
 		/* Reuse the same buffer to read remaining install codes. */
 		zb_buf_reuse(buffer);
-		zb_install_code_list_read(buffer, new_start_index);
+		zb_install_code_list_read_impl(buffer, new_start_index);
 		return;
 	}
 
@@ -751,7 +758,13 @@ exit:
  * @param[in] buffer        Buffer ID.
  * @param[in] start_index   Index of IC list to start reading install codes from.
  */
-static void zb_install_code_list_read(zb_uint8_t buffer, zb_uint16_t start_index)
+static void zb_install_code_list_read(zb_cb_param_t param)
+{
+	zb_install_code_list_read_impl(ZB_UNPACK_BUF_REF(param),
+				       ZB_UNPACK_USER_PARAM(param));
+}
+
+static void zb_install_code_list_read_impl(zb_bufid_t buffer, zb_uint16_t start_index)
 {
 	zb_secur_ic_get_list_req_t *ic_list_req = NULL;
 
@@ -886,9 +899,9 @@ static int cmd_zb_install_code(const struct shell *shell, size_t argc,
 		}
 
 		if (strcmp(argv[1], "enable") == 0) {
-			zb_set_installcode_policy(ZB_TRUE);
+			zb_set_installcode_policy(ZB_INSTALL_CODE_REQUIRED);
 		} else if (strcmp(argv[1], "disable") == 0) {
-			zb_set_installcode_policy(ZB_FALSE);
+			zb_set_installcode_policy(ZB_INSTALL_CODE_NOT_REQUIRED);
 		} else {
 			err_msg = "Syntax error";
 			goto exit;
@@ -1002,7 +1015,7 @@ static int cmd_zb_legacy_enable(const struct shell *shell, size_t argc,
 	zb_bdb_set_legacy_device_support(1);
 	legacy_mode = ZB_TRUE;
 
-	if (ZB_SCHEDULE_APP_CALLBACK(zb_bdb_set_legacy_device_support, legacy_mode)) {
+	if (ZB_SCHEDULE_APP_CALLBACK(zb_shell_bdb_set_legacy_support, legacy_mode)) {
 		zb_shell_print_error(shell, "Can not execute command", ZB_FALSE);
 		return -ENOEXEC;
 	}
@@ -1043,7 +1056,7 @@ static int cmd_zb_legacy_disable(const struct shell *shell, size_t argc,
 	zb_bdb_set_legacy_device_support(0);
 	legacy_mode = ZB_FALSE;
 
-	if (ZB_SCHEDULE_APP_CALLBACK(zb_bdb_set_legacy_device_support, legacy_mode)) {
+	if (ZB_SCHEDULE_APP_CALLBACK(zb_shell_bdb_set_legacy_support, legacy_mode)) {
 		zb_shell_print_error(shell, "Can not execute command", ZB_FALSE);
 		return -ENOEXEC;
 	}
@@ -1153,30 +1166,18 @@ static int cmd_zb_factory_reset(const struct shell *shell, size_t argc,
 static int cmd_child_max(const struct shell *shell, size_t argc, char **argv)
 {
 	ARG_UNUSED(argc);
+	ARG_UNUSED(argv);
 
-	uint32_t child_max = 0xFFFFFFFF;
-
-	/* Two argc - set the amount of the max_children. */
 	if (zigbee_is_stack_started()) {
 		zb_shell_print_error(shell, "Stack already started", ZB_FALSE);
 		return -ENOEXEC;
 	}
 
-	zb_shell_sscan_uint(argv[1], (uint8_t *)&child_max, 4, 10);
-	if (child_max > 32) {
-		zb_shell_print_error(
-			shell,
-			"Children device number must be within [0:32]",
-			ZB_FALSE);
-		return -EINVAL;
-	} else {
-		/* Set the value by calling ZBOSS API. */
-		zb_set_max_children(child_max);
-		shell_print(shell, "Setting max children to: %d", child_max);
-	}
-
-	zb_shell_print_done(shell, ZB_FALSE);
-	return 0;
+	zb_shell_print_error(
+		shell,
+		"max_children was removed in ZBOSS 5; use ZB_NEIGHBOR_TABLE_SIZE",
+		ZB_FALSE);
+	return -ENOTSUP;
 }
 #endif
 
