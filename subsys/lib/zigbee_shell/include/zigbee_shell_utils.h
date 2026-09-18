@@ -99,7 +99,7 @@ zb_bool_t zb_shell_is_zcl_cmd_response(zb_zcl_parsed_hdr_t *zcl_hdr, struct ctx_
  *
  * @param index   Index of context entry to invalidate.
  */
-void zb_shell_zcl_cmd_timeout_cb(zb_uint8_t index);
+void zb_shell_zcl_cmd_timeout_cb(zb_cb_param_t param);
 
 /**@brief Parse uint8_t from input string.
  *

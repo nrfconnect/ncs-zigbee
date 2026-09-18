@@ -64,6 +64,18 @@ void zigbee_network_join_commissioning_set_active(bool active);
  */
 void zigbee_network_rejoin_abort(void);
 
+/** @brief Set BDB primary channel mask on the 2.4 GHz page. */
+void zigbee_bdb_set_primary_channel_mask(zb_uint32_t channel_mask);
+
+/** @brief Set BDB secondary channel mask on the 2.4 GHz page. */
+void zigbee_bdb_set_secondary_channel_mask(zb_uint32_t channel_mask);
+
+/** @brief Get BDB primary channel mask from the 2.4 GHz page. */
+zb_uint32_t zigbee_bdb_get_primary_channel_mask(void);
+
+/** @brief Get BDB secondary channel mask from the 2.4 GHz page. */
+zb_uint32_t zigbee_bdb_get_secondary_channel_mask(void);
+
 /**@brief Function for converting an input buffer to a hex string.
  *
  * @param[out] out       Pointer to the output buffer.

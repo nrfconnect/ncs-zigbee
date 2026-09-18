@@ -19,8 +19,10 @@ LOG_MODULE_DECLARE(zigbee_shell, CONFIG_ZIGBEE_SHELL_LOG_LEVEL);
  *
  * @param index   Index of the entry with frame to send in the context manager.
  */
-static void zb_zcl_send_add_group_cmd(zb_uint8_t index)
+static void zb_zcl_send_add_group_cmd(zb_cb_param_t param)
 {
+	zb_uint8_t index = (zb_uint8_t)param;
+
 	struct zcl_packet_info *packet_info;
 	struct ctx_entry *entry = ctx_mgr_get_entry_by_index(index);
 
@@ -50,8 +52,10 @@ static void zb_zcl_send_add_group_cmd(zb_uint8_t index)
  *
  * @param index   Index of the entry with frame to send in the context manager.
  */
-static void zb_zcl_send_remove_group_cmd(zb_uint8_t index)
+static void zb_zcl_send_remove_group_cmd(zb_cb_param_t param)
 {
+	zb_uint8_t index = (zb_uint8_t)param;
+
 	struct zcl_packet_info *packet_info;
 	struct ctx_entry *entry = ctx_mgr_get_entry_by_index(index);
 
@@ -81,8 +85,10 @@ static void zb_zcl_send_remove_group_cmd(zb_uint8_t index)
  *
  * @param index   Index of the entry with frame to send in the context manager.
  */
-static void zb_zcl_send_get_group_mem_cmd(zb_uint8_t index)
+static void zb_zcl_send_get_group_mem_cmd(zb_cb_param_t param)
 {
+	zb_uint8_t index = (zb_uint8_t)param;
+
 	zb_uint8_t *data_ptr;
 	struct zcl_packet_info *packet_info;
 	struct ctx_entry *entry = ctx_mgr_get_entry_by_index(index);
@@ -124,8 +130,10 @@ static void zb_zcl_send_get_group_mem_cmd(zb_uint8_t index)
  *
  * @param index   Index of the entry with frame to send in the context manager.
  */
-static void zb_zcl_send_add_group_if_identifying_cmd(zb_uint8_t index)
+static void zb_zcl_send_add_group_if_identifying_cmd(zb_cb_param_t param)
 {
+	zb_uint8_t index = (zb_uint8_t)param;
+
 	struct zcl_packet_info *packet_info;
 	struct ctx_entry *entry = ctx_mgr_get_entry_by_index(index);
 
@@ -155,8 +163,10 @@ static void zb_zcl_send_add_group_if_identifying_cmd(zb_uint8_t index)
  *
  * @param index   Index of the entry with frame to send in the context manager.
  */
-static void zb_zcl_send_remove_all_groups_cmd(zb_uint8_t index)
+static void zb_zcl_send_remove_all_groups_cmd(zb_cb_param_t param)
 {
+	zb_uint8_t index = (zb_uint8_t)param;
+
 	struct zcl_packet_info *packet_info;
 	struct ctx_entry *entry = ctx_mgr_get_entry_by_index(index);
 
@@ -233,8 +243,10 @@ cmd_send_error:
  *
  * @param[in] bufid   Reference to a ZBOSS buffer containing zb_zcl_command_send_status_t data.
  */
-static void zb_zcl_cmd_acked(zb_uint8_t bufid)
+static void zb_zcl_cmd_acked(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	uint8_t index = 0;
 	zb_ret_t zb_err_code = RET_OK;
 	zb_zcl_command_send_status_t *cmd_status = NULL;
@@ -799,8 +811,10 @@ remove_all_groups_error:
  *
  * @return ZB_TRUE if command was handled by the function, ZB_FALSE otherwise.
  */
-zb_uint8_t zb_shell_ep_handler_groups_cmd(zb_bufid_t bufid)
+zb_uint8_t zb_shell_ep_handler_groups_cmd(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	zb_ret_t zb_err_code;
 	struct ctx_entry *entry;
 	zb_uint16_t remote_node_short_add;

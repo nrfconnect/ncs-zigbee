@@ -17,9 +17,9 @@ void zb_osif_async_serial_init(void);
 void zb_osif_logger_put_bytes(const zb_uint8_t *buf, zb_short_t len);
 void zb_osif_serial_logger_put_bytes(const zb_uint8_t *buf, zb_short_t len);
 void zb_osif_async_serial_put_bytes(const zb_uint8_t *buf, zb_short_t len);
-void zb_osif_logger_set_uart_byte_received_cb(zb_callback_t cb);
-void zb_osif_serial_logger_set_uart_byte_received_cb(zb_callback_t cb);
-void zb_osif_async_serial_set_uart_byte_received_cb(zb_callback_t cb);
+void zb_osif_logger_set_uart_byte_received_cb(zb_osif_uart_byte_received_cb_t cb);
+void zb_osif_serial_logger_set_uart_byte_received_cb(zb_osif_uart_byte_received_cb_t cb);
+void zb_osif_async_serial_set_uart_byte_received_cb(zb_osif_uart_byte_received_cb_t cb);
 void zb_osif_async_serial_flush(void);
 void zb_osif_logger_flush(void);
 void zb_osif_serial_logger_flush(void);
@@ -54,7 +54,7 @@ void zb_osif_serial_put_bytes(const zb_uint8_t *buf, zb_short_t len)
 }
 
 /* Function set UART RX callback function */
-void zb_osif_set_uart_byte_received_cb(zb_callback_t cb)
+void zb_osif_set_uart_byte_received_cb(zb_osif_uart_byte_received_cb_t cb)
 {
 	if (IS_ENABLED(CONFIG_ZBOSS_TRACE_HEXDUMP_LOGGING)) {
 		zb_osif_logger_set_uart_byte_received_cb(cb);

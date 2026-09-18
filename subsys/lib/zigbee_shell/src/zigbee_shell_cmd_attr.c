@@ -81,8 +81,10 @@ static void print_write_attr_response(zb_bufid_t bufid, struct ctx_entry *entry)
  *
  * @param bufid   ZBOSS buffer id.
  */
-zb_uint8_t zb_shell_ep_handler_attr(zb_bufid_t bufid)
+zb_uint8_t zb_shell_ep_handler_attr(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	zb_ret_t zb_err_code;
 	struct ctx_entry *entry;
 	zb_zcl_parsed_hdr_t *zcl_hdr;
@@ -172,8 +174,10 @@ static void construct_read_write_attr_frame(struct ctx_entry *entry)
  *
  * @param index   Index of the entry with frame to send in the context manager.
  */
-static void zb_zcl_send_read_write_attr_frame(zb_uint8_t index)
+static void zb_zcl_send_read_write_attr_frame(zb_cb_param_t param)
 {
+	zb_uint8_t index = (zb_uint8_t)param;
+
 	zb_ret_t zb_err_code;
 	struct zcl_packet_info *packet_info;
 	struct ctx_entry *entry = ctx_mgr_get_entry_by_index(index);

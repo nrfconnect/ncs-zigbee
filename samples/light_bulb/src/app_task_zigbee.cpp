@@ -29,7 +29,8 @@
 #include <ram_pwrdn.h>
 
 extern "C" {
-#include "zb_dimmable_light.h"
+#include <zboss_api.h>
+#include <zb_ha_dimmable_light.h>
 #include <dk_buttons_and_leds.h>
 #include <zb_nrf_platform.h>
 #include <zboss_api.h>
@@ -177,12 +178,12 @@ ZB_ZCL_DECLARE_LEVEL_CONTROL_ATTRIB_LIST(
     level_control_attr_list, &dev_ctx.level_control_attr.current_level,
     &dev_ctx.level_control_attr.remaining_time);
 
-ZB_DECLARE_DIMMABLE_LIGHT_CLUSTER_LIST(dimmable_light_clusters, basic_attr_list,
+ZB_HA_DECLARE_DIMMABLE_LIGHT_CLUSTER_LIST(dimmable_light_clusters, basic_attr_list,
                                        identify_attr_list, groups_attr_list,
                                        scenes_attr_list, on_off_attr_list,
                                        level_control_attr_list);
 
-ZB_DECLARE_DIMMABLE_LIGHT_EP(dimmable_light_ep, DIMMABLE_LIGHT_ENDPOINT,
+ZB_HA_DECLARE_DIMMABLE_LIGHT_EP(dimmable_light_ep, DIMMABLE_LIGHT_ENDPOINT,
                              dimmable_light_clusters);
 
 #ifndef CONFIG_ZIGBEE_FOTA
@@ -202,8 +203,9 @@ ZBOSS_DECLARE_DEVICE_CTX_2_EP(dimmable_light_ctx, zigbee_fota_client_ep,
  *
  * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
  */
-static void start_identifying(zb_bufid_t bufid) {
-  ZVUNUSED(bufid);
+static void start_identifying(zb_cb_param_t param)
+{
+  ZVUNUSED(param);
 
   if (ZB_JOINED()) {
     /* Check if endpoint is in identifying mode,
@@ -343,24 +345,24 @@ static void on_off_set_value(zb_bool_t on) {
  *
  * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
  */
-static void toggle_identify_led(zb_bufid_t bufid) {
+static void toggle_identify_led(zb_cb_param_t param)
+{
   static int blink_status;
 
   light_bulb_set_brightness(((++blink_status) % 2) ? (255U) : (0U));
-  ZB_SCHEDULE_APP_ALARM(toggle_identify_led, bufid,
+  ZB_SCHEDULE_APP_ALARM(toggle_identify_led, param,
                         ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
 }
 
 /**@brief Function to handle identify notification events on the first endpoint.
- *
- * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
  */
-static void identify_cb(zb_bufid_t bufid) {
+static void identify_cb(zb_cb_param_t param)
+{
   zb_ret_t zb_err_code;
 
-  if (bufid) {
+  if (param) {
     /* Schedule a self-scheduling function that will toggle the LED. */
-    ZB_SCHEDULE_APP_CALLBACK(toggle_identify_led, bufid);
+    ZB_SCHEDULE_APP_CALLBACK(toggle_identify_led, param);
   } else {
     /* Cancel the toggling function alarm and restore current Zigbee LED state.
      */
@@ -475,7 +477,9 @@ static void ota_evt_handler(const struct zigbee_fota_evt *evt) {
  * @param[in]   bufid   Reference to Zigbee stack buffer
  *                      used to pass received data.
  */
-static void zcl_device_cb(zb_bufid_t bufid) {
+static void zcl_device_cb(zb_cb_param_t param)
+{
+  zb_bufid_t bufid = (zb_bufid_t)param;
   zb_uint8_t cluster_id;
   zb_uint8_t attr_id;
   zb_zcl_device_callback_param_t *device_cb_param =

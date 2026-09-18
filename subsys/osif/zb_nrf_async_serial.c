@@ -20,7 +20,7 @@ static const struct device *uart_dev = DEVICE_DT_GET(DT_CHOSEN(ncs_zigbee_uart))
 static bool is_sleeping;
 static bool uart_initialized;
 
-static zb_callback_t char_handler;
+static zb_osif_uart_byte_received_cb_t char_handler;
 static zb_mserial_recv_data_cb_t rx_data_cb;
 static zb_serial_send_data_cb_t tx_data_cb;
 static zb_serial_send_data_cb_t tx_trx_data_cb;
@@ -364,7 +364,7 @@ void zb_osif_async_serial_flush(void)
 	k_sem_give(&tx_done_sem);
 }
 
-void zb_osif_async_serial_set_uart_byte_received_cb(zb_callback_t hnd)
+void zb_osif_async_serial_set_uart_byte_received_cb(zb_osif_uart_byte_received_cb_t hnd)
 {
 	char_handler = hnd;
 }

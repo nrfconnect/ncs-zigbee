@@ -19,7 +19,7 @@ LOG_MODULE_DECLARE(zboss_osif, CONFIG_ZBOSS_OSIF_LOG_LEVEL);
 /* UART device used to print ZBOSS Trace messages. */
 static const struct device *uart_dev = DEVICE_DT_GET(DT_CHOSEN(ncs_zboss_trace_uart));
 static bool uart_dev_initialized;
-static zb_callback_t char_handler;
+static zb_osif_uart_byte_received_cb_t char_handler;
 
 static void uart_rx_bytes(uint8_t *buf, size_t len)
 {
@@ -98,7 +98,7 @@ void zb_osif_serial_logger_flush(void)
 
 #if defined(CONFIG_ZB_NRF_TRACE_RX_ENABLE)
 /* Function set UART RX callback function */
-void zb_osif_serial_logger_set_uart_byte_received_cb(zb_callback_t cb)
+void zb_osif_serial_logger_set_uart_byte_received_cb(zb_osif_uart_byte_received_cb_t cb)
 {
 	char_handler = cb;
 }

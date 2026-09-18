@@ -65,7 +65,7 @@ static const char * const relationship_name[] = {
 	"unauthenticated child"
 };
 
-static void refresh_active_nbt_table(zb_bufid_t bufid);
+static void refresh_active_nbt_table(zb_cb_param_t param);
 
 static void active_nbr_clear(void)
 {
@@ -130,18 +130,19 @@ static void active_nbr_log(void)
 	}
 }
 
-static void refresh_active_nbt_table_delayed(zb_bufid_t bufid)
+static void refresh_active_nbt_table_delayed(zb_cb_param_t param)
 {
 	zb_ret_t error_code;
 
-	error_code = zb_nwk_nbr_iterator_next(bufid, refresh_active_nbt_table);
+	error_code = zb_nwk_nbr_iterator_next(ZB_UNPACK_BUF_REF(param), refresh_active_nbt_table);
 	ZB_ERROR_CHECK(error_code);
 }
 
-static void refresh_active_nbt_table(zb_bufid_t bufid)
+static void refresh_active_nbt_table(zb_cb_param_t param)
 {
 	static zb_bool_t cache_updated = ZB_FALSE;
 	zb_ret_t error_code;
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
 	zb_nwk_nbr_iterator_params_t *args = ZB_BUF_GET_PARAM(bufid, zb_nwk_nbr_iterator_params_t);
 	zb_nwk_nbr_iterator_entry_t *entry = (zb_nwk_nbr_iterator_entry_t *)zb_buf_begin(bufid);
 

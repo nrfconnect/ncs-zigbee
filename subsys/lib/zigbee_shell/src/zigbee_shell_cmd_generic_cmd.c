@@ -24,8 +24,10 @@ LOG_MODULE_DECLARE(zigbee_shell, CONFIG_ZIGBEE_SHELL_LOG_LEVEL);
  *
  * @param[in] bufid   Reference to a ZBOSS buffer containing zb_zcl_command_send_status_t data.
  */
-static void zb_zcl_cmd_acked(zb_uint8_t bufid)
+static void zb_zcl_cmd_acked(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	uint8_t index = 0;
 	zb_ret_t zb_err_code = RET_OK;
 	zb_zcl_command_send_status_t *cmd_status = NULL;
@@ -103,8 +105,10 @@ static void construct_zcl_cmd_frame(struct ctx_entry *entry)
  *
  * @param index   Index of the entry with frame to send in the context manager.
  */
-static void zb_zcl_send_cmd_frame(zb_uint8_t index)
+static void zb_zcl_send_cmd_frame(zb_cb_param_t param)
 {
+	zb_uint8_t index = (zb_uint8_t)param;
+
 	zb_ret_t zb_err_code;
 	struct zcl_packet_info *packet_info;
 	struct ctx_entry *entry = ctx_mgr_get_entry_by_index(index);
@@ -527,8 +531,10 @@ error:
  *
  * @param bufid   Reference to a ZBOSS buffer.
  */
-zb_uint8_t zb_shell_ep_handler_generic_cmd(zb_bufid_t bufid)
+zb_uint8_t zb_shell_ep_handler_generic_cmd(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	zb_ret_t zb_err_code;
 	struct ctx_entry *entry;
 	zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(bufid, zb_zcl_parsed_hdr_t);

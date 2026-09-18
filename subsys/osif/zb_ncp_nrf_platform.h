@@ -17,7 +17,4 @@
  */
 int zboss_app_main(void);
 
-/* Callout function called in zboss_app_main() right after starting ZBOSS. */
-void zb_ncp_app_fw_custom_post_start(void);
-
 #endif /* ZB_NCP_NRF_PLATFORM_H__ */

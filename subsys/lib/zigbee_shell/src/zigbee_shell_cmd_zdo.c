@@ -87,7 +87,7 @@ LOG_MODULE_DECLARE(zigbee_shell, CONFIG_ZIGBEE_SHELL_LOG_LEVEL);
 
 
 /* Forward declarations. */
-static void ctx_timeout_cb(zb_uint8_t ctx_timeout_cb);
+static void ctx_timeout_cb(zb_cb_param_t param);
 
 /**@brief Parse a list of cluster IDs.
  *
@@ -120,9 +120,9 @@ static int sscan_cluster_list(char **argv, uint8_t num, void *ids)
  * @param[in] idx Index of context manager entry in which zdo request
  *                information is stored.
  */
-static void zb_zdo_req(uint8_t idx)
+static void zb_zdo_req(zb_cb_param_t param)
 {
-	struct ctx_entry *ctx_entry = ctx_mgr_get_entry_by_index(idx);
+	struct ctx_entry *ctx_entry = ctx_mgr_get_entry_by_index((uint8_t)param);
 	struct zdo_req_info *req_ctx = &(ctx_entry->zdo_data.zdo_req);
 	zb_ret_t zb_err_code;
 
@@ -154,8 +154,10 @@ static void zb_zdo_req(uint8_t idx)
  *
  * @param[in] tsn ZBOSS transaction sequence number.
  */
-static void cmd_zb_match_desc_timeout(zb_uint8_t tsn)
+static void cmd_zb_match_desc_timeout(zb_cb_param_t param)
 {
+	zb_uint8_t tsn = (zb_uint8_t)param;
+
 	struct ctx_entry *ctx_entry =
 		ctx_mgr_find_ctx_entry(tsn, CTX_MGR_ZDO_ENTRY_TYPE);
 
@@ -171,8 +173,10 @@ static void cmd_zb_match_desc_timeout(zb_uint8_t tsn)
  *
  * @param[in] bufid Reference number to ZBOSS memory buffer.
  */
-static void cmd_zb_match_desc_cb(zb_bufid_t bufid)
+static void cmd_zb_match_desc_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	zb_zdo_match_desc_resp_t *match_desc_resp;
 	zb_apsde_data_indication_t *data_ind;
 	struct ctx_entry *ctx_entry;
@@ -213,8 +217,10 @@ static void cmd_zb_match_desc_cb(zb_bufid_t bufid)
 	zb_buf_free(bufid);
 }
 
-static void cmd_zb_active_ep_cb(zb_bufid_t bufid)
+static void cmd_zb_active_ep_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	struct ctx_entry *ctx_entry;
 	zb_zdo_ep_resp_t *active_ep_resp =
 		(zb_zdo_ep_resp_t *)zb_buf_begin(bufid);
@@ -248,8 +254,10 @@ static void cmd_zb_active_ep_cb(zb_bufid_t bufid)
 	zb_buf_free(bufid);
 }
 
-static void cmd_zb_simple_desc_req_cb(zb_bufid_t bufid)
+static void cmd_zb_simple_desc_req_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	struct ctx_entry *ctx_entry;
 	zb_zdo_simple_desc_resp_t *simple_desc_resp;
 	zb_uint8_t in_cluster_cnt;
@@ -307,8 +315,10 @@ static void cmd_zb_simple_desc_req_cb(zb_bufid_t bufid)
  *
  * @param[in] tsn ZBOSS transaction sequence number.
  */
-static void cmd_zb_bind_unbind_timeout(zb_uint8_t tsn)
+static void cmd_zb_bind_unbind_timeout(zb_cb_param_t param)
 {
+	zb_uint8_t tsn = (zb_uint8_t)param;
+
 	struct ctx_entry *ctx_entry =
 		ctx_mgr_find_ctx_entry(tsn, CTX_MGR_ZDO_ENTRY_TYPE);
 
@@ -324,8 +334,10 @@ static void cmd_zb_bind_unbind_timeout(zb_uint8_t tsn)
  *
  * @param[in] bufid Reference number to ZBOSS memory buffer.
  */
-void cmd_zb_bind_unbind_cb(zb_bufid_t bufid)
+void cmd_zb_bind_unbind_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	zb_ret_t zb_err_code;
 	struct ctx_entry *ctx_entry;
 	zb_zdo_bind_resp_t *bind_resp =
@@ -359,8 +371,10 @@ void cmd_zb_bind_unbind_cb(zb_bufid_t bufid)
  *
  * @param[in] tsn ZBOSS transaction sequence number.
  */
-static void cmd_zb_nwk_addr_timeout(zb_uint8_t tsn)
+static void cmd_zb_nwk_addr_timeout(zb_cb_param_t param)
 {
+	zb_uint8_t tsn = (zb_uint8_t)param;
+
 	struct ctx_entry *ctx_entry =
 		ctx_mgr_find_ctx_entry(tsn, CTX_MGR_ZDO_ENTRY_TYPE);
 
@@ -376,8 +390,10 @@ static void cmd_zb_nwk_addr_timeout(zb_uint8_t tsn)
  *
  * @param[in] bufid Reference number to ZBOSS memory buffer.
  */
-void cmd_zb_nwk_addr_cb(zb_bufid_t bufid)
+void cmd_zb_nwk_addr_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	zb_zdo_nwk_addr_resp_head_t *nwk_addr_resp;
 	struct ctx_entry *ctx_entry;
 	zb_ret_t zb_err_code;
@@ -414,8 +430,10 @@ void cmd_zb_nwk_addr_cb(zb_bufid_t bufid)
  *
  * @param[in] tsn ZBOSS transaction sequence number.
  */
-static void cmd_zb_ieee_addr_timeout(zb_uint8_t tsn)
+static void cmd_zb_ieee_addr_timeout(zb_cb_param_t param)
 {
+	zb_uint8_t tsn = (zb_uint8_t)param;
+
 	struct ctx_entry *ctx_entry =
 		ctx_mgr_find_ctx_entry(tsn, CTX_MGR_ZDO_ENTRY_TYPE);
 
@@ -429,8 +447,10 @@ static void cmd_zb_ieee_addr_timeout(zb_uint8_t tsn)
  *
  * @param[in] bufid Reference number to ZBOSS memory buffer.
  */
-void cmd_zb_ieee_addr_cb(zb_bufid_t bufid)
+void cmd_zb_ieee_addr_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	zb_zdo_ieee_addr_resp_t *ieee_addr_resp;
 	struct ctx_entry *ctx_entry;
 	zb_ret_t zb_err_code;
@@ -1436,8 +1456,10 @@ static int cmd_zb_eui64(const struct shell *shell, size_t argc, char **argv)
  * @param[in] tsn    ZBOSS transaction sequence number obtained as result
  *                   of zdo_mgmt_leave_req.
  */
-static void cmd_zb_mgmt_leave_timeout_cb(zb_uint8_t tsn)
+static void cmd_zb_mgmt_leave_timeout_cb(zb_cb_param_t param)
 {
+	zb_uint8_t tsn = (zb_uint8_t)param;
+
 	struct ctx_entry *ctx_entry =
 		ctx_mgr_find_ctx_entry(tsn, CTX_MGR_ZDO_ENTRY_TYPE);
 
@@ -1453,8 +1475,10 @@ static void cmd_zb_mgmt_leave_timeout_cb(zb_uint8_t tsn)
  *
  * @param[in] bufid ZBOSS buffer reference.
  */
-static void cmd_zb_mgmt_leave_cb(zb_bufid_t bufid)
+static void cmd_zb_mgmt_leave_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	zb_zdo_mgmt_leave_res_t *mgmt_leave_resp;
 	struct ctx_entry *ctx_entry;
 
@@ -1693,8 +1717,10 @@ error:
  *
  * @param[in] tsn ZDO transaction sequence number returned by request.
  */
-static void ctx_timeout_cb(zb_uint8_t tsn)
+static void ctx_timeout_cb(zb_cb_param_t param)
 {
+	zb_uint8_t tsn = (zb_uint8_t)param;
+
 	struct ctx_entry *ctx_entry =
 		ctx_mgr_find_ctx_entry(tsn, CTX_MGR_ZDO_ENTRY_TYPE);
 
@@ -1714,8 +1740,10 @@ static void ctx_timeout_cb(zb_uint8_t tsn)
  *
  * @param[in] bufid ZBOSS buffer id.
  */
-static void zdo_request_cb(zb_bufid_t bufid)
+static void zdo_request_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	struct ctx_entry *ctx_entry;
 	zb_zdo_callback_info_t *cb_info;
 	bool is_request_complete;
@@ -1901,8 +1929,10 @@ static void print_bind_resp(const struct shell *shell,
  *
  * @param bufid     Reference to ZBOSS buffer (as required by Zigbee stack API).
  */
-static void cmd_zb_mgmt_bind_cb(zb_bufid_t bufid)
+static void cmd_zb_mgmt_bind_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	zb_zdo_mgmt_bind_resp_t *resp;
 	struct ctx_entry *ctx_entry;
 

@@ -31,10 +31,10 @@ static zb_uint32_t get_request_duration(struct ctx_entry *req_data);
  *
  * @param index   Index to context entry with ping data to invalidate.
  */
-static void invalidate_ping_entry_cb(zb_uint8_t index)
+static void invalidate_ping_entry_cb(zb_cb_param_t param)
 {
 	uint32_t delay_ms;
-	struct ctx_entry *ping_entry = ctx_mgr_get_entry_by_index(index);
+	struct ctx_entry *ping_entry = ctx_mgr_get_entry_by_index((zb_uint8_t)param);
 
 	if (ping_entry) {
 		delay_ms = get_request_duration(ping_entry);
@@ -47,7 +47,7 @@ static void invalidate_ping_entry_cb(zb_uint8_t index)
 
 		ctx_mgr_delete_entry(ping_entry);
 	} else {
-		LOG_ERR("Couldn't get ping entry %d- entry not found", index);
+		LOG_ERR("Couldn't get ping entry %d- entry not found", (zb_uint8_t)param);
 	}
 }
 
@@ -94,8 +94,10 @@ static struct ctx_entry *find_ping_entry_by_short(zb_uint16_t addr_short)
  *
  * @param  index  Index of context manager entry with ping data to send.
  */
-static void zb_zcl_send_ping_frame(zb_uint8_t index)
+static void zb_zcl_send_ping_frame(zb_cb_param_t param)
 {
+	zb_uint8_t index = (zb_uint8_t)param;
+
 	zb_ret_t zb_err_code;
 	struct zcl_packet_info *packet_info;
 	struct ctx_entry *ping_entry = ctx_mgr_get_entry_by_index(index);
@@ -192,8 +194,10 @@ static zb_uint32_t get_request_duration(struct ctx_entry *req_data)
 	return time_diff_ms;
 }
 
-static void frame_acked_cb(zb_bufid_t bufid)
+static void frame_acked_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	if (bufid) {
 		zb_buf_free(bufid);
 	}
@@ -206,12 +210,13 @@ static void frame_acked_cb(zb_bufid_t bufid)
  *
  * @param[in] bufid  Reference to a ZBOSS buffer containing APC ACK data.
  */
-static void dispatch_user_callback(zb_bufid_t bufid)
+static void dispatch_user_callback(zb_cb_param_t param)
 {
 	zb_uint16_t short_addr;
 	zb_ret_t zb_err_code = RET_OK;
 	struct ctx_entry *req_data = NULL;
 	zb_zcl_command_send_status_t *ping_cmd_status;
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
 
 	if (bufid == 0) {
 		return;
@@ -529,8 +534,10 @@ static void ping_req_indicate(zb_bufid_t zcl_cmd_bufid)
  *
  * @param bufid    Reference to a ZBOSS buffer
  */
-zb_uint8_t zb_shell_ep_handler_ping(zb_bufid_t bufid)
+zb_uint8_t zb_shell_ep_handler_ping(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+
 	zb_uint32_t time_diff;
 	zb_zcl_addr_t remote_node_addr;
 	zb_zcl_parsed_hdr_t *zcl_hdr = ZB_BUF_GET_PARAM(bufid, zb_zcl_parsed_hdr_t);

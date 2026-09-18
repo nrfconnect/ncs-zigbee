@@ -49,7 +49,7 @@ void zb_shell_configure_endpoint(void);
  *                  processing this frame.
  * @retval ZB_FALSE Zigbee stack must process this frame.
  */
-zb_uint8_t zb_shell_ep_handler(zb_bufid_t bufid);
+zb_uint8_t zb_shell_ep_handler(zb_cb_param_t param);
 
 /**@brief Function for setting the state of the debug mode of the shell.
  *

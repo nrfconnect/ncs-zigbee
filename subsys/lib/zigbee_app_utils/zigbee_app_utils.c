@@ -17,6 +17,7 @@
 #include <zigbee/zigbee_error_handler.h>
 #include <zb_nrf_platform.h>
 #include <zboss_api.h>
+#include <zboss_api_bdb.h>
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR) || defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
 #include <zb_config.h>
 #include <zboss_api_zcl.h>
@@ -72,10 +73,10 @@ static zb_bool_t bdb_start_commissioning_tracked(zb_uint8_t mode_mask)
 	return started;
 }
 
-static void restart_network_formation(zb_uint8_t param)
+static void restart_network_formation(zb_cb_param_t param)
 {
 	ZVUNUSED(param);
-	(void)bdb_start_commissioning_tracked(ZB_BDB_NETWORK_FORMATION);
+	(void)bdb_start_commissioning_tracked(ZB_BDB_NETWORK_FORMATION_ONLY);
 }
 
 /* Rejoin-procedure related variables. */
@@ -90,15 +91,15 @@ static volatile bool is_rejoin_start_scheduled;
 #endif
 
 /* Forward declarations. */
-static void rejoin_the_network(zb_uint8_t param);
+static void rejoin_the_network(zb_cb_param_t param);
 static void start_network_rejoin(bool force);
-static void stop_network_rejoin(zb_uint8_t was_scheduled);
-static void network_steering_timeout(zb_uint8_t param);
-static void tc_rejoin_timeout(zb_uint8_t param);
-static void start_tc_rejoin(zb_uint8_t param);
+static void stop_network_rejoin(zb_cb_param_t param);
+static void network_steering_timeout(zb_cb_param_t param);
+static void tc_rejoin_timeout(zb_cb_param_t param);
+static void start_tc_rejoin(zb_cb_param_t param);
 static void rejoin_attempt_finished(void);
 #if defined ZB_COORDINATOR_ROLE
-static void change_panid(zb_uint8_t param);
+static void change_panid(zb_cb_param_t param);
 #endif
 
 /* A ZBOSS internal API needed for workaround for KRKNWK-14112 */
@@ -114,7 +115,7 @@ struct zb_aps_device_key_pair_set_s ZB_PACKED_PRE
 	zb_bitfield_t   reserved:4;
 	zb_uint8_t      align[3];
 } ZB_PACKED_STRUCT;
-extern void zb_nwk_forget_device(zb_uint8_t addr_ref);
+extern void zb_nwk_forget_device(zb_cb_param_t addr_ref);
 extern struct zb_aps_device_key_pair_set_s  *zb_secur_get_link_key_by_address(
 							zb_ieee_addr_t address,
 							zb_uint8_t attr);
@@ -296,7 +297,6 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 			zb_zcl_set_backward_compatible_statuses_mode(ZB_ZCL_STATUSES_ZCL8_MODE));
 		stack_initialised = true;
 		LOG_INF("Zigbee stack initialized");
-		comm_status = bdb_start_commissioning_tracked(ZB_BDB_INITIALIZATION);
 		break;
 
 	case ZB_BDB_SIGNAL_DEVICE_FIRST_START:
@@ -321,7 +321,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 			} else {
 				LOG_INF("Start network formation");
 				comm_status = bdb_start_commissioning_tracked(
-					ZB_BDB_NETWORK_FORMATION);
+					ZB_BDB_NETWORK_FORMATION_ONLY);
 			}
 		} else {
 			LOG_ERR("Failed to initialize Zigbee stack (status: %d)",
@@ -359,7 +359,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 			/* Device has joined the network so stop the network
 			 * rejoin procedure.
 			 */
-			stop_network_rejoin(ZB_FALSE);
+			stop_network_rejoin((zb_cb_param_t)ZB_FALSE);
 			LOG_INF("Joined network successfully on reboot signal (Extended PAN ID: %s, PAN ID: 0x%04hx)",
 				ieee_addr_buf,
 				ZB_PIBCACHE_PAN_ID());
@@ -410,7 +410,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 			 * rejoin procedure.
 			 */
 			if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
-				stop_network_rejoin(ZB_FALSE);
+				stop_network_rejoin((zb_cb_param_t)ZB_FALSE);
 			}
 		} else {
 			if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
@@ -505,7 +505,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 				 * start network formation.
 				 */
 				comm_status = bdb_start_commissioning_tracked(
-					ZB_BDB_NETWORK_FORMATION);
+					ZB_BDB_NETWORK_FORMATION_ONLY);
 			} else {
 				/* Start network rejoin procedure. */
 				start_network_rejoin(false);
@@ -591,7 +591,8 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 									&addr_ref) == RET_OK)
 				&& zb_secur_get_link_key_by_address(update_params->long_addr,
 					ZB_SECUR_PROVISIONAL_KEY)) {
-				ZB_SCHEDULE_APP_ALARM_CANCEL(zb_nwk_forget_device, addr_ref);
+				ZB_SCHEDULE_APP_ALARM_CANCEL(zb_nwk_forget_device,
+							     (zb_cb_param_t)addr_ref);
 			}
 		}
 		break;
@@ -750,7 +751,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 				 * rejoin procedure.
 				 */
 				if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
-					stop_network_rejoin(ZB_FALSE);
+					stop_network_rejoin((zb_cb_param_t)ZB_FALSE);
 				}
 			} else {
 				if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
@@ -823,7 +824,7 @@ void zigbee_led_status_update(zb_bufid_t bufid, uint32_t led_idx)
 	}
 }
 
-static void network_steering_timeout(zb_uint8_t param)
+static void network_steering_timeout(zb_cb_param_t param)
 {
 	if (param == ZB_UNDEFINED_BUFFER) {
 		zb_buf_get_out_delayed(network_steering_timeout);
@@ -836,7 +837,7 @@ static void network_steering_timeout(zb_uint8_t param)
 
 /**@brief Start network steering.
  */
-static void start_network_steering(zb_uint8_t param)
+static void start_network_steering(zb_cb_param_t param)
 {
 	zb_bool_t ret;
 
@@ -851,7 +852,7 @@ static void start_network_steering(zb_uint8_t param)
 	}
 }
 
-static void tc_rejoin_timeout(zb_uint8_t param)
+static void tc_rejoin_timeout(zb_cb_param_t param)
 {
 	ZVUNUSED(param);
 	LOG_ERR("tc_rejoin_timeout() is called, consider attempt finished, try again");
@@ -859,7 +860,7 @@ static void tc_rejoin_timeout(zb_uint8_t param)
 	rejoin_the_network(0);
 }
 
-static void start_tc_rejoin(zb_uint8_t param)
+static void start_tc_rejoin(zb_cb_param_t param)
 {
 	zb_bdb_initiate_tc_rejoin(param);
 	ZB_SCHEDULE_APP_ALARM(tc_rejoin_timeout, ZB_UNDEFINED_BUFFER,
@@ -868,7 +869,7 @@ static void start_tc_rejoin(zb_uint8_t param)
 
 /**@brief Process rejoin procedure. To be called in signal handler.
  */
-static void rejoin_the_network(zb_uint8_t param)
+static void rejoin_the_network(zb_cb_param_t param)
 {
 	ZVUNUSED(param);
 
@@ -997,8 +998,9 @@ static void start_network_rejoin(bool force)
  * @param[in] was_scheduled   Zigbee flag to indicate if the function
  *                            was scheduled or called directly.
  */
-static void stop_network_rejoin(zb_uint8_t was_scheduled)
+static void stop_network_rejoin(zb_cb_param_t param)
 {
+	zb_bool_t was_scheduled = (zb_bool_t)param;
 	/* For Router and End Device:
 	 *   Try to stop scheduled network steering. Stop rejoin procedure
 	 *   or if no network steering was scheduled, request rejoin stop
@@ -1064,7 +1066,7 @@ static void stop_network_rejoin(zb_uint8_t was_scheduled)
 /* Function to be scheduled when user_input_indicate() is called
  * and wait_for_user_input is true.
  */
-static void start_network_rejoin_ED(zb_uint8_t param)
+static void start_network_rejoin_ED(zb_cb_param_t param)
 {
 	ZVUNUSED(param);
 	if (!ZB_JOINED() && wait_for_user_input) {
@@ -1172,7 +1174,7 @@ bool was_factory_reset_done(void)
 #endif /* CONFIG_ZIGBEE_FACTORY_RESET */
 
 #if defined ZB_COORDINATOR_ROLE
-static void change_panid_cb(zb_uint8_t param)
+static void change_panid_cb(zb_cb_param_t param)
 {
   zb_channel_panid_change_preparation_t *params = ZB_BUF_GET_PARAM(param, zb_channel_panid_change_preparation_t);
   if (params->error_cnt == 0)
@@ -1185,7 +1187,7 @@ static void change_panid_cb(zb_uint8_t param)
   }
 }
 
-static void change_panid(zb_uint8_t param)
+static void change_panid(zb_cb_param_t param)
 {
   if (param == 0u)
   {
@@ -1204,6 +1206,40 @@ static void change_panid(zb_uint8_t param)
   }
 }
 #endif /* ZB_COORDINATOR_ROLE */
+
+void zigbee_bdb_set_primary_channel_mask(zb_uint32_t channel_mask)
+{
+	zb_channel_list_t channel_list;
+
+	zb_channel_list_init(channel_list);
+	zb_channel_page_list_set_2_4GHz_mask(channel_list, channel_mask);
+	zb_set_bdb_primary_channel_list(channel_list);
+}
+
+void zigbee_bdb_set_secondary_channel_mask(zb_uint32_t channel_mask)
+{
+	zb_channel_list_t channel_list;
+
+	zb_channel_list_init(channel_list);
+	zb_channel_page_list_set_2_4GHz_mask(channel_list, channel_mask);
+	zb_set_bdb_secondary_channel_list(channel_list);
+}
+
+zb_uint32_t zigbee_bdb_get_primary_channel_mask(void)
+{
+	zb_channel_list_t channel_list;
+
+	zb_get_bdb_primary_channel_list(channel_list);
+	return zb_channel_page_list_get_2_4GHz_mask(channel_list);
+}
+
+zb_uint32_t zigbee_bdb_get_secondary_channel_mask(void)
+{
+	zb_channel_list_t channel_list;
+
+	zb_get_bdb_secondary_channel_list(channel_list);
+	return zb_channel_page_list_get_2_4GHz_mask(channel_list);
+}
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
 
@@ -1229,14 +1265,14 @@ void zigbee_touchlink_initiator_prepare_scan_channels(void)
 #endif
 
 	zb_set_channel_mask(mask);
-	zb_set_bdb_primary_channel_set(mask);
+	zigbee_bdb_set_primary_channel_mask(mask);
 }
 
 #endif /* CONFIG_ZIGBEE_TOUCHLINK_INITIATOR */
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
 
-extern void bdb_touchlink_target_start(zb_uint8_t param);
+extern void bdb_touchlink_target_start(zb_cb_param_t param);
 
 enum zigbee_tl_target_state_e {
 	ZIGBEE_TL_TARGET_STATE_IDLE,
@@ -1296,7 +1332,7 @@ static bool zigbee_touchlink_target_resume_distributed_nwk(void)
 	zb_bdb_enable_distributed_network_formation();
 	zigbee_network_join_commissioning_set_active(true);
 
-	if (bdb_start_commissioning_tracked(ZB_BDB_NETWORK_FORMATION) != ZB_TRUE) {
+	if (bdb_start_commissioning_tracked(ZB_BDB_NETWORK_FORMATION_ONLY) != ZB_TRUE) {
 		zigbee_network_join_commissioning_set_active(false);
 		return false;
 	}
@@ -1378,7 +1414,7 @@ void zigbee_touchlink_target_signal_handler(zb_bufid_t bufid)
 
 			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_ON_NETWORK;
 			zigbee_network_join_commissioning_set_active(false);
-			stop_network_rejoin(ZB_FALSE);
+			stop_network_rejoin((zb_cb_param_t)ZB_FALSE);
 
 			/* Explicitly persist the NWK security material generated for this freshly formed
 			 * distributed network.
@@ -1397,7 +1433,7 @@ void zigbee_touchlink_target_signal_handler(zb_bufid_t bufid)
 		if (status == RET_OK) {
 			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_ON_NETWORK;
 			zigbee_network_join_commissioning_set_active(false);
-			stop_network_rejoin(ZB_FALSE);
+			stop_network_rejoin((zb_cb_param_t)ZB_FALSE);
 		} else {
 			zigbee_tl_target_state = ZIGBEE_TL_TARGET_STATE_IDLE;
 		}

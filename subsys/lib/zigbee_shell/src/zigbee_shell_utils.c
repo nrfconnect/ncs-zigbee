@@ -18,11 +18,11 @@
 
 LOG_MODULE_DECLARE(zigbee_shell, CONFIG_ZIGBEE_SHELL_LOG_LEVEL);
 
-extern zb_uint8_t zb_shell_ep_handler_attr(zb_bufid_t bufid);
-extern zb_uint8_t zb_shell_ep_handler_generic_cmd(zb_bufid_t bufid);
-extern zb_uint8_t zb_shell_ep_handler_report(zb_bufid_t bufid);
-extern zb_uint8_t zb_shell_ep_handler_ping(zb_bufid_t bufid);
-extern zb_uint8_t zb_shell_ep_handler_groups_cmd(zb_bufid_t bufid);
+extern zb_uint8_t zb_shell_ep_handler_attr(zb_cb_param_t param);
+extern zb_uint8_t zb_shell_ep_handler_generic_cmd(zb_cb_param_t param);
+extern zb_uint8_t zb_shell_ep_handler_report(zb_cb_param_t param);
+extern zb_uint8_t zb_shell_ep_handler_ping(zb_cb_param_t param);
+extern zb_uint8_t zb_shell_ep_handler_groups_cmd(zb_cb_param_t param);
 
 static zb_device_handler_t zb_ep_handlers[] = {
 	zb_shell_ep_handler_attr,
@@ -32,18 +32,19 @@ static zb_device_handler_t zb_ep_handlers[] = {
 	zb_shell_ep_handler_groups_cmd
 };
 
-zb_uint8_t zb_shell_ep_handler(zb_bufid_t bufid)
+zb_uint8_t zb_shell_ep_handler(zb_cb_param_t param)
 {
 	unsigned int idx;
 	uint8_t ep_handler_cnt = (sizeof(zb_ep_handlers) /
 				  sizeof(zb_device_handler_t));
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
 
 	if (IS_ENABLED(CONFIG_ZIGBEE_LOGGER_EP)) {
 		(void)(zigbee_logger_eprxzcl_ep_handler(bufid));
 	}
 
 	for (idx = 0; idx < ep_handler_cnt; idx++) {
-		if ((zb_ep_handlers[idx])(bufid) == ZB_TRUE) {
+		if ((zb_ep_handlers[idx])(param) == ZB_TRUE) {
 			return ZB_TRUE;
 		}
 	}
@@ -173,12 +174,12 @@ zb_bool_t zb_shell_is_zcl_cmd_response(zb_zcl_parsed_hdr_t *zcl_hdr, struct ctx_
 	return ZB_TRUE;
 }
 
-void zb_shell_zcl_cmd_timeout_cb(zb_uint8_t index)
+void zb_shell_zcl_cmd_timeout_cb(zb_cb_param_t param)
 {
-	struct ctx_entry *entry = ctx_mgr_get_entry_by_index(index);
+	struct ctx_entry *entry = ctx_mgr_get_entry_by_index((zb_uint8_t)param);
 
 	if (entry == NULL) {
-		LOG_ERR("Couldn't get attr entry %d - entry not found", index);
+		LOG_ERR("Couldn't get attr entry %d - entry not found", (zb_uint8_t)param);
 		return;
 	}
 
