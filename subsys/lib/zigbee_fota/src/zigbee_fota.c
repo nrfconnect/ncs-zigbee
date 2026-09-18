@@ -195,7 +195,7 @@ static void ota_resume_storage_init(void)
 		return;
 	}
 
-	err = settings_subsys_init();
+	err = zigbee_settings_subsys_init();
 	if (err) {
 		LOG_WRN("Unable to initialize settings for Zigbee FOTA resume: %d", err);
 		return;
