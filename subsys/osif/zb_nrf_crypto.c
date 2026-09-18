@@ -6,6 +6,7 @@
 
 #include <zephyr/sys/__assert.h>
 #include <zephyr/random/random.h>
+#include <zigbee/zigbee_settings_subsys.h>
 #include <zboss_api.h>
 #if CONFIG_NRF_SECURITY
 #include <psa/crypto.h>
@@ -20,6 +21,11 @@
 
 void zb_osif_rng_init(void)
 {
+}
+
+zb_uint32_t zb_osif_random_hw(void)
+{
+	return zb_random_seed();
 }
 
 zb_uint32_t zb_random_seed(void)
@@ -38,17 +44,89 @@ zb_uint32_t zb_random_seed(void)
 	return rnd_val;
 }
 
-void psa_init(void)
+#if defined(ZB_PSA_CRYPTO)
+
+/*
+ * Override weak zb_psa_init() from libzboss (see secur/zb_psa_crypto.c).
+ * Settings must be ready before psa_crypto_init() when using persistent
+ * PSA storage for the ZBOSS master key (ZOI: override platform PSA hooks).
+ */
+void zb_psa_init(void)
 {
-	psa_status_t status = psa_crypto_init();
-	ZVUNUSED(status);
+	psa_status_t status;
+
+#if defined(CONFIG_SETTINGS) && defined(CONFIG_MBEDTLS_PSA_CRYPTO_STORAGE_C)
+	int err = zigbee_settings_subsys_init();
+
+	__ASSERT(err == 0, "Cannot initialize settings for PSA storage (err: %d)", err);
+#endif
+
+	status = psa_crypto_init();
 	__ASSERT(status == PSA_SUCCESS, "Cannot initialize PSA crypto");
 }
 
+#endif /* ZB_PSA_CRYPTO */
+
 void zb_osif_aes_init(void)
 {
-	psa_init();
+#if defined(ZB_PSA_CRYPTO)
+	zb_psa_init();
+#endif
 }
+
+#if defined(ZB_PSA_CRYPTO_STORAGE)
+
+#define ZB_PSA_MASTER_KEY_ID 0x1
+
+static psa_status_t import_master_key(psa_key_lifetime_t lifetime)
+{
+	psa_status_t status;
+	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+	psa_key_id_t key_id;
+	uint8_t key_material[16];
+
+	attributes = (psa_key_attributes_t)PSA_KEY_ATTRIBUTES_INIT;
+	psa_set_key_id(&attributes, ZB_PSA_MASTER_KEY_ID);
+	psa_set_key_lifetime(&attributes, lifetime);
+	psa_set_key_algorithm(&attributes, PSA_ALG_CTR);
+	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+	psa_set_key_bits(&attributes, 128);
+	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
+
+#if defined(CONFIG_ENTROPY_HAS_DRIVER)
+	__ASSERT(sys_csrand_get(key_material, sizeof(key_material)) == 0,
+		 "Cannot get random material for PSA master key");
+#else
+	sys_rand_get(key_material, sizeof(key_material));
+#endif
+
+	status = psa_import_key(&attributes, key_material, sizeof(key_material), &key_id);
+	psa_reset_key_attributes(&attributes);
+
+	return status;
+}
+
+void zb_psa_generate_master_key(void)
+{
+	psa_status_t status;
+	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+
+	zb_psa_init();
+
+	if (PSA_SUCCESS == psa_get_key_attributes(ZB_PSA_MASTER_KEY_ID, &attributes)) {
+		psa_reset_key_attributes(&attributes);
+		return;
+	}
+	psa_reset_key_attributes(&attributes);
+
+	status = import_master_key(PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
+		PSA_KEY_PERSISTENCE_DEFAULT, PSA_KEY_LOCATION_LOCAL_STORAGE));
+	if (status != PSA_SUCCESS) {
+		(void)import_master_key(PSA_KEY_LIFETIME_VOLATILE);
+	}
+}
+
+#endif /* ZB_PSA_CRYPTO_STORAGE */
 
 void zb_osif_aes128_hw_encrypt(const zb_uint8_t *key, const zb_uint8_t *msg, zb_uint8_t *c)
 {
@@ -92,7 +170,9 @@ zb_int_t zb_osif_scalarmult(zb_uint8_t *result_point,
 
 	ZVUNUSED(status);
 
-	psa_init();
+#if defined(ZB_PSA_CRYPTO)
+	zb_psa_init();
+#endif
 
 	psa_key_attributes_t key_attributes = PSA_KEY_ATTRIBUTES_INIT;
 	psa_set_key_usage_flags(&key_attributes, PSA_KEY_USAGE_DERIVE);

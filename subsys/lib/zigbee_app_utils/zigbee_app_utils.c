@@ -102,6 +102,17 @@ static void rejoin_attempt_finished(void);
 static void change_panid(zb_cb_param_t param);
 #endif
 
+static void skip_startup_continue(zb_cb_param_t param)
+{
+	ZVUNUSED(param);
+	/* Z5: continue autostart so BDB runs init -> formation internally
+	 * (see steering_finish -> formation in zdo_commissioning_bdb.c).
+	 * Do not use STEERING_ONLY here: it skips formation and leaves the
+	 * coordinator unjoined when DEVICE_FIRST_START is delivered.
+	 */
+	zboss_start_continue();
+}
+
 /* A ZBOSS internal API needed for workaround for KRKNWK-14112 */
 struct zb_aps_device_key_pair_set_s ZB_PACKED_PRE
 {
@@ -297,6 +308,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 			zb_zcl_set_backward_compatible_statuses_mode(ZB_ZCL_STATUSES_ZCL8_MODE));
 		stack_initialised = true;
 		LOG_INF("Zigbee stack initialized");
+		ZB_SCHEDULE_APP_CALLBACK(skip_startup_continue, 0);
 		break;
 
 	case ZB_BDB_SIGNAL_DEVICE_FIRST_START:
@@ -319,9 +331,12 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 				LOG_INF("Start network steering");
 				start_network_rejoin(false);
 			} else {
-				LOG_INF("Start network formation");
+				/* Formation already ran inside BDB autostart before this
+				 * signal (ZBOSS zc_combo pattern). Open the network.
+				 */
+				LOG_INF("Start network steering");
 				comm_status = bdb_start_commissioning_tracked(
-					ZB_BDB_NETWORK_FORMATION_ONLY);
+					ZB_BDB_NETWORK_STEERING);
 			}
 		} else {
 			LOG_ERR("Failed to initialize Zigbee stack (status: %d)",

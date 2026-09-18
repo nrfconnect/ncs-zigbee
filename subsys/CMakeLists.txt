@@ -17,8 +17,10 @@ zephyr_library_link_libraries(zigbee)
 
 # Source files
 zephyr_library_sources(osif/zb_nrf_platform.c)
+zephyr_library_sources_ifdef(CONFIG_SETTINGS zigbee_settings_subsys.c)
 zephyr_library_sources(osif/zb_nrf_transceiver.c)
 zephyr_library_sources(osif/zb_nrf_crypto.c)
+zephyr_library_sources(osif/zb_nrf_psa_master_key.c)
 zephyr_library_sources(osif/zb_nrf_pwr_mgmt.c)
 zephyr_library_sources_ifdef(CONFIG_DK_LIBRARY osif/zb_nrf_led_button.c)
 zephyr_library_sources_ifdef(CONFIG_ZIGBEE_HAVE_SERIAL osif/zb_nrf_serial.c)
