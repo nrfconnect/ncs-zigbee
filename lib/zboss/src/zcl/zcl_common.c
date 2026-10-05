@@ -421,6 +421,7 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
     case ZB_ZCL_ATTR_TYPE_S16:
     case ZB_ZCL_ATTR_TYPE_16BITMAP:
     case ZB_ZCL_ATTR_TYPE_16BIT_ENUM:
+    case ZB_ZCL_ATTR_TYPE_SEMI:
        ZB_ZCL_PACKET_PUT_DATA16(cmd_ptr, attr_value);
       break;
 
@@ -509,6 +510,7 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
     case ZB_ZCL_ATTR_TYPE_64BITMAP:
     case ZB_ZCL_ATTR_TYPE_U64:
     case ZB_ZCL_ATTR_TYPE_S64:
+    case ZB_ZCL_ATTR_TYPE_DOUBLE:
     case ZB_ZCL_ATTR_TYPE_IEEE_ADDR:
       ZB_ZCL_PACKET_PUT_DATA64(cmd_ptr, attr_value);
       break;
@@ -543,6 +545,7 @@ zb_uint8_t zb_zcl_get_analog_attribute_size(zb_uint8_t attr_type)
 
     case ZB_ZCL_ATTR_TYPE_U16:
     case ZB_ZCL_ATTR_TYPE_S16:
+    case ZB_ZCL_ATTR_TYPE_SEMI:
       ret = sizeof(zb_uint16_t);
       break;
 
@@ -553,6 +556,7 @@ zb_uint8_t zb_zcl_get_analog_attribute_size(zb_uint8_t attr_type)
 
     case ZB_ZCL_ATTR_TYPE_U32:
     case ZB_ZCL_ATTR_TYPE_S32:
+    case ZB_ZCL_ATTR_TYPE_SINGLE:
       ret = sizeof(zb_uint32_t);
       break;
 
@@ -563,6 +567,7 @@ zb_uint8_t zb_zcl_get_analog_attribute_size(zb_uint8_t attr_type)
 
     case ZB_ZCL_ATTR_TYPE_U64:
     case ZB_ZCL_ATTR_TYPE_S64:
+    case ZB_ZCL_ATTR_TYPE_DOUBLE:
       ret = sizeof(zb_uint64_t);
       break;
 
@@ -595,6 +600,9 @@ zb_bool_t zb_zcl_is_analog_data_type(zb_uint8_t attr_type)
     case ZB_ZCL_ATTR_TYPE_S32:
     case ZB_ZCL_ATTR_TYPE_S48:
     case ZB_ZCL_ATTR_TYPE_S64:
+    case ZB_ZCL_ATTR_TYPE_SEMI:
+    case ZB_ZCL_ATTR_TYPE_SINGLE:
+    case ZB_ZCL_ATTR_TYPE_DOUBLE:
     case ZB_ZCL_ATTR_TYPE_UTC_TIME:
       ret = ZB_TRUE;
       break;
@@ -824,6 +832,7 @@ void zb_zcl_fix_endian(zb_uint8_t *data_ptr, zb_uint8_t data_type)
     case ZB_ZCL_ATTR_TYPE_U16:
     case ZB_ZCL_ATTR_TYPE_S16:
     case ZB_ZCL_ATTR_TYPE_16BITMAP:
+    case ZB_ZCL_ATTR_TYPE_SEMI:
       ZB_HTOLE16(&int_vars.u16, data_ptr);
       ZB_MEMCPY(data_ptr, &int_vars.u16, sizeof(zb_uint16_t));
       break;
@@ -832,11 +841,13 @@ void zb_zcl_fix_endian(zb_uint8_t *data_ptr, zb_uint8_t data_type)
     case ZB_ZCL_ATTR_TYPE_U32:
     case ZB_ZCL_ATTR_TYPE_S32:
     case ZB_ZCL_ATTR_TYPE_32BITMAP:
+    case ZB_ZCL_ATTR_TYPE_SINGLE:
       ZB_HTOLE32(&int_vars.u32, data_ptr);
       ZB_MEMCPY(data_ptr, &int_vars.u32, sizeof(zb_uint32_t));
       break;
 
     case ZB_ZCL_ATTR_TYPE_64BIT:
+    case ZB_ZCL_ATTR_TYPE_DOUBLE:
     case ZB_ZCL_ATTR_TYPE_IEEE_ADDR:
       ZB_HTOLE64(&int_vars.u64, data_ptr);
       ZB_MEMCPY(data_ptr, &int_vars.u64, sizeof(zb_ieee_addr_t));

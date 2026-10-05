@@ -1242,6 +1242,15 @@ void zb_zcl_read_report_config_cmd_handler(zb_uint8_t param)
                      case ZB_ZCL_ATTR_TYPE_S32:
                        ZB_ZCL_PACKET_PUT_DATA32(resp_data, &attr_rep_info->u.send_info.delta.s32);    /*Add signed 32-bit delta field*/
                        break;
+                     case ZB_ZCL_ATTR_TYPE_SEMI:
+                       ZB_ZCL_PACKET_PUT_DATA16(resp_data, &attr_rep_info->u.send_info.delta.u16);    /*Add half float delta field, raw bits*/
+                       break;
+                     case ZB_ZCL_ATTR_TYPE_SINGLE:
+                       ZB_ZCL_PACKET_PUT_DATA32(resp_data, &attr_rep_info->u.send_info.delta.single); /*Add single float delta field*/
+                       break;
+                     case ZB_ZCL_ATTR_TYPE_DOUBLE:
+                       ZB_ZCL_PACKET_PUT_DATA64(resp_data, attr_rep_info->u.send_info.delta.data64);  /*Add double float delta field*/
+                       break;
                      case ZB_ZCL_ATTR_TYPE_U48:
                        ZB_ZCL_PACKET_PUT_DATA48(resp_data, &attr_rep_info->u.send_info.delta.u48);    /*Add 48-bit delta field*/
                        break;
