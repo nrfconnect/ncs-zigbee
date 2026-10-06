@@ -48,6 +48,8 @@ To enable additional features in the ZBOSS libraries, you can use the following 
 
 * ``CONFIG_ZIGBEE_LIBRARY_NCP_DEV`` - With this option enabled, the application links with an additional library, which implements NCP commands.
   This option is enabled by default in the :ref:`Zigbee NCP sample <zigbee_ncp_sample>`.
+  This option uses a production version of ZBOSS that has not been certified.
+  |zigbee_ncp_cert_xref|
 
 * ``CONFIG_ZIGBEE_GP_CB`` - With this option enabled, the application can support the Green Power Combo feature, which implements the basic set of Green Power Proxy and Green Power Sink functionalities within a single device.
   This option can only be enabled for an application that is built from ZBOSS stack sources.

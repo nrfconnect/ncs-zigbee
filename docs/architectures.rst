@@ -100,9 +100,12 @@ The split stack architectures are most commonly used to design a Zigbee gateway,
 Network Co-Processor (NCP)
 ==========================
 
-In this design, the host processor runs the Zigbee application layer (ZCL) and the Zigbee commissioning logic.
-The connectivity device (nRF SoC) runs the :ref:`NCP application <zigbee_ncp_sample>` that contains lower parts of the Zigbee stack (802.15.4 PHY/MAC and the Zigbee PRO network layer), as well as provides commands to execute BDB commissioning primitives.
-The host processor communicates with the NCP through a serial interface (USB or UART).
+In this design, the host processor runs the Application, the Zigbee application layer (ZCL), and the Zigbee commissioning logic.
+The host communicates with the connectivity device through a serial interface (USB or UART) using the ZBOSS NCP protocol.
+
+The connectivity device (nRF SoC) runs the :ref:`NCP application <zigbee_ncp_sample>`.
+It implements the remainder of the ZBOSS stack on the connectivity side: the application framework, ZDO, APS, the Zigbee PRO network layer, IEEE 802.15.4 MAC and PHY, and the nRF 802.15.4 radio driver.
+The two sides exchange ZBOSS stack operations through NCP serialization over the serial link.
 
 The NCP design has the following advantages:
 
@@ -115,7 +118,15 @@ The NCP design has the following advantages:
 It also has the following trade-offs:
 
 * The host part of the stack must be built and run for every individual host processor in use.
-  However, Nordic Semiconductor provides reference implementation for Linux-based platforms in the ZBOSS NCP Host package.
+  Nordic Semiconductor provides the :ref:`ZBOSS NCP Host <ug_zigbee_tools_ncp_host>` package as a reference implementation for development and evaluation on Linux-based host processors.
+* Zigbee Compliant Platform certification is required for each combination of host processor and NCP SoC before you can certify a Zigbee Certified Product that uses this architecture.
+  This requirement applies to the |addon| and to every SoC supported as an NCP connectivity device.
+  The Zigbee Compliant Platform certification IDs (CIDs) listed in the Nordic compatibility matrices cover the single-SoC configuration only; they do not cover the host and NCP architecture.
+  Customers who want to certify a host and NCP solution should contact the `ZBOSS Open Initiative (ZOI)`_.
+
+.. note::
+   The NCP connectivity device firmware built with ``CONFIG_ZIGBEE_LIBRARY_NCP_DEV`` links libraries that are not part of the certified ZBOSS libraries shipped for single-SoC designs.
+   See :ref:`zboss_configuration` for this Kconfig option.
 
 .. figure:: images/zigbee_platform_design_ncp.svg
    :alt: Split Zigbee architecture
@@ -132,6 +143,8 @@ The tool is available for download as a standalone :file:`zip` package using the
   * `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
 
 |zigbee_ncp_package_more_info|
+
+|zigbee_ncp_host_dev_only|
 
 This platform design is suitable for the following development kits:
 

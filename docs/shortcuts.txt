@@ -35,8 +35,11 @@
 
 .. |zigbee_logger_dev_only| replace:: The Zigbee endpoint logger library is intended for development, testing, and evaluation purposes only and is not intended to be enabled in production end products.
 
-.. |zigbee_ncp_host_dev_only| replace:: The ZBOSS NCP Host package is intended for developing and evaluating NCP-based host applications.
-   It is not intended to ship unchanged as the production host software for end products without your own product development, security review, and certification process.
+.. |zigbee_ncp_host_dev_only| replace:: The ZBOSS NCP Host package is a reference implementation for development and evaluation.
+   It provides development-ready host source code, evaluation-ready connectivity-device firmware, and prebuilt host libraries for 64-bit Ubuntu |ubuntu_version| Linux only.
+   It is not a certified, production-ready deliverable.
+
+.. |zigbee_ncp_cert_xref| replace:: For Zigbee Compliant Platform certification when using a host processor with an NCP connectivity device, see :ref:`ug_zigbee_platform_design_ncp_details`.
 
 .. ### Other shortcuts
 
