@@ -36,6 +36,14 @@ List of known issues
 
 .. rst-class:: v1-4-0
 
+KRKNWK-22613: Zigbee FOTA does not work for the light bulb sample
+  When Zigbee FOTA variant is enabled using the :file:`prj_fota.conf` file, the light bulb sample does not compile.
+  This issue is related to the missing Kconfig options for the FOTA variant.
+
+  **Workaround:** Cherry-pick and apply commit with the fix from ``main`` (commit hash: ``fda1f10981dc88553078f9f3aa14e3d4189007d2``).
+
+.. rst-class:: v1-4-0
+
 KRKNWK-22334: Zigbee Touchlink commissioning does not work reliably when Zigbee FOTA is enabled
   When Zigbee Firmware-Over-the-Air (FOTA) is enabled, Zigbee Touchlink commissioning does not work reliably.
   This issue is not observed when Zigbee FOTA is disabled.
