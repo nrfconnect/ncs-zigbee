@@ -38,6 +38,8 @@ To test the functionalities implemented in this user guide, you need the followi
 * One compatible development kit for programming the :ref:`Zigbee network coordinator <zigbee_network_coordinator_sample>` sample
 
 You can also optionally use `nRF Sniffer for 802.15.4`_ configured for capturing Zigbee packets with Wireshark (see `Configuring Wireshark for Zigbee`_) to gather some of the required information, such as the short address of a Zigbee node.
+|zigbee_tool_dev_eval_only|
+
 However, this guide does not describe Wireshark usage.
 
 .. _ug_zigee_adding_clusters_copying_template:

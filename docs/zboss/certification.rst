@@ -28,6 +28,11 @@ The certification guarantees that a platform or product will work and will inter
 Nordic Semiconductor provides the Zigbee Compliant Platform.
 You can use this platform as the building block for your Zigbee Certified Product, which is conformant with the ZCL and BDB standard.
 
+The certification IDs (CIDs) in the compatibility matrices listed on this page apply to single-SoC designs that use the certified ZBOSS libraries from the |addon|.
+They do not apply to the Network Co-Processor (NCP) architecture, in which a host processor runs the application together with an nRF SoC connectivity device.
+A separate Zigbee Compliant Platform certification is required for each combination of host processor and NCP SoC, as described in :ref:`ug_zigbee_platform_design_ncp_details`.
+Customers who want to certify a host and NCP solution should contact the `ZBOSS Open Initiative (ZOI)`_.
+
 .. _zboss_certification_r22_mode:
 
 R22 behavior mode for Zigbee 3.0 product certification

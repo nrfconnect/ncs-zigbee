@@ -237,6 +237,8 @@ Configuring Zigbee shell
 
 The Zigbee shell library implements a set of :ref:`Zigbee shell commands <zigbee_shell_reference>` that can be used with all Zigbee samples for testing and debugging.
 
+|zigbee_shell_dev_only|
+
 |zigbee_shell_config|
 
 To extend a sample with the Zigbee shell command support, set the following Kconfig options:

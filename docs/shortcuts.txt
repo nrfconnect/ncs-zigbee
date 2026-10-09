@@ -24,6 +24,23 @@
 .. |connect_terminal| replace:: Connect to the kit with a terminal emulator (for example, nRF Connect Serial Terminal).
    See `Testing and optimization`_ in the |NCS| documentation for the required settings and steps.
 
+.. ### Development and evaluation disclaimers
+
+.. |zigbee_tool_dev_eval_only| replace:: This tool is intended for development, testing, and evaluation purposes only and is not intended for use in production end products.
+
+.. |zigbee_samples_dev_only| replace:: The samples in the |addon| are provided for reference and for development, testing, and evaluation purposes only.
+   They are not certified product implementations and are not intended to be used unchanged in production end products.
+
+.. |zigbee_shell_dev_only| replace:: The Zigbee shell library is intended for development, testing, and evaluation purposes only and is not intended to be enabled in production end products.
+
+.. |zigbee_logger_dev_only| replace:: The Zigbee endpoint logger library is intended for development, testing, and evaluation purposes only and is not intended to be enabled in production end products.
+
+.. |zigbee_ncp_host_dev_only| replace:: The ZBOSS NCP Host package is a reference implementation for development and evaluation.
+   It provides development-ready host source code, evaluation-ready connectivity-device firmware, and prebuilt host libraries for 64-bit Ubuntu |ubuntu_version| Linux only.
+   It is not a certified, production-ready deliverable.
+
+.. |zigbee_ncp_cert_xref| replace:: For Zigbee Compliant Platform certification when using a host processor with an NCP connectivity device, see :ref:`ug_zigbee_platform_design_ncp_details`.
+
 .. ### Other shortcuts
 
 .. |sysbuild_autoenabled_ncs| replace:: When building `repository applications <Repository application_>`_ in the |addon| which is an `SDK repository <Repository types_>`_, building with sysbuild is `enabled by default <Sysbuild enabled by default_>`_.

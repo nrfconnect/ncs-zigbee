@@ -9,8 +9,10 @@ Zigbee: NCP
 
 The :ref:`Zigbee <zigbee_index>` NCP sample demonstrates the usage of Zigbee's :ref:`ug_zigbee_platform_design_ncp_details` architecture.
 
-Together with the source code from :ref:`ug_zigbee_tools_ncp_host`, you can use this sample to create a complete and functional Zigbee device.
+Together with the source code from :ref:`ug_zigbee_tools_ncp_host`, you can use this sample to create a complete and functional Zigbee device for development and evaluation.
 For example, as shown in the `Testing`_ scenario, you can program a development kit with the NCP sample and bundle it with the simple gateway application on the NCP host processor.
+
+|zigbee_ncp_cert_xref|
 
 You can then use this sample together with the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` to set up a basic Zigbee network.
 
@@ -32,7 +34,7 @@ To test this sample, you also need the following:
 
   * `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
 
-  For more information, see also the `NCP Host documentation`_.
+  For more information, see also the `NCP Host documentation`_ and :ref:`ug_zigbee_tools_ncp_host`.
 * The :ref:`zigbee_light_bulb_sample` sample programmed on one separate device.
 
 This means that you need at least two development kits for testing this sample.
@@ -48,6 +50,7 @@ Overview
 The sample demonstrates using a Nordic Semiconductor's Development Kit as a Zigbee Network Co-Processor.
 
 The sample uses the ``CONFIG_ZIGBEE_LIBRARY_NCP_DEV`` Kconfig option, which is available as part of the :ref:`zboss_configuration`.
+This option uses a production version of ZBOSS that has not been certified; see :ref:`zboss_configuration` for details.
 The NCP Kconfig option extends the compilation process with an implementation of the ZBOSS API serialization through NCP commands.
 It also implements the ZBOSS default signal handler function that controls the ZBOSS and commissioning logic.
 
@@ -236,6 +239,9 @@ For more configuration options, see :ref:`Zigbee stack logs <zigbee_ug_logging_s
   After every reset, the sample first boots to MCUboot and then, after a couple of seconds, the NCP sample is booted.
   When booted to MCUboot, you can upload the new image with the `dfu-util tool`_.
   See the Testing section of the `USB DFU (Device Firmware Upgrade)`_ Zephyr sample for the list of required dfu-util commands.
+
+  .. note::
+     Using ``dfu-util`` in this sample flow is intended for development and testing of the USB variant only and is not described as a production firmware update mechanism for end products.
 
   To learn more about configuring bootloader for an application in |NCS|, see the `Secure bootloader chain` page in the |NCS| documentation.
 
