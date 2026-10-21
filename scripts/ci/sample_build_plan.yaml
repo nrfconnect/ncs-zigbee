@@ -57,6 +57,19 @@ path_triggers:
         platform:
           - nrf54lm20dk/nrf54lm20b/cpuapp
 
+  light-bulb-fota:
+    paths:
+      - samples/light_bulb/prj_fota.conf
+    samples:
+      - scenario: light_bulb
+        variants:
+          - fota
+        platform:
+          - nrf52840dk/nrf52840
+          - nrf5340dk/nrf5340/cpuapp
+          - nrf54l15dk/nrf54l15/cpuapp
+          - nrf54lm20dk/nrf54lm20b/cpuapp
+
   light-switch-sample:
     paths:
       - samples/light_switch/**/*.{c,h,cpp,hpp,yml,yaml,conf}
@@ -174,6 +187,12 @@ path_triggers:
     samples:
       - scenario: light_bulb
         variants:
+          - fota
+        platform:
+          - nrf52840dk/nrf52840
+          - nrf5340dk/nrf5340/cpuapp
+      - scenario: light_bulb
+        variants:
           - fota_and_bt_dfu
         platform:
           - nrf54lm20dk/nrf54lm20b/cpuapp
@@ -208,6 +227,12 @@ path_triggers:
     paths:
       - subsys/lib/zigbee_fota/**
     samples:
+      - scenario: light_bulb
+        variants:
+          - fota
+        platform:
+          - nrf52840dk/nrf52840
+          - nrf5340dk/nrf5340/cpuapp
       - scenario: light_bulb
         variants:
           - fota_and_bt_dfu
