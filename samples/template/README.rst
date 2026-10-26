@@ -17,6 +17,7 @@ Requirements
 The sample supports the following development kit:
 
 .. include:: /includes/device_table_single_multi.txt
+   :end-before: * - `nRF54LM20 Dongle
 
 ..
   You can use one or more of the development kits listed above and mix different development kits.

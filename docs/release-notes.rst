@@ -46,6 +46,7 @@ The following release is `supported <Software maturity levels_>`_.
 
 * Added:
 
+  * Support for the nRF54LM20 Dongle in the :ref:`zigbee_light_bulb_sample`, :ref:`zigbee_light_switch_sample`, and :ref:`zigbee_shell_sample` samples.
   * Experimental support for the nRF54LC10 DK (nRF54LC10A SoC) in the :ref:`zigbee_samples`.
 
 * Updated:

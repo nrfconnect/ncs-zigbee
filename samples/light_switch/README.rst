@@ -44,7 +44,7 @@ The Light switch sample demonstrates the Zigbee End Device role and implements t
 
 Once the light switch is successfully commissioned, it sends a broadcast message to find devices with the implemented Level Control and On/Off clusters.
 The light switch remembers the device network address from the first response.
-At this point, you can start using the buttons on the development kit to control the clusters on the newly found devices.
+At this point, you can start using the buttons on the device to control the clusters on the newly found devices.
 
 Additionally, the light switch sample powers down unused RAM sections to lower power consumption in the sleep state.
 
@@ -149,6 +149,10 @@ The device acts as a Touchlink initiator and can commission directly with a near
 .. note::
    Touchlink in the |addon| for the |NCS| is provided as an experimental feature with basic functionality.
 
+.. note::
+   Touchlink is not supported on the nRF54LM20 Dongle.
+   The dongle has only one button, which is needed for on and off control.
+
 To activate the Multiprotocol Bluetooth LE extension, set :makevar:`EXTRA_CONF_FILE` to the :file:`overlay-multiprotocol_ble.conf`.
 For example, when building from the command line, use the following command:
 
@@ -232,6 +236,23 @@ User interface
           The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
           Releasing the button within this time does not trigger the factory reset procedure.
 
+   .. group-tab:: nRF54LM20 Dongle
+
+      Blue LED 1:
+          Lit and solid when the device is connected to a Zigbee network.
+
+      Red LED 2:
+          Lit and solid when the light switch has found a light bulb to control.
+
+      Button 1:
+          Press for less than three seconds to toggle the connected light bulb on or off.
+          Press for three seconds to start Identify mode.
+          Press for five seconds to initiate the `factory reset of the device <Resetting to factory defaults_>`_.
+          The factory reset time can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+
+      .. note::
+         Brightness control is not possible from the dongle light switch due to the limited number of buttons.
+
    .. group-tab:: nRF52 and nRF53 DKs
 
       LED 3:
@@ -304,6 +325,12 @@ Multiprotocol Bluetooth LE extension assignments
           Lit and solid when a Bluetooth LE Central is connected to the NUS service.
           Available when using `Nordic UART Service (NUS)`_ in the multiprotocol configuration.
 
+   .. group-tab:: nRF54LM20 Dongle
+
+      Red LED 1:
+          Lit and solid when a Bluetooth LE Central is connected to the NUS service.
+          Available when using `Nordic UART Service (NUS)`_ in the multiprotocol configuration.
+
    .. group-tab:: nRF52 and nRF53 DKs
 
       LED 1:
@@ -336,7 +363,7 @@ Building and running
 Testing
 =======
 
-After programming the sample to your development kits, complete the following steps to test it:
+After programming the samples to your devices, complete the following steps to test them:
 
 .. tabs::
 
@@ -361,6 +388,27 @@ After programming the sample to your development kits, complete the following st
 
          This LED indicates that the light switch found a light bulb to control.
 
+   .. group-tab:: nRF54LM20 Dongle
+
+      1. Turn on the development kit that runs the Network coordinator sample.
+
+         When the network status LED turns on, this development kit has become the Coordinator of the Zigbee network.
+
+      #. Turn on the development kit that runs the Light bulb sample.
+
+         When the network status LED turns on, the light bulb has become a Router inside the network.
+
+         .. note::
+            If the network status LED does not turn on, use the Network coordinator controls to reopen the network.
+
+      #. Connect the nRF54LM20 Dongle that runs the Light switch sample.
+
+         When **Blue LED 1** turns on, the light switch has become an End Device, connected directly to the Coordinator.
+
+      #. Wait until **Red LED 2** on the light switch node turns on.
+
+         This LED indicates that the light switch found a light bulb to control.
+
    .. group-tab:: nRF52 and nRF53 DKs
 
       1. Turn on the development kit that runs the Network coordinator sample.
@@ -382,7 +430,7 @@ After programming the sample to your development kits, complete the following st
 
          This LED indicates that the light switch found a light bulb to control.
 
-You can now use buttons on the development kit to control the light bulb, as described in :ref:`zigbee_light_switch_user_interface`.
+You can now use buttons on the light switch device to control the light bulb, as described in :ref:`zigbee_light_switch_user_interface`.
 
 .. _zigbee_light_switch_testing_touchlink:
 
@@ -441,13 +489,18 @@ Set up nRF Toolbox by completing the following steps:
 
 
    .. tabs::
+
       .. group-tab:: nRF54 DKs
-	  
+
          Observe that **LED 0** on the light switch node is solid.
 
+      .. group-tab:: nRF54LM20 Dongle
+
+         Observe that **Red LED 1** on the light switch node is solid.
+
       .. group-tab:: nRF52 and nRF53 DKs
-	  
-         Observe that **LED 1** on the light switch node is solid.   
+
+         Observe that **LED 1** on the light switch node is solid.
 
    This indicates that the Bluetooth LE connection is established.
 
@@ -457,7 +510,7 @@ In nRF Toolbox, tap the buttons you assigned to perform the test:
 #. Tap the :guilabel:`t` command button two times to toggle the LED on the Zigbee Light bulb node on and off.
 #. Tap the :guilabel:`i` and :guilabel:`d` command buttons to make adjustments to the brightness level.
 
-You can now control the devices either with the buttons on the development kits or with the NUS UART command buttons in the nRF Toolbox application.
+You can now control the devices either with the buttons on the light switch devices or with the NUS UART command buttons in the nRF Toolbox application.
 
 .. _zigbee_light_switch_testing_zigbee_bt_dfu:
 
