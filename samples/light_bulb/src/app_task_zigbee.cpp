@@ -106,12 +106,18 @@ extern "C" {
 #endif
 
 /* Button used to enter the Bulb into the Identify mode. */
+#ifdef CONFIG_BOARD_NRF54LM20DONGLE
+#define IDENTIFY_MODE_BUTTON DK_BTN2_MSK
+#else
 #define IDENTIFY_MODE_BUTTON DK_BTN4_MSK
+#endif /* defined CONFIG_BOARD_NRF54LM20DONGLE */
 
-/* Use onboard led4 to act as a light bulb.
- * The app.overlay file has this at node label "pwm_led3" in /pwmleds.
- */
+/* PWM LED node used to act as a light bulb. */
+#ifdef CONFIG_BOARD_NRF54LM20DONGLE
+#define PWM_DK_LED_NODE DT_NODELABEL(red_pwm_led)
+#else
 #define PWM_DK_LED_NODE DT_NODELABEL(pwm_led3)
+#endif /* defined CONFIG_BOARD_NRF54LM20DONGLE */
 
 #if DT_NODE_HAS_STATUS(PWM_DK_LED_NODE, okay)
 static const struct pwm_dt_spec led_pwm = PWM_DT_SPEC_GET(PWM_DK_LED_NODE);

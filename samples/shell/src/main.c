@@ -34,14 +34,16 @@
 #define IDENTIFY_LED                     DK_LED1
 #else
 #define IDENTIFY_LED                     DK_LED4
-#endif /* defined CONFIG_BOARD_NRF52840DONGLE_NRF52840 */
+#endif
 
 /* Button used to enter the Identify mode. */
 #ifdef CONFIG_BOARD_NRF52840DONGLE_NRF52840
 #define IDENTIFY_MODE_BUTTON             DK_BTN1_MSK
+#elif defined(CONFIG_BOARD_NRF54LM20DONGLE)
+#define IDENTIFY_MODE_BUTTON             DK_BTN2_MSK
 #else
 #define IDENTIFY_MODE_BUTTON             DK_BTN4_MSK
-#endif /* defined CONFIG_BOARD_NRF52840DONGLE_NRF52840 */
+#endif
 
 LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
 

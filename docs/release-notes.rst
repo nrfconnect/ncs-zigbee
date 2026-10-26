@@ -44,6 +44,11 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 
 The following release is `supported <Software maturity levels_>`_.
 
+* Added:
+
+  * Support for the nRF54LM20 Dongle in the :ref:`zigbee_light_bulb_sample`, :ref:`zigbee_light_switch_sample`, and :ref:`zigbee_shell_sample` samples.
+    The Shell sample supports the nRF USB CDC ACM backend.
+
 * Updated:
 
   * Improved ZBOSS NVRAM storage by batching flash writes into fewer operations.

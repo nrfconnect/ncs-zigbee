@@ -35,6 +35,9 @@ Every base layout reserves the end of internal flash for:
 The nRF52840 Dongle layout reserves a further 128 KB at the top of flash for the factory-programmed Nordic Open USB DFU bootloader, which shrinks ``slot0_partition`` accordingly.
 Keep that region free in derived layouts: writing to it erases the bootloader settings, after which the bootloader rejects the application and stays in DFU mode.
 
+The nRF54LM20 Dongle layout preserves the MCUboot and secondary image partitions defined by the board.
+It resizes ``slot0_partition`` and reserves space for Zephyr settings, ZBOSS non-volatile data, and ZBOSS product configuration.
+
 The following table lists the available files, which targets they cover, and when to use each variant:
 
 .. list-table:: DTS partition layout variants
@@ -56,6 +59,11 @@ The following table lists the available files, which targets they cover, and whe
        | nRF54L15 (SoC)
        | nRF54LM20 (SoC)
      - Required starting point for any Zigbee application.
+
+   * - Board-specific base
+     - :file:`dts/nrf54lm20dongle_partitions.dtsi`
+     - nRF54LM20 Dongle (board only)
+     - Required for Zigbee applications built for the ``nrf54lm20dongle/nrf54lm20b/cpuapp`` board target.
 
    * - MCUboot (USB transport)
      - :file:`dts/mcuboot_usb_transport/<soc>_partitions.dtsi`

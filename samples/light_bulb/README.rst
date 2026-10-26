@@ -14,7 +14,7 @@ You can use this sample with the :ref:`Zigbee Network coordinator <zigbee_networ
 Requirements
 ************
 
-The sample supports the following development kit:
+The sample supports the following hardware platforms:
 
 .. include:: /includes/device_table_single_multi.txt
 
@@ -83,6 +83,27 @@ User interface
 
 .. tabs::
 
+   .. group-tab:: nRF54LM20 Dongle
+
+      Red LED 1:
+          Blinks to indicate that the main application thread is running.
+
+      Blue LED 1:
+          Turns on when the light bulb joins the network.
+
+      Red LED 2:
+          Indicates changes to the light bulb brightness.
+          It can be controlled by another Zigbee device in the network, for example a light switch.
+          Blinks when the light bulb is in Identify mode.
+
+      Button 1:
+          Depending on how long the button is pressed:
+
+          * If pressed for less than five seconds, it starts or cancels the Identify mode.
+          * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
+            The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+            Releasing the button within this time does not trigger the factory reset procedure.
+
    .. group-tab:: nRF54 DKs
 
       LED 0:
@@ -138,9 +159,34 @@ Building and running
 Testing
 =======
 
-After programming the sample to your development kits, complete the following steps to test it:
+After programming the samples to your devices, complete the following steps to test them:
 
 .. tabs::
+
+   .. group-tab:: nRF54LM20 Dongle
+
+      1. Turn on the development kit that runs the Network coordinator sample.
+
+         When the network status LED turns on, this development kit has become the Coordinator of the Zigbee network and the network is established.
+
+      #. Connect the nRF54LM20 Dongle that runs the Light bulb sample.
+
+         When **Blue LED 1** turns on, the light bulb has become a Router inside the network.
+
+         .. note::
+            If **Blue LED 1** does not turn on, use the Network coordinator controls to reopen the network.
+
+      #. Turn on the development kit that runs the Light switch sample.
+
+         When the network status LED turns on, the light switch has become an End Device, connected directly to the Coordinator.
+
+      #. Wait until the bulb-found LED on the development kit that runs the Light switch sample turns on.
+
+         This LED indicates that the switch found a light bulb to control.
+
+      #. Use the buttons on the development kit that runs the :ref:`zigbee_light_switch_sample` sample to control the light bulb.
+
+         The result of using the buttons is reflected on the light bulb's **Red LED 2**.
 
    .. group-tab:: nRF54 DKs
 

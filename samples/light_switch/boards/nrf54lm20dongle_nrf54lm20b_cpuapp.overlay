@@ -1,0 +1,26 @@
+/*
+ * Copyright (c) 2025 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+#include <nrf54lm20dongle_partitions.dtsi>
+
+/ {
+	chosen {
+		ncs,zigbee-timer = &timer23;
+		ncs,zboss-trace-uart = &board_cdc_acm_uart;
+	};
+};
+
+&timer23 {
+	status = "okay";
+};
+
+&gpio1 {
+	led1_green_blue_off_hog {
+		gpio-hog;
+		gpios = <26 GPIO_ACTIVE_HIGH>, <27 GPIO_ACTIVE_HIGH>;
+		output-high;
+	};
+};

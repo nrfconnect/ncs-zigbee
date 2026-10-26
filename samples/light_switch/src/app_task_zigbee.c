@@ -82,10 +82,15 @@
 #define IDENTIFY_LED               ZIGBEE_NETWORK_STATE_LED
 /* LED indicating that light witch found a light bulb to control. */
 #define BULB_FOUND_LED             DK_LED4
+#if defined(CONFIG_BOARD_NRF54LM20DONGLE)
+/* Button ID used to toggle the light bulb. */
+#define BUTTON_TOGGLE              DK_BTN2_MSK
+#else
 /* Button ID used to switch on the light bulb. */
 #define BUTTON_ON                  DK_BTN1_MSK
 /* Button ID used to switch off the light bulb. */
 #define BUTTON_OFF                 DK_BTN2_MSK
+#endif
 /* Dim step size - increases/decreses current level (range 0x000 - 0xfe). */
 #define DIMM_STEP                  15
 /* Button ID used to enable sleepy behavior (sampled once at boot). */
@@ -96,11 +101,16 @@
 #define BUTTON_TOUCHLINK           DK_BTN3_MSK
 #endif
 
-/* Button to start Factory Reset */
+#if defined(CONFIG_BOARD_NRF54LM20DONGLE)
+/* Button used to toggle, enter Identify mode, and start Factory Reset. */
+#define FACTORY_RESET_BUTTON       DK_BTN2_MSK
+#else
+/* Button to start Factory Reset. */
 #define FACTORY_RESET_BUTTON       DK_BTN4_MSK
 
-/* Button used to enter the Identify mode. */
+/* Button used to enter Identify mode. */
 #define IDENTIFY_MODE_BUTTON       DK_BTN4_MSK
+#endif
 
 /* Transition time for a single step operation in 0.1 sec units.
  * 0xFFFF - immediate change.
@@ -111,6 +121,10 @@
  * the dimm command is sent again.
  */
 #define BUTTON_LONG_POLL_TMO       K_MSEC(500)
+
+#if defined(CONFIG_BOARD_NRF54LM20DONGLE)
+#define IDENTIFY_LONG_PRESS_TMO    K_SECONDS(3)
+#endif
 
 #if !defined ZB_ED_ROLE
 #error Define ZB_ED_ROLE to compile light switch (End Device) source code.
@@ -323,6 +337,11 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 	}
 
 	switch (has_changed) {
+#if defined(CONFIG_BOARD_NRF54LM20DONGLE)
+	case BUTTON_TOGGLE:
+		cmd_id = ZB_ZCL_CMD_ON_OFF_TOGGLE_ID;
+		break;
+#else
 	case BUTTON_ON:
 		LOG_DBG("ON - button changed");
 		cmd_id = ZB_ZCL_CMD_ON_OFF_ON_ID;
@@ -347,12 +366,26 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 			}
 		}
 		return;
+#endif
 	default:
 		LOG_DBG("Unhandled button");
 		return;
 	}
 
 	switch (button_state) {
+#if defined(CONFIG_BOARD_NRF54LM20DONGLE)
+	case BUTTON_TOGGLE:
+		LOG_DBG("Button pressed");
+		buttons_ctx.state = button_state;
+		atomic_set(&buttons_ctx.long_poll, ZB_FALSE);
+
+		/* Alarm can be scheduled only once. Next alarm only resets
+		 * counting.
+		 */
+		k_timer_start(&buttons_ctx.alarm,
+			      IDENTIFY_LONG_PRESS_TMO, K_NO_WAIT);
+		break;
+#else
 	case BUTTON_ON:
 	case BUTTON_OFF:
 		LOG_DBG("Button pressed");
@@ -364,10 +397,19 @@ static void button_handler(uint32_t button_state, uint32_t has_changed)
 		k_timer_start(&buttons_ctx.alarm, BUTTON_LONG_POLL_TMO,
 			      K_NO_WAIT);
 		break;
+#endif
 	case 0:
 		LOG_DBG("Button released");
 
 		k_timer_stop(&buttons_ctx.alarm);
+
+#if defined(CONFIG_BOARD_NRF54LM20DONGLE)
+		if (was_factory_reset_done()) {
+			atomic_set(&buttons_ctx.long_poll, ZB_FALSE);
+			LOG_DBG("After Factory Reset - ignore button release");
+			break;
+		}
+#endif
 
 		if (atomic_set(&buttons_ctx.long_poll, ZB_FALSE) == ZB_FALSE) {
 			/* Allocate output buffer and send on/off command. */
@@ -619,6 +661,14 @@ static void find_light_bulb(zb_cb_param_t param)
  */
 static void light_switch_button_handler(struct k_timer *timer)
 {
+#if defined(CONFIG_BOARD_NRF54LM20DONGLE)
+	ARG_UNUSED(timer);
+
+	if (dk_get_buttons() & buttons_ctx.state) {
+		atomic_set(&buttons_ctx.long_poll, ZB_TRUE);
+		ZB_SCHEDULE_APP_CALLBACK(start_identifying, 0);
+	}
+#else
 	zb_ret_t zb_err_code;
 	zb_uint16_t cmd_id;
 
@@ -643,6 +693,7 @@ static void light_switch_button_handler(struct k_timer *timer)
 	} else {
 		atomic_set(&buttons_ctx.long_poll, ZB_FALSE);
 	}
+#endif
 }
 
 #if defined(CONFIG_ZIGBEE_FOTA) || defined(CONFIG_ZIGBEE_BT_DFU)
