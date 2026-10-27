@@ -24,7 +24,7 @@
  */
 #if defined(ZB_PSA_CRYPTO_STORAGE)
 
-#include <hw_crypto_api.h>
+#include "zb_nrf_crypto.h"
 #include <psa/crypto.h>
 
 #define ZB_PSA_MASTER_KEY_ID 0x1
