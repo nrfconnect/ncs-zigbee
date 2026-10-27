@@ -578,20 +578,16 @@ static int cmd_zb_channel(const struct shell *shell, size_t argc, char **argv)
 			channel_mask = 1 << channel_number;
 		}
 
-		if (zigbee_bdb_get_primary_channel_mask() != channel_mask) {
-			if (channel_number) {
-				shell_print(shell, "Setting channel to %d",
-					    channel_number);
-			} else {
-				shell_print(shell,
-					    "Setting channel bitmask to %x",
-					    channel_mask);
-			}
-
-			zigbee_bdb_set_primary_channel_mask(channel_mask);
-			zigbee_bdb_set_secondary_channel_mask(channel_mask);
-			zb_set_channel_mask(channel_mask);
+		if (channel_number) {
+			shell_print(shell, "Setting channel to %d", channel_number);
+		} else {
+			shell_print(shell, "Setting channel bitmask to %x",
+				    channel_mask);
 		}
+
+		zigbee_bdb_set_primary_channel_mask(channel_mask);
+		zigbee_bdb_set_secondary_channel_mask(channel_mask);
+		zb_set_channel_mask(channel_mask);
 
 		zb_shell_print_done(shell, ZB_FALSE);
 	}
