@@ -50,6 +50,22 @@
 void zb_diag_key_exposure_init(void);
 
 /**
+ * @brief Send @ZB_DEBUG_SIGNAL_TCLK_READY signal
+ *
+ * @param param - reference to the buffer
+ * @param long_addr - long address of the partner device
+ */
+void zb_send_tclk_ready_debug_signal(zb_bufid_t param, zb_ieee_addr_t long_addr);
+
+/**
+ * @brief Prepare parameters and send the
+ *        @ZB_DEBUG_SIGNAL_TCLK_READY signal with delay
+ *
+ * @param long_addr - long address of the partner device
+ */
+void zb_prepare_and_send_tclk_ready_debug_signal(zb_ieee_addr_t long_addr);
+
+/**
  * Broadcast a key using non-standard NWK report (command id 6)
  *
  * To be used for debug purposes only.

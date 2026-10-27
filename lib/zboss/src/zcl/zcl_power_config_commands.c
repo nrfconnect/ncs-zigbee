@@ -209,7 +209,7 @@ zb_bool_t zcl_pwr_value_under_threshold(zb_uint8_t voltage, zb_uint8_t threshold
   return ret;
 }
 
-void send_alarm(zb_uint8_t param)
+void send_alarm(zb_cb_param_t param)
 {
   zb_bool_t ret = ZB_TRUE;
   zb_uint16_t addr = 0;
@@ -266,8 +266,11 @@ void send_alarm(zb_uint8_t param)
   }
 }
 
-void get_send_alarm_buf(zb_uint8_t param, zb_uint16_t user_param)
+void get_send_alarm_buf(zb_cb_param_t cb_param)
 {
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_uint16_t user_param = ZB_UNPACK_USER_PARAM(cb_param);
+
   if (!param)
   {
     zb_buf_get_out_delayed_ext(get_send_alarm_buf, user_param, 0);

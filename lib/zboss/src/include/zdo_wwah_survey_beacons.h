@@ -79,7 +79,7 @@ ZB_PACKED_STRUCT zb_zdo_beacon_survey_configuration_t;
  *          the buffer with Survey Beacons command, because this buffer
  *          will be reused to send Survey Beacons Response command.
  */
-zb_ret_t zdo_wwah_start_survey_beacons(zb_uint8_t param);
+zb_ret_t zdo_wwah_start_survey_beacons(zb_bufid_t param);
 
 /**
  *  @brief Process a received beacons and put information from it
@@ -96,22 +96,22 @@ void zdo_wwah_process_beacon_info(
  *  @brief Send 'Survey Beacons Response' command
  *
  */
-void zdo_send_survey_beacons_response(zb_uint8_t param);
+void zdo_send_survey_beacons_response(zb_bufid_t param);
 
 
-void zb_tlv_put_potential_parents(zb_uint8_t param,
+void zb_tlv_put_potential_parents(zb_bufid_t param,
                                   zb_uint16_t current_parent,
                                   zb_uint8_t potent_parents_cnt,
                                   zb_zcl_wwah_beacon_survey_t *potent_parents_list);
 
 
-void zb_zdo_beacon_survey_put_configuration_tlv (zb_uint8_t param,
+void zb_zdo_beacon_survey_put_configuration_tlv (zb_bufid_t param,
                                                  zb_uint8_t channel_page_cnt,
                                                  zb_uint32_t *channel_page_list,
                                                  zb_uint8_t conf_mask);
 
 
-void zb_zdo_beacon_survey_put_results_tlv (zb_uint8_t param,
+void zb_zdo_beacon_survey_put_results_tlv (zb_bufid_t param,
                                            zb_uint8_t total_beacon_surv,
                                            zb_uint8_t num_cur_zbn,
                                            zb_uint8_t num_potent_parents_cur_zbn,

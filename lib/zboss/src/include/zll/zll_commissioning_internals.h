@@ -115,7 +115,7 @@ void zll_cancel_transaction(void);
  *  Takes appropriate actions on transaction identifier lifetime timeout.
  *  @param param [IN] - just a formal parameter for ZB_CALLBACK functions, should be ignored.
  */
-void zll_intrp_transaction_guard(zb_uint8_t param);
+void zll_intrp_transaction_guard(zb_cb_param_t param);
 
 /**
  *  @internal @brief ZLL.ScanRequest lifetime guard function.
@@ -123,7 +123,7 @@ void zll_intrp_transaction_guard(zb_uint8_t param);
  *  @param param [IN] - reference (number in the pool) to the @ref zb_buf_t "buffer" could be used
  *  on the next step.
  */
-void zll_scan_req_guard(zb_uint8_t param);
+void zll_scan_req_guard(zb_cb_param_t param);
 
 /**
  *  @internal @brief Puts task status into the buffer and notifies user on transaction state change.
@@ -171,12 +171,12 @@ zb_ret_t zll_get_addr_range(struct zb_zll_addr_range_s* range);
 /**
  *
  */
-zb_ret_t zll_handle_scan_req(zb_uint8_t param);
+zb_ret_t zll_handle_scan_req(zb_bufid_t param);
 
 /** @internal @brief Handle incoming DeviceInformationRequest frame.
   * @param param reference to the buffer containing the packet.
   */
-zb_ret_t zll_handle_devinfo_req(zb_uint8_t param);
+zb_ret_t zll_handle_devinfo_req(zb_bufid_t param);
 
 /**
  *  @brief Handles ZLL Commissioning Identify command.
@@ -185,39 +185,39 @@ zb_ret_t zll_handle_devinfo_req(zb_uint8_t param);
  *  structure allocated, and @ref zb_zcl_parsed_hdr_s structure as buffer parameter.
  *  @return Command processing status.
  */
-zb_ret_t zb_zll_identify_handler(zb_uint8_t param);
+zb_ret_t zb_zll_identify_handler(zb_bufid_t param);
 
-zb_ret_t zll_network_start_req_handler(zb_uint8_t param);
+zb_ret_t zll_network_start_req_handler(zb_bufid_t param);
 
 #ifdef ZB_ZLL_ENABLE_COMMISSIONING_SERVER
 
-zb_ret_t zll_reset_to_fn_req_handler(zb_uint8_t param);
+zb_ret_t zll_reset_to_fn_req_handler(zb_bufid_t param);
 
 #if defined ZB_ROUTER_ROLE
-zb_ret_t zll_join_router_req_handler(zb_uint8_t param);
+zb_ret_t zll_join_router_req_handler(zb_bufid_t param);
 #endif
 
 #if defined ZB_ED_ROLE
-zb_ret_t zll_join_ed_req_handler(zb_uint8_t param);
+zb_ret_t zll_join_ed_req_handler(zb_bufid_t param);
 #endif
 
 #endif  /* ZB_ZLL_ENABLE_COMMISSIONING_SERVER */
 
-void zll_handle_scan_res(zb_uint8_t param);
+void zll_handle_scan_res(zb_bufid_t param);
 
 #ifdef ZB_ZLL_ENABLE_COMMISSIONING_CLIENT
 
-zb_ret_t zll_join_router_res_handler(zb_uint8_t param);
+zb_ret_t zll_join_router_res_handler(zb_bufid_t param);
 
-zb_ret_t zll_join_ed_res_handler(zb_uint8_t param);
+zb_ret_t zll_join_ed_res_handler(zb_bufid_t param);
 
 #endif /* ZB_ZLL_ENABLE_COMMISSIONING_CLIENT */
 
-void zll_handle_devinfo_res(zb_uint8_t param);
+void zll_handle_devinfo_res(zb_bufid_t param);
 
-zb_ret_t zll_network_start_res_handler(zb_uint8_t param);
+zb_ret_t zll_network_start_res_handler(zb_bufid_t param);
 
-zb_ret_t zll_network_update_req_handler(zb_uint8_t param);
+zb_ret_t zll_network_update_req_handler(zb_bufid_t param);
 
 zb_uint8_t zll_calc_enc_dec_nwk_key(zb_uint8_t *key_encrypted,  /* pointer on encrypted key data */
                                     zb_uint8_t *key_decrypted,  /* pointer on decrypted key data */

@@ -229,6 +229,7 @@ key. They use same algorithm.
   * APS dups table size.
   *
   * @note This is a default value of the define. This value can be changed by user.
+  * The value will be overridden when "configurable memory" feature is used.
   */
 #define ZB_APS_DUPS_TABLE_SIZE 32U
 #endif
@@ -245,20 +246,16 @@ key. They use same algorithm.
    APS retransmissions
  */
 
-/*
- APS: max number of packets waiting for APS ACK
-
- Derive it from the pool size. Keep some free buffers in the pool, remember some
- buffers are reserved at start (I see 4 out buffers reserved).
-*/
-#ifndef ZB_CONFIGURABLE_MEM
 /**
  * APS: maximum number of packets waiting for APS ACK
  *
  * @note This is a default value of the define. This value can be changed by user.
+ * The value will be overridden when "configurable memory" feature is used.
+ *
+ * Default value is derived from the pool size. Keep some free buffers in the pool, remember some
+ * buffers are reserved at start (I see 4 out buffers reserved).
  */
-  #define ZB_N_APS_RETRANS_ENTRIES   ((ZB_IOBUF_POOL_SIZE / 3U) > 0U ? (ZB_IOBUF_POOL_SIZE / 3U) : (ZB_IOBUF_POOL_SIZE / 2U))
-#endif
+#define ZB_N_APS_RETRANS_ENTRIES ((ZB_IOBUF_POOL_SIZE / 3U) > 0U ? (ZB_IOBUF_POOL_SIZE / 3U) : (ZB_IOBUF_POOL_SIZE / 2U))
 
 /**
  * APS maximum of apscMaxFrameRetries times
@@ -284,7 +281,7 @@ Motivation of increasing wait duration: be able to retry send when ZED polling n
   #define ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY_CONST (10U*ZB_TIME_ONE_SECOND)
 #else
 /*
-To satisfy negative test in the testsute of some customer use same value as for ZR
+To satisfy negative test in the testsuite of some customer use same value as for ZR
 */
 #define ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY_CONST ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY
 #endif
@@ -292,6 +289,14 @@ To satisfy negative test in the testsute of some customer use same value as for 
 #ifndef ZB_CONFIGURABLE_RETRIES
 #define ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY_CONST
 #else
+#ifndef ZB_APS_MAX_ACK_WAITING_TIME
+/* 
+Maximum value that both ZB_AIB().aps_ack_wait_duration_sleepy and 
+ZB_AIB().aps_ack_wait_duration_non_sleepy attributes can support.
+It can be defined in vendor file, if not, set a default value of 10 seconds 
+*/
+#define ZB_APS_MAX_ACK_WAITING_TIME (10U * ZB_TIME_ONE_SECOND)  
+#endif
 #define ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY ZB_AIB().aps_ack_wait_duration_sleepy
 #endif
 
@@ -315,10 +320,10 @@ The max amount of jitter that is added to the apsParentAnnounceBaseTimer before 
   /* Some devices send APS_ACK to AF and ZDO commands after sending appropriate response or
    * DefaultResponse. For example, ZCL On/Off command can be done within 5-7 seconds,
    * so 2 seconds for wail duration is insufficiently. */
-  #define ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY_CONST (ZB_MILLISECONDS_TO_BEACON_INTERVAL(1600))
+  #define ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY_CONST (ZB_MILLISECONDS_TO_BEACON_INTERVAL(1600U))
 
 #ifndef ZB_CONFIGURABLE_RETRIES
-  #define ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY (ZB_MILLISECONDS_TO_BEACON_INTERVAL(1600))
+  #define ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY (ZB_MILLISECONDS_TO_BEACON_INTERVAL(1600U))
 #else
   #define ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY ZB_AIB().aps_ack_wait_duration_non_sleepy
 #endif
@@ -603,13 +608,6 @@ At the worst case our NWK can skip long address at tx: 8 bytes of reserve.
  */
 #define ZB_APS_MAX_FRAGMENT_NUM 8U
 
-/*!
-*   Maximum number of fragments which can be
-*   transmitted/received during one APS frame window.
-*
-*   See Zigbee specification revision 22 section 2.2.8.4.5 Fragmented Transmissions
-*/
-#define ZB_APS_MAX_FRAGMENT_NUM_IN_WINDOW 8U
 /** @endcond *//* internals_doc */
 
 /*!
@@ -628,6 +626,19 @@ At the worst case our NWK can skip long address at tx: 8 bytes of reserve.
 /****************************NWK layer options**************************/
 /** @cond internals_doc */
 
+/* Define ZB_NO_BIG_NET prior to loading common definitions.
+ * Some of the definitions depend on ZB_NO_BIG_NET */
+#if defined(ZB_ED_ROLE) && !defined(ZB_NO_BIG_NET)
+/* ED doesn't need big networks features (big tables for addresses, APS Key Pairs, neighbors) */
+#define ZB_NO_BIG_NET
+#endif /* ZB_ED_ROLE */
+
+#ifdef ZB_NO_BIG_NET
+#define ZB_CONFIG_CONST_BIG_NET(big_net_const, small_net_const) (small_net_const)
+#else
+#define ZB_CONFIG_CONST_BIG_NET(big_net_const, small_net_const) (big_net_const)
+#endif /* ZB_NO_BIG_NET */
+
 /*!
  Define maximum number of nodes on network
  that can be defined using configurable memory feature.
@@ -635,7 +646,7 @@ At the worst case our NWK can skip long address at tx: 8 bytes of reserve.
  Maximum number of nodes on network in build
  with configurable memory feature enabled shouldn't be greater than this value.
 */
-#define ZB_NWK_CONFIGURABLE_MEM_MAX_NETWORK_SIZE 250u
+#define ZB_NWK_CONFIGURABLE_MEM_MAX_NETWORK_SIZE ZB_CONFIG_CONST_BIG_NET(600U, 250U)
 
 /*!
  Define maximum number of routers per node.
@@ -657,15 +668,15 @@ At the worst case our NWK can skip long address at tx: 8 bytes of reserve.
 #define ZB_NWK_STOCH_DEPTH    15U
 
 
-#ifndef ZB_CONFIGURABLE_MEM
 /*!
-   NWK Mesh route stuff: route discovery table size
+   NWK: route discovery table size
+
+   @note This is a default value of the define. This value can be changed by user.
+   The value will be overridden when "configurable memory" feature is used.
 */
 #ifndef ZB_NWK_ROUTE_DISCOVERY_TABLE_SIZE
 #define ZB_NWK_ROUTE_DISCOVERY_TABLE_SIZE 6U
 #endif
-
-#endif /* ZB_CONFIGURABLE_MEM */
 
 /* nwkcRouteDiscoveryTime == 0x2710 ms == 10 sec. Expiry function called once
  * per second */
@@ -703,13 +714,15 @@ At the worst case our NWK can skip long address at tx: 8 bytes of reserve.
 #define ZB_NWK_PENDING_TABLE_SIZE 5U
 #endif
 
-/*! Pending entry expiry during route request */
+/*! Pending tx entry expiry during route request */
 #define ZB_NWK_PENDING_ENTRY_EXPIRY_CNTR 2U
+/*
+a) RREQ is sent 4 times separated by nwkcRREQRetryInterval (0xfe ms), so can suppose we are waiting for 0xfe * 4 ~ 1016ms (maybe a bit more)
+b) APS ACK wait duration is around 1.6s. In case of routing discovery fail we want to re-discover route at next APS reteransmit, so want to age out pending nwk TX in ~ 1.6s.
+ */
+#define ZB_NWK_PENDING_EXPIRY_TOTAL ZB_MILLISECONDS_TO_BEACON_INTERVAL(1600u)
 
-/*! Period of expiration ctr decreasing. See nib.pending_table usage.
-    Pending table saves original request while discovery is in progress,
-      so keep timeout the same as in the discovery table. (Total of 10 seconds) */
-#define ZB_NWK_PENDING_EXPIRY_FUNC_PERIOD (ZB_SECONDS_TO_BEACON_INTERVAL(5U)) /* 5 seconds */
+#define ZB_NWK_PENDING_EXPIRY_TX_PERIOD (ZB_NWK_PENDING_EXPIRY_TOTAL / (ZB_NWK_PENDING_ENTRY_EXPIRY_CNTR + 1U))
 
 /*! Network static path cost */
 #define ZB_NWK_STATIC_PATH_COST 7U
@@ -749,6 +762,14 @@ At the worst case our NWK can skip long address at tx: 8 bytes of reserve.
 /* nwkcMaxRREQJitter */
 #define ZB_NWKC_MAX_RREQ_JITTER_OCTETS 0xfa0U
 
+/*
+r23:
+Implementers MAY
+adjust the jitter amount so that route request command frames arriving with large path cost are delayed more than
+frames arriving with lower path cost.
+ */
+#define ZB_MIN_PATH_COST_4_RREQ_JITTER_INC 10u
+
 /* nwkcRREQRetryInterval */
 #define ZB_NWKC_RREQ_RETRY_INTERVAL 0x1f02U
 
@@ -763,7 +784,15 @@ At the worst case our NWK can skip long address at tx: 8 bytes of reserve.
  * the scope of this spec. */
 /* Should correspond to ( 5 * minutes = 300 seconds / ZB_NWK_PENDING_EXPIRY_FUNC_PERIOD )  */
 /*! Expiration time of the network routing table  */
-#define ZB_NWK_ROUTING_TABLE_EXPIRY 60U
+//#define ZB_NWK_ROUTING_TABLE_EXPIRY 60U
+#define ZB_NWK_ROUTING_TABLE_EXPIRY 120U /* 10 min */
+/*
+  alarm to be used for routing table expiry
+ */
+#define ZB_NWK_PENDING_EXPIRY_FUNC_PERIOD (ZB_SECONDS_TO_BEACON_INTERVAL(5U)) /* 5 seconds */
+
+
+
 
 /*!
  * The maximum number of retries allowed after a broadcast transmission failure.
@@ -1397,14 +1426,23 @@ request command frame.
  */
 #define ZB_MAC_EXT_DATA_REQ
 
-/* Was 3, seems like it is too small when there are >7-10 beacons.
-   Also it seems like we need some bottom line for this - it should not be 1 etc. */
+/* According to R23.2 (k.8.1):
+   FFD may add a random jitter between receiving Beacon Request
+    and sending Beacon frame.
+   The delay value is a random value between 0 and 1/2
+    of the minimal scan duration which
+    is aBaseSuperframeDuration * (8 + 1) / 2 symbols (4320 symbols, 69120 usec).
+  See the description of ScanDuration parameter
+    in NLME-NETWORK-AND-PARENT-DISCOVERY.request (Table 2-64)
+    and recommended ScanDuration value (n=3) in D.9. */
 /*! MAC beacon request timeout length (high bound of the random value) */
 #ifndef ZB_MAC_HANDLE_BEACON_REQ_HI_TMO
-/*! Default MAC beacon request timeout length */
-#define ZB_MAC_HANDLE_BEACON_REQ_HI_TMO_DEFAULT 8U
-/*! Extended MAC beacon request timeout length */
-#define ZB_MAC_HANDLE_BEACON_REQ_HI_TMO_EXTENDED 20U
+/*! Default MAC beacon request timeout length, 4.5 BI.
+    Use 4 BIs timeout because of our time resolution. */
+#define ZB_MAC_HANDLE_BEACON_REQ_HI_TMO_DEFAULT 4U
+/*! Extended MAC beacon request timeout length.
+    This feature seems dead: lets keep it only for special builds. */
+#define ZB_MAC_HANDLE_BEACON_REQ_HI_TMO_EXTENDED (ZB_MAC_HANDLE_BEACON_REQ_HI_TMO_DEFAULT)
 
 #ifdef ZB_CERTIFICATION_HACKS
 /* Choose exact value depending on cert hack flags */
@@ -1421,9 +1459,10 @@ request command frame.
 /*! MAC beacon request timeout length (low bound of the random value) */
 #ifndef ZB_MAC_HANDLE_BEACON_REQ_LOW_TMO
 /*! Default MAC beacon request timeout length */
-#define ZB_MAC_HANDLE_BEACON_REQ_LOW_TMO_DEFAULT 1U
-/*! Extended MAC beacon request timeout length */
-#define ZB_MAC_HANDLE_BEACON_REQ_LOW_TMO_EXTENDED 12U
+#define ZB_MAC_HANDLE_BEACON_REQ_LOW_TMO_DEFAULT 0U
+/*! Extended MAC beacon request timeout length
+    This feature seems dead: lets keep it only for special builds. */
+#define ZB_MAC_HANDLE_BEACON_REQ_LOW_TMO_EXTENDED 0U
 
 #ifdef ZB_STACK_REGRESSION_TESTING_API
 /** Choose exact value depending on regression tests flags */
@@ -1696,34 +1735,92 @@ request command frame.
 *   node that did not successfully establish a new link key. This attribute
 *   is used by Zigbee coordinator nodes.
  */
-/*! Timeout in seconds for the Trust Center to remove the Trust Center link key of the newly joined
-   node that did not successfully establish a new link key. This attribute
-   is used by Zigbee coordinator nodes.*/
-#define ZB_DEFAULT_BDB_TRUST_CENTER_NODE_JOIN_TIMEOUT ZB_MILLISECONDS_TO_BEACON_INTERVAL(0xfU * 1000U)
-/*! Timeout in seconds for the Trust Center to exchange link keys with the newly joined node */
-#define ZB_BDBC_TCLINK_KEY_EXCHANGE_TIMEOUT ZB_MILLISECONDS_TO_BEACON_INTERVAL(5000U)
+
 /*! Minimum commissioning period */
 #define ZB_BDBC_MIN_COMMISSIONING_TIME_S 180U
-/*! Number of Trust Center link attempts to exchange link keys with the newly joined node. */
-#define ZB_DEFAULT_BDB_TCLINK_KEY_EXCHANGE_ATTEMPTS_MAX 3U
+
+/*! Number of Trust Center link attempts to exchange link keys with the newly joined node.
+ * This value equals 3 according BDB 3.0.1 and 0 according BDB 3.1 */
+#define ZB_DEFAULT_BDB_TCLINK_KEY_EXCHANGE_ATTEMPTS_MAX 0U
+
+/*! Number of failed polls to TC before rejoin. (BDB 3.1 - 7.3.1-7.3.3)*/
+#define BDB_TC_CONNECTIVITY_MAX_FAILURE_CNT         3U
+
+/*! Max jitter value that should be applied if joiner uses Node Descr Req method. (BDB 3.1 - 7.3.3)  */
+#define BDB_TC_CONNECTIVITY_NODE_DESCR_JITTER_SEC   10U
+
+/*! Timeout after which TC poll will be considered as failed.
+    Applies only to Keep-Alive method because:
+      - Poll control cluster has its own timer
+      - Node desc response will be called by zdo_cb_killer (that has its own timer too) */
+#define BDB_TC_CONNECTIVITY_POLL_TIMEOUT            ((ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY) * (ZB_N_APS_MAX_FRAME_RETRIES))
+
+/*! Timeout after that failed discovery of method that supported by TC will be retried.
+    After BDB_TC_CONNECTIVITY_MAX_FAILURE_CNT failed timeouts, device will try to rejoin. */
+#define BDB_TC_CONNECTIVITY_DISCOVERY_RETRY_TIMEOUT (BDB_TC_CONNECTIVITY_POLL_TIMEOUT)
+
 /** @endcond *//*internals_doc*/
 
 #define ZB_MAX_BEACON_APPENDIX_TLV_SIZE    32U
 
+/*! @cond bdb_general */
+
+/*!
+ * @brief Primary channel mask default value
+ * @see pro-bdb-v3.1-specification, 5.4.5 bdbcfPrimaryChannelList
+ */
+#define ZB_BDBCF_PRIMARY_CHANNEL_MASK_DEFAULT      0x02108800U  /* 11, 15, 20, 25 */
+
+/*!
+ * @brief Secondary channel mask default value
+ * @see pro-bdb-v3.1-specification, 5.4.7 bdbcfSecondaryChannelList
+ */
+#define ZB_BDBCF_SECONDARY_CHANNEL_MASK_DEFAULT    0x05EF7000U  /* all except primary */
+
+/*!
+ * @brief Minimum duration a battery powered device remains in fast poll mode after joining a network
+ * @see pro-bdb-v3.1-specification, 5.3.1 bdbcMinFastPollDurationAfterJoin
+ */
+#define ZB_BDBC_MIN_FAST_POLL_DURATION_AFTER_JOIN  (90u) /* seconds */
+
+/*!
+ * @brief This constant specifies the maximum number of join or key exchange attempts made to the same network
+ * @see pro-bdb-v3.1-specification, 5.1.1 bdbcMaxSameNetworkRetryAttempts
+ */
+#define ZB_BDBC_MAX_SAME_NETWORK_RETRY_ATTEMPTS    (10u) /* times */
+
+/*!
+ * @brief This constant specifies the recommended number of join or key exchange attempts made to the same network
+ * @see pro-bdb-v3.1-specification, 5.1.3 bdbcRecSameNetworkRetryAttempts
+ */
+#define ZB_BDBC_REC_SAME_NETWORK_RETRY_ATTEMPTS    (3u) /* times */
+
+/*! Max jitter value for off network steering procedure (see BDB 3.1 section 9.8) */
+#define ZB_BDB_MAX_OFF_NWK_STEERING_JITTER (5000u) /* ms */
+/*! @endcond */ /* bdb_general */
 
 /*! @cond touchlink */
 /* Table 2 Constants used by nodes supporting touchlink */
 #define ZB_BDBC_TL_INTER_PANTRANS_ID_LIFETIME ZB_MILLISECONDS_TO_BEACON_INTERVAL(8000U)
 #define ZB_BDBC_TL_MIN_STARTUP_DELAY_TIME     ZB_MILLISECONDS_TO_BEACON_INTERVAL(2000U)
 /* used for a non-extended touchlink scan */
-#define ZB_BDBC_TL_PRIMARY_CHANNEL_SET        0x02108800
+#define ZB_BDBC_TL_PRIMARY_CHANNEL_SET        ZB_BDBCF_PRIMARY_CHANNEL_MASK_DEFAULT
 #define ZB_BDBC_TL_RX_WINDOW_DURATION         ZB_MILLISECONDS_TO_BEACON_INTERVAL(5000U)
 #define ZB_BDBC_TL_SCAN_TIME_BASE_DURATION    ZB_MILLISECONDS_TO_BEACON_INTERVAL(250U)
 /* used for an extended touchlink scan after the bdbcTLPrimaryChannelSet
  * channels have been scanned. */
-#define ZB_BDBC_TL_SECONDARY_CHANNEL_SET      (0x07fff800U ^ ZB_BDBC_TL_PRIMARY_CHANNEL_SET)
+#define ZB_BDBC_TL_SECONDARY_CHANNEL_SET      ZB_BDBCF_SECONDARY_CHANNEL_MASK_DEFAULT
 /*! @endcond */ /* touchlink */
 
+/*! @cond tclk_update */
+/* BDB 3.1 TCLK Update default values */
+#define ZB_BDB_TCLKU_TIMEOUT_DEFAULT     0x15180u /* 24h */
+/*! @endcond */ /* tclk_update */
+
+/*! @cond tc_connectivity_checks */
+#define ZB_BDB_CF_EN_CONN_INITIAL_BACKOFF_TIME_DEFAULT 0x0e10U /* 1h. bdb3.1(rev21) 5.4.1 */
+#define ZB_BDB_CF_EN_CONN_MAX_BACKOFF_TIME_DEFAULT 0x4650u /* 5h. bdb3.1(rev21) 5.4.2 */
+/*! @endcond */ /* tc_connectivity_checks */
 
 /* Green Power */
 
@@ -1787,6 +1884,11 @@ request command frame.
 #define ZB_ZGP_MAX_PAIRED_SRV_CONF_CLUSTERS 15U
 #endif /* ZB_ZGP_MAX_PAIRED_CONF_CLUSTERS */
 
+/**
+Delay between packets in GPDFS
+ */
+#define ZB_MAC_ZGP_INTERFRAME_DELAY_US 196u
+
 #ifndef ZB_ZGP_MAX_PAIRED_CLI_CONF_CLUSTERS
 #define ZB_ZGP_MAX_PAIRED_CLI_CONF_CLUSTERS 15U
 #endif /* ZB_ZGP_MAX_PAIRED_CONF_CLUSTERS */
@@ -1800,8 +1902,9 @@ request command frame.
 #define ZB_APS_MSG_MAX_SIZE 1536U
 #define ZB_ASDU_MAX_LEN_MULTIPLIER ((ZB_APS_MSG_MAX_SIZE + sizeof(zb_apsde_data_indication_t) + ZB_APS_HEADER_MAX_LEN)/ZB_IO_BUF_SIZE + 1U)
 #define ZB_ASDU_MAX_FRAG_LEN (ZB_ASDU_MAX_LEN_MULTIPLIER*ZB_IO_BUF_SIZE - sizeof(zb_apsde_data_indication_t) - ZB_APS_HEADER_MAX_LEN)
-#define ZB_APS_MAX_WINDOW_SIZE 1U
-#define ZB_APS_INTERFRAME_DELAY 50U /* milliseconds */
+/* According to Zigbee R23 Core Specification section 2.2.8.4.5.2
+   Interframe delay is not applicable for Window size 1. */
+#define ZB_APS_INTERFRAME_DELAY 0U
 
 #if defined(ZB_SE_ENABLE_SERVICE_DISCOVERY_PROCESSING)
 

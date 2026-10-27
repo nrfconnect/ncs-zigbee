@@ -90,13 +90,20 @@ typedef zb_uint16_t zb_nvram_tl_t;
 
 /**
    Data set header in nvram segment
+
+   @note The dataset header size is not fixed and depends on building configuration
+   (NVRAM time label size)
  */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_hdr_1_0_s
 {
+  /* [0 bytes] */
   /* We must write time label separately from other fields.
      If it is ok to write 2 bytes into flash, can use 4 bytes header, else use
      4 bytes time label and 4 bytes for other fields. */
   zb_nvram_tl_t time_label;     /*!< Time index - not real or Zigbee time */
+
+  /* [2 or 4 bytes] */
+
 #ifndef ZB_NVRAM_32BIT_TL
 #warning ("check maximum dataset length")
   zb_lbitfield_t data_len:11;    /*!< Record length. It equals to header length + dataset length  <= 2k - is it enough? */
@@ -107,14 +114,25 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_hdr_1_0_s
   zb_uint16_t data_set_type;    /*!< Dataset type. See @par zb_nvram_dataset_types_t  */
 #endif /* 32 bit */
 
-  /* FIXME: it looks like migration from old datasets-vistout-version is broken: there must be no data_set_version.
+  /* [4 or 8 bytes] */
+
+  /* FIXME: it looks like migration from old datasets-without-version is broken: there must be no data_set_version.
      Anyway, it is useful for one-time nvram migration of very old devices, so just ignore it now.
    */
   zb_uint16_t data_set_version;     /*!< Dataset version.
                                      * Unique per dataset: each dataset fills it with its own version. */
   zb_uint8_t reserved[2];  /*!< Alignment, reserved for future use. */
+
+  /* [8 or 12 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_hdr_1_0_t;
+
+/* This and the following similar compile time assertion is needed to
+ * that the size of the datasets does not differ from the original due to unexpected changes in configuration.
+ * So, the assertion may point to some cases when migration from other versions
+ * will not be available. */
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_hdr_1_0_t) == 8U ||
+  sizeof(zb_nvram_dataset_hdr_1_0_t) == 12U);
 
 /**
  * @name NVRAM transaction state
@@ -130,14 +148,22 @@ zb_nvram_dataset_hdr_1_0_t;
 
 /**
    Data set header in nvram segment
+
+   @note The dataset header size is not fixed and depends on building configuration
+   (NVRAM time label size)
  */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_hdr_7_0_s
 {
+  /* [0 bytes] */
+
   /* We must write time label separately from other fields.
      If it is ok to write 2 bytes into flash, can use 4 bytes header, else use
      4 bytes time label and 4 bytes for other fields. */
   /* Note: to simplify migration keep that field in nvram v8 (with data set trailers). */
   zb_nvram_tl_t time_label;     /*!< Time index - not real or ZigBee time */
+
+  /* [2 or 4 bytes] */
+
   /* If must align anyway, need not use bitfields */
   zb_uint16_t data_len;    /*!< Record length. It equal header length + dataset length  */
   zb_uint16_t data_set_type;    /*!< Dataset type. See @par zb_nvram_dataset_types_t  */
@@ -146,30 +172,54 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_hdr_7_0_s
   zb_uint8_t transaction_status; /*!< Current transaction status. @see @ref nvram_transaction_state  */
   zb_uint8_t reserved;       /*!< Alignment. Reserved for future
                                    use  */
+
+  /* [10 or 12 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_hdr_7_0_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_hdr_1_0_t) == 10U ||
+  sizeof(zb_nvram_dataset_hdr_1_0_t) == 12U);
 
 /**
    Data set trailer
+
+   @note The dataset tail size is not fixed and depends on building configuration
+   (NVRAM time label size)
  */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_tail_8_0_s
 {
+  /* [0 bytes] */
   zb_nvram_tl_t time_label;     /*!< Time index - not real or ZigBee time - kind of TSN */
+  /* [2 or 4 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_tail_8_0_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_tail_8_0_t) == 2U ||
+  sizeof(zb_nvram_dataset_tail_8_0_t) == 4U);
 
 /* TODO: implement migration tail_8_0 -> tail_9_0 */
 /**
    Data set trailer
+
+   @note The dataset tail size is not fixed and depends on building configuration
+   (NVRAM time label size)
  */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_tail_9_0_s
 {
+  /* [0 bytes] */
   zb_nvram_tl_t time_label;     /*!< Time index - not real or ZigBee time - kind of TSN */
+
+  /* [2 or 4 bytes] */
+
   zb_uint16_t   crc;            /*!< CRC16 field for validate dataset integrity */
   zb_uint16_t   reserved;       /*!< Reserved field for future needs */
+
+  /* [6 or 8 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_tail_9_0_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_tail_9_0_t) == 6U ||
+  sizeof(zb_nvram_dataset_tail_9_0_t) == 8U);
 
 typedef zb_nvram_dataset_tail_9_0_t zb_nvram_dataset_tail_t;
 
@@ -289,8 +339,9 @@ typedef struct zb_nvram_position_s
 #define ZB_NVRAM_VER_12_0 11U /* Version with guarantee that all dataset sizes are forcefully aligned to 4 */
 /* 13-14 - a gap for some nvram improvements in r22 codebase */
 #define ZB_NVRAM_VER_15_0 14U /* First r23 version */
+#define ZB_NVRAM_VER_16_0 15U /* Big networks support */
 #define ZB_NVRAM_VER_R23_FIRST ZB_NVRAM_VER_15_0
-#define ZB_NVRAM_LAST_VER ZB_NVRAM_VER_15_0 /* Should always be equal to the highest version */
+#define ZB_NVRAM_LAST_VER ZB_NVRAM_VER_16_0 /* Should always be equal to the highest version */
   /*------------------*/
 #define ZB_NVRAM_VER_COUNT (ZB_NVRAM_LAST_VER + 1U)
 /** @} */
@@ -299,7 +350,7 @@ typedef struct zb_nvram_position_s
 #define ZB_MIN_NVRAM_VER_WITH_DS_TRAILERS ZB_NVRAM_VER_9_0
 #define ZB_MIN_NVRAM_VER_WITH_DS_CRC_IN_TAIL ZB_NVRAM_VER_11_0
 
-/* Initnial value for crc calculation */
+/* Initial value for crc calculation */
 #define ZB_NVRAM_CRC_DEFAULT_VALUE 0xFFFFU
 
 typedef zb_uint16_t zb_nvram_ver_t;
@@ -324,9 +375,13 @@ zb_nvram_migration_info_t;
 
 /**
  * Common NVRAM dataset. See spec 2.2.8, 3.6.8, 4.3.3, 4.4.10
+ *
+ * @note The dataset size is fixed and doesn't depend on building configuration
  */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_1_0_s
 {
+  /* [0 bytes] */
+
   zb_bitfield_t   aps_designated_coordinator : 1; /*!< This boolean flag indicates whether the
                                               device should assume on startup that it must
                                               become a Zigbee coordinator.  */
@@ -336,32 +391,57 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_1_0_s
   zb_bitfield_t   stack_profile:4;            /*!< Stack profile identifier  */
   zb_bitfield_t   use_tc_alternative_key:1;   /*!< if 1, use alternative TC key */
   zb_bitfield_t   reserved:1;
+
+  /* [1 byte] */
+
   zb_uint8_t      depth;                     /*!< current node depth */
   zb_uint16_t     nwk_manager_addr;             /*!< NWK manager address */
   zb_uint16_t     panId;                        /*!< Pan ID */
   zb_uint16_t     network_address;              /*!< Current network address */
 
+  /* [8 bytes] */
+
   zb_uint32_t     aps_channel_mask;     /*!< This is the mask containing allowable
                                            channels on which the device may attempt
                                            to form or join a network at startup time.  */
+
+  /* [12 bytes] */
+
   zb_ext_pan_id_t aps_use_extended_pan_id;
   zb_ext_pan_id_t nwk_extended_pan_id;  /*!< Extended Pan ID for the PAN of which the device is a member */
   zb_ieee_addr_t parent_address;            /*!< Parent address */
   zb_ieee_addr_t trust_center_address;      /*!< Trust Center IEEE address */
+
+  /* [44 bytes] */
+
   zb_uint8_t nwk_key[ZB_CCM_KEY_SIZE];      /*!< Network Key */
   zb_uint8_t nwk_key_seq;
   zb_uint8_t tc_standard_key[ZB_CCM_KEY_SIZE];      /*!< Trust Center Standard Key */
   zb_uint8_t tc_alternative_key[ZB_CCM_KEY_SIZE];   /*!< Trust Center Alternative Key */
 
+  /* [93 bytes] */
+
   /* Custom fields*/
   zb_uint8_t channel;                       /*!< Current channel. Custom field */
+
+  /* [94 bytes] */
+
   zb_uint8_t aligned[2];
+
+  /* [96 bytes] */
 
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_common_ver_1_0_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_common_ver_1_0_t) == 96U);
+
+/**
+ * @note The dataset size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_2_0_s
 {
+  /* [0 bytes] */
+
   zb_bitfield_t   aps_designated_coordinator : 1; /*!< This boolean flag indicates whether the
                                               device should assume on startup that it must
                                               become a Zigbee coordinator.  */
@@ -370,31 +450,56 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_2_0_s
                                            join on startup.  */
   zb_bitfield_t   stack_profile:4;            /*!< Stack profile identifier  */
   zb_bitfield_t   reserved:2;
+
+  /* [1 byte] */
+
   zb_uint8_t      depth;                     /*!< current node depth */
   zb_uint16_t     nwk_manager_addr;             /*!< NWK manager address */
   zb_uint16_t     panId;                        /*!< Pan ID */
   zb_uint16_t     network_address;              /*!< Current network address */
 
+  /* [8 bytes] */
+
   zb_uint32_t     aps_channel_mask;     /*!< This is the mask containing allowable
                                            channels on which the device may attempt
                                            to form or join a network at startup time.  */
+
+  /* [12 bytes] */
+
   zb_ext_pan_id_t aps_use_extended_pan_id;
   zb_ext_pan_id_t nwk_extended_pan_id;  /*!< Extended Pan ID for the PAN of which the device is a member */
   zb_ieee_addr_t parent_address;            /*!< Parent address */
   zb_ieee_addr_t trust_center_address;      /*!< Trust Center IEEE address */
+
+  /* [44 bytes] */
+
   zb_uint8_t nwk_key[ZB_CCM_KEY_SIZE];      /*!< Network Key */
   zb_uint8_t nwk_key_seq;
   zb_uint8_t tc_standard_key[ZB_CCM_KEY_SIZE];      /*!< Trust Center Standard Key */
 
+  /* [77 bytes] */
+
   /* Custom fields*/
   zb_uint8_t channel;                       /*!< Current channel. Custom field */
+
+  /* [78 bytes] */
+
   zb_uint8_t aligned[2];
+
+  /* [80 bytes] */
 
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_common_ver_2_0_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_common_ver_2_0_t) == 80U);
+
+/**
+ * @note The dataset size is not fixed and depends on building configuration
+ * (Sub-GHz, Multi-MAC interfaces count)
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_4_0_s
 {
+  /* [0 bytes] */
   zb_bitfield_t   aps_designated_coordinator : 1; /*!< This boolean flag indicates whether the
                                               device should assume on startup that it must
                                               become a Zigbee coordinator.  */
@@ -404,21 +509,40 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_4_0_s
   zb_bitfield_t   stack_profile:4;            /*!< Stack profile identifier  */
   /*zb_bitfield_t   reserved:2;*/
   zb_bitfield_t   device_type:2;    /*!< NIB device type */
+
+  /* [1 byte] */
+
   zb_uint8_t      depth;                     /*!< current node depth */
   zb_uint16_t     nwk_manager_addr;             /*!< NWK manager address */
   zb_uint16_t     panId;                        /*!< Pan ID */
   zb_uint16_t     network_address;              /*!< Current network address */
 
+  /* [8 bytes] */
+
   zb_channel_list_t aps_channel_mask_list; /*!< This is the masks list containing allowable
                                             * channels on which the device may attempt
                                             * to form or join a network at startup time. */
+
+  /* [12 bytes (no Sub-GHz)]
+   * [28 bytes (Sub-GHz with 5 pages)]
+   * [48 bytes (Sub-GHz with 10 pages)] */
+
   zb_ext_pan_id_t aps_use_extended_pan_id;
   zb_ext_pan_id_t nwk_extended_pan_id;  /*!< The extended PAN identifier for the PAN of which the device is a member */
   zb_ieee_addr_t parent_address;            /*!< Parent address */
   zb_ieee_addr_t trust_center_address;      /*!< Trust Center IEEE address */
+
+  /* [44 bytes (no Sub-GHz)]
+   * [60 bytes (Sub-GHz with 5 pages)]
+   * [80 bytes (Sub-GHz with 10 pages)] */
+
   zb_uint8_t nwk_key[ZB_CCM_KEY_SIZE];      /*!< Network Key */
   zb_uint8_t nwk_key_seq;
   zb_uint8_t tc_standard_key[ZB_CCM_KEY_SIZE];      /*!< Trust Center Standard Key */
+
+  /* [77 bytes (no Sub-GHz)]
+   * [93 bytes (Sub-GHz with 5 pages)]
+   * [113 bytes (Sub-GHz with 10 pages)] */
 
   /* Custom fields*/
   /* In default configuration ZB_NWK_MAC_IFACE_TBL_SIZE is 1, so the dataset is compatible with previous stack versions.
@@ -427,6 +551,11 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_4_0_s
   zb_uint8_t channel[ZB_NWK_MAC_IFACE_TBL_SIZE]; /*!< Current channel. Custom field */
   zb_uint8_t page[ZB_NWK_MAC_IFACE_TBL_SIZE];    /*!< Current page. Custom field */
   zb_nwk_mac_iface_tbl_ent_t mac_iface_tbl[ZB_NWK_MAC_IFACE_TBL_SIZE]; /*!< nwkMacInterfaceTable from NWK NIB()*/
+
+  /* [91 bytes (no Sub-GHz, no Multi-MAC)]
+   * [123 bytes (Sub-GHz with 5 pages, no Multi-MAC)]
+   * [163 bytes (Sub-GHz with 10 pages, no Multi-MAC)] */
+
   /* There was 1 reserved byte */
   zb_bitfield_t   hub_connectivity:1; /*!< hub connectivity for WWAH and r23 all hubs  */
   zb_bitfield_t   rx_on:1;            /*!< rx-on-when-idle for ZED  */
@@ -435,6 +564,11 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_4_0_s
                                      * detected TC swapout, not all processing
                                      * completed. */
   zb_bitfield_t   reserved:5;
+
+  /* [92 bytes (no Sub-GHz, no Multi-MAC)]
+   * [124 bytes (Sub-GHz with 5 pages, no Multi-MAC)]
+   * [164 bytes (Sub-GHz with 10 pages, no Multi-MAC)] */
+
 #if ZB_NWK_MAC_IFACE_TBL_SIZE == 1
 #elif ZB_NWK_MAC_IFACE_TBL_SIZE == 2
   /* sizeof(zb_nvram_dataset_common_ver_3_0_t) == 106 (without additional reserved bytes) */
@@ -443,11 +577,81 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_4_0_s
   #error Current Multi-MAC configuration is not supported
 #endif
 
+  /* [92 bytes (no Sub-GHz, no Multi-MAC)]
+   * [124 bytes (Sub-GHz with 5 pages, no Multi-MAC)]
+   * [164 bytes (Sub-GHz with 10 pages, no Multi-MAC)] */
+
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_common_ver_4_0_t;
 
-typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_5_0_s
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_common_ver_4_0_t) == 92U ||
+  sizeof(zb_nvram_dataset_common_ver_4_0_t) == 124U ||
+  sizeof(zb_nvram_dataset_common_ver_4_0_t) == 164U);
+
+/**
+ * Channel list structure without Sub-GHz
+ */
+typedef zb_channel_page_t zb_nvram_channel_list_no_subghz_t[ZB_CHANNEL_PAGES_NUM_NO_SUBGHZ];
+
+/**
+ * Channel list structure without Sub-GHz
+ */
+typedef zb_channel_page_t zb_nvram_channel_list_subghz_t[ZB_CHANNEL_PAGES_NUM_SUBGHZ];
+
+
+typedef ZB_PACKED_PRE struct zb_nvram_iface_tbl_ent_subghz_s
 {
+  /* [0 bytes] */
+  zb_bitfield_t index:5;            /**< A unique index that can be used to
+                                    * identify an entry  */
+  zb_bitfield_t enabled:1;          /**< Flag indicates the interface is enabled
+                                    * or disabled  */
+  zb_bitfield_t routers_allowed:1;  /**< Indicates whether routers are allowed to
+                                    * join to this device on this interface */
+  zb_bitfield_t beacons_supported:1; /**< Indicates whether the current
+                                      * interface supports beacons  */
+
+  /* [1 byte] */
+
+  zb_bitfield_t ehn_beacons_supported:1; /**< Indicates whether the current
+                                      * interface supports Enhanced beacons */
+  zb_bitfield_t scan_type:1;        /**< The type of scan to be used when
+                                    * performing a scan for NLME-NETWORK-DISCOVERY.req */
+  zb_bitfield_t trusted_link:1;     /**< This flag disables NWK encryption */
+  zb_bitfield_t locks_count:5;      /**< Fit into zb_uint16_t */
+
+  /* [2 bytes] */
+
+  zb_uint16_t link_power_data_rate; /**< The rate, in seconds, of how often a
+                                    * Link Power Delta request is
+                                    * generated. In bands where this is
+                                    * optional, it should be set to 0,
+                                    * disabling the function. The default
+                                    * value should be 16.  */
+
+  /* [4 bytes] */
+
+  zb_channel_page_t channel_in_use; /**< The current channel in use by the
+                                    * device. Only a single channel may be
+                                    * selected at one time. */
+
+  /* [8 bytes] */
+
+  zb_nvram_channel_list_subghz_t supported_channels; /**< Indicates the pages and channels that
+                                         * are supported by this interface. */
+  /* [48 bytes (Sub-GHz with 10 pages)] */
+}
+ZB_PACKED_STRUCT zb_nvram_iface_tbl_ent_subghz_t;
+
+
+/**
+ * @note The dataset size is not fixed and depends on building configuration
+ * (Multi-MAC interfaces count)
+ */
+typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_5_0_subghz_s
+{
+  /* [0 bytes] */
+
   zb_bitfield_t   aps_designated_coordinator : 1; /*!< This boolean flag indicates whether the
                                               device should assume on startup that it must
                                               become a Zigbee coordinator.  */
@@ -457,21 +661,34 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_5_0_s
   zb_bitfield_t   stack_profile:4;            /*!< Stack profile identifier  */
   /*zb_bitfield_t   reserved:2;*/
   zb_bitfield_t   device_type:2;    /*!< NIB device type and rx-on attr */
+
+  /* [1 byte] */
+
   zb_uint8_t      depth;                     /*!< current node depth */
   zb_uint16_t     nwk_manager_addr;          /*!< NWK manager address */
   zb_uint16_t     panId;                     /*!< Pan ID */
   zb_uint16_t     network_address;           /*!< Current network address */
 
-  zb_channel_list_t aps_channel_mask_list; /*!< This is the masks list containing allowable
-                                            * channels on which the device may attempt
-                                            * to form or join a network at startup time. */
+  /* [8 bytes] */
+
+  zb_nvram_channel_list_subghz_t aps_channel_mask_list; /*!< This is the masks list containing allowable
+                                                         * channels on which the device may attempt
+                                                         * to form or join a network at startup time. */
+
+  /* [48 bytes (Sub-GHz with 10 pages)] */
+
   zb_ext_pan_id_t aps_use_extended_pan_id;
   zb_ext_pan_id_t nwk_extended_pan_id;  /*!< The extended PAN identifier for the PAN of which the device is a member */
   zb_ieee_addr_t parent_address;            /*!< Parent address */
   zb_ieee_addr_t trust_center_address;      /*!< Trust Center IEEE address */
+
+  /* [80 bytes (Sub-GHz with 10 pages)] */
+
   zb_uint8_t nwk_key[ZB_CCM_KEY_SIZE];      /*!< Network Key */
   zb_uint8_t nwk_key_seq;
   zb_uint8_t tc_standard_key[ZB_CCM_KEY_SIZE];      /*!< Trust Center Standard Key */
+
+  /* [113 bytes (Sub-GHz with 10 pages)] */
 
   /* Custom fields */
   /* In default configuration ZB_NWK_MAC_IFACE_TBL_SIZE is 1, so the dataset is compatible with previous stack versions.
@@ -479,11 +696,10 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_5_0_s
    * migrations between single-MAC and multi-MAC NVRAM are not supported now */
   zb_uint8_t channel[ZB_NWK_MAC_IFACE_TBL_SIZE];  /*!< Current channel. Custom field */
   zb_uint8_t page[ZB_NWK_MAC_IFACE_TBL_SIZE];     /*!< Current page. Custom field */
-  zb_nwk_mac_iface_tbl_ent_t mac_iface_tbl[ZB_NWK_MAC_IFACE_TBL_SIZE]; /*!<
-                                                                        * nwkMacInterfaceTable
-                                                                        * from
-                                                                        * NWK NIB()*/
-  /* There was 1 reserved byte */
+  zb_nvram_iface_tbl_ent_subghz_t mac_iface_tbl[ZB_NWK_MAC_IFACE_TBL_SIZE]; /*!< nwkMacInterfaceTable from NWK NIB()*/
+  /* There was 1 reserved zb_nwk_mac_iface_tbl_ent_t byte */
+
+  /* [163 bytes (Sub-GHz with 10 pages, no Multi-MAC)] */
 
   zb_bitfield_t   hub_connectivity:1; /*!< hub connectivity for WWAH and r23 all hubs  */
   zb_bitfield_t   rx_on:1;            /*!< rx-on-when-idle for ZED  */
@@ -492,14 +708,22 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_5_0_s
                                      * detected TC swapout, not all processing
                                      * completed. */
   zb_bitfield_t   configuration_mode:1; /*!< If 1, device is in configuration mode (== !restricted mode */
-  zb_bitfield_t   reserved:4;
+  zb_bitfield_t   psa_encrypted:1; /*!< This flag is used to store nwk key and tc standard key not explicitly using PSA master key */
+  zb_bitfield_t   reserved:3;
+
+  /* [164 bytes (Sub-GHz with 10 pages, no Multi-MAC)] */
 
   /* New fields from r23 - start of ver 4.0 */
   zb_uint32_t    nwk_next_channel_change;
   zb_uint16_t    nwk_next_pan_id;
 
+  /* [170 bytes (Sub-GHz with 10 pages, no Multi-MAC)] */
+
   zb_uint8_t    nwk_update_id;             /*!< Node's network settings snapshot index */
   zb_uint8_t    reserved1;
+
+  /* [172 bytes (Sub-GHz with 10 pages, no Multi-MAC)] */
+
 #if ZB_NWK_MAC_IFACE_TBL_SIZE == 1
 #elif ZB_NWK_MAC_IFACE_TBL_SIZE == 2
   /* sizeof(zb_nvram_dataset_common_ver_4_0_t) == 114 (without additional reserved bytes) */
@@ -507,16 +731,160 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_5_0_s
 #else
   #error Current Multi-MAC configuration is not supported
 #endif
+
+  /* [172 bytes (Sub-GHz with 10 pages, no Multi-MAC)] */
 } ZB_PACKED_STRUCT
-zb_nvram_dataset_common_ver_5_0_t;
+zb_nvram_dataset_common_ver_5_0_subghz_t;
+
+
+typedef ZB_PACKED_PRE struct zb_nvram_iface_tbl_ent_no_subghz_s
+{
+  /* [0 bytes] */
+  zb_bitfield_t index:5;            /**< A unique index that can be used to
+                                    * identify an entry  */
+  zb_bitfield_t enabled:1;          /**< Flag indicates the interface is enabled
+                                    * or disabled  */
+  zb_bitfield_t routers_allowed:1;  /**< Indicates whether routers are allowed to
+                                    * join to this device on this interface */
+  zb_bitfield_t beacons_supported:1; /**< Indicates whether the current
+                                      * interface supports beacons  */
+
+  /* [1 bytes] */
+
+  zb_bitfield_t ehn_beacons_supported:1; /**< Indicates whether the current
+                                      * interface supports Enhanced beacons */
+  zb_bitfield_t scan_type:1;        /**< The type of scan to be used when
+                                    * performing a scan for NLME-NETWORK-DISCOVERY.req */
+  zb_bitfield_t trusted_link:1;     /**< This flag disables NWK encryption */
+  zb_bitfield_t locks_count:5;      /**< Fit into zb_uint16_t */
+
+  /* [2 bytes] */
+
+  zb_uint16_t link_power_data_rate; /**< The rate, in seconds, of how often a
+                                    * Link Power Delta request is
+                                    * generated. In bands where this is
+                                    * optional, it should be set to 0,
+                                    * disabling the function. The default
+                                    * value should be 16.  */
+
+  /* [4 bytes] */
+
+  zb_channel_page_t channel_in_use; /**< The current channel in use by the
+                                    * device. Only a single channel may be
+                                    * selected at one time. */
+
+  /* [8 bytes] */
+
+  zb_nvram_channel_list_no_subghz_t supported_channels; /**< Indicates the pages and channels that
+                                                         * are supported by this interface. */
+  /* [12 bytes (no Sub-GHz)] */
+}
+ZB_PACKED_STRUCT zb_nvram_iface_tbl_ent_no_subghz_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_iface_tbl_ent_no_subghz_t) == 12U);
+
+/**
+ * @note The dataset size is not fixed and depends on building configuration
+ * (Multi-MAC interfaces count)
+ */
+typedef ZB_PACKED_PRE struct zb_nvram_dataset_common_ver_5_0_no_subghz_s
+{
+  /* [0 bytes] */
+  zb_bitfield_t   aps_designated_coordinator : 1; /*!< This boolean flag indicates whether the
+                                              device should assume on startup that it must
+                                              become a Zigbee coordinator.  */
+  zb_bitfield_t   aps_insecure_join : 1; /*!< A boolean flag, which defaults to TRUE and
+                                           indicates whether it is OK to use insecure
+                                           join on startup.  */
+  zb_bitfield_t   stack_profile:4;            /*!< Stack profile identifier  */
+  /*zb_bitfield_t   reserved:2;*/
+  zb_bitfield_t   device_type:2;    /*!< NIB device type and rx-on attr */
+
+  /* [1 byte] */
+
+  zb_uint8_t      depth;                     /*!< current node depth */
+  zb_uint16_t     nwk_manager_addr;          /*!< NWK manager address */
+  zb_uint16_t     panId;                     /*!< Pan ID */
+  zb_uint16_t     network_address;           /*!< Current network address */
+
+  /* [8 bytes] */
+
+  zb_nvram_channel_list_no_subghz_t aps_channel_mask_list; /*!< This is the masks list containing allowable
+                                                            * channels on which the device may attempt
+                                                            * to form or join a network at startup time. */
+
+  /* [12 bytes (no Sub-GHz)] */
+
+  zb_ext_pan_id_t aps_use_extended_pan_id;
+  zb_ext_pan_id_t nwk_extended_pan_id;  /*!< The extended PAN identifier for the PAN of which the device is a member */
+  zb_ieee_addr_t parent_address;            /*!< Parent address */
+  zb_ieee_addr_t trust_center_address;      /*!< Trust Center IEEE address */
+
+  /* [44 bytes (no Sub-GHz)] */
+
+  zb_uint8_t nwk_key[ZB_CCM_KEY_SIZE];      /*!< Network Key */
+  zb_uint8_t nwk_key_seq;
+  zb_uint8_t tc_standard_key[ZB_CCM_KEY_SIZE];      /*!< Trust Center Standard Key */
+
+  /* [77 bytes (no Sub-GHz)] */
+
+  /* Custom fields */
+  /* In default configuration ZB_NWK_MAC_IFACE_TBL_SIZE is 1, so the dataset is compatible with previous stack versions.
+   * When multiple interfaces are enabled, the dataset will become incompatible with default configuration and
+   * migrations between single-MAC and multi-MAC NVRAM are not supported now */
+  zb_uint8_t channel[ZB_NWK_MAC_IFACE_TBL_SIZE];  /*!< Current channel. Custom field */
+  zb_uint8_t page[ZB_NWK_MAC_IFACE_TBL_SIZE];     /*!< Current page. Custom field */
+  zb_nvram_iface_tbl_ent_no_subghz_t mac_iface_tbl[ZB_NWK_MAC_IFACE_TBL_SIZE]; /*!< nwkMacInterfaceTable from NWK NIB()*/
+  /* There was 1 reserved zb_nwk_mac_iface_tbl_ent_t byte */
+
+  /* [91 bytes (no Sub-GHz, no Multi-MAC)] */
+
+  zb_bitfield_t   hub_connectivity:1; /*!< hub connectivity for WWAH and r23 all hubs  */
+  zb_bitfield_t   rx_on:1;            /*!< rx-on-when-idle for ZED  */
+  zb_bitfield_t   tc_swapped:1;     /*!< TC swapout is in progress for ZC (not
+                                     * all known devices came back) / Joiner
+                                     * detected TC swapout, not all processing
+                                     * completed. */
+  zb_bitfield_t   configuration_mode:1; /*!< If 1, device is in configuration mode (== !restricted mode */
+  zb_bitfield_t   psa_encrypted:1; /*!< This flag is used to store nwk key and tc standard key not explicitly using PSA master key */
+  zb_bitfield_t   reserved:3;
+
+  /* [92 bytes (no Sub-GHz, no Multi-MAC)] */
+
+  /* New fields from r23 - start of ver 4.0 */
+  zb_uint32_t    nwk_next_channel_change;
+  zb_uint16_t    nwk_next_pan_id;
+
+  /* [98 bytes (no Sub-GHz, no Multi-MAC)] */
+
+  zb_uint8_t    nwk_update_id; /*!< Node's network settings snapshot index */
+  zb_uint8_t    reserved1;
+
+  /* [100 bytes (no Sub-GHz, no Multi-MAC)] */
+
+#if ZB_NWK_MAC_IFACE_TBL_SIZE == 1
+#elif ZB_NWK_MAC_IFACE_TBL_SIZE == 2
+  /* sizeof(zb_nvram_dataset_common_ver_4_0_t) == 114 (without additional reserved bytes) */
+  zb_uint8_t mm_reserved[2];
+#else
+  #error Current Multi-MAC configuration is not supported
+#endif
+
+  /* [100 bytes (no Sub-GHz, no Multi-MAC)] */
+} ZB_PACKED_STRUCT
+zb_nvram_dataset_common_ver_5_0_no_subghz_t;
+
 
 /* The new dataset does not introduce new fields, but renames the previously reserved fields,
  * so we can use the new dataset definition while loading legacy structure.
  */
 typedef zb_nvram_dataset_common_ver_4_0_t zb_nvram_dataset_common_ver_3_0_t;
 
-typedef zb_nvram_dataset_common_ver_5_0_t zb_nvram_dataset_common_t;
-
+#if defined ZB_SUBGHZ_BAND_ENABLED
+typedef zb_nvram_dataset_common_ver_5_0_subghz_t zb_nvram_dataset_common_t;
+#else
+typedef zb_nvram_dataset_common_ver_5_0_no_subghz_t zb_nvram_dataset_common_t;
+#endif /* ZB_SUBGHZ_BAND_ENABLED */
 
 /**
  * @name NVRAM dataset common versions
@@ -537,47 +905,94 @@ typedef zb_nvram_dataset_common_ver_5_0_t zb_nvram_dataset_common_t;
 
 
 /* Check dataset alignment for IAR compiler and ARM Cortex target platform */
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_common_ver_5_0_no_subghz_t);
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_common_ver_5_0_subghz_t);
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_common_t);
 
+/**
+ * @note The dataset size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_counters_ver_1_0_s
 {
+  /* [0 bytes] */
   zb_uint32_t nib_counter;
+  /* [4 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_counters_ver_1_0_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_counters_ver_1_0_t) == 4U);
+
+/**
+ * @note The dataset size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_counters_ver_2_0_s
 {
+  /* [0 bytes] */
   zb_uint32_t nib_counter;
   zb_uint32_t aib_counter;
+  /* [8 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_counters_ver_2_0_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_counters_ver_2_0_t) == 8U);
+
+/**
+ * @note The dataset size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_counters_ver_3_0_s
 {
+  /* [0 bytes] */
   zb_uint32_t nib_outgoing_frame_counter;
+  /* [4 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_counters_ver_3_0_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_counters_ver_3_0_t) == 4U);
+
+/**
+ * @note The dataset size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_counters_ver_3_0_aps_s
 {
+  /* [0 bytes] */
   zb_uint32_t outgoing_frame_counter;
+  /* [4 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_counters_ver_3_0_aps_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_counters_ver_3_0_aps_t) == 4U);
+
+/**
+ * @note The dataset size is fixed and doesn't depend on building configuration
+ */
+typedef ZB_PACKED_PRE struct zb_nvram_dataset_counters_ver_4_0_s
+{
+  /* [0 bytes] */
+  zb_uint32_t nib_outgoing_frame_counter;
+  /* [4 bytes] */
+} ZB_PACKED_STRUCT
+zb_nvram_dataset_counters_ver_4_0_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_counters_ver_4_0_t) == 4U);
+
 /**
  * @name NVRAM dataset counters versions
- * @anchor nvram_dataset_binding_versions
+ * @anchor nvram_dataset_counters_versions
  */
 /** @{ */
 #define ZB_NVRAM_IB_COUNTERS_DS_VER_1 0U
+/* APS Outgoing Frame Counter field is added */
 #define ZB_NVRAM_IB_COUNTERS_DS_VER_2 1U
+/* APS Outgoing Frame Counter per key pair is introduced */
 #define ZB_NVRAM_IB_COUNTERS_DS_VER_3 2U
+/* APS Outgoing Frame Counters are moved to APS Key Pair dataset
+ * as incremental Key Pair datasets are implemented */
+#define ZB_NVRAM_IB_COUNTERS_DS_VER_4 3U
 /** @} */
 
-typedef zb_nvram_dataset_counters_ver_3_0_t zb_nvram_dataset_counters_t;
-typedef zb_nvram_dataset_counters_ver_3_0_aps_t zb_nvram_dataset_counters_aps_t;
+typedef zb_nvram_dataset_counters_ver_4_0_t zb_nvram_dataset_counters_t;
 
-#define ZB_NVRAM_IB_COUNTERS_DS_VER ZB_NVRAM_IB_COUNTERS_DS_VER_3
+#define ZB_NVRAM_IB_COUNTERS_DS_VER ZB_NVRAM_IB_COUNTERS_DS_VER_4
 
 /* Check dataset alignment for IAR compiler and ARM Cortex target platform */
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_counters_t);
@@ -586,32 +1001,50 @@ ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_counters_t);
 
 /**
  * HA NVRAM dataset. See HA spec IAS Zone Cluster
+ *
+ * @note The dataset size is fixed and doesn't depend on building configuration
  */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_ha_s
 {
+  /* [0 bytes] */
+
   /* IAS Zone data */
   zb_ieee_addr_t cie_address;   /*!< CIE address */
+
+  /* [8 bytes] */
 
   zb_uint8_t cie_ep;            /*!< CIE EP used for notifications*/
   zb_uint8_t zone_state;        /*!< Zone State */
   zb_uint16_t cie_short_addr;   /*!< CIE short address used for notifications*/
+
+  /* [12 bytes] */
 
   zb_uint8_t zone_id;           /*!< ZoneID value */
   /* Poll control data */
   zb_uint8_t poll_ctrl_ep; /*!< poll control client endpoint */
   zb_uint16_t poll_ctrl_short_addr; /*!< poll control client short addr*/
 
+  /* [16 bytes] */
+
   /* Reserved data */
   zb_uint8_t reserved; /* Reserved */
+
+  /* [17 bytes] */
 
   /*Diagnostic cluster data */
   zb_uint16_t number_of_resets; /*Number of resets*/
   zb_uint16_t join_indication; /*Number of join attempts*/
   zb_uint16_t packet_buffer_allocate_failures; /*Number of buffer allocation errors*/
 
+  /* [23 bytes] */
+
   zb_uint8_t   cie_address_is_set;  /*!< Is CIE address set */
+
+  /* [24 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_ha_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_ha_t) == 24U);
 
 #define ZB_NVRAM_HA_DATA_DS_VER_1 0U
 typedef zb_uint16_t zb_nvram_dataset_ha_versions_t;
@@ -627,9 +1060,13 @@ ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_ha_t);
 
 /**
  * Dataset of the ZDO Diagnostics.
+ *
+ * @note The dataset size is fixed and doesn't depend on building configuration
  */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_diagnostics_v1_s
 {
+  /* [0 bytes] */
+
   /*! @brief An attribute that is incremented
    *         each time the device resets. */
   zb_uint16_t number_of_resets;
@@ -637,6 +1074,8 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_diagnostics_v1_s
   /*! @brief A counter that is incremented each time
    *  an entry is added to the neighbor table. */
   zb_uint16_t nwk_neighbor_added;
+
+  /* [4 bytes] */
 
   /*! @brief A counter that is incremented each time
    *  an entry is removed from the neighbor table. */
@@ -646,6 +1085,8 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_diagnostics_v1_s
    *  becomes stale because the neighbor has not been heard from. */
   zb_uint16_t nwk_neighbor_stale;
 
+  /* [8 bytes] */
+
   /*! @brief A counter that is incremented each time
    *         a node joins or rejoins the network via this node. */
   zb_uint16_t join_indication;
@@ -654,13 +1095,21 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_diagnostics_v1_s
    *  is removed from the child table. */
   zb_uint16_t childs_removed;
 
+  /* [12 bytes] */
+
   /*! @brief A counter that is incremented each time
    *         the stack failed to allocate a packet buffers. */
   zb_uint16_t packet_buffer_allocate_failures;
 
+  /* [14 bytes] */
+
   zb_uint8_t alignment[2]; /* total size == 16 bytes */
+
+  /* [16 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_diagnostics_v1_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_diagnostics_v1_t) == 16U);
 
 /**
  * @name NVRAM dataset diagnostics versions
@@ -698,44 +1147,99 @@ ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_diagnostics_v1_t);
 
 #endif /* defined ZB_CONFIGURABLE_MEM */
 
-typedef ZB_PACKED_PRE struct zb_aps_bind_dst_table_old_s
+/* APS Binding Table datasets
+ * (includes Source Binding Table entry, Destination Binding Table entry, full Binding Table dataset) */
+
+/* Binding Table version 1 */
+
+/**
+ * @brief NVRAM representation of APS Binding Destination Table entry,
+ * version 1
+ *
+ * @note The NVRAM structure size is not fixed and depends on building configuration
+ * (configurable memory)
+ */
+typedef ZB_PACKED_PRE struct zb_nvram_aps_bind_dst_table_ent_v1_s
 {
+  /* [0 bytes] */
+
   ZB_PACKED_PRE union
   {
     zb_uint16_t group_addr;                /*!< group address */
-    zb_aps_bind_long_dst_addr_t long_addr; /*!< @see zb_asp_long_dst_addr_t */
-  } u;
+
+    ZB_PACKED_PRE struct
+    {
+      zb_uint8_t  dst_addr_ref; /*!< destination address reference.
+                                 * It has fixed one-byte type for compatibility
+                                 * (current zb_address_ieee_ref_t may have 2 bytes in size) */
+      zb_uint8_t  dst_end;      /*!< destination endpoint */
+    } ZB_PACKED_STRUCT long_addr;
+
+  } ZB_PACKED_STRUCT u;
+
+  /* [2 bytes] */
+
 #ifndef ZB_CONFIGURABLE_MEM
   zb_uint8_t            trans_index[ZB_SINGLE_TRANS_INDEX_SIZE_OLD];
 #else
   zb_uint8_t            *trans_index;
 #endif
 
+  /* [2 bytes + ZB_SINGLE_TRANS_INDEX_SIZE_OLD, no configurable memory]
+   * [2 bytes + pointer size, configurable memory] */
+
   zb_bitfield_t         dst_addr_mode:3;   /*!< destination address mode flag, 0
                                             * - group address, otherwise long
                                             * address plus dest endpoint */
   zb_bitfield_t         src_table_index:5; /*!< index from zb_asp_src_table_t */
-} ZB_PACKED_STRUCT zb_aps_bind_dst_table_old_t;
+
+  /* [3 bytes + ZB_SINGLE_TRANS_INDEX_SIZE_OLD, no configurable memory]
+   * [3 bytes + pointer size, configurable memory] */
+
+} ZB_PACKED_STRUCT zb_nvram_aps_bind_dst_table_ent_v1_t;
 
 
+/* Keep old type name for backward compatibility as it may be used in external tools */
+typedef zb_nvram_aps_bind_dst_table_ent_v1_t zb_aps_bind_dst_table_old_t;
 
 /**
-   Global binding table - source part
+   @brief NVRAM representation of APS Binding Source Table entry,
+   version 1
+
+   @note The NVRAM structure size is fixed and doesn't depend on building configuration
 */
-typedef ZB_PACKED_PRE struct zb_aps_bind_src_table_nv_s
+typedef ZB_PACKED_PRE struct zb_nvram_aps_bind_src_table_ent_v1_s
 {
+  /* [0 bytes] */
+
   zb_uint8_t            reserved;   /* was src addr ref, now not used. Keep it to avoid nvram migration  */
   zb_uint8_t            src_end;    /*!< source endpoint */
+
+  /* [2 bytes] */
+
   zb_uint16_t           cluster_id; /*!< cluster id */
-} ZB_PACKED_STRUCT zb_aps_bind_src_table_nv_t;
 
+  /* [4 bytes] */
+} ZB_PACKED_STRUCT zb_nvram_aps_bind_src_table_ent_v1_t;
 
-typedef ZB_PACKED_PRE struct zb_aps_binding_table_old_s
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_aps_bind_src_table_ent_v1_t);
+
+/* Keep old type name for backward compatibility as it may be used in external tools */
+typedef zb_nvram_aps_bind_src_table_ent_v1_t zb_aps_bind_src_table_nv_t;
+
+/**
+ * @note The dataset size is not fixed and depends on building configuration
+ * (configurable memory, binding table size)
+ * */
+typedef ZB_PACKED_PRE struct zb_nvram_dataset_binding_v1_s
 {
-  zb_aps_bind_src_table_nv_t src_table[ZB_APS_SRC_BINDING_TABLE_SIZE_OLD]; /*!< Source table */
-  zb_aps_bind_dst_table_old_t dst_table[ZB_APS_DST_BINDING_TABLE_SIZE_OLD]; /*!< Destination table */
+  zb_nvram_aps_bind_src_table_ent_v1_t src_table[ZB_APS_SRC_BINDING_TABLE_SIZE_OLD]; /*!< Source table */
+  zb_nvram_aps_bind_dst_table_ent_v1_t dst_table[ZB_APS_DST_BINDING_TABLE_SIZE_OLD]; /*!< Destination table */
+
   zb_uint8_t              src_n_elements;                               /*!< Count elements in source table */
   zb_uint8_t              dst_n_elements;                               /*!< Count elements in destination table */
+
+  /* SNCP_MODE is not active, but left here for backward compatibility */
 #ifdef SNCP_MODE
   zb_uint8_t              remote_bind_offset;                           /*!< Offset to attribute id's to remote binding requests */
   zb_uint8_t              align;
@@ -744,62 +1248,230 @@ typedef ZB_PACKED_PRE struct zb_aps_binding_table_old_s
   zb_uint8_t              align[2];
 #endif
 #ifndef ZB_CONFIGURABLE_MEM
-  zb_uint8_t              trans_table[ZB_APS_BIND_TRANS_TABLE_SIZE];    /*!< Buffers for simultaneous sendings */
+  zb_uint8_t              trans_table[ZB_APS_BIND_TRANS_TABLE_SIZE];    /*!< Buffers for simultaneous transmissions */
 #else
   zb_uint8_t              *trans_table;
 #endif
-} ZB_PACKED_STRUCT zb_aps_binding_table_old_t;
+} ZB_PACKED_STRUCT zb_nvram_dataset_binding_v1_t;
 
-typedef zb_aps_binding_table_old_t zb_nvram_dataset_binding_v1_t;
+/* Binding Table version 2 */
+typedef zb_nvram_aps_bind_src_table_ent_v1_t zb_nvram_aps_bind_src_table_ent_v2_t;
 
-typedef ZB_PACKED_PRE struct zb_aps_bind_dst_table_v2_s
+/**
+ * @brief NVRAM representation of APS Binding Destination Table entry,
+ * version 2
+ *
+ * @note The NVRAM structure size is not fixed and depends on building configuration
+ * (configurable memory, binding table size)
+ */
+typedef ZB_PACKED_PRE struct zb_nvram_aps_bind_dst_table_ent_v2_s
 {
+  /* [0 bytes] */
+
 #ifdef ZB_CONFIGURABLE_MEM
   /* WARNING: this field will be rewritten if APS binding dataset is present in NVRAM */
   zb_uint8_t            *trans_index;
 #endif /* defined ZB_CONFIGURABLE_MEM */
 
+  /* [0 bytes, no configurable memory]
+   * [pointer size, configurable memory] */
+
   ZB_PACKED_PRE union
   {
     zb_uint16_t group_addr;                /*!< group address */
-    zb_aps_bind_long_dst_addr_t long_addr; /*!< @see zb_asp_long_dst_addr_t */
+
+    ZB_PACKED_PRE struct
+    {
+      zb_uint8_t  dst_addr_ref; /*!< destination address reference.
+                                 * It has fixed one-byte type for compatibility
+                                 * (current zb_address_ieee_ref_t may have 2 bytes in size) */
+      zb_uint8_t  dst_end;      /*!< destination endpoint */
+    } ZB_PACKED_STRUCT long_addr;
   } u;
+
+  /* [2 bytes, no configurable memory]
+   * [2 bytes + pointer size, configurable memory] */
 
 #ifndef ZB_CONFIGURABLE_MEM
   zb_uint8_t            trans_index[ZB_SINGLE_TRANS_INDEX_SIZE];
 #endif /* defined ZB_CONFIGURABLE_MEM */
+
+  /* [2 bytes + ZB_SINGLE_TRANS_INDEX_SIZE, no configurable memory]
+   * [2 bytes + pointer size, configurable memory] */
+
   zb_uint8_t            align;
 
   zb_bitfield_t         dst_addr_mode:3;   /*!< destination address mode flag, 0
                                             * - group address, otherwise long
                                             * address plus dest endpoint */
   zb_bitfield_t         src_table_index:5; /*!< index from zb_asp_src_table_t */
-} ZB_PACKED_STRUCT zb_aps_bind_dst_table_v2_t;
+
+  /* [4 bytes + ZB_SINGLE_TRANS_INDEX_SIZE, no configurable memory]
+   * [4 bytes + pointer size, configurable memory] */
+} ZB_PACKED_STRUCT zb_nvram_aps_bind_dst_table_ent_v2_t;
+
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_aps_bind_dst_table_ent_v2_t);
+
+/* Keep old type name for backward compatibility as it may be used in external tools */
+typedef zb_nvram_aps_bind_dst_table_ent_v2_t zb_aps_bind_dst_table_v2_t;
+
+/* Binding Table version 3 */
+typedef zb_nvram_aps_bind_src_table_ent_v1_t zb_nvram_aps_bind_src_table_ent_v3_t;
+
+/**
+ * @brief NVRAM representation of APS Binding Destination Table entry,
+ * version 3
+ *
+ * @note The NVRAM structure size is not fixed and depends on building configuration
+ * (configurable memory, binding table size)
+ */
+typedef ZB_PACKED_PRE struct zb_aps_bind_dst_table_v3_s
+{
+  /* [0 bytes] */
+
+#ifdef ZB_CONFIGURABLE_MEM
+  /* WARNING: this field will be rewritten if APS binding dataset is present in NVRAM */
+  zb_uint8_t            *trans_index;
+#endif /* defined ZB_CONFIGURABLE_MEM */
+
+  /* [0 bytes, no configurable memory]
+   * [pointer size, configurable memory] */
+
+  ZB_PACKED_PRE union
+  {
+    zb_uint16_t group_addr;                /*!< group address */
+
+    ZB_PACKED_PRE struct
+    {
+      zb_uint8_t  dst_addr_ref; /*!< destination address reference.
+                                 * It has fixed one-byte type for compatibility
+                                 * (current zb_address_ieee_ref_t may have 2 bytes in size) */
+      zb_uint8_t  dst_end;      /*!< destination endpoint */
+    } ZB_PACKED_STRUCT long_addr;
+
+  } u;
+
+  /* [2 bytes, no configurable memory]
+   * [2 bytes + pointer size, configurable memory] */
+
+#ifndef ZB_CONFIGURABLE_MEM
+  zb_uint8_t            trans_index[ZB_SINGLE_TRANS_INDEX_SIZE];
+#endif /* defined ZB_CONFIGURABLE_MEM */
+
+  /* [2 bytes + ZB_SINGLE_TRANS_INDEX_SIZE, no configurable memory]
+   * [2 bytes + pointer size, configurable memory] */
+
+  zb_uint8_t            dst_addr_mode;   /*!< destination address mode flag, 0
+                                          * - group address, otherwise long
+                                          * address plus dest endpoint */
+  zb_uint8_t            src_table_index; /*!< index from zb_asp_src_table_t */
+
+  /* [4 bytes + ZB_SINGLE_TRANS_INDEX_SIZE, no configurable memory]
+   * [4 bytes + pointer size, configurable memory] */
+
+  /* SNCP_MODE is not active, but left here for backward compatibility */
+#ifdef SNCP_MODE
+  zb_uint8_t            id;              /* original index position when inserted, to identify
+                                          *  entry even if moved with the array (on removal of
+                                          *  other elements) */
+  zb_uint8_t            align;
+  zb_uint8_t            reserved[2];
+#endif
+} ZB_PACKED_STRUCT zb_nvram_aps_bind_dst_table_ent_v3_t;
+
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_aps_bind_dst_table_ent_v3_t);
+
+/* Keep old type name for backward compatibility as it may be used in external tools */
+typedef zb_nvram_aps_bind_dst_table_ent_v3_t zb_aps_bind_dst_table_v3_t;
+
+/* Binding Table version 4 */
+typedef zb_nvram_aps_bind_src_table_ent_v1_t zb_nvram_aps_bind_src_table_ent_v4_t;
+
+/**
+ * @brief NVRAM representation of APS Binding Destination Table entry,
+ * version 4
+ *
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
+typedef ZB_PACKED_PRE struct zb_nvram_aps_bind_dst_table_ent_v4_s
+{
+  /* [0 bytes] */
+  ZB_PACKED_PRE union
+  {
+    zb_uint16_t group_addr;                /*!< group address */
+
+    ZB_PACKED_PRE struct
+    {
+      zb_uint16_t dst_addr_ref;           /*!< destination address reference.
+                                           *   Fixed two bytes size is used here to support large networks
+                                           *   (see zb_address_ieee_ref_t declaration) */
+      zb_uint8_t  dst_end;                /*!< destination endpoint */
+    } ZB_PACKED_STRUCT long_addr;
+  } ZB_PACKED_STRUCT u;
+
+  /* [3 bytes] */
+
+  zb_uint8_t            dst_addr_mode;   /*!< destination address mode flag, 0
+                                          * - group address, otherwise long
+                                          * address plus dest endpoint */
+  zb_uint8_t            src_table_index; /*!< index from zb_asp_src_table_t */
+
+  /* [5 bytes] */
+
+  /* SNCP_MODE is not active, but left here for backward compatibility */
+#ifdef SNCP_MODE
+  zb_uint8_t            id;              /* original index position when inserted, to identify
+                                          *  entry even if moved with the array (on removal of
+                                          *  other elements) */
+  zb_uint8_t            align[2];
+#else
+  zb_uint8_t            reserved[3];
+#endif
+
+  /* [8 bytes] */
+} ZB_PACKED_STRUCT zb_nvram_aps_bind_dst_table_ent_v4_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_aps_bind_dst_table_ent_v4_t) == 8U);
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_aps_bind_dst_table_ent_v4_t);
 
 /**
  * @brief APS binding NVRAM dataset.
+ *
+ * @note The dataset size is fixed and doesn't depend on building configuration
  */
-typedef ZB_PACKED_PRE struct zb_nvram_dataset_binding_v3_s
+typedef ZB_PACKED_PRE struct zb_nvram_dataset_binding_v4_s
 {
+  /* [0 bytes] */
   zb_uint8_t src_n_elements;  /*!< Count elements in source table */
   zb_uint8_t dst_n_elements;  /*!< Count elements in destination table */
+
+  /* [2 bytes] */
+
+  /* SNCP_MODE is not active, but left here for backward compatibility */
 #ifdef SNCP_MODE
   zb_uint8_t remote_bind_offset;  /*!< Offset to attribute id's to remote binding requests */
   zb_uint8_t align;
 #else
   zb_uint8_t align[2];
 #endif
+  /* [4 bytes] */
 } ZB_PACKED_STRUCT
-zb_nvram_dataset_binding_v3_t;
+zb_nvram_dataset_binding_v4_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_binding_v4_t) == 4U);
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_binding_v4_t);
 
 /* The new dataset header does not introduce new fields, but renames the previously reserved fields,
  * so we can use the new dataset header definition while loading legacy structure.
  * The binding dataset contents have changed, because the zb_aps_bind_dst_table_t has a different size.
- * The v2 loading function uses the zb_aps_bind_dst_table_v2_t type instead.
+ * The v2 loading function uses the zb_nvram_aps_bind_dst_table_ent_v2_t type instead.
  */
-typedef zb_nvram_dataset_binding_v3_t zb_nvram_dataset_binding_v2_t;
+typedef zb_nvram_dataset_binding_v4_t zb_nvram_dataset_binding_v2_t;
+typedef zb_nvram_dataset_binding_v4_t zb_nvram_dataset_binding_v3_t;
+typedef zb_nvram_dataset_binding_v4_t zb_nvram_dataset_binding_t;
 
-typedef zb_nvram_dataset_binding_v3_t zb_nvram_dataset_binding_t;
+typedef zb_nvram_aps_bind_src_table_ent_v4_t zb_nvram_aps_bind_src_table_ent_t;
+typedef zb_nvram_aps_bind_dst_table_ent_v4_t zb_nvram_aps_bind_dst_table_ent_t;
 
 /**
  * @name NVRAM dataset binding versions
@@ -812,19 +1484,29 @@ typedef zb_nvram_dataset_binding_v3_t zb_nvram_dataset_binding_t;
 #define ZB_NVRAM_APS_BINDING_DATA_DS_VER_1 0U
 #define ZB_NVRAM_APS_BINDING_DATA_DS_VER_2 1U
 #define ZB_NVRAM_APS_BINDING_DATA_DS_VER_3 2U
+#define ZB_NVRAM_APS_BINDING_DATA_DS_VER_4 3U
 /** @} */
 
-#define ZB_NVRAM_APS_BINDING_DATA_DS_VER ZB_NVRAM_APS_BINDING_DATA_DS_VER_3
+#define ZB_NVRAM_APS_BINDING_DATA_DS_VER ZB_NVRAM_APS_BINDING_DATA_DS_VER_4
 
 /* Check dataset alignment for IAR compiler and ARM Cortex target platform */
-ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_binding_v3_t);
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_aps_bind_dst_table_ent_t);
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_aps_bind_src_table_ent_t);
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_binding_t);
 
+/**
+ * @note The dataset size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_groups_hdr_s
 {
+  /* [0 bytes] */
   zb_uint8_t n_groups;                        /*!< # of entries in APS group table */
   zb_uint8_t aligned[3];
+  /* [4 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_groups_hdr_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_groups_hdr_t) == 4U);
 
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_groups_hdr_t);
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_aps_group_table_ent_t);
@@ -846,19 +1528,28 @@ ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_aps_group_table_ent_t);
 #if defined ZB_HA_ENABLE_POLL_CONTROL_SERVER || defined DOXYGEN
 /**
  * HA POLL CONTROL NVRAM dataset.
+ *
+ * @note The dataset size is fixed and doesn't depend on building configuration
  */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_poll_control_s
 {
+  /* [0 bytes] */
   zb_uint32_t checkin_interval;
   zb_uint32_t long_poll_interval;
+  /* [8 bytes] */
   zb_uint16_t short_poll_interval;
   zb_uint16_t fast_poll_timeout;
+  /* [12 bytes] */
   zb_uint32_t checkin_interval_min;
   zb_uint32_t long_poll_interval_min;
+  /* [20 bytes] */
   zb_uint16_t fast_poll_timeout_max;
   zb_uint8_t  aligned[2];
+  /* [24 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_poll_control_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_poll_control_t) == 24U);
 
 /* Check dataset alignment for IAR compiler and ARM Cortex target platform */
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_poll_control_t);
@@ -876,21 +1567,35 @@ zb_nvram_dataset_poll_control_versions_t;
 #if defined ZB_ZCL_SUPPORT_CLUSTER_WWAH || defined DOXYGEN
 /**
  * WWAH NVRAM dataset.
+ *
+ * @note The dataset size is fixed and doesn't depend on building configuration
  */
 typedef ZB_PACKED_PRE struct zb_nvram_dataset_wwah_s
 {
+  /* [0 bytes] */
+
   /* >>> WWAH CTX TODO: clarify what is needed to store */
   zb_uint8_t wwah_behavior;
   zb_uint16_t time_server_addr;
   zb_uint8_t time_server_endpoint;
 
+  /* [4 bytes] */
+
   zb_uint8_t aps_ack_exempt_table_cnt;
   zb_uint8_t aps_link_key_enabled_by_default;
+
+  /* [6 bytes] */
 
   zb_uint8_t aps_link_key_authorization_table_cnt;
   zb_uint8_t use_trust_center_for_cluster_table_cnt;
   zb_uint8_t reserved;          /* there was classification mask - no longer needed, may be ignored while loading old datasets. */
+
+  /* [9 bytes] */
+
   zb_zcl_wwah_periodic_checkins_data_t periodic_checkins;
+
+  /* [21 bytes] */
+
   /* <<< WWAH CTX */
 
   /* >>> WWAH attributes */
@@ -898,11 +1603,13 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_wwah_s
   zb_uint8_t nwk_retry_count;
   zb_uint8_t mac_retry_count;
   zb_uint8_t wwah_app_event_retry_queue_size;
+  /* [26 bytes] */
   zb_uint8_t mac_poll_failure_wait_time;
   zb_uint8_t current_debug_report_id;
   zb_uint8_t pending_network_update_channel;
   zb_uint16_t pending_network_update_panid;
   zb_uint16_t ota_max_offline_duration; /* 79b */
+  /* [33 bytes] */
 
   zb_bitfield_t disable_ota_downgrades:1;
   zb_bitfield_t mgmt_leave_without_rejoin_enabled:1;
@@ -912,15 +1619,19 @@ typedef ZB_PACKED_PRE struct zb_nvram_dataset_wwah_s
   zb_bitfield_t wwah_app_event_retry_enabled:1;
   zb_bitfield_t wwah_rejoin_enabled:1;
   zb_bitfield_t configuration_mode_enabled:1;
+  /* [34 bytes] */
   zb_bitfield_t tc_security_on_nwk_key_rotation_enabled:1;
   zb_bitfield_t wwah_bad_parent_recovery_enabled:1;
   zb_bitfield_t align_bitfield:6;
+  /* [35 bytes] */
   /* <<< WWAH attributes */
 
   zb_uint8_t align_struct[1];
+  /* [36 bytes] */
 } ZB_PACKED_STRUCT
 zb_nvram_dataset_wwah_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_dataset_wwah_t) == 36U);
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_dataset_wwah_t);
 
 typedef enum zb_nvram_dataset_wwah_versions_e
@@ -937,12 +1648,20 @@ zb_nvram_dataset_wwah_versions_t;
 
 #ifdef ZB_ENABLE_ZGP
 
+/**
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_zgp_sink_tbl_entry_ver_6_0_s
 {
+  /* [0 bytes] */
   zb_uint32_t      src_id;
   zb_ieee_addr_t   ieee_addr;
 
+  /* [12 bytes] */
+
   zb_uint32_t      zgpd_sec_frame_counter;
+
+  /* [16 bytes] */
 
 /**
  * Options field of sink table entry
@@ -958,31 +1677,55 @@ typedef ZB_PACKED_PRE struct zb_nvram_zgp_sink_tbl_entry_ver_6_0_s
  */
   zb_uint16_t      options;
 
-  zb_uint8_t       match_dev_tbl_idx;
+  /* [18 bytes] */
+
+  zb_uint8_t       unused;
   zb_uint8_t       zgpd_key[ZB_CCM_KEY_SIZE];
+
+  /* [35 bytes] */
+
   zb_uint8_t       aligned[1];
+
+  /* [36 bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_zgp_sink_tbl_entry_ver_6_0_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_zgp_sink_tbl_entry_ver_6_0_t) == 36U);
 
 /* Check dataset alignment for IAR compiler and ARM Cortex target platform */
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_zgp_sink_tbl_entry_ver_6_0_t);
 
 typedef zb_nvram_zgp_sink_tbl_entry_ver_6_0_t zb_nvram_zgp_sink_tbl_t;
 
+/**
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_zgp_dataset_info_ver_6_0_s
 {
+  /* [0 bytes] */
   zb_uint16_t               zgp_sink_tbl_size;
   zb_uint32_t               immed_tx_frame_counter;
+  /* [6 bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_zgp_dataset_info_ver_6_0_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_zgp_dataset_info_ver_6_0_t) == 6U);
+
 #ifdef ZB_ENABLE_ZGP_PROXY
+
+/**
+   @note The dataset size is not fixed and depends on building configuration
+   (ZGP sink table size)
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_zgp_dataset_ver_6_0_s
 {
+  /* [0 bytes] */
   zb_nvram_zgp_dataset_info_ver_6_0_t zgp_info;
+  /* [6 bytes] */
   zb_nvram_zgp_sink_tbl_t             zgp_sink_tbl[ZB_ZGP_SINK_TBL_SIZE];
+  /* [6 + 36 * ZB_ZGP_SINK_TBL_SIZE bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_zgp_dataset_ver_6_0_t;
@@ -1014,11 +1757,11 @@ zb_nvram_dataset_gr_sinkt_versions_t;
 
 typedef enum zb_nvram_dataset_gr_proxyt_versions_e
 {
-  ZB_NVRAM_DATASET_GP_PRPOXYT_DS_VER_1 = 0,
+  ZB_NVRAM_DATASET_GP_PROXYT_DS_VER_1 = 0,
 }
 zb_nvram_dataset_gr_proxyt_versions_t;
 
-#define ZB_NVRAM_DATASET_GP_PRPOXYT_DS_VER ZB_NVRAM_DATASET_GP_PRPOXYT_DS_VER_1
+#define ZB_NVRAM_DATASET_GP_PROXYT_DS_VER ZB_NVRAM_DATASET_GP_PROXYT_DS_VER_1
 
 typedef enum zb_nvram_dataset_gp_cluster_versions_e
 {
@@ -1063,66 +1806,183 @@ zb_nvram_dataset_gp_app_tbl_versions_t;
  * After, ZB_NVRAM_ADDR_MAP_DS_VER should be updated. */
 #define ZB_NVRAM_ADDR_MAP_DS_VER_0     0U
 #define ZB_NVRAM_ADDR_MAP_DS_VER_1     1U
-#define ZB_NVRAM_ADDR_MAP_DS_VER_2     2U
-#define ZB_NVRAM_ADDR_MAP_DS_VER       ZB_NVRAM_ADDR_MAP_DS_VER_2 /* Should be equal to latest (highest) version */
+#define ZB_NVRAM_ADDR_MAP_DS_VER_2     2U /* Adds alignment to all dataset-specific structures */
+#define ZB_NVRAM_ADDR_MAP_DS_VER_3     3U /* Big-net-related changes.
+                                             Removed version field from dataset header,
+                                              updated record types from v2 to v3 */
+#define ZB_NVRAM_ADDR_MAP_DS_VER       ZB_NVRAM_ADDR_MAP_DS_VER_3 /* Should be equal to latest (highest) version */
 #define ZB_NVRAM_ADDR_MAP_DS_VER_COUNT (ZB_NVRAM_ADDR_MAP_DS_VER + 1U)
 /** @} */
 
+/**
+ * @name NVRAM address map dataset version (for single entry)
+ * @anchor nvram_addr_map_entry_ds_versions
+ */
+/** @{ */
+  /* First(0) version should be 0.
+ * New versions should be added to the end, before ZB_NVRAM_ADDR_MAP_ENTRY_DS_VER.
+ * After, ZB_NVRAM_ADDR_MAP_ENTRY_DS_VER should be updated. */
+#define ZB_NVRAM_ADDR_MAP_ENTRY_DS_VER_0     0U
+#define ZB_NVRAM_ADDR_MAP_ENTRY_DS_VER       ZB_NVRAM_ADDR_MAP_ENTRY_DS_VER_0 /* Should be equal to latest (highest) version */
+#define ZB_NVRAM_ADDR_MAP_ENTRY_DS_VER_COUNT (ZB_NVRAM_ADDR_MAP_ENTRY_DS_VER + 1U)
+/** @} */
+
+/**
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_addr_map_hdr_v0_s
 {
+  /* [0 bytes] */
   zb_uint8_t addr_map_num;   /*!< Stores number of addr maps - see zb_address_map_t */
   zb_uint8_t version;        /*!< Stores version of the dataset */
+  /* [2 bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_addr_map_hdr_v0_t;
 
-typedef ZB_PACKED_PRE struct zb_nvram_addr_map_hdr_s
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_addr_map_hdr_v0_t) == 2U);
+
+/**
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
+typedef ZB_PACKED_PRE struct zb_nvram_addr_map_hdr_v2_s
 {
+  /* [0 bytes] */
   zb_uint8_t addr_map_num;   /*!< Stores number of addr maps - see zb_address_map_t */
   zb_uint8_t version;        /*!< Stores version of the dataset */
   zb_uint8_t aligned[2];
+  /* [4 bytes] */
 }
 ZB_PACKED_STRUCT
-zb_nvram_addr_map_hdr_t;
+zb_nvram_addr_map_hdr_v2_t; /* According to svn history, alignment has been added in v2 dataset. */
 
-/** Store a NVM record describing address map, see zb_address_map_t */
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_addr_map_hdr_v2_t) == 4U);
+
+/**
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
+typedef ZB_PACKED_PRE struct zb_nvram_addr_map_hdr_v3_s
+{
+  /* [0 bytes] */
+  zb_uint16_t addr_map_num;   /*!< Stores number of addr maps - see zb_address_map_t */
+  zb_uint8_t aligned[2];
+  /* [4 bytes] */
+}
+ZB_PACKED_STRUCT
+zb_nvram_addr_map_hdr_v3_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_addr_map_hdr_v3_t) == 4U);
+
+typedef zb_nvram_addr_map_hdr_v3_t zb_nvram_addr_map_hdr_t;
+
+/**
+ * Store a NVM record describing address map, see zb_address_map_t
+ *
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_addr_map_rec_v0_s
 {
-  zb_ieee_addr_t  ieee_addr; /*!< Uncompressed IEEE address */
+  /* [0 bytes] */
+  zb_ieee_addr_t  ieee_addr; /*!< IEEE address */
   zb_uint16_t     addr;      /*!< 16-bit device address */
   zb_uint8_t      index;     /*!< Reference for neighbor table */
+  /* [11 bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_addr_map_rec_v0_t;
 
-/** Store a NVM record describing address map, see zb_address_map_t */
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_addr_map_rec_v0_t) == 11U);
+
+/**
+ * Store a NVM record describing address map, see zb_address_map_t
+ *
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_addr_map_rec_v1_s
 {
-  zb_ieee_addr_t  ieee_addr; /*!< Uncompressed IEEE address */
+  /* [0 bytes] */
+  zb_ieee_addr_t  ieee_addr; /*!< IEEE address */
   zb_uint16_t     addr;      /*!< 16-bit device address */
+  /* [10 bytes] */
   zb_uint8_t      index;     /*!< Reference for neighbor table */
   zb_uint8_t      redirect_type; /*!< Redirect type */
   zb_uint8_t      redirect_ref; /*!< reference to regular/redirect
                                  * entry */
+  /* [13 bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_addr_map_rec_v1_t;
 
-/** Store a NVM record describing address map, see zb_address_map_t */
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_addr_map_rec_v1_t) == 13U);
+
+/**
+ * Store a NVM record describing address map, see zb_address_map_t
+ *
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_addr_map_rec_v2_s
 {
-  zb_ieee_addr_t  ieee_addr; /*!< Uncompressed IEEE address */
+  /* [0 bytes] */
+  zb_ieee_addr_t  ieee_addr; /*!< IEEE address */
   zb_uint16_t     addr;      /*!< 16-bit device address */
+  /* [10 bytes] */
   zb_uint8_t      index;     /*!< Reference for neighbor table */
   zb_uint8_t      redirect_type; /*!< Redirect type */
   zb_uint8_t      redirect_ref; /*!< reference to regular/redirect
                                  * entry */
+  /* [13 bytes] */
   zb_uint8_t aligned[3];
+  /* [16 bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_addr_map_rec_v2_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_addr_map_rec_v2_t) == 16U);
+
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_addr_map_rec_v2_t);
+
+/**
+ * Store a NVM record describing address map, see zb_address_map_t
+ *
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
+typedef ZB_PACKED_PRE struct zb_nvram_addr_map_rec_v3_s
+{
+  /* [0 bytes] */
+  ZB_PACKED_PRE union
+  {
+    ZB_PACKED_PRE struct zb_nvram_addr_map_rec_primary_s
+    {
+      zb_ieee_addr_t             ieee_addr;     /*!< IEEE address */
+      zb_uint16_t                short_addr;    /*!< 16-bit device address */
+    } ZB_PACKED_STRUCT primary;
+
+    ZB_PACKED_PRE struct zb_nvram_addr_map_rec_secondary_s
+    {
+      zb_uint16_t redirect_ref;  /*!< reference to primary entry */
+      zb_uint8_t aligned[8];
+    } ZB_PACKED_STRUCT secondary;
+  } u;
+
+  /* [10 bytes] */
+
+  /* TODO: move addr_ref or redirected_type to reserved field of dataset header to
+   * make structure size equal to 12 instead of 16 bytes. */
+  zb_uint16_t                addr_ref;
+  /* [12 bytes] */
+  zb_uint8_t                 redirect_type; /*!< Redirect type */
+  zb_uint8_t                 addr_deleted_flag;
+  /* [14 bytes] */
+  zb_uint8_t                 aligned[2];
+  /* [16 bytes] */
+}
+ZB_PACKED_STRUCT
+zb_nvram_addr_map_rec_v3_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_addr_map_rec_v3_t) == 16U);
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_addr_map_rec_v3_t);
+
+typedef zb_nvram_addr_map_rec_v3_t zb_nvram_addr_map_rec_t;
 
 /**
   ZB_NVRAM_NEIGHBOUR_TBL
@@ -1148,94 +2008,176 @@ ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_addr_map_rec_v2_t);
 #define ZB_NVRAM_NEIGHBOR_TBL_DS_VER_1 1U
 #define ZB_NVRAM_NEIGHBOR_TBL_DS_VER_2 2U
 #define ZB_NVRAM_NEIGHBOR_TBL_DS_VER_3 3U
-#define ZB_NVRAM_NEIGHBOUR_TBL_DS_VER ZB_NVRAM_NEIGHBOR_TBL_DS_VER_3 /* Should be equal to latest (highest) version */
+#define ZB_NVRAM_NEIGHBOR_TBL_DS_VER_4 4U
+#define ZB_NVRAM_NEIGHBOUR_TBL_DS_VER ZB_NVRAM_NEIGHBOR_TBL_DS_VER_4 /* Should be equal to latest (highest) version */
 #define ZB_NVRAM_NEIGHBOR_TBL_DS_VER_COUNT (ZB_NVRAM_NEIGHBOUR_TBL_DS_VER + 1U)
 /** @} */
 
+/**
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_neighbour_hdr_v0_s
 {
+  /* [0 bytes] */
   zb_uint8_t nbr_rec_num; /*!< Stores number of stored neighbour devices */
   zb_uint8_t version;     /*!< Stores version of the dataset */
+  /* [2 bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_neighbour_hdr_v0_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_neighbour_hdr_v0_t) == 2U);
+
+/**
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_neighbour_hdr_v1_s
 {
+  /* [0 bytes] */
   zb_uint8_t nbr_rec_num; /*!< Stores number of stored neighbour devices */
   zb_uint8_t version;     /*!< Stores version of the dataset */
   zb_uint8_t aligned[2];
+  /* [4 bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_neighbour_hdr_v1_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_neighbour_hdr_v1_t) == 4U);
+
 
 typedef zb_nvram_neighbour_hdr_v1_t zb_nvram_neighbour_hdr_t;
 
 
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_neighbour_hdr_t);
 
+/**
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_neighbour_rec_v0_s
 {
-  zb_address_ieee_ref_t     addr_ref;          /*!< Neighbor address */
-  zb_bitfield_t             depth:4;           /*!< Device depth  */
-  zb_bitfield_t             rx_on_when_idle:1; /*!< Store device rx On when idle state */
-  zb_bitfield_t             relationship:3;    /*!< The relationship with nbr device, see @ref nwk_relationship */
-  zb_bitfield_t             device_type:2;     /*!< Neighbor device type - @see @ref nwk_device_type */
-  zb_bitfield_t             reserved:6;
-  zb_uint8_t                key_seq_number;    /*!< key number */
+  /* [0 bytes] */
+  zb_uint8_t                   addr_ref;          /*!< Neighbor address */
+  /* [1 byte] */
+  zb_bitfield_t                depth:4;           /*!< Device depth  */
+  zb_bitfield_t                rx_on_when_idle:1; /*!< Store device rx On when idle state */
+  zb_bitfield_t                relationship:3;    /*!< The relationship with nbr device, see @ref nwk_relationship */
+  /* [2 bytes] */
+  zb_bitfield_t                device_type:2;     /*!< Neighbor device type - @see @ref nwk_device_type */
+  zb_bitfield_t                reserved:6;
+  /* [3 bytes] */
+  zb_uint8_t                   key_seq_number;    /*!< key number */
+  /* [4 bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_neighbour_rec_v0_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_neighbour_rec_v0_t) == 4U);
 
+/**
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_neighbour_rec_v1_s
 {
-  zb_address_ieee_ref_t     addr_ref;          /*!< Neighbor address */
-  zb_bitfield_t             depth:4;           /*!< Device depth  */
-  zb_bitfield_t             rx_on_when_idle:1; /*!< Store device rx On when idle state */
-  zb_bitfield_t             relationship:3;    /*!< The relationship with nbr device, see @ref nwk_relationship */
-  zb_bitfield_t             device_type:2;     /*!< Neighbor device type - @see @ref nwk_device_type */
-  zb_bitfield_t             nwk_ed_timeout:4;  /*!< ED timeout value (for Child Aging) */
-  zb_bitfield_t             reserved:2;
-  zb_uint8_t                key_seq_number;    /*!< key number */
+  /* [0 bytes] */
+  zb_uint8_t                    addr_ref;          /*!< Neighbor address */
+  /* [1 byte] */
+  zb_bitfield_t                 depth:4;           /*!< Device depth  */
+  zb_bitfield_t                 rx_on_when_idle:1; /*!< Store device rx On when idle state */
+  zb_bitfield_t                 relationship:3;    /*!< The relationship with nbr device, see @ref nwk_relationship */
+  /* [2 bytes] */
+  zb_bitfield_t                 device_type:2;     /*!< Neighbor device type - @see @ref nwk_device_type */
+  zb_bitfield_t                 nwk_ed_timeout:4;  /*!< ED timeout value (for Child Aging) */
+  zb_bitfield_t                 reserved:2;
+  /* [3 bytes] */
+  zb_uint8_t                    key_seq_number;    /*!< key number */
+  /* [4 bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_neighbour_rec_v1_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_neighbour_rec_v1_t) == 4U);
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_neighbour_rec_v1_t);
 
+/**
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_neighbour_rec_v2_s
 {
-  zb_address_ieee_ref_t     addr_ref;          /*!< Neighbor address */
-  zb_bitfield_t             depth:4;           /*!< Device depth  */
-  zb_bitfield_t             rx_on_when_idle:1; /*!< Store device rx On when idle state */
-  zb_bitfield_t             relationship:3;    /*!< The relationship with nbr device, see @ref nwk_relationship */
-  zb_bitfield_t             device_type:2;     /*!< Neighbor device type - @see @ref nwk_device_types */
-  zb_bitfield_t             nwk_ed_timeout:4;  /*!< ED timeout value (for Child Aging) */
-  zb_bitfield_t             reserved:2;
-  zb_uint8_t                key_seq_number;    /*!< key number */
-  zb_uint8_t                mac_iface_idx;     /*!< Mac Interface Table index */
-  zb_uint8_t                align[3];          /*!< Reserved for future use */
+  /* [0 bytes] */
+  zb_uint8_t                   addr_ref;          /*!< Neighbor address */
+  /* [1 byte] */
+  zb_bitfield_t                depth:4;           /*!< Device depth  */
+  zb_bitfield_t                rx_on_when_idle:1; /*!< Store device rx On when idle state */
+  zb_bitfield_t                relationship:3;    /*!< The relationship with nbr device, see @ref nwk_relationship */
+  /* [2 bytes] */
+  zb_bitfield_t                device_type:2;     /*!< Neighbor device type - @see @ref nwk_device_types */
+  zb_bitfield_t                nwk_ed_timeout:4;  /*!< ED timeout value (for Child Aging) */
+  zb_bitfield_t                reserved:2;
+  /* [3 bytes] */
+  zb_uint8_t                   key_seq_number;    /*!< key number */
+  /* [4 bytes] */
+  zb_uint8_t                   mac_iface_idx;     /*!< Mac Interface Table index */
+  zb_uint8_t                   align[3];          /*!< Reserved for future use */
+  /* [8 bytes] */
 }
 ZB_PACKED_STRUCT
 zb_nvram_neighbour_rec_v2_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_neighbour_rec_v2_t) == 8U);
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_neighbour_rec_v2_t);
 
+/*
+ * ZB_NVRAM_NEIGHBOR_TBL_DS_VER_2 and ZB_NVRAM_NEIGHBOR_TBL_DS_VER_3
+ * refer to zb_nvram_neighbour_rec_v2_t struct
+ *
+ * @note The NVRAM structure size is fixed and doesn't depend on building configuration
+ */
+typedef ZB_PACKED_PRE struct zb_nvram_neighbour_rec_v4_s
+{
+  /* [0 bytes] */
+  zb_uint8_t                   align[1];          /*!< Reserved for future use */
+  /* [1 byte] */
+  zb_bitfield_t                depth:4;           /*!< Device depth  */
+  zb_bitfield_t                rx_on_when_idle:1; /*!< Store device rx On when idle state */
+  zb_bitfield_t                relationship:3;    /*!< The relationship with nbr device, see @ref nwk_relationship */
+  /* [2 bytes] */
+  zb_bitfield_t                device_type:2;     /*!< Neighbor device type - @see @ref nwk_device_types */
+  zb_bitfield_t                nwk_ed_timeout:4;  /*!< ED timeout value (for Child Aging) */
+  zb_bitfield_t                reserved:2;
+  /* [3 bytes] */
+  zb_uint8_t                   key_seq_number;    /*!< key number */
+  /* [4 bytes] */
+  zb_uint8_t                   mac_iface_idx;     /*!< Mac Interface Table index */
+  zb_uint16_t                  addr_ref;          /*!< Neighbor address */
+  zb_uint8_t                   align2[1];          /*!< Reserved for future use */
+  /* [8 bytes] */
+}
+ZB_PACKED_STRUCT
+zb_nvram_neighbour_rec_v4_t;
+
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_neighbour_rec_v4_t) == 8U);
+ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_neighbour_rec_v4_t);
+
+/**
+ * @note The dataset size is fixed and doesn't depend on building configuration
+ */
 typedef ZB_PACKED_PRE struct zb_nvram_page_hdr_dataset_s
 {
+  /* [0 bytes] */
    /*!< Version of dataset structures stored in NVRAM (simple counter)
    * One version for all datasets. */
   zb_nvram_ver_t version;
   zb_uint8_t  aligned[4-sizeof(zb_nvram_ver_t)];
+  /* [4 bytes] */
 }
 zb_nvram_page_hdr_dataset_t;
 
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_nvram_page_hdr_dataset_t) == 4U);
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_page_hdr_dataset_t);
 
 typedef enum zb_nvram_zcl_reporting_data_ds_versions_e
 {
-  ZB_NVRAM_ZCL_REPORTING_DATA_DS_VER_1 = 0,
+  ZB_NVRAM_ZCL_REPORTING_DATA_DS_VER_1 = 0U,
 }
 zb_nvram_zcl_reporting_data_ds_versions_t;
 
@@ -1251,13 +2193,23 @@ zb_nvram_zcl_reporting_data_ds_versions_t;
 /** @{ */
 #define ZB_NVRAM_APS_SECURE_DATA_DS_VER_1 0U
 #define ZB_NVRAM_APS_SECURE_DATA_DS_VER_2 1U
+#define ZB_NVRAM_APS_SECURE_DATA_DS_VER_3 2U
 /** @} */
 
-#define ZB_NVRAM_APS_SECURE_DATA_DS_VER ZB_NVRAM_APS_SECURE_DATA_DS_VER_2
+#define ZB_NVRAM_APS_SECURE_DATA_DS_VER ZB_NVRAM_APS_SECURE_DATA_DS_VER_3
+
+#define ZB_APS_DEVICE_KEY_PAIR_NVRAM_LOCATION_NONE (0U)
+
+#define ZB_APS_DEVICE_KEY_PAIR_NVRAM_GET_PAGE() \
+  (ZB_U2B(ZB_NVRAM().migration_in_progress) ? ZB_NVRAM_MIGRATION_PREV_PAGE() : ZB_NVRAM().current_page)
+
+
+zb_ret_t zb_nvram_write_aps_keypair_entry_dataset(
+  zb_aps_key_pair_ref_t entry_ref, zb_bool_t entry_removed_flag);
 
 typedef enum zb_nvram_installcodes_ds_versions_e
 {
-  ZB_NVRAM_INSTALLCODES_DS_VER_1 = 0,
+  ZB_NVRAM_INSTALLCODES_DS_VER_1 = 0U,
 }
 zb_nvram_installcodes_ds_versions_t;
 
@@ -1306,9 +2258,13 @@ void zb_nvram_local_init(void *id);
  */
 void zb_nvram_load(void);
 
+zb_bool_t zb_nvram_dataset_is_supported(zb_nvram_dataset_types_t ds);
+zb_uint16_t zb_nvram_get_dataset_version(zb_uint16_t ds_type);
+zb_uint16_t zb_nvram_get_length_dataset(const zb_nvram_dataset_hdr_t *hdr);
+
 #ifdef ZB_ZBOSS_DEINIT
 /**
-   Denit nvram
+   Deinit nvram
  */
 void zb_nvram_deinit(void);
 #endif
@@ -1436,6 +2392,24 @@ zb_ret_t zb_nvram_custom_ds_register(zb_nvram_ds_filter_cb_t filter,
                                      zb_nvram_ds_get_version_cb_t get_version,
                                      zb_nvram_ds_read_cb_t read,
                                      zb_nvram_ds_write_cb_t write);
+
+#ifndef APP_ONLY_NVRAM
+
+zb_ret_t zb_nvram_read_addr_map_entry(zb_uint8_t page, zb_uint32_t *pos);
+
+zb_ret_t zb_nvram_write_addr_map_entry(
+  zb_address_ieee_ref_t addr_ref,
+  const zb_ieee_addr_t ieee_addr,
+  zb_uint8_t page,
+  zb_uint32_t *pos);
+
+zb_ret_t zb_nvram_read_addr_map_entry_dataset(
+  zb_uint8_t page, zb_uint32_t pos, zb_uint16_t len, zb_nvram_ver_t nvram_ver, zb_uint16_t ds_ver);
+zb_uint16_t zb_nvram_addr_map_entry_dataset_length(void);
+
+void zb_nvram_addr_map_restore_locks(void);
+
+#endif /* APP_ONLY_NVRAM */
 
 #endif  /* ZB_USE_NVRAM */
 

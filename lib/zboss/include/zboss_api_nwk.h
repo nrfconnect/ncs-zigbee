@@ -64,12 +64,14 @@
   #define ZB_NWK_MAC_IFACE_TBL_SIZE 1U
 #elif defined(ZB_MACSPLIT_DEVICE) && !defined(ZB_MAC_MONOLITHIC) && !defined(ZB_MAC_BLE) && !defined(ZB_MACSPLIT_HOST) && !defined(ZB_MAC_SUBGHZ)
   #define ZB_NWK_MAC_IFACE_TBL_SIZE 1U
-  /* MAC-split SoC uses default MAC interface, so for building device with only SoC interface just declare monolithic MAC */
+  /* MAC-Split SoC uses default MAC interface, so for building device with only SoC interface just declare monolithic MAC */
 #elif defined(NCP_MODE_HOST)
   /* Preserve default table size to keep previous stack behaviour, but
    * do not use any interfaces in that case */
   #define ZB_NWK_MAC_IFACE_TBL_SIZE 1U
 #elif defined(ZB_EXTMAC)
+  #define ZB_NWK_MAC_IFACE_TBL_SIZE 1U
+#elif defined(ZB_MAC_BLE)
   #define ZB_NWK_MAC_IFACE_TBL_SIZE 1U
 #else
   #error Multi-MAC configuration is not supported, at least one interface should be enabled
@@ -82,7 +84,7 @@
 /**
  * @brief Flag that is used to perform some action on all interfaces together
  */
-#define ZB_NWK_MULTIMAC_ALL_INTERFACES 0xFFU
+#define ZB_NWK_MULTIMAC_ALL_INTERFACES 0x7U
 
 /** @} */ /* nwk_multi_mac */
 
@@ -618,16 +620,6 @@ zb_nwk_pib_cache_t *zb_nwk_get_pib_cache(void);
 #endif /* !NCP_MODE_HOST */
 
 /**
-   Arguments of the NLME-PERMIT_JOINING.request routine.
-*/
-typedef ZB_PACKED_PRE struct zb_nlme_permit_joining_request_s
-{
-  zb_uint8_t permit_duration; /**< Time in seconds during which the coordinator
-                               * or router will allow associations */
-} ZB_PACKED_STRUCT
-zb_nlme_permit_joining_request_t;
-
-/**
    Permit Joining signal info
 */
 typedef ZB_PACKED_PRE struct zb_nlme_permit_joining_signal_info_s
@@ -636,19 +628,6 @@ typedef ZB_PACKED_PRE struct zb_nlme_permit_joining_signal_info_s
                                * or router will allow associations */
 } ZB_PACKED_STRUCT
 zb_nlme_permit_joining_signal_info_t;
-
-/**
-   NLME-PERMIT-JOINING.request primitive
-
-   Allow/disallow network joining
-
-   @param param - buffer containing parameters - @see
-   zb_nlme_network_formation_request_t
-   @return RET_OK on success, error code otherwise.
-
-   @snippet doxygen_snippets.dox zb_nlme_permit_joining_request
- */
-void zb_nlme_permit_joining_request(zb_uint8_t param);
 
 
 /** @} */
@@ -666,6 +645,13 @@ typedef struct zb_channel_panid_change_preparation_s
 {
   zb_uint16_t error_cnt;  /*!< Number of not OK responses from remote devices for next channel/panid change */
 } zb_channel_panid_change_preparation_t;
+
+
+/**
+   @brief Callback parameters for zb_prepare_network_for_for_nwk_key_update()
+   Stack sends transport key to the all devices and count errors
+  */
+#define zb_nwk_key_update_preparation_t zb_channel_panid_change_preparation_t
 
 
 /**
@@ -698,7 +684,7 @@ typedef struct zb_panid_change_parameters_s
 
    @snippet r23_new_api/r23_zc.c change_channel_snippet
  */
-zb_ret_t zb_prepare_network_for_channel_change(zb_uint8_t param, zb_callback_t cb);
+zb_ret_t zb_prepare_network_for_channel_change(zb_bufid_t param, zb_callback_t cb);
 
 /**
    This function set nwkNextPanId and sends set_configuration_req for all remote devices
@@ -708,7 +694,16 @@ zb_ret_t zb_prepare_network_for_channel_change(zb_uint8_t param, zb_callback_t c
 
    @snippet r23_new_api/r23_zc.c change_panid_snippet
  */
-zb_ret_t zb_prepare_network_for_panid_change(zb_uint8_t param, zb_callback_t cb);
+zb_ret_t zb_prepare_network_for_panid_change(zb_bufid_t param, zb_callback_t cb);
+
+/**
+   This function unicast a network key for all remote devices.
+   The network key has sequence number greater than active by 1.
+   Parameters zb_panid_change_parameters_t will be using for zb_start_panid_change()
+   @param param - buffer
+   @param cb    - callback function, @ref zb_nwk_key_update_preparation_t
+ */
+zb_ret_t zb_prepare_network_for_nwk_key_update(zb_bufid_t param, zb_callback_t cb);
 #endif /* ZB_COORDINATOR_ROLE */
 
 #if defined ZB_ROUTER_ROLE
@@ -721,7 +716,7 @@ zb_ret_t zb_prepare_network_for_panid_change(zb_uint8_t param, zb_callback_t cb)
 
    @snippet r23_new_api/r23_zc.c change_channel_snippet
  */
-zb_ret_t zb_start_channel_change(zb_uint8_t param);
+zb_ret_t zb_start_channel_change(zb_bufid_t param);
 
 
 /**
@@ -735,35 +730,9 @@ zb_ret_t zb_start_channel_change(zb_uint8_t param);
 
    @snippet r23_new_api/r23_zc.c change_panid_snippet
  */
-zb_ret_t  zb_start_panid_change(zb_uint8_t param);
+zb_ret_t  zb_start_panid_change(zb_bufid_t param);
 #endif  /* #ifdef ZB_ROUTER_ROLE */
 
-
-/**
-   Toggles panid conflict resolution.
-
-   @deprecated Enabling/disabling of panid conflict resolution is deprecated in r23 codebase snd does nothing.
-
-   Call of that function allows switching on/off panid conflict resolution and detection
-   logic.
-
-   @deprecated Kept only for backward compatibility.
-   PANID conflict detection is always enabled at R23 and can not be disabled. Application is responsible for starting of conflict resolution.
-
-   @param status - if ZB_TRUE, enable conflict resolution, else disable
- */
-void zb_enable_panid_conflict_resolution(zb_bool_t status);
-
-/**
-   Toggles automatic panid conflict resolution.
-
-   @deprecated Enabling/disabling of automatic panid conflict resolution is deprecated in r23 codebase and does nothing.
-
-   Call of that function allows switching on/off automatic panid conflict resolution.
-
-   @param status - if ZB_TRUE, enable conflict resolution, else disable
- */
-void zb_enable_auto_pan_id_conflict_resolution(zb_bool_t status);
 
 /** @} */ /* nwk_panid_conflicts */
 
@@ -771,21 +740,6 @@ void zb_enable_auto_pan_id_conflict_resolution(zb_bool_t status);
 /** @addtogroup nwk_management_service NWK management service
  * @{
  */
-#ifdef ZB_LOW_SECURITY_MODE
-/**
-    Public API to set device security level to 0
-    @deprecated This function will be removed in the next Major release after june 2023.
-                Now security level is always equal to 5.
-*/
-void zb_disable_nwk_security(void);
-
-/**
-    Public API to set device security level to 5
-    @deprecated This function will be removed in the next Major release after june 2023.
-                Now security level is always equal to 5.
-*/
-void zb_enable_nwk_security(void);
-#endif /* ZB_LOW_SECURITY_MODE */
 
 #ifdef ZB_NWK_CONFIGURABLE_DST_IEEE_IN_HDR
 /**
@@ -833,6 +787,10 @@ zb_ret_t zb_get_source_route(zb_route_record_t *p_route_record, zb_uint16_t shor
    It's possible to call this function to send MTORR immediately, e.g. after a new device joined the network.
    It does affect only for Coordinator role.
 
+   The function has extended version with additional parameter to set nwkConcentratorDiscoverySeparation attribute.
+   (see \ref zb_start_concentrator_mode_ext).
+   Default attribute value is 0.
+
    @param radius - the hop count radius for concentrator route discoveries.
    If the value is set zero then the default radius will be used.
    @param disc_time - the time in seconds between concentrator route discoveries.
@@ -840,11 +798,46 @@ zb_ret_t zb_get_source_route(zb_route_record_t *p_route_record, zb_uint16_t shor
 */
 void zb_start_concentrator_mode(zb_uint8_t radius, zb_uint32_t disc_time);
 
+
+/**
+   Enable Concentrator mode for the device (disabled by default).
+   It's possible to call this function to send MTORR immediately, e.g. after a new device joined the network.
+   It does affect only for Coordinator role.
+
+   @param radius - the hop count radius for concentrator route discoveries.
+   If the value is set zero then the default radius will be used.
+   @param disc_time - the time in seconds between concentrator route discoveries.
+   If the value is set to zero, the route discoveries are done by the application layer only.
+   @param disc_separation_time - the minimum time in seconds between concentrator route discoveries.
+   If the value is set to zero, there is no minimum separation time.
+*/
+void zb_start_concentrator_mode_ext(zb_uint8_t radius, zb_uint32_t disc_time, zb_uint32_t disc_separation_time);
+
 /**
    Disable Concentrator mode for the device.
    It does affect only for Coordinator role.
 */
 void zb_stop_concentrator_mode(void);
+
+
+/**
+ * @brief Sets delay in beacon intervals to send MTORR after route request receiving.
+ * If delay is zero, reactive MTORR feature will be enabled
+ * (i.e. concentrator may send MTORR immediately instead of Route Reply).
+ * If delay is not zero, concentrator will send Route Reply as usual and
+ * will be advised to send MTORR as well.
+ *
+ * @param delay delay in beacon intervals
+ */
+void zb_concentrator_mode_set_mtorr_delay_after_rreq(zb_time_t delay);
+
+/**
+ * @brief Gets delay in beacon intervals to send MTORR after route request receiving.
+ *
+ * @return delay in beacon intervals
+ */
+zb_time_t zb_concentrator_mode_get_mtorr_delay_after_rreq(void);
+
 #endif /* ZB_COORDINATOR_ROLE */
 
 
@@ -900,10 +893,10 @@ zb_nwk_device_type_t zb_get_device_type(void);
 zb_uint16_t zb_nwk_get_parent(void);
 
 
-#define ZB_NWK_NBR_ITERATOR_INDEX_EOT 0xFFFFU /*! Index, indicating that the iterator reached boundaries of the neighbour table. */
+#define ZB_NWK_NBR_ITERATOR_INDEX_EOT 0xFFU /*! Index, indicating that the iterator reached boundaries of the neighbour table. */
 
 typedef ZB_PACKED_PRE struct zb_nwk_nbr_iterator_cb_params_s {
-   zb_uint16_t index;        /*!< In the callback function:
+   zb_uint8_t index;         /*!< In the callback function:
                               *     Index of the returned neighbour table entry.
                               *     The value of ZB_NWK_NBR_ITERATOR_INDEX_EOT
                               *     indicates that the entry was not returned and
@@ -939,10 +932,6 @@ typedef ZB_PACKED_PRE struct zb_nwk_nbr_iterator_entry_s
                                          *   This field shall be present in every neighbour table entry.
                                          *   @if DOXYGEN_INTERNAL_DOC See @ref nwk_relationship @endif
                                          */
-  zb_uint8_t      send_via_routing;     /*!< That field is deprecated. Removed
-                                         * from zb_neighbor_tbl_ent_t, always 0
-                                         * here. */
-
   zb_uint8_t      keepalive_received;   /*!< This value indicates at least one keepalive
                                          *   has been received from the end device since
                                          *   the router has rebooted.
@@ -979,7 +968,7 @@ zb_nwk_nbr_iterator_entry_t;
    @param  bufid  The ZBOSS buffer, containing arguments defined by zb_nwk_nbr_iterator_params_t structure, passed as buffer parameters.
    @param  cb     Callback function, that will get the next neighbour table entry.
  */
-zb_ret_t zb_nwk_nbr_iterator_next(zb_uint8_t bufid, zb_callback_t cb);
+zb_ret_t zb_nwk_nbr_iterator_next(zb_bufid_t bufid, zb_callback_t cb);
 
 /** @} */ /* nwk_management_service */
 
@@ -987,6 +976,11 @@ zb_ret_t zb_nwk_nbr_iterator_next(zb_uint8_t bufid, zb_callback_t cb);
 
 /**
    Set the number of end device a device is allow to have.
+
+   @param value maximum number of EDs reserved in neighbor table.
+
+   @note if device is ZED/ZR, @p value must be < ZB_NEIGHBOR_TABLE_SIZE
+         if device is ZC, @p value must be <= ZB_NEIGHBOR_TABLE_SIZE
 
    @return RET_OK if successful
  */
@@ -1032,6 +1026,61 @@ void zb_nwk_mutlipan_allow_channel_change_while_joined(zb_bool_t allow);
  */
 zb_bool_t zb_nwk_mutlipan_get_channel_change_after_join_enabled(void);
 #endif /* ZB_MULTIPAN_ENABLE_CHANNEL_CHANGE_BLOCKING_WHILE_JOINED */
+
+
+#if defined(ZB_ROUTER_ROLE) && defined(ZB_DENSE_NET_ROUTING_OPTIMIZATION)
+
+
+/**
+ * @name Routing optimization type for dense network
+ * @anchor nwk_rtg_optimization
+*/
+/** @{ */
+#define ZB_NWK_RTG_OPT_CLEAR_RTG_TBL_FOR_NEIGHBORS (1U << 0U) /*!< Remove routing entry for device when
+                                                               *   it becomes neighbor */
+#define ZB_NWK_RTG_OPT_STOP_ROUTE_DISC_FOR_NEIGHBOR (1U << 1U) /*!< Stop Route Discovery for device when
+                                                                *   it becomes neighbor */
+#define ZB_NWK_RTG_OPT_STOP_ROUTE_DISC_FOR_BEST_ROUTE (1U << 2U) /*!< Stop Route Discovery for device when
+                                                                  *   it becomes available via the best possible route */
+#define ZB_NWK_RTG_OPT_ZC_DEFAULT_ROUTE_TO_JOINER (1U << 3U) /*!< Add route to joiner device via initiator of
+                                                              *   Update Device command */
+#define ZB_NWK_RTG_OPT_SRC_ROUTE_SOLICITATION_TLV (1U << 4U) /*!< Enables sending of Source Route Solicitation TLV
+                                                              *   on concentrator device and processing of the TLV on
+                                                              *   router devices */
+#define ZB_NWK_RTG_OPT_EXTENDED_ROUTE_INFORMATION_TLV (1U << 5U) /*!< Enables sending of Extended Route Information TLV
+                                                                  *   for router devices.
+                                                                  *
+                                                                  * TLV is needed to discard outdated routing information,
+                                                                  * but this is not currently implemented and the option has
+                                                                  * only information effect
+                                                                  * (devices just add TLV, but not process it). */
+#define ZB_NWK_RTG_OPT_CONCENTRATOR_INFORMATION_TLV (1U << 6U) /*!< Enables sending of Concentrator Information TLV
+                                                                  * for concentrator devices.
+                                                                  *
+                                                                  * TLV is processing this is not currently implemented and
+                                                                  * the option has only information effect
+                                                                  * (devices just add TLV, but not process it). */
+
+#define ZB_NWK_RTG_OPT_DONT_REMOVE_RTG_ON_NBT_EXPIRE (1U << 7U) /*!< When using an existing route, ignore outgoing cost 0 */
+
+#define ZB_NWK_RTG_OPT_ALL (                                               \
+   ZB_NWK_RTG_OPT_CLEAR_RTG_TBL_FOR_NEIGHBORS |                            \
+   ZB_NWK_RTG_OPT_STOP_ROUTE_DISC_FOR_NEIGHBOR |                           \
+   ZB_NWK_RTG_OPT_STOP_ROUTE_DISC_FOR_BEST_ROUTE |                         \
+   ZB_NWK_RTG_OPT_ZC_DEFAULT_ROUTE_TO_JOINER |                             \
+   ZB_NWK_RTG_OPT_SRC_ROUTE_SOLICITATION_TLV |                             \
+   ZB_NWK_RTG_OPT_EXTENDED_ROUTE_INFORMATION_TLV |                         \
+   ZB_NWK_RTG_OPT_CONCENTRATOR_INFORMATION_TLV |                           \
+   ZB_NWK_RTG_OPT_DONT_REMOVE_RTG_ON_NBT_EXPIRE)
+
+/** @} */
+
+void zb_enable_nwk_dense_net_routing_optimization(zb_uint8_t optimization_mask);
+
+zb_bool_t zb_is_nwk_dense_net_routing_optimization_enabled(zb_uint8_t optimization_type);
+
+#endif /* ZB_ROUTER_ROLE && ZB_DENSE_NET_ROUTING_OPTIMIZATION */
+
 /** @} */ /* nwk_api */
 
 #endif /*#ifndef ZB_ZBOSS_API_NWK_H*/

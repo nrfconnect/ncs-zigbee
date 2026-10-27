@@ -85,7 +85,7 @@ zb_discover_cmd_list_t gs_daily_schedule_server_cmd_list =
      (_payload), (_cb) \
   )
 
-zb_bool_t zb_zcl_process_s_daily_schedule_specific_commands(zb_uint8_t param);
+zb_bool_t zb_zcl_process_s_daily_schedule_specific_commands(zb_cb_param_t param);
 
 static zb_ret_t check_value_daily_schedule(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 
@@ -173,7 +173,7 @@ PUT_PL_END()
 #undef PUT_PL_START
 #undef PUT_PL_END
 
-void zb_zcl_daily_schedule_send_cmd_publish_schedule(zb_uint8_t param,
+void zb_zcl_daily_schedule_send_cmd_publish_schedule(zb_bufid_t param,
   const zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep, zb_uint8_t src_ep,
   const zb_zcl_daily_schedule_publish_schedule_payload_t *pl,
@@ -191,7 +191,7 @@ void zb_zcl_daily_schedule_send_cmd_publish_schedule(zb_uint8_t param,
 }
 
 
-void zb_zcl_daily_schedule_send_cmd_publish_day_profile(zb_uint8_t param,
+void zb_zcl_daily_schedule_send_cmd_publish_day_profile(zb_bufid_t param,
   const zb_addr_u *dst_addr,
   zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep, zb_uint8_t src_ep,
@@ -209,7 +209,7 @@ void zb_zcl_daily_schedule_send_cmd_publish_day_profile(zb_uint8_t param,
                   cb);
 }
 
-void zb_zcl_daily_schedule_send_cmd_cancel_schedule(zb_uint8_t param,
+void zb_zcl_daily_schedule_send_cmd_cancel_schedule(zb_bufid_t param,
   const zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep, zb_uint8_t src_ep,
   const zb_zcl_daily_schedule_cancel_schedule_payload_t *pl,
@@ -226,7 +226,7 @@ void zb_zcl_daily_schedule_send_cmd_cancel_schedule(zb_uint8_t param,
                        cb);
 }
 
-void zb_zcl_daily_schedule_send_cmd_cancel_all_schedules(zb_uint8_t param,
+void zb_zcl_daily_schedule_send_cmd_cancel_all_schedules(zb_bufid_t param,
   const zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep, zb_uint8_t src_ep,
   zb_callback_t cb
@@ -245,7 +245,7 @@ void zb_zcl_daily_schedule_send_cmd_cancel_all_schedules(zb_uint8_t param,
 /* Server definitions */
 
 static ZB_INLINE const zb_uint8_t *zb_zcl_daily_schedule_get_schedule_parse_payload(
-  zb_zcl_daily_schedule_get_schedule_payload_t *pl, zb_uint8_t param)
+  zb_zcl_daily_schedule_get_schedule_payload_t *pl, zb_bufid_t param)
 {
   zb_uint8_t *data = (zb_uint8_t *)zb_buf_begin(param);
   zb_uint8_t data_size = zb_buf_len(param);
@@ -268,7 +268,7 @@ static ZB_INLINE const zb_uint8_t *zb_zcl_daily_schedule_get_schedule_parse_payl
 }
 
 static const zb_uint8_t *zb_zcl_daily_schedule_get_day_profile_parse_payload(
-  zb_zcl_daily_schedule_get_day_profile_payload_t *pl, zb_uint8_t param)
+  zb_zcl_daily_schedule_get_day_profile_payload_t *pl, zb_bufid_t param)
 {
   zb_uint8_t *data = zb_buf_begin(param);
   zb_uint8_t data_size = zb_buf_len(param);
@@ -290,7 +290,7 @@ static const zb_uint8_t *zb_zcl_daily_schedule_get_day_profile_parse_payload(
 }
 
 
-static zb_bool_t zb_zcl_daily_schedule_process_get_schedule(zb_uint8_t param,
+static zb_bool_t zb_zcl_daily_schedule_process_get_schedule(zb_bufid_t param,
                                                  const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_daily_schedule_get_schedule_payload_t pl_in = ZB_ZCL_DAILY_SCHEDULE_GET_SCHEDULE_PL_INIT;
@@ -329,7 +329,7 @@ static zb_bool_t zb_zcl_daily_schedule_process_get_schedule(zb_uint8_t param,
 }
 
 
-static zb_bool_t zb_zcl_daily_schedule_process_get_day_profile(zb_uint8_t param,
+static zb_bool_t zb_zcl_daily_schedule_process_get_day_profile(zb_bufid_t param,
                                                  const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_daily_schedule_get_day_profile_payload_t pl_in = ZB_ZCL_DAILY_SCHEDULE_GET_DAY_PROFILE_PL_INIT;
@@ -370,7 +370,7 @@ static zb_bool_t zb_zcl_daily_schedule_process_get_day_profile(zb_uint8_t param,
 }
 
 
-static zb_bool_t zb_zcl_daily_schedule_process_get_schedule_cancellation(zb_uint8_t param,
+static zb_bool_t zb_zcl_daily_schedule_process_get_schedule_cancellation(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_daily_schedule_cancel_schedule_payload_t pl_out = ZB_ZCL_DAILY_SCHEDULE_CANCEL_SCHEDULE_PL_INIT;
@@ -412,7 +412,7 @@ switch (ZB_ZCL_DEVICE_CMD_PARAM_STATUS(param))
 }
 
 
-static zb_bool_t zb_zcl_process_daily_schedule_srv_cmd(zb_uint8_t param,
+static zb_bool_t zb_zcl_process_daily_schedule_srv_cmd(zb_bufid_t param,
                                             const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_bool_t processed = ZB_FALSE;
@@ -440,13 +440,13 @@ static zb_bool_t zb_zcl_process_daily_schedule_srv_cmd(zb_uint8_t param,
 
 /******************************************************************************/
 /* Handler definition */
-zb_bool_t zb_zcl_process_s_daily_schedule_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_s_daily_schedule_specific_commands(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_bool_t           processed = ZB_FALSE;
 
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_s_daily_schedule_specific_commands, "
-            "param=%hd", (FMT__H, param));
+            "param=%d", (FMT__D, param));
 
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {

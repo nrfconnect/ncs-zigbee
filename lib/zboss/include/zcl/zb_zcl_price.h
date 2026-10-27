@@ -4505,18 +4505,18 @@ typedef ZB_PACKED_PRE struct zb_zcl_price_cancel_tariff_payload_s
   zb_zcl_price_send_cmd_price_ack_tsn( \
     _param, _dst_addr, _dst_addr_mode, _dst_ep, _src_ep, _payload, _tsn, NULL)
 
-void zb_zcl_price_send_cmd_publish_price(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_price_send_cmd_publish_price(zb_bufid_t param, const zb_addr_u *dst_addr,
                                               zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                               zb_uint8_t src_ep,
                                               const zb_zcl_price_publish_price_payload_t *payload,
                                               zb_callback_t cb);
 
-void zb_zcl_price_send_cmd_get_current_price(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_price_send_cmd_get_current_price(zb_bufid_t param, const zb_addr_u *dst_addr,
                                                   zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                   zb_uint8_t src_ep, zb_uint8_t rx_on_when_idle,
                                                   zb_callback_t cb);
 
-void zb_zcl_price_send_cmd_price_ack(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_price_send_cmd_price_ack(zb_bufid_t param, const zb_addr_u *dst_addr,
                                           zb_aps_addr_mode_t dst_addr_mode,
                                           zb_uint8_t dst_ep, zb_uint8_t src_ep,
                                           const zb_zcl_price_ack_payload_t *payload,
@@ -4532,28 +4532,28 @@ void zb_zcl_price_send_cmd_price_ack(zb_uint8_t param, const zb_addr_u *dst_addr
  *  @param _tsn - sequence number of source command
  *  @param cb - Callback which should be called when the ZCL stack receives APS ack.
  */
-void zb_zcl_price_send_cmd_price_ack_tsn(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_price_send_cmd_price_ack_tsn(zb_bufid_t param, const zb_addr_u *dst_addr,
                                           zb_aps_addr_mode_t dst_addr_mode,
                                           zb_uint8_t dst_ep, zb_uint8_t src_ep,
                                           const zb_zcl_price_ack_payload_t *payload,
                                           zb_uint8_t tsn,
                                           zb_callback_t cb);
 
-void zb_zcl_price_send_cmd_get_scheduled_prices(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_price_send_cmd_get_scheduled_prices(zb_bufid_t param, const zb_addr_u *dst_addr,
                                                      zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                      zb_uint8_t src_ep,
                                                      const zb_zcl_price_get_scheduled_prices_payload_t *payload,
                                                      zb_callback_t cb);
 
 
-void zb_zcl_price_send_cmd_get_tier_labels(zb_uint8_t param, zb_addr_u *dst_addr,
+void zb_zcl_price_send_cmd_get_tier_labels(zb_bufid_t param, zb_addr_u *dst_addr,
                                                 zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                 zb_uint8_t src_ep,
                                                 zb_zcl_price_get_tier_labels_payload_t *payload,
                                                 zb_callback_t cb);
 
 
-void zb_zcl_price_send_cmd_publish_tier_labels(zb_uint8_t param, zb_addr_u *dst_addr,
+void zb_zcl_price_send_cmd_publish_tier_labels(zb_bufid_t param, zb_addr_u *dst_addr,
                                                     zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                     zb_uint8_t src_ep,
                                                     zb_zcl_price_publish_tier_labels_payload_t *payload,

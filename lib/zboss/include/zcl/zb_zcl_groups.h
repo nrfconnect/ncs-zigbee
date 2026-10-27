@@ -737,7 +737,7 @@ zb_zcl_groups_remove_group_res_t;
  * @return ZB_TRUE - if command was processed
  *         ZB_FALSE - if command is not for server or is not supported
  */
-zb_bool_t zb_zcl_process_groups_commands_srv(zb_uint8_t param);
+zb_bool_t zb_zcl_process_groups_commands_srv(zb_cb_param_t param);
 
 /**
  * Handler for incoming group commands directed to client
@@ -747,7 +747,7 @@ zb_bool_t zb_zcl_process_groups_commands_srv(zb_uint8_t param);
  * @return ZB_TRUE - if command was processed
  *         ZB_FALSE - if command is not for client or is not supported
  */
-zb_bool_t zb_zcl_process_groups_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_groups_commands_cli(zb_cb_param_t param);
 
 /** @cond internals_doc
     @internal @name Groups cluster internals

@@ -81,18 +81,18 @@ zb_discover_cmd_list_t gs_groups_server_cmd_list =
 
 #ifdef ZB_ZCL_ENABLE_DEFAULT_GROUPS_PROCESSING
 
-static void add_group_handler(zb_uint8_t param, zb_bool_t check_identifying);
-static void view_group_handler(zb_uint8_t param);
-static void get_group_membership_handler(zb_uint8_t param);
-static void remove_group_handler(zb_uint8_t param);
-static void remove_all_groups_handler(zb_uint8_t param);
+static void add_group_handler(zb_bufid_t param, zb_bool_t check_identifying);
+static void view_group_handler(zb_bufid_t param);
+static void get_group_membership_handler(zb_bufid_t param);
+static void remove_group_handler(zb_bufid_t param);
+static void remove_all_groups_handler(zb_bufid_t param);
 
 static zb_ret_t aps_status_to_zcl_status(zb_ret_t aps_status);
-static void dummy_handler(zb_uint8_t unused);
+static void dummy_handler(zb_cb_param_t unused);
 
 zb_ret_t check_value_groups_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
-zb_bool_t zb_zcl_process_groups_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_groups_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_groups_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_groups_commands_cli(zb_cb_param_t param);
 
 void zb_zcl_groups_init_server()
 {
@@ -124,7 +124,7 @@ zb_ret_t check_value_groups_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_
   return RET_OK;
 }
 /*
-zb_bool_t zb_zcl_process_groups_commands_mixed(zb_uint8_t param)
+zb_bool_t zb_zcl_process_groups_commands_mixed(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_FALSE;
   processed = zb_zcl_process_groups_commands_srv(param);
@@ -137,7 +137,7 @@ zb_bool_t zb_zcl_process_groups_commands_mixed(zb_uint8_t param)
   return processed;
 }
 */
-zb_bool_t zb_zcl_process_groups_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_groups_commands_srv(zb_cb_param_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t *cmd_info;
@@ -150,7 +150,7 @@ zb_bool_t zb_zcl_process_groups_commands_srv(zb_uint8_t param)
 
   cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_groups_commands_srv: param %hd",(FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_groups_commands_srv: param %d",(FMT__D, param));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_GROUPS == cmd_info->cluster_id);
 
@@ -199,7 +199,7 @@ zb_bool_t zb_zcl_process_groups_commands_srv(zb_uint8_t param)
   return processed;
 }
 
-static void add_group_send_default_resp(zb_uint8_t param, zb_zcl_parsed_hdr_t *cmd_info, zb_ret_t status)
+static void add_group_send_default_resp(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info, zb_ret_t status)
 {
   TRACE_MSG(TRACE_ZCL1, ">> add_group_send_default_resp", (FMT__0));
 
@@ -217,13 +217,13 @@ static void add_group_send_default_resp(zb_uint8_t param, zb_zcl_parsed_hdr_t *c
   TRACE_MSG(TRACE_ZCL1, "<< add_group_send_default_resp", (FMT__0));
 }
 
-static void add_group_cb_send_default_resp(zb_uint8_t param)
+static void add_group_cb_send_default_resp(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_apsme_add_group_conf_t *conf_param;
   zb_ret_t status;
 
-  TRACE_MSG(TRACE_ZCL1, ">> add_group_cb_send_default_resp, param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> add_group_cb_send_default_resp, param %d", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, zb_buf_begin(param), sizeof(zb_zcl_parsed_hdr_t));
   conf_param = ZB_BUF_GET_PARAM(param, zb_apsme_add_group_conf_t);
@@ -235,7 +235,7 @@ static void add_group_cb_send_default_resp(zb_uint8_t param)
   TRACE_MSG(TRACE_ZCL1, "<< add_group_cb_send_default_resp", (FMT__0));
 }
 
-static void add_group_send_add_group_resp(zb_uint8_t param, zb_zcl_parsed_hdr_t *cmd_info,
+static void add_group_send_add_group_resp(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info,
   zb_ret_t status, zb_uint16_t group_id)
 {
   zb_uint8_t *resp_data;
@@ -267,13 +267,13 @@ static void add_group_send_add_group_resp(zb_uint8_t param, zb_zcl_parsed_hdr_t 
   TRACE_MSG(TRACE_ZCL1, "<< add_group_send_add_group_resp", (FMT__0));
 }
 
-static void add_group_cb_send_add_group_resp(zb_uint8_t param)
+static void add_group_cb_send_add_group_resp(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_apsme_add_group_conf_t *conf_param;
   zb_ret_t status;
 
-  TRACE_MSG(TRACE_ZCL1, ">> add_group_cb_send_add_group_resp, param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> add_group_cb_send_add_group_resp, param %d", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, zb_buf_begin(param), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -285,7 +285,7 @@ static void add_group_cb_send_add_group_resp(zb_uint8_t param)
   TRACE_MSG(TRACE_ZCL1, "<< add_group_cb_send_add_group_resp", (FMT__0));
 }
 
-static void add_group_handler(zb_uint8_t param, zb_bool_t check_identifying)
+static void add_group_handler(zb_bufid_t param, zb_bool_t check_identifying)
 {
   zb_zcl_groups_add_group_req_t add_group_req;
   zb_apsme_add_group_req_t *aps_req;
@@ -295,8 +295,8 @@ static void add_group_handler(zb_uint8_t param, zb_bool_t check_identifying)
   zb_zcl_parsed_hdr_t *resp_cmd_info = NULL;
   zb_bool_t respond_with_default_resp = ZB_FALSE;
 
-  TRACE_MSG(TRACE_ZCL1, ">> add_group_handler param %hd, check_identifying %hd",
-            (FMT__H_H, param, check_identifying));
+  TRACE_MSG(TRACE_ZCL1, ">> add_group_handler param %d, check_identifying %hd",
+            (FMT__D_H, param, check_identifying));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -414,7 +414,7 @@ static void add_group_handler(zb_uint8_t param, zb_bool_t check_identifying)
 }
 
 
-static void view_group_handler(zb_uint8_t param)
+static void view_group_handler(zb_bufid_t param)
 {
   zb_zcl_groups_view_group_req_t view_group_req;
   zb_uint8_t *resp_data;
@@ -423,7 +423,7 @@ static void view_group_handler(zb_uint8_t param)
   zb_apsme_get_group_membership_conf_t *conf;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, ">> view_group_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> view_group_handler %d", (FMT__D, param));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
   ZB_ZCL_GROUPS_GET_VIEW_GROUP_REQ(param, view_group_req);
@@ -490,7 +490,7 @@ static void view_group_handler(zb_uint8_t param)
 }
 
 
-static void get_group_membership_handler(zb_uint8_t param)
+static void get_group_membership_handler(zb_bufid_t param)
 {
   zb_zcl_groups_get_group_membership_req_t *get_member_req;
   zb_uint8_t *resp_data;
@@ -580,7 +580,7 @@ static void get_group_membership_handler(zb_uint8_t param)
 }
 
 
-static void remove_group_send_remove_group_resp(zb_uint8_t param, zb_zcl_parsed_hdr_t *cmd_info,
+static void remove_group_send_remove_group_resp(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info,
   zb_ret_t status, zb_uint16_t group_id)
 {
   zb_uint8_t *resp_data;
@@ -615,13 +615,13 @@ static void remove_group_send_remove_group_resp(zb_uint8_t param, zb_zcl_parsed_
   TRACE_MSG(TRACE_ZCL1, "<< remove_group_send_remove_group_resp", (FMT__0));
 }
 
-static void remove_group_cb_send_remove_group_resp(zb_uint8_t param)
+static void remove_group_cb_send_remove_group_resp(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_apsme_remove_group_conf_t *conf_param;
   zb_ret_t status;
 
-  TRACE_MSG(TRACE_ZCL1, ">> remove_group_cb_send_remove_group_resp, param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> remove_group_cb_send_remove_group_resp, param %d", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, zb_buf_begin(param), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -636,7 +636,7 @@ static void remove_group_cb_send_remove_group_resp(zb_uint8_t param)
 }
 
 
-static void remove_group_handler(zb_uint8_t param)
+static void remove_group_handler(zb_bufid_t param)
 {
   zb_zcl_groups_remove_group_req_t rem_group_req;
   zb_apsme_remove_group_req_t *aps_req;
@@ -684,14 +684,14 @@ static void remove_group_handler(zb_uint8_t param)
 }
 
 
-static void remove_all_groups_cb_send_default_resp(zb_uint8_t param)
+static void remove_all_groups_cb_send_default_resp(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_apsme_remove_all_groups_conf_t *conf_param;
   zb_uint8_t *resp_data;
   zb_ret_t status;
 
-  TRACE_MSG(TRACE_ZCL1, ">> remove_all_groups_cb_send_default_resp, param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> remove_all_groups_cb_send_default_resp, param %d", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, zb_buf_begin(param), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -733,7 +733,7 @@ static void remove_all_groups_cb_send_default_resp(zb_uint8_t param)
 }
 
 
-static void remove_all_groups_handler(zb_uint8_t param)
+static void remove_all_groups_handler(zb_bufid_t param)
 {
   zb_apsme_remove_all_groups_req_t *aps_req;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -792,7 +792,7 @@ static zb_ret_t aps_status_to_zcl_status(zb_ret_t aps_status)
 
 
 /* Just do nothing, used as gag */
-static void dummy_handler(zb_uint8_t unused)
+static void dummy_handler(zb_cb_param_t unused)
 {
   ZVUNUSED(unused);
 }
@@ -926,12 +926,12 @@ void send_add_group_if_ident_cmd(
 
 #ifdef ZB_ZCL_ENABLE_DEFAULT_GROUPS_PROCESSING_CLIENT
 
-zb_bool_t zb_zcl_process_groups_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_groups_commands_cli(zb_cb_param_t param)
 {
   zb_bool_t            processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t  cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_groups_commands_cli: param %hd",(FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_groups_commands_cli: param %d",(FMT__D, param));
 
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {

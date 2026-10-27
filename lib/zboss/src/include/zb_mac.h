@@ -59,32 +59,6 @@ ZB_RING_BUFFER_DECLARE(zb_rx_queue, zb_bufid_t, ZB_MAC_RX_QUEUE_CAP);
 
 #endif  /* ZB_USE_RX_QUEUE */
 
-/**
- *  \addtogroup PHY common constants and types.
- *  @{
- */
-
-/**
- *  @brief PHY enumerations descriptions
- */
-typedef enum zb_phy_status_e
-{
-  PHY_BUSY                  = 0x00,
-  PHY_BUSY_RX               = 0x01,
-  PHY_BUSY_TX               = 0x02,
-  PHY_FORCE_TRX_OFF         = 0x03,
-  PHY_IDLE                  = 0x04,
-  PHY_INVALID_PARAMETER     = 0x05,
-  PHY_RX_ON                 = 0x06,
-  PHY_SUCCESS               = 0x07,
-  PHY_TRX_OFF               = 0x08,
-  PHY_TX_ON                 = 0x09,
-  PHY_UNSUPPORTED_ATTRIBUTE = 0x0a,
-  PHY_READ_ONLY             = 0x0b
-} zb_phy_status_t;
-
-/** @} */ /* PHY common constants and types */
-
 /* Include platform-specific MAC stuff from the separate repo */
 #ifndef ZB_EXTMAC
 #include "mac_platform.h"
@@ -125,6 +99,9 @@ typedef enum zb_phy_status_e
 */
 #define SEQ_NUMBER_OFFSET           2U
 /* check specification IEEE 802.15 item 7.2.1 */
+
+/* Invalid MAC Data Sequence Number */
+#define ZB_MAC_INVALID_DSN 0x1FFU
 
 /**
    offset in bytes from the start of the mac frame to destination PAN
@@ -1505,6 +1482,7 @@ zb_mac_scan_confirm_t;
 
 #define ZB_PIB_ATTRIBUTE_TRAFF_DUMP_STATE               0x98U
 #define ZB_PIB_ATTRIBUTE_RESET_TO_BOOTLOADER            0x99U
+#define ZB_PIB_ATTRIBUTE_MAC_DIAGNOSTICS                0x9AU
 
 /** @} */
 
@@ -1699,15 +1677,14 @@ typedef ZB_PACKED_PRE struct zb_mcps_data_req_params_s
   zb_bitfield_t src_addr_mode:2;      /**< Source address mode, one of @ref address_modes */
   zb_bitfield_t dst_addr_mode:2;      /**< Destination address mode, one of @ref address_modes */
   zb_bitfield_t nwk_retry_cnt:3;
-  zb_bitfield_t mhr_len:5;         /* mhr length, filled by MAC and used internally.
-                                    * Can't be >= 32 */
+  zb_bitfield_t iface_id: 5;
+  zb_uint16_t transaction_buf;    /**< The field is used in multimac proxy to pass transaction buffer between req and confirm. */
 #ifdef ZB_MAC_SECURITY
   zb_uint8_t      security_level;   /**< */
   zb_uint8_t      key_id_mode;      /**< */
   zb_uint8_t      key_source[8];    /**< */
   zb_uint8_t      key_index;        /**< */
 #endif
-  zb_uint8_t iface_id;
   ZB_PACKED_PRE struct
   {
     zb_bitfield_t invalid_fcs: 1;                 /**< Invalid FCS for TP/154/MAC/FRAME-VALIDATION-01 */
@@ -1754,6 +1731,7 @@ typedef ZB_PACKED_PRE struct zb_mcps_data_confirm_params_s
   zb_uint8_t msdu_handle;   /**< MSDU handle value. */
   zb_time_t timestamp;      /**< Timestamp of TX done. For testing purposes */
   zb_uint8_t iface_id;
+  zb_uint16_t transaction_buf;     /**< The field is used in multimac proxy to pass transaction buffer between req and confirm. */
 } ZB_PACKED_STRUCT zb_mcps_data_confirm_params_t;
 
 /**
@@ -1761,7 +1739,7 @@ typedef ZB_PACKED_PRE struct zb_mcps_data_confirm_params_s
  *  Accepts data request.
  *  @param param - reference to buffer, contains upper layer data to send.
  */
-void zb_mcps_data_request(zb_uint8_t param);
+void zb_mcps_data_request(zb_cb_param_t param);
 
 /**
  *  @brief MCPS-DATA.indication primitive.
@@ -1774,7 +1752,7 @@ void zb_mcps_data_request(zb_uint8_t param);
  *
  *  Other fields got from MAC nsdu by macros
  */
-void zb_mcps_data_indication(zb_uint8_t param);
+void zb_mcps_data_indication(zb_cb_param_t param);
 
 /**
  *  @brief MCPS-DATA.confirm primitive.
@@ -1787,11 +1765,11 @@ void zb_mcps_data_indication(zb_uint8_t param);
  *
  *  Other fields got from MAC nsdu by macros.
  */
-void zb_mcps_data_confirm(zb_uint8_t param);
+void zb_mcps_data_confirm(zb_cb_param_t param);
 
 
-void zb_mac_send_beacon_request_command(zb_uint8_t unused);
-void zb_mac_send_enhanced_beacon_request_command(zb_uint8_t param);
+void zb_mac_send_beacon_request_command(zb_cb_param_t unused);
+void zb_mac_send_enhanced_beacon_request_command(zb_cb_param_t param);
 
 /** @} */ /* MAC data service constants ans API */
 
@@ -1810,7 +1788,7 @@ void zb_mac_send_enhanced_beacon_request_command(zb_uint8_t param);
  *
  *  Other fields got from MAC nsdu by macros
  */
-void zb_mcps_poll_indication(zb_uint8_t param);
+void zb_mcps_poll_indication(zb_cb_param_t param);
 
 
 /** @brief Defines MLME-POLL.indication primitive. */
@@ -1864,6 +1842,7 @@ typedef ZB_PACKED_PRE struct zb_mlme_set_request_s
   zb_uint8_t  pib_attr;
   zb_uint8_t         iface_id;
   zb_uint8_t         pib_length;
+  zb_uint16_t        transaction_buf; /**< The field is used in multimac proxy to pass transaction buffer between req and confirm. */
   union zb_cb_align64_u    confirm_cb_u;
 } ZB_PACKED_STRUCT
 zb_mlme_set_request_t;
@@ -1874,6 +1853,7 @@ typedef ZB_PACKED_PRE struct zb_mlme_set_confirm_s
   zb_mac_status_t status;
   zb_uint8_t pib_attr;
   zb_uint8_t iface_id; /*!< MAC Interface #  */
+  zb_uint16_t transaction_buf; /**< The field is used in multimac proxy to pass transaction buffer between req and confirm. */
   ZB_PACKED_PRE union zb_cb_align64_u confirm_cb_u;
 } ZB_PACKED_STRUCT zb_mlme_set_confirm_t;
 
@@ -1945,14 +1925,14 @@ zb_mlme_set_ieee_joining_list_req_t;
  *  @snippet tp_154_mac_ack_frame_delivery_01_dut_ffd0.c zb_mlme_get_request
  *
  */
-void zb_mlme_get_request(zb_uint8_t param);
+void zb_mlme_get_request(zb_cb_param_t cb_param);
 
 #ifdef MAC_DIRECT_PIB_ACCESS
 /**
  *  @brief MLME-GET.confirm primitive.
  *  @param param - reference to the buffer containing operation status information.
  */
-void zb_mlme_get_confirm(zb_uint8_t param);
+void zb_mlme_get_confirm(zb_cb_param_t param);
 #endif /* MAC_DIRECT_PIB_ACCESS */
 
 /**
@@ -1962,14 +1942,14 @@ void zb_mlme_get_confirm(zb_uint8_t param);
  *  @snippet tp_154_mac_ack_frame_delivery_01_dut_ffd0.c zb_mlme_set_request
  *
  */
-void zb_mlme_set_request(zb_uint8_t param);
+void zb_mlme_set_request(zb_cb_param_t param);
 
 #if (defined ZB_ZGPD_ROLE && defined ZB_ENABLE_ZGP) || defined MAC_DIRECT_PIB_ACCESS
 /**
  *  @brief MLME-SET.confirm primitive.
  *  @param param - reference to the buffer containing operation status information.
  */
-void zb_mlme_set_confirm(zb_uint8_t param);
+void zb_mlme_set_confirm(zb_cb_param_t param);
 #endif /* (ZB_ZGPD_ROLE && ZB_ENABLE_ZGP) || MAC_DIRECT_PIB_ACCESS */
 
 /** @brief Parameters for start request. */
@@ -1985,6 +1965,7 @@ typedef ZB_PACKED_PRE struct zb_mlme_start_req_s
   zb_bitfield_t  battery_life_extension:1;          /**< IS Battery life extension */
   zb_bitfield_t  coord_realignment:1;               /**< */
   zb_bitfield_t  reserved:5;                        /**< Reserved */
+  zb_uint16_t transaction_buf;                      /**< The field is used in multimac proxy to pass transaction buffer between req and confirm. */
 } ZB_PACKED_STRUCT
 zb_mlme_start_req_t;
 
@@ -1993,14 +1974,14 @@ zb_mlme_start_req_t;
  *  @param param - reference to buffer, contains zb_mlme_start_req_t parameters for start.
  *
  */
-void zb_mlme_start_request(zb_uint8_t param);
+void zb_mlme_start_request(zb_cb_param_t param);
 
 
 /**
  *  @brief Confirms start procedure.
  *  @param param - reference to buffer.
  */
-void zb_mlme_start_confirm(zb_uint8_t param);
+void zb_mlme_start_confirm(zb_cb_param_t param);
 
 /** @brief Parameter for the zb_mlme_reset_request(). */
 typedef ZB_PACKED_PRE struct zb_mlme_reset_request_s
@@ -2011,6 +1992,7 @@ typedef ZB_PACKED_PRE struct zb_mlme_reset_request_s
                                            their values prior to the generation of the
                                            MLME-RESET.request primitive.  */
   zb_uint8_t iface_id;
+  zb_uint16_t transaction_buf;           /**< The field is used in multimac proxy to pass transaction buffer between req and confirm. */
   ZB_PACKED_PRE struct
   {
     zb_bitfield_t allow_empty_beacon_payload:1;   /**< Allow sending/receiving empty Beacon payload */
@@ -2027,13 +2009,14 @@ zb_mlme_reset_request_t;
  *  @brief Handles MLME-RESET.request.
  *  @param param - parameter (packet buffer), see @ref zb_mlme_reset_request_s is on its tail.
  */
-void zb_mlme_reset_request(zb_uint8_t param);
+void zb_mlme_reset_request(zb_cb_param_t param);
 
 /** @brief Parameter for the zb_mlme_reset_confirm(). */
 typedef ZB_PACKED_PRE struct zb_mlme_reset_confirm_s
 {
   zb_uint8_t status; /**< Status */
   zb_uint8_t iface_id;
+  zb_uint16_t transaction_buf; /**< The field is used in multimac proxy to pass transaction buffer between req and confirm. */
 } ZB_PACKED_STRUCT
 zb_mlme_reset_confirm_t;
 
@@ -2042,7 +2025,7 @@ zb_mlme_reset_confirm_t;
  *  This function called by MAC layer via callback.
  *  @param param - packet buffer. Only its header.status is used.
  */
-void zb_mlme_reset_confirm (zb_uint8_t param);
+void zb_mlme_reset_confirm (zb_cb_param_t param);
 
 /**
  * @name Possible scan operations
@@ -2098,19 +2081,19 @@ typedef ZB_PACKED_PRE struct
  *
  *  @snippet start_ze_s05.c zb_mlme_scan_request
  */
-void zb_mlme_scan_request(zb_uint8_t param);
+void zb_mlme_scan_request(zb_cb_param_t param);
 
 
 /**
  *  @brief Confirms scan procedure.
- *  @param param - reference to buffer.
+ *  @param cb_param - reference to buffer.
  */
-void zb_mlme_scan_confirm(zb_uint8_t param);
+void zb_mlme_scan_confirm(zb_cb_param_t cb_param);
 
 
-void zb_mac_cancel_scan(zb_bufid_t buf);
+void zb_mac_cancel_scan(zb_cb_param_t buf);
 
-void zb_mac_cancel_scan_response(zb_bufid_t buf);
+void zb_mac_cancel_scan_response(zb_cb_param_t buf);
 
 /**
  * @brief Beacon type
@@ -2173,7 +2156,7 @@ zb_mac_beacon_notify_indication_t;
  *  layer just calls this function.
  *  @param param - reference to buffer containing @ref zb_mac_beacon_notify_indication_s.
  */
-void zb_mlme_beacon_notify_indication(zb_uint8_t param);
+void zb_mlme_beacon_notify_indication(zb_cb_param_t param);
 
 /**
  * @brief Data structure for mlme_associate_request.
@@ -2326,7 +2309,7 @@ typedef ZB_PACKED_PRE struct zb_mlme_associate_confirm_s
  *
  *  @snippet association_04_rfd.c ZB_MLME_BUILD_ASSOCIATE_REQUEST
  */
-void zb_mlme_associate_request(zb_uint8_t param);
+void zb_mlme_associate_request(zb_cb_param_t param);
 
 /**
  *  @brief Associate response - coordinator side.
@@ -2335,11 +2318,11 @@ void zb_mlme_associate_request(zb_uint8_t param);
  *
  *  @snippet data_01_ffd.c ZB_MLME_BUILD_ASSOCIATE_RESPONSE
  */
-void zb_mlme_associate_response(zb_uint8_t param);
+void zb_mlme_associate_response(zb_cb_param_t param);
 
-void zb_mlme_associate_indication(zb_uint8_t param);
+void zb_mlme_associate_indication(zb_cb_param_t param);
 
-void zb_mlme_associate_confirm(zb_uint8_t param);
+void zb_mlme_associate_confirm(zb_cb_param_t param);
 
 /** @brief Parameters for poll indication. */
 typedef ZB_PACKED_PRE struct zb_mcps_poll_indication_param_s
@@ -2362,9 +2345,9 @@ typedef ZB_PACKED_PRE struct zb_mlme_poll_request_s
  *  @brief Handles MLME-poll.confirm.
  *  @param param - parameter (packet buffer), with poll status.
  */
-void zb_mlme_poll_confirm(zb_uint8_t param);
+void zb_mlme_poll_confirm(zb_cb_param_t param);
 
-void zb_mlme_poll_request(zb_uint8_t param);
+void zb_mlme_poll_request(zb_cb_param_t param);
 
 /**
  *  @brief Sync loss reasons.
@@ -2422,7 +2405,7 @@ typedef ZB_PACKED_PRE struct zb_mlme_comm_status_indication_s
 } ZB_PACKED_STRUCT
 zb_mlme_comm_status_indication_t;
 
-void zb_mlme_comm_status_indication(zb_uint8_t param);
+void zb_mlme_comm_status_indication(zb_cb_param_t param);
 
 #ifdef ZB_MAC_DUTY_CYCLE_MONITORING
 
@@ -2446,7 +2429,7 @@ typedef ZB_PACKED_PRE struct zb_mlme_duty_cycle_mode_indication_s
  *  MAC layer just calls this function.
  *  @param  param - reference to the buffer containing Duty Cycle mode value.
  */
-void zb_mlme_duty_cycle_mode_indication(zb_uint8_t param);
+void zb_mlme_duty_cycle_mode_indication(zb_cb_param_t param);
 
 zb_uint_t zb_mac_duty_cycle_get_time_period_sec(void);
 
@@ -2483,7 +2466,7 @@ typedef ZB_PACKED_PRE struct zb_mlme_get_power_info_tbl_req_s
  *       The external identifier 'func_name' clashes with other
  *       identifier(s) in the first 31 characters 1 time(s).
  */
-void zb_mlme_get_power_info_table_request(zb_uint8_t param);
+void zb_mlme_get_power_info_table_request(zb_cb_param_t param);
 
 typedef ZB_PACKED_PRE struct zb_mlme_get_power_info_tbl_conf_s
 {
@@ -2491,21 +2474,21 @@ typedef ZB_PACKED_PRE struct zb_mlme_get_power_info_tbl_conf_s
   zb_mac_power_ctrl_info_tbl_ent_t ent;
 } ZB_PACKED_STRUCT zb_mlme_get_power_info_tbl_conf_t;
 
-void zb_mlme_get_power_info_table_confirm(zb_uint8_t param);
+void zb_mlme_get_power_info_table_confirm(zb_cb_param_t param);
 
 typedef ZB_PACKED_PRE struct zb_mlme_set_power_info_tbl_req_s
 {
   zb_mac_power_ctrl_info_tbl_ent_t ent;
 } ZB_PACKED_STRUCT zb_mlme_set_power_info_tbl_req_t;
 
-void zb_mlme_set_power_info_table_request(zb_uint8_t param);
+void zb_mlme_set_power_info_table_request(zb_cb_param_t param);
 
 typedef ZB_PACKED_PRE struct zb_mlme_set_power_info_tbl_conf_s
 {
   zb_uint8_t status;
 } ZB_PACKED_STRUCT zb_mlme_set_power_info_tbl_conf_t;
 
-void zb_mlme_set_power_info_table_confirm(zb_uint8_t param);
+void zb_mlme_set_power_info_table_confirm(zb_cb_param_t param);
 
 #endif  /* ZB_MAC_POWER_CONTROL */
 
@@ -2671,16 +2654,16 @@ zb_uint8_t zb_parse_mhr(zb_mac_mhr_t *mhr, zb_bufid_t buf);
 
 zb_uint8_t zb_parse_mhr_ptr(zb_mac_mhr_t *mhr, const zb_uint8_t *ptr);
 
-void zb_mac_resp_by_empty_frame(zb_uint8_t param);
+void zb_mac_resp_by_empty_frame(zb_cb_param_t param);
 
-#if defined ZB_TRAFFIC_DUMP_ON || defined ZB_NSNG || defined ZB_MAC_TESTING_MODE || defined DOXYGEN
+#if defined ZB_TRAFFIC_DUMP_ON || defined ZB_NSNG || defined ZB_MAC_TESTING_MODE || defined DOXYGEN || defined ZB_DSIM
 void zb_mac_fcs_add(zb_bufid_t buf);
 #define MAC_ADD_FCS(buf) zb_mac_fcs_add(buf)
 #else
 #define MAC_ADD_FCS(buf)
 #endif /* ZB_TRAFFIC_DUMP_ON || ZB_NSNG || ZB_MAC_TESTING_MODE || DOXYGEN */
 
-void zb_mlme_orphan_indication(zb_uint8_t param);
+void zb_mlme_orphan_indication(zb_cb_param_t param);
 
 /**
    Sends orphan request command
@@ -2688,7 +2671,7 @@ void zb_mlme_orphan_indication(zb_uint8_t param);
    zb_mac_orphan_response_t
    @return noting
 */
-void zb_mlme_orphan_response(zb_uint8_t param);
+void zb_mlme_orphan_response(zb_cb_param_t param);
 
 
 #ifdef ZB_LIMIT_VISIBILITY
@@ -2773,7 +2756,7 @@ void zb_mac_diag_data_get(zb_uint16_t short_address, zb_uint8_t *lqi, zb_int8_t 
 
    @param param - parameter (packet buffer), @see zb_mlme_purge_request_t is on its tail
 */
-void zb_mlme_purge_request(zb_uint8_t param);
+void zb_mlme_purge_request(zb_cb_param_t param);
 
 #endif /* ZB_MAC_TESTING_MODE || DOXYGEN */
 
@@ -2784,7 +2767,7 @@ void zb_mlme_purge_request(zb_uint8_t param);
 
    @param param - parameter (packet buffer), with status and zb_mlme_purge_confirm_t
 */
-void zb_mlme_purge_confirm(zb_uint8_t param);
+void zb_mlme_purge_confirm(zb_cb_param_t param);
 
 /**
    MLME-purge.request parameter
@@ -2805,14 +2788,14 @@ typedef zb_mlme_purge_request_t zb_mlme_purge_confirm_t;
 
    @param param - parameter (packet buffer)
 */
-void zb_plme_cca_request(zb_uint8_t param);
+void zb_plme_cca_request(zb_cb_param_t param);
 
 /**
    Handles PLME-CCA.confirm
 
    @param param - parameter (packet buffer), with status
 */
-void zb_plme_cca_confirm(zb_uint8_t param);
+void zb_plme_cca_confirm(zb_cb_param_t param);
 #endif /* ZB_MAC_TESTING_MODE || DOXYGEN */
 
 #if defined ZB_MAC_PENDING_BIT_SOURCE_MATCHING
@@ -2937,7 +2920,7 @@ typedef enum zb_mac_interface_type_e
   MAC_INTERFACE_TYPE_MAX
 } zb_mac_interface_type_t;
 
-typedef void (*zb_mac_interface_func_t)(zb_bufid_t param);
+typedef void (*zb_mac_interface_func_t)(zb_cb_param_t param);
 typedef struct zb_mac_interface_s {
     zb_mac_interface_func_t mcps_data_request;
     zb_mac_interface_func_t mcps_purge_indirect_queue_request;
@@ -2992,8 +2975,13 @@ typedef zb_ret_t (*zb_tx_power_provider_t)(zb_uint8_t page, zb_uint8_t channel, 
  * Please note, in split architecture this array of TX power is sending asynchronously without confirmation.
  */
 void zb_mac_set_tx_power_provider_function(zb_tx_power_provider_t new_provider);
-void zb_mac_set_tx_power_async_confirm(zb_bufid_t param);
-void zb_mac_get_tx_power_async_confirm(zb_bufid_t param);
+void zb_mac_set_tx_power_async_confirm(zb_cb_param_t param);
+void zb_mac_get_tx_power_async_confirm(zb_cb_param_t param);
+
+/**
+ * @brief Update transceiver power for each page and channel synchronously according to power provider.
+*/
+void zb_mac_update_channel_pages(void);
 
 #endif /* #ifdef ZB_MAC_CONFIGURABLE_TX_POWER */
 
@@ -3027,9 +3015,9 @@ typedef ZB_PACKED_PRE struct zb_mcps_purge_indir_q_conf_s
   zb_uint8_t iface_id;
 } ZB_PACKED_STRUCT zb_mcps_purge_indir_q_conf_t;
 
-void zb_mcps_purge_indirect_queue_request(zb_uint8_t param);
+void zb_mcps_purge_indirect_queue_request(zb_cb_param_t param);
 
-void zb_mcps_purge_indirect_queue_confirm(zb_uint8_t param);
+void zb_mcps_purge_indirect_queue_confirm(zb_cb_param_t param);
 
 #endif
 
@@ -3037,7 +3025,7 @@ void zb_mcps_purge_indirect_queue_confirm(zb_uint8_t param);
 /**
    Reset MAC-Split device
 */
-void zb_mlme_dev_reset(zb_uint8_t param);
+void zb_mlme_dev_reset(zb_bufid_t param);
 #endif /* ZB_MACSPLIT_HOST */
 
 #if defined ZB_TRAFFIC_DUMP_ON && !defined ZB_TRANSPORT_OWN_TRAFFIC_DUMP_ON
@@ -3049,6 +3037,8 @@ void zb_mac_traffic_dump(zb_bufid_t buf, zb_bool_t is_w, zb_uint8_t interface_ty
 #define ZB_DUMP_INCOMING_DATA(buf, iface_type, iface_id) zb_mac_traffic_dump((buf), ZB_FALSE, iface_type, iface_id)
 #define ZB_DUMP_OUTGOING_DATA(buf, iface_type, iface_id) zb_mac_traffic_dump((buf), ZB_TRUE,  iface_type, iface_id)
 #else
+void zb_mac_dump_mac_ack_iface(zb_bool_t is_out, zb_uint8_t data_pending, zb_uint8_t dsn, zb_uint8_t interface_type, zb_uint8_t interface_id);
+
 #define zb_mac_dump_mac_ack(is_out, data_pending, dsn) zb_mac_dump_mac_ack_iface(is_out, data_pending, dsn, ZB_DUMP_IFACE_DEFAULT, 0)
 #define ZB_DUMP_INCOMING_DATA(buf) zb_mac_traffic_dump((buf), ZB_FALSE, ZB_DUMP_IFACE_DEFAULT, 0)
 #define ZB_DUMP_OUTGOING_DATA(buf) zb_mac_traffic_dump((buf), ZB_TRUE,  ZB_DUMP_IFACE_DEFAULT, 0)
@@ -3097,7 +3087,7 @@ zb_bool_t zb_mac_check_frame_dst_addr(const zb_mac_mhr_t *mhr);
 zb_bool_t zb_mac_check_frame_pan_id(const zb_mac_mhr_t *mhr);
 
 #ifdef ZB_CERTIFICATION_HACKS
-void mac_cert_send_beacon(zb_uint8_t param);
+void mac_cert_send_beacon(zb_cb_param_t param);
 #endif
 
 #ifdef ZB_PHY_TESTING_MODE
@@ -3105,7 +3095,7 @@ void mac_cert_send_beacon(zb_uint8_t param);
 /**
  * Validate received packet buffer in PHY Testing mode
  */
-void zb_mac_phy_testing_rx_data_indication_cb(zb_uint8_t param);
+void zb_mac_phy_testing_rx_data_indication_cb(zb_bufid_t param);
 
 /**
  * Handle PHY Testing mode request
@@ -3136,33 +3126,33 @@ void zb_mac_phy_testing_mode_notification(zb_bufid_t param);
 #if defined ZB_MAC_API_TRACE_PRIMITIVES
 
 /* MAC API trace functions */
-void zb_mac_api_trace_association_request(zb_uint8_t param);
-void zb_mac_api_trace_association_response(zb_uint8_t param);
-void zb_mac_api_trace_association_confirm(zb_uint8_t param);
-void zb_mac_api_trace_association_indication(zb_uint8_t param);
-void zb_mac_api_trace_reset_request(zb_uint8_t param);
-void zb_mac_api_trace_reset_confirm(zb_uint8_t param);
-void zb_mac_api_trace_beacon_notify_indication(zb_uint8_t param);
-void zb_mac_api_trace_comm_status_indication(zb_uint8_t param);
-void zb_mac_api_trace_orphan_indication(zb_uint8_t param);
-void zb_mac_api_trace_orphan_response(zb_uint8_t param);
-void zb_mac_api_trace_scan_request(zb_uint8_t param);
-void zb_mac_api_trace_scan_confirm(zb_uint8_t param);
-void zb_mac_api_trace_poll_request(zb_uint8_t param);
-void zb_mac_api_trace_poll_confirm(zb_uint8_t param);
-void zb_mac_api_trace_poll_indication(zb_uint8_t param);
-void zb_mac_api_trace_start_request(zb_uint8_t param);
-void zb_mac_api_trace_start_confirm(zb_uint8_t param);
-void zb_mac_api_trace_set_request(zb_uint8_t param);
-void zb_mac_api_trace_set_confirm(zb_uint8_t param);
-void zb_mac_api_trace_purge_request(zb_uint8_t param);
-void zb_mac_api_trace_purge_confirm(zb_uint8_t param);
-void zb_mac_api_trace_data_request(zb_uint8_t param);
-void zb_mac_api_trace_data_confirm(zb_uint8_t param);
-void zb_mac_api_trace_data_indication(zb_uint8_t param);
-void zb_mac_api_trace_get_request(zb_uint8_t param);
-void zb_mac_api_trace_get_confirm(zb_uint8_t param);
-void zb_mac_api_trace_cca_confirm(zb_uint8_t param);
+void zb_mac_api_trace_association_request(zb_bufid_t param);
+void zb_mac_api_trace_association_response(zb_bufid_t param);
+void zb_mac_api_trace_association_confirm(zb_bufid_t param);
+void zb_mac_api_trace_association_indication(zb_bufid_t param);
+void zb_mac_api_trace_reset_request(zb_bufid_t param);
+void zb_mac_api_trace_reset_confirm(zb_bufid_t param);
+void zb_mac_api_trace_beacon_notify_indication(zb_bufid_t param);
+void zb_mac_api_trace_comm_status_indication(zb_bufid_t param);
+void zb_mac_api_trace_orphan_indication(zb_bufid_t param);
+void zb_mac_api_trace_orphan_response(zb_bufid_t param);
+void zb_mac_api_trace_scan_request(zb_bufid_t param);
+void zb_mac_api_trace_scan_confirm(zb_bufid_t param);
+void zb_mac_api_trace_poll_request(zb_bufid_t param);
+void zb_mac_api_trace_poll_confirm(zb_bufid_t param);
+void zb_mac_api_trace_poll_indication(zb_bufid_t param);
+void zb_mac_api_trace_start_request(zb_bufid_t param);
+void zb_mac_api_trace_start_confirm(zb_bufid_t param);
+void zb_mac_api_trace_set_request(zb_bufid_t param);
+void zb_mac_api_trace_set_confirm(zb_bufid_t param);
+void zb_mac_api_trace_purge_request(zb_bufid_t param);
+void zb_mac_api_trace_purge_confirm(zb_bufid_t param);
+void zb_mac_api_trace_data_request(zb_bufid_t param);
+void zb_mac_api_trace_data_confirm(zb_bufid_t param);
+void zb_mac_api_trace_data_indication(zb_bufid_t param);
+void zb_mac_api_trace_get_request(zb_bufid_t param);
+void zb_mac_api_trace_get_confirm(zb_bufid_t param);
+void zb_mac_api_trace_cca_confirm(zb_bufid_t param);
 
 #endif /* ZB_MAC_API_TRACE_PRIMITIVES */
 
@@ -3284,7 +3274,7 @@ zb_mac_diagnostic_ctx_t;
 
 
 void zb_mac_diagnostics_init(zb_mac_diagnostic_ctx_t *ctx);
-void zb_mac_diagnostics_periodic_handler(zb_uint8_t unused);
+void zb_mac_diagnostics_periodic_handler(zb_cb_param_t unused);
 void zb_mac_diagnostics_get_info(zb_mac_diagnostic_ex_info_t *diag_info);
 void zb_mac_diagnostics_cleanup_info(void);
 void zb_mac_diagnostics_inc_tx_total(void);

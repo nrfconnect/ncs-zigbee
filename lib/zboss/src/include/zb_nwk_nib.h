@@ -189,12 +189,6 @@
     */
 #define ZB_NIB_ATTRIBUTE_EXTENDED_PANID                     0X9A
   /**
-     A flag determining the layer where multicast messaging occurs.
-      - TRUE = multicast occurs at the network layer.
-      - FALSE= multicast oc-curs at the APS layer and using the APS header.
-    */
-#define ZB_NIB_ATTRIBUTE_USE_MULTICAST                     0X9B
-  /**
      The route record table.
     */
 #define ZB_NIB_ATTRIBUTE_ROUTE_RECORD_TABLE                 0X9C
@@ -463,18 +457,6 @@ zb_bool_t zb_is_device_zc_or_zr(void);
 #define ZB_NIB_SET_USE_TREE_ROUTING(v)
 #endif
 
-/* use nwk multicast? */
-#ifndef ZB_NO_NWK_MULTICAST
-/** @brief returns ZB_NIB_GET_USE_MULTICAST attribute value */
-#define ZB_NIB_GET_USE_MULTICAST() ZB_NIB().nwk_use_multicast
-/** @brief Set ZB_NIB_SET_USE_MULTICAST attribute value to 'v' */
-#define ZB_NIB_SET_USE_MULTICAST( v ) (ZB_NIB().nwk_use_multicast = ( v ))
-#else
-/** @brief Use multicast - unsupported */
-#define ZB_NIB_GET_USE_MULTICAST() 0
-/** @brief \deprecated unsupported */
-#define ZB_NIB_SET_USE_MULTICAST( v )
-#endif
 
 #ifndef ZB_LITE_NO_CONFIGURABLE_LINK_STATUS
 /** @brief LINK_STATUS_PERIOD attribute */
@@ -558,6 +540,10 @@ zb_bool_t zb_is_device_zc_or_zr(void);
 #define ZB_NIB_GET_CONCENTRATOR_DISC_TIME() ZB_NIB().nwk_concentrator_disc_time
 /** @brief Set CONCENTRATOR_DISC_TIME attribute to 'v' */
 #define ZB_NIB_SET_CONCENTRATOR_DISC_TIME( v ) (ZB_NIB().nwk_concentrator_disc_time = ( v ))
+/** @brief CONCENTRATOR_DISC_SEPARATION_TIME attribute */
+#define ZB_NIB_GET_CONCENTRATOR_DISC_SEPARATION_TIME() ZB_NIB().nwk_concentrator_disc_separation
+/** @brief Set CONCENTRATOR_DISC_SEPARATION_TIME attribute to 'v' */
+#define ZB_NIB_SET_CONCENTRATOR_DISC_SEPARATION_TIME( v ) (ZB_NIB().nwk_concentrator_disc_separation = ( v ))
 #else
 /** @brief IS_CONCENTRATOR attribute */
 #define ZB_NIB_GET_IS_CONCENTRATOR() ZB_FALSE
@@ -571,6 +557,10 @@ zb_bool_t zb_is_device_zc_or_zr(void);
 #define ZB_NIB_GET_CONCENTRATOR_DISC_TIME() 0
 /** @brief Set CONCENTRATOR_DISC_TIME attribute to 'v' */
 #define ZB_NIB_SET_CONCENTRATOR_DISC_TIME( v )
+/** @brief CONCENTRATOR_DISC_SEPARATION_TIME attribute */
+#define ZB_NIB_GET_CONCENTRATOR_DISC_SEPARATION_TIME() 0
+/** @brief Set CONCENTRATOR_DISC_SEPARATION_TIME attribute to 'v' */
+#define ZB_NIB_SET_CONCENTRATOR_DISC_SEPARATION_TIME( v )
 #endif /* ZB_LITE_NO_SOURCE_ROUTING */
 
 /** @brief SECURITY_MATERIAL attribute */
@@ -590,14 +580,9 @@ typedef struct zb_nwk_pend_s    /* do not pack for IAR */
 {
   zb_uint16_t dest_addr; /*!< 16-bit network destination address of this
                           * request */
-  zb_uint8_t  param; /*!< buffer waiting for route discovery */
+  zb_bufid_t  param; /*!< buffer waiting for route discovery */
   zb_bitfield_t used:1; /*!< 1 if entry is used, 0 - otherwise */
-  zb_bitfield_t expiry:5; /*!< expiration time. ZB_NWK_PENDING_ENTRY_EXPIRY_CNTR,
-                           * 5-bits i */
-  zb_bitfield_t waiting_buf:1; /*!< if pending buffer waits new buffer to
-                                 * start route discovery */
-  zb_bitfield_t reserved:1;
-
+  zb_bitfield_t expiry:7; /*!< expiration time. ZB_NWK_PENDING_ENTRY_EXPIRY_CNTR */
   zb_uint8_t    handle;
 } ZB_PACKED_STRUCT
 zb_nwk_pend_t;
@@ -640,7 +625,7 @@ typedef struct zb_tx_stat_window_s
 */
 typedef ZB_PACKED_PRE struct zb_nwk_mac_iface_tbl_ent_s
 {
-  /* [0] */
+  /* [0 bytes] */
   zb_bitfield_t index:5;            /**< A unique index that can be used to
                                      * identify an entry  */
   zb_bitfield_t enabled:1;          /**< Flag indicates the interface is enabled
@@ -650,7 +635,7 @@ typedef ZB_PACKED_PRE struct zb_nwk_mac_iface_tbl_ent_s
   zb_bitfield_t beacons_supported:1; /**< Indicates whether the current
                                       * interface supports beacons  */
 
-  /* [1] */
+  /* [1 bytes] */
   zb_bitfield_t ehn_beacons_supported:1; /**< Indicates whether the current
                                       * interface supports Enhanced beacons */
   zb_bitfield_t scan_type:1;        /**< The type of scan to be used when
@@ -658,7 +643,7 @@ typedef ZB_PACKED_PRE struct zb_nwk_mac_iface_tbl_ent_s
   zb_bitfield_t trusted_link:1;     /**< This flag disables NWK encryption */
   zb_bitfield_t locks_count:5;      /**< Fit into zb_uint16_t */
 
-  /* [2] */
+  /* [2 bytes] */
   zb_uint16_t link_power_data_rate; /**< The rate, in seconds, of how often a
                                      * Link Power Delta request is
                                      * generated. In bands where this is
@@ -666,18 +651,29 @@ typedef ZB_PACKED_PRE struct zb_nwk_mac_iface_tbl_ent_s
                                      * disabling the function. The default
                                      * value should be 16.  */
 
-  /* [4] */
+  /* [4 bytes] */
   zb_channel_page_t channel_in_use; /**< The current channel in use by the
                                      * device. Only a single channel may be
                                      * selected at one time. */
 
-  /* [8] */
+  /* [8 bytes] */
   zb_channel_list_t supported_channels; /**< Indicates the pages and channels that
                                          * are supported by this interface. */
-  /* [8 + 4*{1 or 5}] */
-  /* Total: 12 or 28 bytes */
+
+  /* [12 bytes (no Sub-GHz)]
+   * [28 bytes (Sub-GHz with 5 pages)]
+   * [48 bytes (Sub-GHz with 10 pages)] */
 }
 ZB_PACKED_STRUCT zb_nwk_mac_iface_tbl_ent_t;
+
+#if defined(ZB_ROUTER_ROLE) && !defined(ZB_LITE_NO_SOURCE_ROUTING)
+typedef struct zb_nwk_src_route_solicitation_addr_s
+{
+  zb_uint16_t addr; /*!< Address to put into Source Route Solicitation TLV */
+  zb_uint8_t age; /*!< Address age to prevent infinite source route solicitation for the address */
+} zb_nwk_src_route_solicitation_addr_t;
+
+#endif /* ZB_ROUTER_ROLE && !ZB_LITE_NO_SOURCE_ROUTING */
 
 /**
    This is NWK NIB residential in memory.
@@ -695,17 +691,6 @@ typedef struct zb_nib_s
 #endif /* ZB_CONFIGURABLE_RETRIES */
   zb_ext_pan_id_t  extended_pan_id;      /*!< Extended Pan ID for the PAN for which the device is a member */
   zb_nwk_device_type_t device_type;      /*!< Current device role, @see @ref nwk_device_type */
-  /**
-   * This value is used to save device type between JOINED states.
-   * Originally, device_type value would be preserved even after LEAVE is done,
-   * which may lead to wrong behaviour in logic, which is dependent on device_type.
-   * So, device_type shall be cleared after LEAVE is done.
-   * But in such case, next JOIN will require calling zb_set_*_role again, which is not convenient,
-   * and likely is not expected by currently implemented logic.
-   *
-   * Because of that, device_type value is being saved and then restored, if needed, during next commissioning
-   */
-  zb_nwk_device_type_t device_type_last; /*!< Last device role before leave, default is ZB_NWK_DEVICE_TYPE_NONE */
   zb_uint8_t     update_id;              /*!< nwkUpdateId - The value identifying a snapshot of the network settings with which this node is operating with. */
   zb_uint32_t    nwk_next_channel_change;
   zb_uint16_t    nwk_next_pan_id;
@@ -764,11 +749,26 @@ typedef struct zb_nib_s
 #else
   zb_nwk_rrec_t *nwk_src_route_tbl;
 #endif
-  zb_uint8_t nwk_src_route_cnt;
+
+  zb_uindex_t nwk_src_route_cnt;
+
   zb_bool_t nwk_is_concentrator;           /*!< A flag determining if this device is a concentrator */
   zb_uint8_t nwk_concentrator_radius;      /*!< The hop count radius for concentrator route discoveries */
-  zb_uint32_t nwk_concentrator_disc_time;  /*!< The time in seconds between concentrator route discoveries. If set to 0x0000,
-                                                the discoveries are done at start up and by the next higher layer only */
+  zb_uint32_t nwk_concentrator_disc_time;  /*!< nwkConcentratorDiscoveryTime, the time in seconds between concentrator route discoveries.
+                                            *   If set to 0x0000, the discoveries are done at start up and by the next higher layer only */
+  zb_uint32_t nwk_concentrator_disc_separation;  /*!< nwkConcentratorDiscoverySeparation, the minimum time, in seconds,
+                                                  *   between two consecutive concentrator route discoveries.
+                                                  *   If set to 0x00, there is no minimum separation.
+                                                  *   This only applies when the device is operating as a Concentrator. */
+  zb_time_t nwk_concentrator_last_disc_time; /*!< Timestamp of previous concentrator route discovery */
+  zb_time_t nwk_concentrator_mtorr_after_rreq_delay; /*!< Delay in beacon intervals to send MTORR after route request receiving.
+                                                      *   If delay is zero, reactive MTORR feature will be enabled
+                                                      *   (i.e. concentrator may send MTORR immediately instead of Route Reply)
+                                                      *   If delay is not zero, concentrator will send Route Reply as usual and
+                                                      *   then will be advised to send MTORR as well. */
+  zb_time_t nwk_concentrator_mtorr_solicitation_delay; /*!< Delay in beacon intervals to send MTORR after starting mesh route discovery
+                                                        *   for specified short address. It is needed to send MTORR with Source Route Solicitation TLV
+                                                        *   to optimize source routing establishment for network devices. */
   zb_bool_t mtorr_after_first_rejoin_sent;
   zb_bool_t do_aggr_route_add;
 #endif
@@ -847,9 +847,6 @@ typedef struct zb_nib_s
   zb_bitfield_t r22_gu_behavior_enabled:1; /*!< if 1, this device ignores all r23 features*/
   zb_bitfield_t nwk_disable_tlvs_in_beacon:1;      /*!< TLV presence in beacons */
   zb_bitfield_t nwk_use_r22_joining:1;      /*!< Use R22 joining instead nwk_commis_req */
-#ifdef ZB_JOIN_CLIENT
-  zb_bitfield_t disable_silent_rejoin:1;      /*!< Disable silent rejoin for ZR */
-#endif /* ZB_JOIN_CLIENT */
 
   zb_tx_stat_window_t tx_stat;  /*!< TX/TX fail counters  */
   zb_uint8_t nwk_keepalive_modes;
@@ -876,6 +873,16 @@ typedef struct zb_nib_s
   zb_uint8_t  nwk_good_parent_lqa; /*!<  nwkGoodParentLQA */
 
   zb_uint16_t nwk_panid_conflict_count; /*!<  nwkPanIdConflictCount */
+
+#if defined(ZB_ROUTER_ROLE) && defined(ZB_DENSE_NET_ROUTING_OPTIMIZATION)
+  zb_uint8_t dense_net_routing_optimization_mask; /*!< Enables routing optimization for dense networks */
+  zb_uint16_t nwk_routing_seq_num; /*!< nwkRoutingSequenceNumber */
+
+#if !defined(ZB_LITE_NO_SOURCE_ROUTING)
+  zb_nwk_src_route_solicitation_addr_t src_route_solicitation_addrs[ZB_SOURCE_ROUTE_SOLICITATION_MAX_ADDRS];
+#endif /* !ZB_LITE_NO_SOURCE_ROUTING */
+
+#endif /* ZB_ROUTER_ROLE && ZB_DENSE_NET_ROUTING_OPTIMIZATION */
 } zb_nib_t;
 
 #ifdef ZB_NIB

@@ -54,20 +54,19 @@
 #include "zb_nwk.h"
 #include "zcl/zb_zcl_common.h"
 #include "zb_bdb_internal.h"
-#include "zb_bdb_internal.h"
 
-void zb_bdb_finding_binding_initiator_alarm(zb_uint8_t param);
-void zb_bdb_finding_binding_target_alarm(zb_uint8_t param);
-void zb_bdb_error_handle_buf(zb_int16_t status, zb_uint8_t param);
+void zb_bdb_finding_binding_initiator_alarm(zb_cb_param_t param);
+void zb_bdb_finding_binding_target_alarm(zb_cb_param_t param);
+void zb_bdb_error_handle_buf(zb_int16_t status, zb_bufid_t param);
 zb_bool_t zb_bdb_find_cluster_match(zb_uint16_t cluster_id, zb_uint8_t role);
-void zb_bdb_active_eps_check_cb(zb_uint8_t param);
+void zb_bdb_active_eps_check_cb(zb_cb_param_t cb_param);
 void zb_bdb_send_identify_query_next_req(zb_uint8_t param);
-void zb_bdb_identify_query_sent_cb(zb_uint8_t param);
-void zb_bdb_fb_send_active_ep_req(zb_uint8_t param, zb_uint16_t src_addr);
-void zb_bdb_process_ext_addr_resp(zb_uint8_t param);
+void zb_bdb_identify_query_sent_cb(zb_cb_param_t cb_param);
+void zb_bdb_fb_send_active_ep_req(zb_bufid_t param, zb_uint16_t src_addr);
+void zb_bdb_process_ext_addr_resp(zb_cb_param_t cb_param);
 
 static zb_ret_t zb_bdb_find_respondent(zb_uint16_t nwk_addr, zb_uint8_t *resp_index);
-static void zb_bdb_finding_binding_initiator_stop(  zb_uint8_t param, zb_uint16_t status);
+static void zb_bdb_finding_binding_initiator_stop(zb_cb_param_t cb_param);
 static zb_ret_t zb_bdb_finding_binding_target_func(zb_uint8_t endpoint, zb_uint16_t commissioning_time_secs);
 static void finding_binding_target_cancel_ep_internal(zb_uint8_t endpoint, zb_bool_t is_timeout_expired);
 
@@ -123,7 +122,7 @@ static zb_ret_t zb_bdb_finding_binding_target_func(zb_uint8_t endpoint, zb_uint1
   }
   if (ret == RET_OK)
   {
-    ZB_BDB().bdb_commissioning_step = ZB_BDB_FINDING_N_BINDING;
+    ZB_BDB().bdb_commissioning_step = ZB_BDB_STEP_FINDING_N_BINDING;
     ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_IN_PROGRESS;
     BDB_COMM_CTX().state = ZB_BDB_COMM_FINDING_AND_BINDING_TARGET;
   }
@@ -187,14 +186,17 @@ zb_ret_t zb_bdb_finding_binding_target_ext(zb_uint8_t endpoint, zb_uint16_t comm
 static void finding_binding_finished_context_update(void)
 {
   BDB_COMM_CTX().state = ZB_BDB_COMM_IDLE;
-  ZB_BDB().bdb_commissioning_step = ZB_BDB_COMMISSIONING_STOP;
-  TRACE_MSG(TRACE_ZDO3, "ZB_BDB_COMMISSIONING_STOP", (FMT__0));
+  ZB_BDB().bdb_commissioning_step = ZB_BDB_STEP_COMMISSIONING_STOP;
+  TRACE_MSG(TRACE_ZDO3, "ZB_BDB_STEP_COMMISSIONING_STOP", (FMT__0));
   ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_SUCCESS;
 }
 
-static void raise_target_finished_cancelled_signal(zb_uint8_t param, zb_uint16_t ep)
+static void raise_target_finished_cancelled_signal(zb_cb_param_t cb_param)
 {
   zb_uint8_t *ptr;
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_uint16_t ep = ZB_UNPACK_USER_PARAM(cb_param);
+
   TRACE_MSG(TRACE_ZDO1, "F&B target cancelled calling zb_zdo_startup_complete", (FMT__0));
   ptr = zb_app_signal_pack_with_detailed_status(param, ZB_BDB_SIGNAL_FINDING_AND_BINDING_TARGET_FINISHED,
                                                 RET_CANCELLED, sizeof(zb_uint8_t));
@@ -228,10 +230,12 @@ void zb_bdb_finding_binding_target_cancel(void)
   TRACE_MSG(TRACE_ZCL1, "< zb_bdb_finding_binding_target_cancel", (FMT__0));
 }
 
-void zb_bdb_finding_binding_target_alarm_ep(zb_uint8_t param, zb_uint16_t endpoint)
+void zb_bdb_finding_binding_target_alarm_ep(zb_cb_param_t cb_param)
 {
   zb_uint8_t *ptr;
-  TRACE_MSG(TRACE_ZCL1, "> zb_bdb_finding_binding_target_alarm_ep param %hd endpoint %d", (FMT__H_D, param, endpoint));
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_uint16_t endpoint = ZB_UNPACK_USER_PARAM(cb_param);
+  TRACE_MSG(TRACE_ZCL1, "> zb_bdb_finding_binding_target_alarm_ep param %d endpoint %d", (FMT__D_D, param, endpoint));
 
   finding_binding_target_cancel_ep_internal((zb_uint8_t)endpoint, ZB_TRUE);
 
@@ -294,20 +298,20 @@ static void finding_binding_target_cancel_ep_internal(zb_uint8_t endpoint, zb_bo
   TRACE_MSG(TRACE_ZCL1, "< finding_binding_target_cancel_ep_internal", (FMT__0));
 }
 
-void zb_bdb_finding_binding_target_cancel_ep(zb_uint8_t endpoint)
+void zb_bdb_finding_binding_target_cancel_ep(zb_cb_param_t endpoint)
 {
-  TRACE_MSG(TRACE_ZCL1, "> zb_bdb_finding_binding_target_cancel_ep endpoint %hd ", (FMT__H, endpoint));
+  TRACE_MSG(TRACE_ZCL1, "> zb_bdb_finding_binding_target_cancel_ep endpoint %d ", (FMT__D, endpoint));
 
   finding_binding_target_cancel_ep_internal(endpoint, ZB_FALSE);
 
   TRACE_MSG(TRACE_ZCL1, "< zb_bdb_finding_binding_target_cancel_ep", (FMT__0));
 }
 
-void zb_bdb_finding_binding_target_alarm(zb_uint8_t endpoint)
+void zb_bdb_finding_binding_target_alarm(zb_cb_param_t endpoint)
 {
-  TRACE_MSG(TRACE_ZCL1, "> zb_bdb_finding_binding_target_alarm endpoint %hd", (FMT__H, endpoint));
+  TRACE_MSG(TRACE_ZCL1, "> zb_bdb_finding_binding_target_alarm endpoint %d", (FMT__D, endpoint));
 
-  zb_buf_get_out_delayed_ext(zb_bdb_finding_binding_target_alarm_ep, (zb_uint16_t)endpoint, sizeof(zb_uint16_t));
+  zb_buf_get_out_delayed_ext(zb_bdb_finding_binding_target_alarm_ep, endpoint, sizeof(zb_uint16_t));
 
   TRACE_MSG(TRACE_ZCL2, "< zb_bdb_finding_binding_target_alarm", (FMT__0));
 }
@@ -317,10 +321,10 @@ void zb_bdb_finding_binding_target_alarm(zb_uint8_t endpoint)
 ****************************************
 F & B Initiator
 */
-
-static void zb_bdb_finding_binding_initiator_stop(
-  zb_uint8_t param, zb_uint16_t status)
+static void zb_bdb_finding_binding_initiator_stop(zb_cb_param_t cb_param)
 {
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_uint16_t status = ZB_UNPACK_USER_PARAM(cb_param);
   zb_zdo_signal_fb_initiator_finished_params_t *signal_params;
 
   finding_binding_finished_context_update();
@@ -351,9 +355,9 @@ void zb_bdb_finding_binding_initiator_cancel(void)
 }
 
 /* Alarm when finding & binding is invoked but no identify query response got */
-void zb_bdb_finding_binding_initiator_alarm(zb_uint8_t param)
+void zb_bdb_finding_binding_initiator_alarm(zb_cb_param_t param)
 {
-  TRACE_MSG(TRACE_ZCL1, "> zb_bdb_finding_binding_initiator_alarm %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_bdb_finding_binding_initiator_alarm %d", (FMT__D, param));
 
   ZVUNUSED(param);
 
@@ -384,7 +388,7 @@ static zb_ret_t zb_bdb_find_respondent(zb_uint16_t nwk_addr, zb_uint8_t *resp_in
 {
   zb_ret_t ret = RET_NOT_FOUND;
   zb_uindex_t i;
-  zb_address_ieee_ref_t addr_ref = 0;
+  zb_address_ieee_ref_t addr_ref = ZB_ADDRESS_IEEE_REF_NONE;
 
   TRACE_MSG(TRACE_ZCL1, "> zb_bdb_find_respondent by addr %d", (FMT__D, nwk_addr));
 
@@ -436,7 +440,7 @@ static void process_next_binding_for_respondent(zb_bdb_comm_respondent_info_t *r
                                                 zb_bufid_t param);
 
 
-static void handle_bind_confirm(zb_uint8_t param)
+static void handle_bind_confirm(zb_cb_param_t param)
 {
   zb_apsme_binding_req_t *aps_bind_req = ZB_BUF_GET_PARAM(param, zb_apsme_binding_req_t);
   zb_bdb_comm_respondent_info_t *respondent = NULL;
@@ -682,13 +686,15 @@ static void process_binding_for_respondent(zb_bdb_comm_respondent_info_t *respon
   Checks simple descriptor received from respondent and
   performs binding if cluster match is found
 */
-void zb_bdb_simple_desc_check_cb(zb_uint8_t param, zb_uint16_t param2)
+void zb_bdb_simple_desc_check_cb(zb_cb_param_t cb_param)
 {
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_bufid_t param2 = (zb_bufid_t)ZB_UNPACK_USER_PARAM(cb_param);
   zb_zdo_simple_desc_resp_t *resp = (zb_zdo_simple_desc_resp_t*)zb_buf_begin(param2);
   zb_bdb_comm_respondent_info_t *respondent = NULL;
   zb_uint8_t resp_idx;
 
-  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_simple_desc_check_cb %hd %d", (FMT__H_D, param, param2));
+  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_simple_desc_check_cb %d %d", (FMT__D_D, param, param2));
 
 
   /*Find record in the F&B identify table */
@@ -778,7 +784,7 @@ zb_bool_t zb_bdb_find_cluster_match(zb_uint16_t cluster_id, zb_uint8_t role)
   Processes simple descriptor response during EZ Mode commissioning
   (finding & binding)
 */
-void zb_bdb_process_simple_desc_res(zb_uint8_t param)
+void zb_bdb_process_simple_desc_res(zb_cb_param_t param)
 {
   zb_int16_t status = RET_OK;
 
@@ -786,7 +792,7 @@ void zb_bdb_process_simple_desc_res(zb_uint8_t param)
   zb_bdb_comm_respondent_info_t *respondent = NULL;
   zb_uint8_t resp_idx;
 
-  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_process_simple_desc_res %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_process_simple_desc_res %d", (FMT__D, param));
 
   status = ( (BDB_COMM_CTX().state == ZB_BDB_COMM_FINDING_AND_BINDING) ?
              RET_OK : RET_CANCELLED );
@@ -818,7 +824,7 @@ void zb_bdb_process_simple_desc_res(zb_uint8_t param)
   Sends SimpleDescriptor request for all the active endpoints
   of the respondent
 */
-void zb_bdb_active_eps_check_cb(zb_uint8_t param)
+void zb_bdb_active_eps_check_cb(zb_cb_param_t param)
 {
   zb_bdb_comm_respondent_info_t *respondent = NULL;
   /* TRICKY HACK: in some cases there is zb_zdo_simple_desc_resp_t instead of zb_zdo_ep_resp_t.
@@ -828,7 +834,7 @@ void zb_bdb_active_eps_check_cb(zb_uint8_t param)
   zb_uint8_t resp_idx;
   zb_uindex_t respondents_to_move;
 
-  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_process_active_ep_check_cb %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_process_active_ep_check_cb %d", (FMT__D, param));
 
   /*Find record in the F&B identify table by address */
   if (zb_bdb_find_respondent(resp->nwk_addr, &resp_idx) == RET_OK)
@@ -861,7 +867,7 @@ void zb_bdb_active_eps_check_cb(zb_uint8_t param)
     }
     else
     {
-      respondent->addr_ref = 0xFF;
+      respondent->addr_ref = ZB_ADDRESS_IEEE_REF_NONE;
 
       if (resp_idx < ZB_ARRAY_SIZE(BDB_COMM_CTX().respondent) - 1)
       {
@@ -905,7 +911,7 @@ void zb_bdb_active_eps_check_cb(zb_uint8_t param)
 /*
  add ep to respondent and go on
 */
-static void zb_bdb_add_ep_to_respondent(zb_uint8_t param, zb_uint16_t nwk_addr, zb_uint8_t ep)
+static void zb_bdb_add_ep_to_respondent(zb_bufid_t param, zb_uint16_t nwk_addr, zb_uint8_t ep)
 {
   zb_ret_t status = RET_OK;
   zb_zdo_ep_resp_t *resp;
@@ -1002,7 +1008,7 @@ static void zb_bdb_add_ep_to_respondent(zb_uint8_t param, zb_uint16_t nwk_addr, 
 /*
   Processes active endpoints response during finding & binding
 */
-void zb_bdb_process_active_eps_res(zb_uint8_t param)
+void zb_bdb_process_active_eps_res(zb_cb_param_t param)
 {
   zb_int16_t status = RET_OK;
   zb_zdo_ep_resp_t *resp = (zb_zdo_ep_resp_t*)zb_buf_begin(param);
@@ -1010,7 +1016,7 @@ void zb_bdb_process_active_eps_res(zb_uint8_t param)
   zb_bdb_comm_respondent_info_t *respondent=NULL;
   zb_uint8_t resp_idx;
 
-  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_process_active_eps_res from addr %d %hd", (FMT__D_H, resp->nwk_addr, param));
+  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_process_active_eps_res from addr %d %d", (FMT__D_D, resp->nwk_addr, param));
 
 
   status = ( (BDB_COMM_CTX().state == ZB_BDB_COMM_FINDING_AND_BINDING) ?
@@ -1057,12 +1063,12 @@ void zb_bdb_process_active_eps_res(zb_uint8_t param)
   Processes identify query response during EZ Mode commissioning
   (finding & binding)
 */
-void zb_bdb_process_identify_query_res(zb_uint8_t param)
+void zb_bdb_process_identify_query_res(zb_cb_param_t param)
 {
   zb_int16_t status = RET_OK;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_process_identify_query_res %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_process_identify_query_res %d", (FMT__D, param));
 
   status = ( (BDB_COMM_CTX().state == ZB_BDB_COMM_FINDING_AND_BINDING) ?
              RET_OK : RET_CANCELLED );
@@ -1124,12 +1130,12 @@ void zb_bdb_process_identify_query_res(zb_uint8_t param)
 }
 
 
-void zb_bdb_fb_send_active_ep_req(zb_uint8_t param, zb_uint16_t src_addr)
+void zb_bdb_fb_send_active_ep_req(zb_bufid_t param, zb_uint16_t src_addr)
 {
   zb_bdb_comm_respondent_info_t *respondent = NULL;
   zb_uint8_t resp_idx = 0xff;
 
-  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_fb_send_active_ep_req param %hd src_addr 0x%x", (FMT__H_D, param, src_addr));
+  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_fb_send_active_ep_req param %d src_addr 0x%x", (FMT__D_D, param, src_addr));
   if (zb_bdb_find_respondent(src_addr, &resp_idx) != RET_OK)
   {
     if (BDB_COMM_CTX().respondent_number < ZB_ARRAY_SIZE(BDB_COMM_CTX().respondent))
@@ -1151,7 +1157,7 @@ void zb_bdb_fb_send_active_ep_req(zb_uint8_t param, zb_uint16_t src_addr)
   if (resp_idx != 0xff)
   {
     zb_zdo_active_ep_req_t *req;
-    zb_address_ieee_ref_t addr_ref = 0;
+    zb_address_ieee_ref_t addr_ref = ZB_ADDRESS_IEEE_REF_NONE;
     respondent = &BDB_COMM_CTX().respondent[resp_idx];
 
     if (zb_address_get_by_short(src_addr, &addr_ref) == RET_OK)
@@ -1177,7 +1183,7 @@ void zb_bdb_fb_send_active_ep_req(zb_uint8_t param, zb_uint16_t src_addr)
 }
 
 
-void zb_bdb_process_ext_addr_resp(zb_uint8_t param)
+void zb_bdb_process_ext_addr_resp(zb_cb_param_t param)
 {
   zb_address_ieee_ref_t addr_ref;
   zb_zdo_nwk_addr_resp_head_t *resp = (zb_zdo_nwk_addr_resp_head_t*)zb_buf_begin(param);
@@ -1217,10 +1223,9 @@ void zb_bdb_process_ext_addr_resp(zb_uint8_t param)
   Checks whether identify_query request
   was sent successfully
 */
-void zb_bdb_identify_query_sent_cb(zb_uint8_t param)
+void zb_bdb_identify_query_sent_cb(zb_cb_param_t param)
 {
-
-  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_identify_query_sent_cb %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_identify_query_sent_cb %d", (FMT__D, param));
 
   if (zb_buf_get_status(param) == RET_OK)
   {
@@ -1244,10 +1249,10 @@ Repeat Identify query
   Sends Identify Query request during
   EZ-Mode finding & binding initiator
 */
-void zb_bdb_send_identify_query_req(zb_uint8_t param)
+void zb_bdb_send_identify_query_req(zb_cb_param_t param)
 {
   zb_addr_u addr;
-  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_identify_query_req %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL2, "> zb_bdb_identify_query_req %d", (FMT__D, param));
 
   addr.addr_short = ZB_NWK_BROADCAST_ALL_DEVICES;
   ZB_ZCL_IDENTIFY_SEND_IDENTIFY_QUERY_REQ
@@ -1321,13 +1326,13 @@ zb_ret_t zb_bdb_finding_binding_initiator(zb_uint8_t endpoint,
   if (ret == RET_OK)
   {
     ret = ( (BDB_COMM_CTX().state == ZB_BDB_COMM_IDLE &&
-             ZB_BDB().bdb_commissioning_step == ZB_BDB_COMMISSIONING_STOP) ?
+             ZB_BDB().bdb_commissioning_step == ZB_BDB_STEP_COMMISSIONING_STOP) ?
             RET_OK : RET_BUSY );
   }
 
   if (ret == RET_OK)
   {
-    ZB_BDB().bdb_commissioning_step = ZB_BDB_FINDING_N_BINDING;
+    ZB_BDB().bdb_commissioning_step = ZB_BDB_STEP_FINDING_N_BINDING;
     ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_IN_PROGRESS;
 
     BDB_COMM_CTX().state = ZB_BDB_COMM_FINDING_AND_BINDING;
@@ -1350,9 +1355,9 @@ zb_ret_t zb_bdb_finding_binding_initiator(zb_uint8_t endpoint,
 
 
 /* Pushes error message up via user callback in buffer's header */
-void zb_bdb_error_handle_buf(zb_int16_t status, zb_uint8_t param)
+void zb_bdb_error_handle_buf(zb_int16_t status, zb_bufid_t param)
 {
-  TRACE_MSG(TRACE_ZCL1, "> zb_bdb_error_handle_buf status %d, param %hd", (FMT__D_H, status, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_bdb_error_handle_buf status %d, param %d", (FMT__D_D, status, param));
 
   zb_buf_set_status(param, status);
   if (status == ZB_ZDP_STATUS_TABLE_FULL)
@@ -1381,8 +1386,8 @@ void zb_bdb_error_handle_buf(zb_int16_t status, zb_uint8_t param)
             (FMT__D_D_H, ZB_BDB().bdb_commissioning_status, ZB_BDB().bdb_application_signal, zb_buf_get_status(param)));
 
   /* bdb commissioning is finished */
-  ZB_BDB().bdb_commissioning_step = ZB_BDB_COMMISSIONING_STOP;
-  TRACE_MSG(TRACE_ZDO3, "ZB_BDB_COMMISSIONING_STOP", (FMT__0));
+  ZB_BDB().bdb_commissioning_step = ZB_BDB_STEP_COMMISSIONING_STOP;
+  TRACE_MSG(TRACE_ZDO3, "ZB_BDB_STEP_COMMISSIONING_STOP", (FMT__0));
 
   ZB_SCHEDULE_CALLBACK(zb_zdo_startup_complete_int, param);
 

@@ -385,6 +385,13 @@ typedef ZB_PACKED_PRE struct zb_zcl_on_off_on_with_timed_off_req_s
   }                                                                                 \
 }
 
+/** @brief Declare run Set Effect command for User Application */
+typedef struct zb_zcl_on_off_set_effect_value_param_s
+{
+  zb_uint8_t effect_id;         /*!< Effect identify */
+  zb_uint8_t effect_variant;    /*!< Effect variant */
+} zb_zcl_on_off_set_effect_value_param_t;
+
 /** @cond internals_doc */
 /**
  *  @name Inform User App about On/Off cluster command and change attributes.
@@ -393,15 +400,7 @@ typedef ZB_PACKED_PRE struct zb_zcl_on_off_on_with_timed_off_req_s
  *  @internal
  *  @{
  */
-
-/** @brief Declare run Set Effect command for User Application
-*/
-typedef struct zb_zcl_on_off_set_effect_value_param_s
-{
-  zb_uint8_t effect_id;         /*!< Effect identify */
-  zb_uint8_t effect_variant;    /*!< Effect variant */
-} zb_zcl_on_off_set_effect_value_param_t;
-
+ 
 /*! Struct for invoke User App & continue after */
 typedef struct zb_zcl_on_off_effect_user_app_schedule_e
 {

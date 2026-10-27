@@ -142,7 +142,7 @@ typedef struct zb_zcl_cvc_alarm_variables_s
 /** @brief Attribute id */
   zb_uint16_t attribute_id;
 /** @brief Alarm buffer id */
-  zb_uint8_t alarm_buf_id;
+  zb_bufid_t alarm_buf_id;
 /** @brief Is Used flag */
   zb_bool_t is_used;
 } ZB_PACKED_STRUCT
@@ -167,7 +167,7 @@ zb_uint8_t zb_zcl_cvc_calculate_transition_values(zb_zcl_cvc_input_variables_t* 
 zb_uint8_t zb_zcl_cvc_start_alarm(zb_uint8_t endpoint_id,
                                   zb_uint16_t cluster_id,
                                   zb_uint16_t attribute_id,
-                                  zb_uint8_t alarm_buf_id);
+                                  zb_bufid_t alarm_buf_id);
 
 
 /*!

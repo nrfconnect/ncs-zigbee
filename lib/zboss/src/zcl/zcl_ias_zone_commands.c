@@ -89,13 +89,13 @@ zb_discover_cmd_list_t gs_ias_zone_client_cmd_list =
 
 void zb_zcl_ias_zone_restore_curr_zone_sens_level(zb_uint8_t endpoint);
 zb_ret_t zb_zcl_ias_zone_init_mode(zb_zcl_ias_zone_int_ctx_t *int_ctx, zb_uint8_t mode, zb_uint16_t val);
-void zb_zcl_ias_zone_restore_normal_mode(zb_uint8_t endpoint);
+void zb_zcl_ias_zone_restore_normal_mode(zb_cb_param_t endpoint);
 void zb_zcl_ias_zone_set_test_bit_delayed(zb_uint8_t endpoint, zb_uint8_t test_bit);
-void zb_zcl_ias_zone_set_test_bit(zb_uint8_t param, zb_uint16_t user_param);
+void zb_zcl_ias_zone_set_test_bit(zb_cb_param_t param);
 zb_ret_t check_value_ias_zone_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 void zb_zcl_ias_zone_write_attr_hook_server(zb_uint8_t endpoint, zb_uint16_t attr_id, zb_uint8_t *new_value, zb_uint16_t manuf_code);
-zb_bool_t zb_zcl_process_ias_zone_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_ias_zone_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_ias_zone_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_ias_zone_specific_commands_cli(zb_cb_param_t param);
 
 void zb_zcl_ias_zone_init_server()
 {
@@ -211,7 +211,7 @@ zb_ret_t zb_zcl_ias_zone_put_cie_address_to_binding_whitelist(zb_uint8_t ep_id)
 }
 
 /** @brief Initiate Test mode command */
-static zb_ret_t zb_zcl_ias_zone_init_test_mode_handler(zb_uint8_t param)
+static zb_ret_t zb_zcl_ias_zone_init_test_mode_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_zone_init_test_mode_t payload;
@@ -219,7 +219,7 @@ static zb_ret_t zb_zcl_ias_zone_init_test_mode_handler(zb_uint8_t param)
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uint8_t endpoint;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_zone_init_test_mode_handler param %d", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_zone_init_test_mode_handler param %d", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
   endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint;
@@ -294,8 +294,11 @@ void zb_zcl_ias_zone_set_test_bit_delayed(zb_uint8_t endpoint, zb_uint8_t test_b
   zb_buf_get_out_delayed_ext(zb_zcl_ias_zone_set_test_bit, endpoint | (test_bit << 8), 0);
 }
 
-void zb_zcl_ias_zone_set_test_bit(zb_uint8_t param, zb_uint16_t user_param)
+void zb_zcl_ias_zone_set_test_bit(zb_cb_param_t cb_param)
 {
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_uint16_t user_param = ZB_UNPACK_USER_PARAM(cb_param);
+
   zb_uint8_t endpoint = ZB_GET_LOW_BYTE(user_param);
   zb_uint8_t test_bit = ZB_GET_HI_BYTE(user_param);
   zb_uint16_t curr_zone_status;
@@ -319,16 +322,16 @@ void zb_zcl_ias_zone_set_test_bit(zb_uint8_t param, zb_uint16_t user_param)
 }
 
 /** @brief Initiate Normal mode command */
-static zb_ret_t zb_zcl_ias_zone_init_normal_mode_handler(zb_uint8_t param)
+static zb_ret_t zb_zcl_ias_zone_init_normal_mode_handler(zb_bufid_t param)
 {
-  zb_uint8_t alarm_buf_param = 0;
+  zb_cb_param_t alarm_buf_param = 0;
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uint8_t endpoint;
   zb_zcl_attr_t *attr_desc_int_ctx;
   zb_zcl_ias_zone_int_ctx_t *int_ctx;
   zb_ret_t retcode;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_zone_init_normal_mode_handler param %d", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_zone_init_normal_mode_handler param %d", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
   endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint;
@@ -378,7 +381,7 @@ static zb_ret_t zb_zcl_ias_zone_init_normal_mode_handler(zb_uint8_t param)
 
 /* Invoke User App for "Enroll Response" command
  */
-void zb_zcl_ias_zone_enroll_response_invoke_user_app(zb_uint8_t param)
+void zb_zcl_ias_zone_enroll_response_invoke_user_app(zb_cb_param_t param)
 {
   zb_zcl_ias_zone_enroll_response_user_app_schedule_t* invoke_data =
       ZB_BUF_GET_PARAM(param, zb_zcl_ias_zone_enroll_response_user_app_schedule_t);
@@ -417,7 +420,7 @@ void zb_zcl_ias_zone_enroll_response_invoke_user_app(zb_uint8_t param)
 #endif /* defined ZB_ENABLE_HA */
 
 /** @brief Zone Enroll Response command */
-static zb_ret_t zone_enroll_res_handler(zb_uint8_t param)
+static zb_ret_t zone_enroll_res_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_zone_enroll_res_t payload;
@@ -425,7 +428,7 @@ static zb_ret_t zone_enroll_res_handler(zb_uint8_t param)
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uint8_t endpoint;
 
-  TRACE_MSG(TRACE_ZCL1, "> zone_enroll_res_handler param %d", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zone_enroll_res_handler param %d", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
   endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint;
@@ -496,7 +499,7 @@ zb_ret_t zb_zcl_ias_zone_init_mode(zb_zcl_ias_zone_int_ctx_t *int_ctx, zb_uint8_
 
 /* NK:TODO: Modify this: zb_zcl_ias_zone_restore_normal_mode(endpoint, restore_bit); to use this
  * func in scheduling and in normal mode handling */
-void zb_zcl_ias_zone_restore_normal_mode(zb_uint8_t endpoint)
+void zb_zcl_ias_zone_restore_normal_mode(zb_cb_param_t endpoint)
 {
   zb_zcl_attr_t *attr_desc_level = zb_zcl_get_attr_desc_a(endpoint,
       ZB_ZCL_CLUSTER_ID_IAS_ZONE, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_IAS_ZONE_CURRENT_ZONE_SENSITIVITY_LEVEL_ID);
@@ -526,7 +529,7 @@ void zb_zcl_ias_zone_restore_normal_mode(zb_uint8_t endpoint)
   }
 }
 
-zb_bool_t zb_zcl_process_ias_zone_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_ias_zone_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -536,7 +539,7 @@ zb_bool_t zb_zcl_process_ias_zone_specific_commands(zb_uint8_t param)
 
   TRACE_MSG( TRACE_ZCL1,
              "> zb_zcl_process_ias_zone_specific_commands: param %d, cmd %d",
-             (FMT__H_H, param, cmd_info.cmd_id));
+             (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_IAS_ZONE == cmd_info.cluster_id);
 
@@ -612,7 +615,7 @@ zb_bool_t zb_zcl_process_ias_zone_specific_commands(zb_uint8_t param)
 }
 
 
-zb_bool_t zb_zcl_process_ias_zone_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_ias_zone_specific_commands_srv(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -622,7 +625,7 @@ zb_bool_t zb_zcl_process_ias_zone_specific_commands_srv(zb_uint8_t param)
   return zb_zcl_process_ias_zone_specific_commands(param);
 }
 
-zb_bool_t zb_zcl_process_ias_zone_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_ias_zone_specific_commands_cli(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -636,13 +639,13 @@ zb_bool_t zb_zcl_process_ias_zone_specific_commands_cli(zb_uint8_t param)
 /* Set or clear Zone Status bits
  * for User App
  */
-void zb_zcl_ias_zone_change_status(zb_uint8_t param)
+void zb_zcl_ias_zone_change_status(zb_cb_param_t param)
 {
   zb_zcl_ias_zone_status_param_t* params = ZB_BUF_GET_PARAM(param, zb_zcl_ias_zone_status_param_t);
   zb_zcl_attr_t *attr_desc;
   zb_uint16_t val;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_zone_change_status param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_zone_change_status param %d", (FMT__D, param));
 
   attr_desc = zb_zcl_get_attr_desc_a(params->endpoint,
         ZB_ZCL_CLUSTER_ID_IAS_ZONE, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_IAS_ZONE_ZONESTATUS_ID);
@@ -676,14 +679,14 @@ zb_bool_t zb_zcl_ias_zone_set_status(
   zb_uint8_t ep,
   zb_uint16_t new_val,
   zb_uint16_t delay,
-  zb_uint8_t buf_param)
+  zb_bufid_t buf_param)
 {
   zb_zcl_attr_t *attr_desc;
   zb_bool_t ret = ZB_FALSE;
 
   TRACE_MSG(TRACE_ZCL1,
-            ">> zb_zcl_ias_zone_set_status ep %hd, buf_param %hd, new_val %d, delay %d",
-            (FMT__H_H_D_D, ep, buf_param, new_val, delay));
+            ">> zb_zcl_ias_zone_set_status ep %hd, buf_param %d, new_val %d, delay %d",
+            (FMT__H_D_D_D, ep, buf_param, new_val, delay));
 
   if (buf_param != ZB_UNDEFINED_BUFFER)
   {
@@ -719,7 +722,7 @@ zb_bool_t zb_zcl_ias_zone_set_status(
 }
 
 zb_bool_t zb_zcl_ias_zone_check_attr_notify(
-  zb_uint8_t buf_param)
+  zb_cb_param_t buf_param)
 {
   zb_bool_t send_not = ZB_FALSE;
   zb_zcl_attr_t *attr_desc;
@@ -729,8 +732,8 @@ zb_bool_t zb_zcl_ias_zone_check_attr_notify(
     ZB_BUF_GET_PARAM(buf_param, zb_zcl_ias_zone_notification_param_t);
 
   TRACE_MSG(TRACE_ZCL1,
-    ">> zb_zcl_ias_zone_check_attr_notify buf_param %hd",
-    (FMT__H,  buf_param));
+    ">> zb_zcl_ias_zone_check_attr_notify buf_param %d",
+    (FMT__D,  buf_param));
 
   attr_desc = zb_zcl_get_attr_desc_a(
     notify_param->ep, ZB_ZCL_CLUSTER_ID_IAS_ZONE, ZB_ZCL_CLUSTER_SERVER_ROLE, ZB_ZCL_ATTR_IAS_ZONE_ZONESTATUS_ID);
@@ -781,7 +784,7 @@ zb_bool_t zb_zcl_ias_zone_check_attr_notify(
 }
 
 
-void zb_zcl_ias_zone_send_status_change_not(zb_uint8_t param)
+void zb_zcl_ias_zone_send_status_change_not(zb_cb_param_t param)
 {
   zb_zcl_ias_zone_notification_param_t *notify_param =
     ZB_BUF_GET_PARAM(param, zb_zcl_ias_zone_notification_param_t);
@@ -893,7 +896,7 @@ void zb_zcl_ias_zone_register_cb(
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_ias_zone_queue_registry", (FMT__0));
 }
 
-static void handle_bind_confirm(zb_uint8_t param)
+static void handle_bind_confirm(zb_cb_param_t param)
 {
   if (zb_buf_get_status(param) != RET_OK)
   {
@@ -903,7 +906,7 @@ static void handle_bind_confirm(zb_uint8_t param)
   zb_buf_free(param);
 }
 
-static void handle_bind_check_response(zb_bufid_t param)
+static void handle_bind_check_response(zb_cb_param_t param)
 {
   zb_aps_check_binding_resp_t *check_binding_resp = NULL;
 

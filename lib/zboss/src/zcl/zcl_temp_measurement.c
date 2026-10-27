@@ -126,7 +126,11 @@ zb_ret_t check_value_temp_measurement_server(zb_uint16_t attr_id, zb_uint8_t end
               ? RET_OK : RET_ERROR;
       break;
 
-    /* TODO: case ZB_ZCL_ATTR_TEMP_MEASUREMENT_TOLERANCE_ID */
+    case ZB_ZCL_ATTR_TEMP_MEASUREMENT_TOLERANCE_ID:
+      ret = ( (ZB_ZCL_ATTR_TEMP_MEASUREMENT_TOLERANCE_MIN_VALUE <= val) &&
+              (val <= ZB_ZCL_ATTR_TEMP_MEASUREMENT_TOLERANCE_MAX_VALUE) )
+              ? RET_OK : RET_ERROR;
+      break;
 
     default:
       break;
@@ -141,17 +145,13 @@ void zb_zcl_temp_measurement_write_attr_hook_server(
 {
   ZVUNUSED(new_value);
   ZVUNUSED(endpoint);
+  ZVUNUSED(attr_id);
   ZVUNUSED(manuf_code);
 
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_temp_measurement_write_attr_hook endpoint %hd, attr_id 0x%x, manuf_code 0x%x",
             (FMT__H_D_D, endpoint, attr_id, manuf_code));
 
-  if (attr_id == ZB_ZCL_ATTR_TEMP_MEASUREMENT_VALUE_ID)
-  {
-	  /* TODO Change min/max temperature by current are not agree
-	   * spec/
-	   * Need consult with customer !*/
-  }
+  /* All attributes in this cluster are read-only. Do nothing */
 
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_temp_measurement_write_attr_hook", (FMT__0));
 }

@@ -265,14 +265,15 @@
 #include "zcl/zb_zcl_ir_blaster.h"
 #endif /* ZB_ENABLE_CUSTOM_CLUSTERS */
 
-#if defined ZB_ENABLE_ZGP_CLUSTER
-//#include "zgp/zgp_internal.h"
-#endif
-
 #if defined (ZB_ZCL_SUPPORT_CLUSTER_DIRECT_CONFIGURATION)
 #include "zcl/zb_zcl_direct_configuration.h"
 #endif
 
+#if defined ZB_SE_ENABLE_KEC_CLUSTER
+#include "zcl/zb_zcl_kec.h"
+#endif
+
+#include "zcl/zb_zcl_keep_alive.h"
 #include "zcl/zb_zcl_grpw_bed_sensor.h"
 #include "zcl/zb_zcl_grpw_freq_agility.h"
 
@@ -354,19 +355,23 @@
  *  @brief Set "Check attribute value" callback.
  *  The macro sets a callback being called for need to check attribute value.
  *
- *  @deprecated This callback will be removed in the next Major release after February 2023
- *              Use @ref ZB_ZCL_CHECK_ATTR_VALUE_MANUF_CB instead
- *
  *  @param func_ptr - callback to set (of type @ref zb_zcl_app_check_attr_value_cb_t).
  *  @hideinitializer
+ *
+ *  @note Only one of @ref ZB_ZCL_CHECK_ATTR_VALUE_MANUF_CB() or @ref ZB_ZCL_CHECK_ATTR_VALUE_CB()
+ *  should be used. Do not set both of them at the same time.
  */
 #define ZB_ZCL_CHECK_ATTR_VALUE_CB(func_ptr) ZCL_CTX().app_check_attr_value_cb = (func_ptr)
 
 /**
  *  @brief Set "Check attribute value" callback to check with manufacturer specific code.
  *  The macro sets a callback being called for need to check attribute value.
+ *
  *  @param func_ptr - callback to set (of type @ref zb_zcl_app_check_attr_value_manuf_cb_t).
  *  @hideinitializer
+ *
+ *  @note Only one of @ref ZB_ZCL_CHECK_ATTR_VALUE_MANUF_CB() or @ref ZB_ZCL_CHECK_ATTR_VALUE_CB()
+ *  should be used. Do not set both of them at the same time.
  */
 #define ZB_ZCL_CHECK_ATTR_VALUE_MANUF_CB(func_ptr) ZCL_CTX().app_check_attr_value_manuf_cb = (func_ptr)
 
@@ -466,29 +471,74 @@
  */
 typedef enum zb_zcl_device_callback_id_e
 {
-  /** Inform user about attribute value modification */
+  /** Inform user about attribute value modification
+   *
+   * @param[in] set_attr_value_param @ref zb_zcl_set_attr_value_param_t \n
+   *                                 @ref zb_zcl_device_callback_param_s::cb_param
+   *
+   * One of the following statuses must be returned:
+   * @return RET_OK - successfully handle command.
+   * @return RET_NOT_IMPLEMENTED - command is not implemented.
+   *
+  */
   ZB_ZCL_SET_ATTR_VALUE_CB_ID = 0,
 /** @cond DOXYGEN_INTERNAL_DOC */
+  /** Inform user about received attribute value */
+  ZB_ZCL_READ_ATTR_RESP_CB_ID,
+  /** Inform user about sent attribute value */
+  ZB_ZCL_WRITE_ATTR_RESP_CB_ID,
   /** Inform user about received attribute report */
   ZB_ZCL_REPORT_ATTR_CB_ID,
   /** Inform user that report was not received during defined time interval */
   ZB_ZCL_NO_REPORTING_CB_ID,
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
-  /** Inform user about change On/Off effect @see ZCL spec 6.6.1.4.4.2 */
+  /** Inform user about change On/Off effect @see ZCL spec 6.6.1.4.4.2
+   *
+   * @param[in] on_off_set_effect_value_param @ref zb_zcl_on_off_set_effect_value_param_t \n
+   *                                          @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_ON_OFF_WITH_EFFECT_VALUE_CB_ID,
-  /** Inform user about ZCL Shade cluster shade position value modification */
+  /** Inform user about ZCL Shade cluster shade position value modification
+   *
+   * @param[in] shade_set_value_param @ref zb_zcl_shade_set_value_param_t \n
+  *                                   @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_SHADE_SET_VALUE_CB_ID,
-  /** Inform user that shade_get_value_param of ZCL Shade custer could be changed */
+  /** Inform user that shade_get_value_param of ZCL Shade custer could be changed
+   *
+   * @param[in] shade_get_value_param @ref zb_zcl_shade_get_value_param_t \n
+   *                                  @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_SHADE_GET_VALUE_CB_ID,
-  /** Inform user about call identify effect command @see ZCL spec 6.3.1.2.1 */
+  /** Inform user about call identify effect command @see ZCL spec 6.3.1.2.1
+   *
+   * @param[in] identify_effect_value_param @ref zb_zcl_identify_effect_value_param_t \n
+   *                                        @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_IDENTIFY_EFFECT_CB_ID,
-  /** Inform user about ZCL Level Control cluster attributes value modification */
+  /** Inform user about ZCL Level Control cluster attributes value modification
+   *
+   * @param[in] level_control_set_value_param @ref zb_zcl_level_control_set_value_param_t \n
+   *                                          @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_LEVEL_CONTROL_SET_VALUE_CB_ID,
-  /** Inform user about enroll result command @see ZCL spec 8.2.2.3.1 */
+  /** Inform user about enroll result command @see ZCL spec 8.2.2.3.1
+   *
+   * @param[in] enroll_response_value_param @ref zb_zcl_ias_zone_enroll_response_value_param_t \n
+   *                                        @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_IAS_ZONE_ENROLL_RESPONSE_VALUE_CB_ID,
-  /** Inform user about call Start warning command @see ZCL spec 8.4.2.3.1 */
+  /** Inform user about call Start warning command @see ZCL spec 8.4.2.3.1
+   *
+   * @param[in] start_warning_value_param @ref zb_zcl_ias_wd_start_warning_value_param_s \n
+   *                                      @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_IAS_WD_START_WARNING_VALUE_CB_ID,
-  /** Inform user about call Squawk command @see ZCL spec 8.4.2.3.2 */
+  /** Inform user about call Squawk command @see ZCL spec 8.4.2.3.2
+   *
+   * @param[in] squawk_value_param @ref zb_zcl_ias_wd_squawk_value_param_s \n
+   *                               @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_IAS_WD_SQUAWK_VALUE_CB_ID,
   /** @b Server. Inform user about IAS ACE Arm command.
    *
@@ -699,19 +749,35 @@ typedef enum zb_zcl_device_callback_id_e
    *
    */
   ZB_ZCL_IAS_ACE_GET_ZONE_STATUS_RESP_CB_ID,
-  /** Inform user about OTA Upgrade commands  */
+  /** Inform user about OTA Upgrade commands
+   *
+   * Callback param (@ref zb_zcl_device_callback_param_s::cb_param) is filled differently depending on the OTA upgrade status:
+   *
+   * @param[in] ota_value_param \n
+   *  - ZB_ZCL_OTA_UPGRADE_STATUS_START: @ref zb_zcl_ota_upgrade_value_param_s::start \n
+   *  - ZB_ZCL_OTA_UPGRADE_STATUS_RECEIVE: @ref zb_zcl_ota_upgrade_value_param_s::receive \n
+   *  - For other Status: @ref zb_zcl_ota_upgrade_value_param_s - only upgrade_status is set
+  */
   ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID,
   /** Inform user about Basic Reset to Factory Defaults commands  */
   ZB_ZCL_BASIC_RESET_CB_ID,
-  /** Inform user about call Thermostat command @see HA spec 10.1.3.3 */
+  /** Inform user about call Thermostat command @see HA spec 10.1.3.3
+   *
+   * @param[in] thermostat_value_param @ref zb_zcl_thermostat_value_param_s \n
+   *                                   @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_THERMOSTAT_VALUE_CB_ID,
-  /** Inform user about Check-In command from polled device */
+  /** Inform user about Check-In command from polled device
+   *
+   * @param[in] checkin_cli_param @ref zb_zcl_poll_control_check_in_cli_param_t \n
+   *                              @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_POLL_CONTROL_CHECK_IN_CLI_CB_ID,
   /** @b Server. Inform user about EN50523 Appliance Events and Alerts Get Alerts command.
    *
    * User's application callback is initialized by RET_OK status of device
    * callback parameters.
-   * @param[out] param_out zb_zcl_en50523_appl_ev_and_alerts_get_alerts_resp_t
+   * @param[out] param_out @ref zb_zcl_en50523_appl_ev_and_alerts_get_alerts_resp_t
    *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command.
@@ -723,7 +789,8 @@ typedef enum zb_zcl_device_callback_id_e
    *
    * User's application callback is initialized by RET_OK status of device
    * callback parameters.
-   * @param[in] param_in zb_zcl_en50523_appl_ev_and_alerts_get_alerts_resp_t
+   * @param[in] param_in @ref zb_zcl_en50523_appl_ev_and_alerts_get_alerts_resp_t
+   *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command. Default Response will be send if requested.
    * @return RET_ERROR - command is handled with errors.
@@ -734,7 +801,7 @@ typedef enum zb_zcl_device_callback_id_e
    *
    * User's application callback is initialized by RET_OK status of device
    * callback parameters.
-   * @param[in] param_in zb_zcl_en50523_appl_ev_and_alerts_alerts_notif_t
+   * @param[in] param_in @ref zb_zcl_en50523_appl_ev_and_alerts_alerts_notif_t
    *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command. Default Response will be send if requested.
@@ -746,19 +813,37 @@ typedef enum zb_zcl_device_callback_id_e
    *
    * User's application callback is initialized by RET_OK status of device
    * callback parameters.
-   * @param[in] param_in zb_zcl_en50523_appl_ev_and_alerts_event_notif_t
+   * @param[in] param_in @ref zb_zcl_en50523_appl_ev_and_alerts_event_notif_t
+   *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command. Default Response will be send if requested.
    * @return RET_ERROR - command is handled with errors.
    */
   ZB_ZCL_EN50523_APPL_EV_AND_ALERTS_EVENT_NOTIFICATION_CB_ID,
-  /** @b Server. Inform user about Query next image request */
+  /** @b Server. Inform user about Query next image request
+   *
+   * @param[in] ota_upgrade_srv_query_img_param @ref zb_zcl_ota_upgrade_srv_query_img_param_s \n
+   *                                            @ref zb_zcl_device_callback_param_s::cb_param
+   *
+  */
   ZB_ZCL_OTA_UPGRADE_SRV_QUERY_IMAGE_CB_ID,
-  /** @b Server. Inform user about the first Image block request */
+  /** @b Server. Inform user about the first Image block request
+   *
+   * @param[in] ota_upgrade_srv_upgrade_started_param @ref zb_zcl_ota_upgrade_srv_upgrade_started_param_s \n
+   *                                                  @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_OTA_UPGRADE_SRV_UPGRADE_STARTED_CB_ID,
-  /** @b Server. Inform user about the aborted Image block request  */
+  /** @b Server. Inform user about the aborted Image block request
+   *
+   * @param[in] ota_upgrade_srv_upgrade_aborted_param @ref zb_zcl_ota_upgrade_srv_upgrade_aborted_param_s \n
+   *                                                  @ref zb_zcl_device_callback_param_s::cb_param
+   */
   ZB_ZCL_OTA_UPGRADE_SRV_UPGRADE_ABORTED_CB_ID,
-  /** @b Server. Inform user about finished OTA upgrade */
+  /** @b Server. Inform user about finished OTA upgrade
+   *
+   * @param[in] ota_upgrade_srv_upgrade_end_param @ref zb_zcl_ota_upgrade_srv_upgrade_end_param_s \n
+   *                                              @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_OTA_UPGRADE_SRV_UPGRADE_END_CB_ID,
   /**@b Server. Ask user about payload for PublishPrice request.
    *
@@ -957,7 +1042,7 @@ typedef enum zb_zcl_device_callback_id_e
    * User's application callback is initialized by RET_OK status of device
    * callback parameters.
    * @param[in] param_in @ref zb_zcl_tunneling_request_tunnel_t
-   * @param[out] param_out tunnel_status
+   * @param[out] param_out @ref zb_zcl_tunnel_request_params_out_s - tunnel_status
    *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command.
@@ -1469,7 +1554,10 @@ typedef enum zb_zcl_device_callback_id_e
   ZB_ZCL_BIG_DATA_TRANSFER_COMPLETE_CB_ID,
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
 #ifdef ZB_ENABLE_SE
-  /** Inform user about Time receiving from Time server */
+  /** Inform user about Time receiving from Time server
+   *
+   * @param[in] param_in @ref zb_zcl_time_sync_payload_t
+  */
   ZB_ZCL_TIME_SYNC_CB_ID,
   ZB_ZCL_TIME_SYNC_FAILED_CB_ID,
 #endif /* ZB_ENABLE_SE */
@@ -1822,7 +1910,6 @@ typedef enum zb_zcl_device_callback_id_e
    *
    * User's application callback is initialized by RET_NOT_FOUND status of device
    * callback parameters.
-   * @param[in] param_in zb_zcl_wwah_enable_wwah_app_event_retry_algorithm_t
    *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command. Default Response will be send if requested.
@@ -1882,6 +1969,18 @@ typedef enum zb_zcl_device_callback_id_e
    */
   ZB_ZCL_DIRECT_CONFIGURATION_CONFIGURE_INTERFACE_CB_ID,
   /** @endcond */ /* DOXYGEN_DIRECT_FEATURE */
+  /** @b Server. Inform user about device can clear cluster attributes during leave command.
+   *
+   * User's application callback is initialized by RET_ERROR status of device
+   * callback parameters.
+   *
+   * One of the following statuses must be returned:
+   * @return RET_OK - successfully handle command. It is mean that the user callback derived
+   *                  clusters attributes value after leave.
+   * @return RET_ERROR - command is handled with errors. In this case application sets clusters
+   *                  attributes by calls ZCL_CTX().set_default_attr_cb() if last exist.
+   */
+  ZB_ZCL_CLEAR_AFTER_LEAVE_CB_ID,
 } zb_zcl_device_callback_id_t;
 
 /** @cond internals_doc */
@@ -2063,7 +2162,7 @@ typedef struct zb_zcl_device_callback_param_s
   * @param param - reference to the buffer containing ZCL packet.
   * @return @ref ZB_TRUE if packet was processed; @ref ZB_FALSE - otherwise
   */
-zb_uint8_t zb_zcl_handle(zb_uint8_t param);
+zb_uint8_t zb_zcl_handle(zb_bufid_t param);
 /**
    Get ZCL TSN stored in ZCL frame
    @param buffer - pointer to a buffer with ZCL frame
@@ -2096,501 +2195,6 @@ void zb_zcl_init_endpoint(zb_af_endpoint_desc_t* ep);
 zb_bool_t zb_zcl_check_cluster_list(void);
 /** @endcond */ /* internals_doc */
 /** @} */ /* ZB_ZCL_INITIALIZATION */
-
-
-#ifdef ZB_BDB_MODE
-/*! \addtogroup zboss_bdb_api
-@{
- @defgroup zboss_bdb_comm_params BDB commissioning parameters
- @defgroup zboss_bdb_comm_start BDB commissioning start & status
- @defgroup zboss_bdb_comm_fb BDB Finding and Binding
-@}
-*/
-
-/**
-   @addtogroup zboss_bdb_comm_params
-   @{
-*/
-
-/** @cond internals_doc */
-/**
-  @brief BDB error codes
-  */
-enum zb_bdb_error_codes_e
-{
-  ZB_BDB_STATUS_SUCCESS = 0,                 /*!< The commissioning sub-procedure was successful.*/
-  ZB_BDB_STATUS_IN_PROGRESS,                 /*!< One of the commissioning sub-procedures has started but is not yet complete.*/
-  ZB_BDB_STATUS_NOT_AA_CAPABLE,              /*!< The initiator is not address assignment capable during touchlink. */
-  ZB_BDB_STATUS_NO_NETWORK,                  /*!< A network has not been found during network steering or touchlink.*/
-  ZB_BDB_STATUS_TARGET_FAILURE,              /*!< A node has not joined a network when requested during touchlink.*/
-  ZB_BDB_STATUS_FORMATION_FAILURE,           /*!< A network could not be formed during network formation. */
-  ZB_BDB_STATUS_NO_IDENTIFY_QUERY_RESPONSE,  /*!< No response to an identify query command has been received during finding and binding.*/
-  ZB_BDB_STATUS_BINDING_TABLE_FULL,          /*!< A binding table entry could not be created due to insufficient space in the binding table during finding and binding. */
-  ZB_BDB_STATUS_NO_SCAN_RESPONSE,            /*!< No response to a scan request inter-PAN command has been received during touchlink. */
-  ZB_BDB_STATUS_NOT_PERMITTED,               /*!< A touchlink (steal) attempt was made when a node is already connected to a centralized security network.
-                                                  A node was instructed to form a network when it did not have a logical type of either Zigbee coordinator or Zigbee router.*/
-  ZB_BDB_STATUS_TCLK_EX_FAILURE,             /*!< The Trust Center link key exchange procedure has failed attempting to join a centralized security network.*/
-  ZB_BDB_STATUS_NOT_ON_A_NETWORK,            /*!< A commissioning procedure was forbidden since the node was not currently on a network.*/
-  ZB_BDB_STATUS_ON_A_NETWORK,                /*!< A commissioning procedure was forbidden since the node was currently on a network.*/
-  ZB_BDB_STATUS_CANCELLED,                   /*!< The current operation (steering or formation) was cancelled by an app */
-  ZB_BDB_STATUS_DEV_ANNCE_SEND_FAILURE,      /*!< A device announce sending has been failed (e.g. device announce haven't acked by parent router). */
-  ZB_BDB_STATUS_PJOIN_FAILED,                /*!< Local Permit joining failed */
-};
-/** @endcond */ /* internals_doc */
-/** @} */
-
-/**
-   @addtogroup zboss_bdb_comm_start
-   @{
-*/
-
-/** @brief BDB commissioning mode mask bits
- * This bitmask is out of BDB 3.1 spec but will continue to be used internally and as a parameter to the commissioning API
-*/
-typedef enum zb_bdb_commissioning_mode_mask_e
-{
-  /** @cond internals_doc */
-  /** Used internally */
-  ZB_BDB_INITIALIZATION = 0,
-  /** @endcond */ /* internals_doc */
-  /** @cond touchlink */
-  /** Touchlink: 0 = Do not attempt Touchlink commissioning;
-                  1 = Attempt Touchlink commissioning
-   */
-  ZB_BDB_TOUCHLINK_COMMISSIONING = 1,
-  /** @endcond */ /* touchlink */
-
-  /** Network steering: 0 = Do not attempt network steering;
-                         1 = Attempt network steering
-   */
-  ZB_BDB_NETWORK_STEERING = 2,
-  /** Network formation: 0 = Do not attempt to form a network;
-                          1 = Attempt to form a network, according to device type2
-   */
-  ZB_BDB_NETWORK_FORMATION = 4,
-  /** Finding and binding: 0 = Do not attempt finding and binding;
-                          1 = Attempt finding and binding
-    @note actually this mode does not call finding and binding procedure. Use
-          @ref zb_bdb_finding_binding_target or @ref zb_bdb_finding_binding_initiator.
-   */
-  ZB_BDB_FINDING_N_BINDING = 8,
-
-  /** @cond internals_doc */
-  /* Used internally */
-  ZB_BDB_LAST_COMMISSIONING_STEP = 0x10,
-  /* Used internally */
-  ZB_BDB_COMMISSIONING_STOP = 0x20,
-  /** @endcond */ /* internals_doc */
-
-  /** @cond touchlink */
-  /* Used internally */
-  ZB_BDB_TOUCHLINK_TARGET = 0x40,
-  /** @endcond */ /* touchlink */
-#ifndef BDB_OLD
-  /** @cond internals_doc */
-  /* Used internally */
-  ZB_BDB_REJOIN = 0x80,
-  /** @endcond */ /* internals_doc */
-#endif
-} zb_bdb_commissioning_mode_mask_t;
-
-/**
- * @brief Starts the specified device commissioning steps.
- *
- * @details This function performs steering and network formation if it is appropriate for the device type.
- * @details Finding and binding is not performed by this function (see note for @ref ZB_BDB_FINDING_N_BINDING).
- * @details When the selected commissioning procedure finishes, one of the following ZBOSS signals is generated:
- *          - @ref ZB_BDB_SIGNAL_STEERING
- *          - @ref ZB_BDB_SIGNAL_FORMATION
- *
- * @note
- * DO NOT call this function from a callback after local leave using @ref zdo_mgmt_leave_req(),
- * because internal contexts will not be cleared correctly in such case!
- * Wait for the @ref ZB_ZDO_SIGNAL_LEAVE signal to restart top level commissioning, if necessary.
- *
- * @param[in] mode_mask - bitmask of commissioning steps to be performed, see @ref zb_bdb_commissioning_mode_mask_t()
- *
- * @retval ZB_TRUE - in case the device starts successfully
- * @retval ZB_FALSE - in case an error occurred (for example, the device has already been running)
- *
- * @par Example
- * Starting BDB top level commissioning on startup signals:
- * @snippet linky_sample/erl_gw/erl_gw.c bdb_start_top_level_commissioning_snippet
-*/
-zb_bool_t bdb_start_top_level_commissioning(zb_uint8_t mode_mask);
-
-#if defined ZB_BDB_MODE && !defined BDB_OLD
-
-/**
- * @brief Cancels Network Steering procedure for a node not on the network.
- *
- * @param[in] buf - ZBOSS buffer
- *
- * @note The ZBOSS @ref ZB_BDB_SIGNAL_STEERING_CANCELLED signal with the status of this operation will be
- *       raised.
- *       Possible statuses:
- *       - @b RET_ILLEGAL_REQUEST (device is a ZC)
- *       - @b RET_INVALID_STATE (steering for a node not on the network is not in progress)
- *       - @b RET_PENDING (it is too late to cancel a steering, it will be completed soon)
- *       - @b RET_IGNORE (cancellation was already requested)
- *       - @b RET_OK (steering is cancelled successfully)
- *
- * @note If the steering is cancelled, the @ref ZB_BDB_SIGNAL_STEERING signal with the
- *       @b ZB_BDB_STATUS_CANCELLED status will be raised as well.
-*/
-void bdb_cancel_joining(zb_bufid_t buf);
-
-#endif /* ZB_BDB_MODE && !BDB_OLD */
-
-/**
- * @brief Cancels Network Formation procedure.
- *
- * @param buf - ZBOSS buffer
- *
- * @note The ZBOSS @b ZB_BDB_SIGNAL_FORMATION_CANCELLED signal with the status of this operation will be raised.
- *       Possible statuses:
- *       - @b RET_INVALID_STATE (formation is not in progress)
- *       - @b RET_PENDING (it is too late to cancel the formation, it will be completed soon)
- *       - @b RET_IGNORE (cancellation was already requested)
- *       - @b RET_OK (formation is cancelled successfully)
- *
- * @note If the formation is cancelled, the @ref ZB_BDB_SIGNAL_FORMATION signal with the
- *       @b ZB_BDB_STATUS_FORMATION status will be raised as well.
-*/
-void bdb_cancel_formation(zb_bufid_t buf);
-
-
-/**
- * @brief Sets scan duration for Energy Detection and Active scan.
- *
- * @param[in] duration - scan duration. Scan time is <tt>(@b aBaseSuperframeDuration * ((1<<@p duration) + 1))</tt>
- * @parblock
- *
- *
- *
- * Duration to seconds Table:
- * Duration | Time
- * :------: | :--:
- * 8 | ~4s
- * 5 | ~0.5s
- * 2 | ~0.08s
- * 1 | ~0.05s (0.046s)
- * @endparblock
- *
- * @cond DOCS_DEV_NOTES
- * In seconds - <tt>((@c 1l << @p duration) + 1) * 15360 / 1000000</tt>
- *
- * I am not sure about this formula ^^^
- * @endcond
- *
- * @see @e @b bdbScanDuration 5.3.9 (BDB 3.0.1)
- */
-void bdb_set_scan_duration(zb_uint8_t duration);
-
-/**
- * @brief Closes the network.
- *
- * @details This function implements BDB 3.0.1 - 8.1.1 "Local disabling of Network Steering."
- * @details It will broadcast a @b Mgmt_Permit_Joining_req with @b PermitDuration of 0.
- *
- * @details In case it is a router or a coordinator, the function will also issue @b NLME-PERMIT-JOINING.request primitive with @b PermitDuration of 0.
- * @details The ZBOSS signal @ref ZB_NWK_SIGNAL_PERMIT_JOIN_STATUS will be raised with @ref zb_zdo_mgmt_permit_joining_req_param_t.permit_duration of 0.
- *
- * @param[in] buf - ZBOSS buffer; if zero is passed, a new buffer will be allocated.
- *
- * @retval RET_OK - broadcast was successful
- * @retval RET_NO_MEMORY - buffer allocation failed
- * @retval RET_ERROR - any error occurred
- *
- * @par Example
- * Application closing the network:
- * @snippet thermostat/thermostat_zr/thermostat_zr.c close_network_example
- */
-zb_ret_t zb_bdb_close_network(zb_bufid_t buf);
-
-/**
- * @brief Checks if the device is factory new.
- *
- * @retval ZB_TRUE - device is factory new
- * @retval ZB_FALSE - device is not factory new
- *
- * @par Example
- * Starting secure rejoin backoff if the device is not factory new:
- * @code
- *  if (!zb_bdb_is_factory_new())
- *  {
- *    zb_zdo_rejoin_backoff_start(ZB_FALSE);
- *  }
- * @endcode
- */
-zb_bool_t zb_bdb_is_factory_new(void);
-
-/** @} */
-
-#if defined(ZB_BDB_ENABLE_FINDING_BINDING) || defined(DOXYGEN)
-
-/**
-   @addtogroup zboss_bdb_comm_fb
-   @{
- */
-/**
- * @brief Starts EZ-Mode finding and binding procedure on the target's endpoint.
- *
- * @details This function puts the device into the identifying mode.
- *          Default duration is 3 minutes.
- *
- * @param[in] endpoint - target endpoint
- *
- * @retval RET_OK - on success
- * @retval RET_INVALID_PARAMETER_1 - target endpoint is not registered
- * @retval RET_INVALID_STATE - finding and binding has already started or the device is not joined
- *
- * @note @p endpoint should be registered on the target.
- *
- * @par Example
- * Starts finding and binding target procedure upon @ref ZB_BDB_SIGNAL_STEERING
- * @snippet onoff_server/on_off_output_zc.c zb_bdb_finding_binding_target_usage
- *
- * @see <b>Finding & binding procedure for a target endpoint</b> 8.4 (BDB 3.0.1)
- * @see @ref zb_bdb_finding_binding_target_ext()
- */
-zb_ret_t zb_bdb_finding_binding_target(zb_uint8_t endpoint);
-
-/**
- * @brief Starts EZ-Mode finding and binding procedure on the target's endpoint with a given timeout.
- *
- * @param[in] endpoint - target endpoint
- * @param[in] commissioning_time_secs - time interval for the device to be in the identifying mode, in seconds. Can't be less than 3 minutes.
- *
- * @retval RET_OK - on success
- * @retval RET_INVALID_PARAMETER_1 - target endpoint is not registered
- * @retval RET_INVALID_PARAMETER_2 - @p commissioning_time_secs is less than @b ZB_BDBC_MIN_COMMISSIONING_TIME_S
- * @retval RET_INVALID_STATE - finding and binding procedure has already started or the device is not joined
- *
- * @see <b>Finding & binding procedure for a target endpoint</b> 8.4 (BDB 3.0.1)
- */
-zb_ret_t zb_bdb_finding_binding_target_ext(zb_uint8_t endpoint, zb_uint16_t commissioning_time_secs);
-
-
-/**
- * List of EZ-Mode binding callback states
- */
-typedef enum zb_bdb_comm_binding_cb_state_e
-{
-  /** Previously user applied bind finished successfully */
-  ZB_BDB_COMM_BIND_SUCCESS = 0,
-  /** Previously user applied bind failed */
-  ZB_BDB_COMM_BIND_FAIL = 1,
-  /** Ask user whether to perform binding */
-  ZB_BDB_COMM_BIND_ASK_USER = 2,
-} zb_bdb_comm_binding_cb_state_t;
-
-/**
- * @brief BDB finding and binding callback template.
- *
- * @details Callback is used both to interact with user application @n
- *           and get decision if new binding is needed or not, and to report the binding result
- *
- * @param[in] status - status of the binding (ask user, success or fail) @ref zb_bdb_comm_binding_cb_state_t
- * @param[in] addr - extended address of a device to bind
- * @param[in] ep - endpoint of a device to bind
- * @param[in] cluster - cluster ID to bind
- *
- * @retval ZB_TRUE - create a binding entry for the cluster
- * @retval ZB_FALSE - ignore the cluster and do not create a binding entry
- *
- * @par Example
- * Callback that prints its parameters and always allows binding
- * @snippet onoff_server/on_off_switch_zed.c zb_bdb_finding_binding_initiator_cb_example
- */
-typedef zb_bool_t (ZB_CODE * zb_bdb_comm_binding_callback_t)(
-  zb_int16_t status, zb_ieee_addr_t addr, zb_uint8_t ep, zb_uint16_t cluster);
-
-/**
- * @brief Starts BDB finding and binding procedure on the initiator.
- *
- * @details This function calls the provided user callback to report the procedure status and to allow
- *          the application to skip binding of some clusters. @n
- *          It may be called several times with Success status and only once with Error status. @n
- *          If any error appears, finding and binding stops.
- *
- * @param[in] endpoint - initiator endpoint
- * @param[in] user_binding_cb - user callback, see @ref zb_bdb_comm_binding_callback_t()
- *
- * @retval RET_OK - on success
- * @retval RET_INVALID_PARAMETER_1 - @p endpoint is not registered
- * @retval RET_INVALID_STATE - device is not joined to the network
- * @retval RET_BUSY - commissioning is in progress
- *
- * @par Example
- * Define callback:
- * @snippet onoff_server/on_off_switch_zed.c zb_bdb_finding_binding_initiator_cb_example
- *
- * Start finding and binding as initiator:
- * @snippet onoff_server/on_off_switch_zed.c zb_bdb_finding_binding_initiator
- *
- * @see <b>Finding & binding procedure for an initiator endpoint</b> 8.5 (BDB 3.0.1)
- */
-zb_ret_t zb_bdb_finding_binding_initiator(zb_uint8_t endpoint, zb_bdb_comm_binding_callback_t user_binding_cb);
-
-/**
- * @brief Cancels previously started finding and binding procedure on all target endpoints.
- *
- * @see zb_bdb_finding_binding_target_cancel_ep()
- */
-void zb_bdb_finding_binding_target_cancel(void);
-
-/**
- * @brief  Cancels previously started finding and binding procedure on the particular target endpoint.
- *
- * @param[in] endpoint - target endpoint. The @ref ZB_ZCL_BROADCAST_ENDPOINT value is treated as cancel on all target endpoints.
- */
-void zb_bdb_finding_binding_target_cancel_ep(zb_uint8_t endpoint);
-
-/**
- * @brief Cancel previously started finding and binding procedure on initiator
- *
- * @see zb_bdb_finding_binding_initiator
- */
-void zb_bdb_finding_binding_initiator_cancel(void);
-
-
-/** @} */
-
-#endif
-
-/**
-   @addtogroup zboss_bdb_comm_params
-   @{
-*/
-/**
- * @brief Sets primary channel set for the BDB energy scan.
- * @details Network scan will be performed on these channels.
- *
- * @param[in] channel_mask - channel mask, can be formatted using
- * @parblock
- * @li @b ZB_CHANNEL_PAGE_SET_PAGE
- * @li @b ZB_CHANNEL_PAGE_SET_MASK
- * @endparblock
- *
- * @note This function is used in:
- *       @li Network Steering for a node not on the network;
- *       @li Network Formation.
- * @note Channel set is reset to zero after changing the network role of the device.
- *
- * @see @e @b bdbPrimaryChannelSet 5.3.8 (BDB 3.0.1)
- * @see @ref zb_get_bdb_primary_channel_set()
- *
- * @cond DOCS_DEV_NOTES
- * link to zb_channel_page.h won't be generated.
- * Should links to files work?
- * @endcond
- *
-*/
-void zb_set_bdb_primary_channel_set(zb_uint32_t channel_mask);
-/**
- * @brief Retrieves primary channel set for the BDB energy scan.
- *
- * @return @p channel_mask - channel mask
- *
- * @cond DOCS_DEV_NOTES
- * Note is repeated.
- * In order to have single source, @copybrief @copydetails could be used
- * @copydetails copies not only @details (@param's as well)
- * @endcond
- *
- * @note Channel set is reset to zero after changing the network role of the device.
- *
- * @see @ref zb_set_bdb_primary_channel_set()
-*/
-zb_uint32_t zb_get_bdb_primary_channel_set(void);
-
-/**
- * @brief Sets secondary channel set for the BDB energy scan.
- * @details Network scan will be performed on these channels if no network is found after the energy
- * scan on the primary channels (@ref zb_set_bdb_primary_channel_set()).
- *
- * @param[in] channel_mask - channel mask, can be formatted using
- * @parblock
- * @li @b ZB_CHANNEL_PAGE_SET_PAGE
- * @li @b ZB_CHANNEL_PAGE_SET_MASK
- * @endparblock
- *
- * @note This function is used in:
- *       @li Network Steering for a node not on the network;
- *       @li Network Formation.
- *
- * @see @e @b bdbSecondaryChannelSet 5.3.10 (BDB 3.0.1)
- * @see @ref zb_get_bdb_secondary_channel_set()
-*/
-void zb_set_bdb_secondary_channel_set(zb_uint32_t channel_mask);
-
-/**
-   Retrieves secondary channel set for the BDB energy scan.
-   @return @p channel_mask - channel mask
-*/
-zb_uint32_t zb_get_bdb_secondary_channel_set(void);
-
-/**
- * @brief Enables Zigbee PRO complaint commissioning support.
- * @details This function turns off link key exchange thus supporting legacy devices (<ZB3.0).
- *
- * @param[in] state - controls requirement of trust center key exchange
- * @parblock
- * @arg @b 1 - to disable trust center requirement for the key exchange
- * @arg @b 0 - to enable trust center requirement for the key exchange
- * @endparblock
-*/
-void zb_bdb_set_legacy_device_support(zb_uint8_t state);
-
-/** @} */
-
-/**
-   @addtogroup zboss_bdb_comm_start
-   @{
-*/
-/**
-  * @brief Sets BDB commissioning mode.
-  * @details This function controls the commissioning procedures to be executed.
-  *
-  * @param[in] commissioning_mode - @b bdbCommissioningMode bitmask of @ref zb_bdb_commissioning_mode_mask_t().
-  *
-  * @see @b bdbCommissioningMode 5.3.2 (BDB 1.0)
-  * @see <b>Top level commissioning procedure</b> 5.3.2 (BDB 1.0)
- */
-void zb_set_bdb_commissioning_mode(zb_uint8_t commissioning_mode);
-
-/** @} */
-
-/**
-   @addtogroup zboss_bdb_comm_params
-   @{
-*/
-/**
- * Maximum endpoints of the "respondent" that can be served
- */
-#define ZB_BDB_COMM_ACTIVE_ENDP_LIST_LEN 4
-
-/**
- * Identify query responses queue size
- */
-#define BDB_MAX_IDENTIFY_QUERY_RESP_NUMBER 4
-
-/**
- * List of BDB commissioning states
- */
-typedef enum zb_bdb_comm_state_e
-{
-  ZB_BDB_COMM_IDLE                       = 0,   /*!< EZ-Mode isn't invoked */
-  ZB_BDB_COMM_FINDING_AND_BINDING        = 4,   /*!< EZ-Mode finding and binding in progress (on initiator) */
-  ZB_BDB_COMM_FINDING_AND_BINDING_TARGET = 5,   /*!< EZ-Mode finding and binding in progress (on target) */
-}
-zb_bdb_comm_state_t;
-
-/** @} */
-
-#endif /* ZB_BDB_MODE*/
-
 
 /** \addtogroup ZB_ZCL_INITIALIZATION
  *  @{
@@ -2639,6 +2243,7 @@ typedef struct zb_discover_cmd_list
 typedef zb_bool_t (*zb_zcl_is_high_freq_msg_func_t)(zb_bufid_t);
 typedef zb_bool_t (*zb_zcl_block_zcl_cmd_t)(zb_zcl_parsed_hdr_t*);
 typedef zb_bool_t (*zb_zcl_read_attr_resp_handler_t)(zb_bufid_t);
+typedef void (*zc_zcl_poll_control_checkin_handler_t)(zb_zcl_status_t);
 
 #if defined ZB_ENABLE_SE || defined ZB_BDB_ENABLE_FINDING_BINDING || defined ZB_ZCL_SUPPORT_CLUSTER_WWAH
 typedef struct zb_zcl_func_selector_s
@@ -2647,14 +2252,15 @@ typedef struct zb_zcl_func_selector_s
   zb_zcl_is_high_freq_msg_func_t is_high_freq_msg;
 #endif /* ZB_ENABLE_SE */
 
-#if defined ZB_SE_COMMISSIONING || (defined ZB_ZCL_SUPPORT_CLUSTER_WWAH && defined ZB_ZCL_ENABLE_WWAH_SERVER)
   zb_zcl_block_zcl_cmd_t block_zcl_cmd;
   zb_zcl_read_attr_resp_handler_t read_attr_resp_handler;
-#endif /* ZB_SE_COMMISSIONING || (ZB_ZCL_SUPPORT_CLUSTER_WWAH && ZB_ZCL_ENABLE_WWAH_SERVER) */
 
 #ifdef ZB_BDB_ENABLE_FINDING_BINDING
   zb_callback_t process_identify_query_res;
 #endif /* ZB_BDB_ENABLE_FINDING_BINDING */
+#ifdef ZB_HA_ENABLE_POLL_CONTROL_SERVER
+  zc_zcl_poll_control_checkin_handler_t poll_control_checkin_notifier;
+#endif /* ZB_HA_ENABLE_POLL_CONTROL_SERVER */
 } zb_zcl_func_selector_t;
 
 #endif /* ZB_ENABLE_SE || ZB_BDB_ENABLE_FINDING_BINDING || ZB_ZCL_SUPPORT_CLUSTER_WWAH */
@@ -2698,11 +2304,7 @@ typedef struct zb_zcl_globals_s
 
   /** @internal Set default value all attributes */
   zb_zcl_set_default_value_attr_cb_t set_default_attr_cb;
-  /** @internal Check attribute value
-   *
-   * @deprecated This callback will be removed in the next Major release after February 2023
-   *             Use @ref app_check_attr_value_manuf_cb instead
-   */
+  /** @internal Check attribute value */
   zb_zcl_app_check_attr_value_cb_t app_check_attr_value_cb;
   /** @internal Check attribute value with manufacturer specific code */
   zb_zcl_app_check_attr_value_manuf_cb_t app_check_attr_value_manuf_cb;
@@ -2775,7 +2377,7 @@ zb_zcl_globals_t *zb_zcl_get_ctx(void);
 typedef zb_uint8_t *(*zb_zcl_put_payload_cb_t)(zb_uint8_t *, const void *);
 
 void zb_zcl_send_cmd(
-  zb_uint8_t param,
+  zb_bufid_t param,
   const zb_addr_u *dst_addr,
   zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep,
@@ -2791,7 +2393,7 @@ void zb_zcl_send_cmd(
 );
 
 void zb_zcl_send_cmd_tsn(
-  zb_uint8_t param,
+  zb_bufid_t param,
   const zb_addr_u *dst_addr,
   zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep,
@@ -2807,10 +2409,10 @@ void zb_zcl_send_cmd_tsn(
   zb_callback_t cb
 );
 
-zb_bool_t zb_zcl_send_default_handler(zb_uint8_t param,
+zb_bool_t zb_zcl_send_default_handler(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info, zb_zcl_status_t status);
 
-void zb_zcl_send_default_resp_ext(zb_uint8_t param,
+void zb_zcl_send_default_resp_ext(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info, zb_zcl_status_t status);
 
 #if defined ZB_APS_ENCRYPTION_PER_CLUSTER

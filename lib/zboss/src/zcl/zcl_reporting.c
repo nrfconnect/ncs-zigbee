@@ -72,11 +72,11 @@ static zb_uint8_t zb_zcl_mark_all_for_reporting(zb_uint8_t flag);
 
 static zb_bool_t check_delta_value(zb_zcl_reporting_info_t *rep_info);
 static void start_wait_reporting_timer(zb_zcl_reporting_info_t *rep_info);
-void zb_zcl_wait_reporting_timeout(zb_uint8_t param);
+void zb_zcl_wait_reporting_timeout(zb_cb_param_t param);
 void zb_zcl_update_reporting_info(zb_zcl_reporting_info_t *rep_info);
 void zb_zcl_adjust_reporting_timer(zb_uint8_t param);
-void zb_zcl_reporting_timer_handler(zb_uint8_t param);
-void zb_zcl_report_attr(zb_uint8_t param);
+void zb_zcl_reporting_timer_handler(zb_cb_param_t param);
+void zb_zcl_report_attr(zb_cb_param_t param);
 
 /*
   Reporting timeouts.
@@ -157,7 +157,7 @@ void zb_zcl_init_reporting_ctx()
  * initializes timeouts (without buffer allocation) */
 void zb_zcl_reset_reporting_ctx()
 {
-  zb_uint8_t old_buf_ref = ZB_UNDEFINED_BUFFER;
+  zb_bufid_t old_buf_ref = ZB_UNDEFINED_BUFFER;
 
   TRACE_MSG(TRACE_ZCL1, ">>zb_zcl_reset_reporting_ctx", (FMT__0));
 
@@ -165,7 +165,7 @@ void zb_zcl_reset_reporting_ctx()
   ZB_BZERO(&ZCL_CTX().reporting_ctx, sizeof(zb_zcl_reporting_ctx_t));
   ZCL_CTX().reporting_ctx.buf_ref = old_buf_ref;
 
-  TRACE_MSG(TRACE_ZCL1, "Use old %hd buf_ref for reporting", (FMT__H, old_buf_ref));
+  TRACE_MSG(TRACE_ZCL1, "Use old %d buf_ref for reporting", (FMT__D, old_buf_ref));
 
   ZB_SCHEDULE_ALARM_CANCEL(zb_zcl_reporting_timer_handler, ZB_ALARM_ALL_CB);
   ZB_SCHEDULE_ALARM_CANCEL(zb_zcl_wait_reporting_timeout, ZB_ALARM_ALL_CB);
@@ -753,7 +753,7 @@ void zb_zcl_adjust_reporting_timer(zb_uint8_t param)
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_adjust_reporting_timer", (FMT__0));
 }
 
-void zb_zcl_reporting_timer_handler(zb_uint8_t param)
+void zb_zcl_reporting_timer_handler(zb_cb_param_t param)
 {
   zb_zcl_reporting_info_t *rep_info = NULL;
   zb_time_t t;
@@ -957,7 +957,7 @@ static zb_zcl_reporting_info_t* get_new_reporting_info(zb_uint8_t endpoint_id)
 }
 
 
-void zb_zcl_report_attr(zb_uint8_t param)
+void zb_zcl_report_attr(zb_cb_param_t param)
 {
   zb_uindex_t i, j;
   zb_bool_t report_sent = ZB_FALSE;
@@ -1110,12 +1110,12 @@ void zb_zcl_mark_report_not_sent(zb_zcl_reporting_info_t *rep_info)
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_mark_report_not_sent", (FMT__0));
 }
 
-void zb_zcl_wait_reporting_timeout(zb_uint8_t param)
+void zb_zcl_wait_reporting_timeout(zb_cb_param_t param)
 {
   zb_zcl_reporting_info_t *rep_info = zb_zcl_get_reporting_info(param);
 
-  TRACE_MSG(TRACE_ZCL1, "zb_zcl_wait_reporting_timeout param %hd, rep_info %p",
-            (FMT__H_P, param, rep_info));
+  TRACE_MSG(TRACE_ZCL1, "zb_zcl_wait_reporting_timeout param %d, rep_info %p",
+            (FMT__D_P, param, rep_info));
 
   if (ZCL_CTX().no_reporting_cb)
   {
@@ -1585,7 +1585,7 @@ zb_ret_t zb_zcl_start_attr_reporting_manuf(zb_uint8_t ep, zb_uint16_t cluster_id
 
    Reports are sent 1-by-1, zb_zcl_reporting_cb() is called when previous report is sent
  */
-void zb_zcl_reporting_cb(zb_uint8_t param)
+void zb_zcl_reporting_cb(zb_cb_param_t param)
 {
   zb_uindex_t i, j;
   zb_zcl_reporting_info_t *rep_info;
@@ -1593,8 +1593,8 @@ void zb_zcl_reporting_cb(zb_uint8_t param)
     ZB_BUF_GET_PARAM(param, zb_zcl_command_send_status_t);
 
   ZVUNUSED(cmd_send_status);
-  TRACE_MSG(TRACE_ZCL1, "zb_zcl_reporting_cb param %hd, send status %hx",
-            (FMT__H_H, param, cmd_send_status->status));
+  TRACE_MSG(TRACE_ZCL1, "zb_zcl_reporting_cb param %d, send status %hx",
+            (FMT__D_H, param, cmd_send_status->status));
 
   for (j = 0; j < ZCL_CTX().device_ctx->ep_count; j++)
   {
@@ -1654,15 +1654,15 @@ zb_bool_t zcl_is_attr_reported_manuf(
    @param cmd_buf - pointer to received buffer with command
    @param cmd_info - pointer to a parsed command header
  */
-void zb_zcl_report_attr_cmd_handler(zb_uint8_t param)
+void zb_zcl_report_attr_cmd_handler(zb_bufid_t param)
 {
   zb_zcl_report_attr_req_t *rep_attr_req;
   zb_zcl_parsed_hdr_t cmd_info;
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_report_attr_cmd_handler %hd",
-            (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_report_attr_cmd_handler %d",
+            (FMT__D, param));
 
   do
   {

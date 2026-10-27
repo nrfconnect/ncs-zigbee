@@ -42,8 +42,10 @@ void zb_osif_serial_flush(void);
 #endif /* ZB_SERIAL_FOR_TRACE */
 
 
+#ifndef ZB_PSA_CRYPTO
 #define ZB_HW_ZB_AES128
 #define ZB_HW_CRYPTO_SCALARMULT
+#endif /* ZB_PSA_CRYPTO */
 
 #ifdef ZB_HW_ZB_AES128
 void zb_osif_aes128_hw_encrypt(const zb_uint8_t *key, const zb_uint8_t *msg, zb_uint8_t *c);
@@ -99,9 +101,6 @@ void zb_osif_disable_all_inter(void);
 #define ZB_SCHEDULE_APP_CALLBACK(func, param) \
 	zigbee_schedule_callback(func, param)
 
-#define ZB_SCHEDULE_APP_CALLBACK2(func, param, user_param) \
-	zigbee_schedule_callback2(func, param, user_param)
-
 #define ZB_SCHEDULE_APP_ALARM(func, param, timeout_bi) \
 	zigbee_schedule_alarm(func, param, timeout_bi)
 
@@ -133,26 +132,7 @@ void zb_osif_disable_all_inter(void);
  *
  * @return RET_OK or RET_OVERFLOW.
  */
-zb_ret_t zigbee_schedule_callback(zb_callback_t func, zb_uint8_t param);
-
-/**@brief Schedule two-param callback execution.
- *
- * This API is thread- and ISR- safe.
- * It performs all necessary actions:
- *  - Forwards request from ISR to thread context
- *  - Schedules the callback in ZBOSS scheduler queue
- *  - Wakes up the Zigbee task.
- *
- * @param func        function to execute
- * @param param       zb_uint8_t callback parameter - usually,
- *                    ref to packet buffer
- * @param user_param  zb_uint16_t additional user parameter
- *
- * @return RET_OK or RET_OVERFLOW.
- */
-zb_ret_t zigbee_schedule_callback2(zb_callback2_t func, zb_uint8_t param,
-				   zb_uint16_t user_param);
-
+zb_ret_t zigbee_schedule_callback(zb_callback_t func, zb_cb_param_t param);
 
 /**@brief Schedule alarm - callback to be executed after timeout.
  *
@@ -174,7 +154,7 @@ zb_ret_t zigbee_schedule_callback2(zb_callback2_t func, zb_uint8_t param,
  *
  * @return RET_OK or RET_OVERFLOW
  */
-zb_ret_t zigbee_schedule_alarm(zb_callback_t func, zb_uint8_t param,
+zb_ret_t zigbee_schedule_alarm(zb_callback_t func, zb_bufid_t param,
 			       zb_time_t run_after);
 
 /**@brief Cancel previously scheduler alarm.
@@ -192,7 +172,7 @@ zb_ret_t zigbee_schedule_alarm(zb_callback_t func, zb_uint8_t param,
  *
  * @return RET_OK or RET_OVERFLOW
  */
-zb_ret_t zigbee_schedule_alarm_cancel(zb_callback_t func, zb_uint8_t param);
+zb_ret_t zigbee_schedule_alarm_cancel(zb_callback_t func, zb_cb_param_t param);
 
 /**@brief Allocate OUT buffer, call a callback when the buffer is available.
  *
@@ -251,7 +231,7 @@ zb_ret_t zigbee_get_in_buf_delayed(zb_callback_t func);
  *                 Special value 0 means "single default buffer".
  * @return RET_OK or RET_OVERFLOW
  */
-zb_ret_t zigbee_get_out_buf_delayed_ext(zb_callback2_t func, zb_uint16_t param,
+zb_ret_t zigbee_get_out_buf_delayed_ext(zb_callback_t func, zb_uint16_t param,
 					zb_uint16_t max_size);
 
 /**@brief Allocate IN buffer, call a callback when the buffer is available.
@@ -269,7 +249,7 @@ zb_ret_t zigbee_get_out_buf_delayed_ext(zb_callback2_t func, zb_uint16_t param,
  *                 Special value 0 means "single default buffer".
  * @return RET_OK or error code.
  */
-zb_ret_t zigbee_get_in_buf_delayed_ext(zb_callback2_t func, zb_uint16_t param,
+zb_ret_t zigbee_get_in_buf_delayed_ext(zb_callback_t func, zb_uint16_t param,
 				   zb_uint16_t max_size);
 
 #endif /* ZBOSS_BUILD */

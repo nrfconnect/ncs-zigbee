@@ -793,7 +793,7 @@ typedef ZB_PACKED_PRE struct zb_zcl_read_attr_res_s
  */
 #define ZB_ZCL_GENERAL_INIT_READ_ATTR_RESP_EXT(_buffer, _cmd_ptr, _direction, _seq, _is_manuf, _manuf_id)       \
 {                                                                                                               \
-  cmd_ptr = ZB_ZCL_START_PACKET((_buffer));                                                                     \
+  (_cmd_ptr) = ZB_ZCL_START_PACKET((_buffer));                                                                     \
   ZB_ZCL_CONSTRUCT_GENERAL_COMMAND_RESP_FRAME_CONTROL_A((_cmd_ptr), (_direction), (_is_manuf));                 \
   ZB_ZCL_CONSTRUCT_COMMAND_HEADER_EXT((_cmd_ptr), (_seq), (_is_manuf), (_manuf_id), ZB_ZCL_CMD_READ_ATTRIB_RESP);       \
 }
@@ -2448,7 +2448,7 @@ zb_zcl_disc_attr_ext_res_t;
     (_status) = ZB_ZCL_PARSE_STATUS_SUCCESS;                            \
     ZB_HTOLE16(&((_data_ptr)->attr_id), &(src_ptr->attr_id));           \
     (_data_ptr)->data_type = src_ptr->data_type;                        \
-    (_data_ptr)->data_access = src_ptr->data_access;                    \
+    (_data_ptr)->attr_access = src_ptr->attr_access;                    \
     (void)zb_buf_cut_left((_buffer), sizeof(zb_zcl_disc_attr_ext_info_t)); \
   }                                                                     \
 }
@@ -2460,22 +2460,22 @@ zb_zcl_disc_attr_ext_res_t;
 /******************** Command handlers ***************************/
 
 /* ZCL handlers */
-void zb_zcl_read_attr_handler(zb_uint8_t param);
-void zb_zcl_write_attr_handler(zb_uint8_t param);
+void zb_zcl_read_attr_handler(zb_bufid_t param);
+void zb_zcl_write_attr_handler(zb_bufid_t param);
 #if defined ZB_ENABLE_HA
-void zb_zcl_discover_commands_res(zb_uint8_t param, zb_bool_t recv_cmd_type);
+void zb_zcl_discover_commands_res(zb_bufid_t param, zb_bool_t recv_cmd_type);
 #endif /* ZB_ENABLE_HA */
 
 #if !(defined ZB_ZCL_DISABLE_REPORTING) || defined(DOXYGEN)
 
-void zb_zcl_configure_reporting_handler(zb_uint8_t param);
+void zb_zcl_configure_reporting_handler(zb_bufid_t param);
 
 /* ZCL commands */
-void zb_zcl_send_report_attr_command(struct zb_zcl_reporting_info_s *rep_info, zb_uint8_t param);
+void zb_zcl_send_report_attr_command(struct zb_zcl_reporting_info_s *rep_info, zb_bufid_t param);
 
 #endif
 
-zb_bool_t zb_zcl_handle_general_commands(zb_uint8_t param);
+zb_bool_t zb_zcl_handle_general_commands(zb_bufid_t param);
 
 /** @endcond */ /* internals_doc */
 

@@ -106,6 +106,11 @@
 /** An APSME-GET.request or APSME-SET.request has been issued with an unknown attribute identifier.
  */
 #define ZB_APS_STATUS_UNSUPPORTED_ATTRIBUTE 0xb0U
+/** Custom status.
+ *  Produced by APS layer if TX have been interrupted by some event:
+ *  e.g. if destination device leaves network.
+ */
+#define ZB_APS_STATUS_CANCELLED             0xb1U
 /** @} */
 
 /**
@@ -169,7 +174,8 @@ typedef zb_uint8_t zb_aps_addr_mode_t;
 #define ZB_APS_AIB_USE_EXT_PANID 0xc4U
 /** The current set of group table entries (@see Table 2.25). */
 #define ZB_APS_AIB_GROUP_TABLE 0xc5U
-/** The value to be used for the NonmemberRadius parameter when using NWK layer multicast. */
+/** The value to be used for the NonmemberRadius parameter when using NWK layer multicast.
+ *  Currently - reserved value */
 #define ZB_APS_AIB_NONMEMBER_RADIUS 0xc6U
 /** The current set of permission configuration items. */
 #define ZB_APS_AIB_PERMISSION_CONFIG 0xc7U
@@ -317,40 +323,6 @@ ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_apsde_data_indication_t);
   */
 
 /**
- * @brief APSME binding structure.
- *
- * This data structure passed to @ref zb_apsme_bind_request()
- * and to @ref zb_apsme_unbind_request().
- *
- * @deprecated Corresponding function @ref zb_apsme_unbind_request() is deprecated and it will be
- * moved to the private header in November 2022. Do not use this structure and corresponding function
- * in the applications.
- */
-typedef struct zb_apsme_binding_req_s
-{
-  zb_ieee_addr_t  src_addr;       /*!< The source IEEE address for the binding entry. */
-  zb_uint8_t      src_endpoint;   /*!< The source endpoint for the binding entry. */
-  zb_uint16_t     clusterid;      /*!< The identifier of the cluster on the source
-                                        device that is to be bound to the destination device.*/
-  zb_uint8_t      addr_mode;      /*!< The type of destination address supplied by
-                                       the DstAddr parameter - see @ref aps_addr_mode  */
-  zb_addr_u       dst_addr;       /*!< The destination address for the binding entry. */
-  zb_uint8_t      dst_endpoint;   /*!< This parameter will be present only if
-                                       the DstAddrMode parameter has a value of
-                                       0x03 and, if present, will be the
-                                       destination endpoint for the binding entry.*/
-#ifdef SNCP_MODE
-  zb_uint8_t       remote_bind;   /*!< Indication if the bind req is local or remote */
-  zb_uint8_t       id;             /*!< unique identifier of the entry for NCP, updated only in
-                                    zb_apsme_bind_request and zb_apsme_unbind_request and used to
-                                    notify NCP */
-  /* confirm_cb is not sent in payload by NCP, keep it in the end of this structure */
-#endif
-  zb_callback_t   confirm_cb;     /*!< The callback to be called when the operation is completed. */
-} zb_apsme_binding_req_t;
-
-
-/**
   * This data structure passed to @ref zb_zdo_check_binding_request().
   */
 typedef struct zb_aps_check_binding_req_s
@@ -443,96 +415,102 @@ typedef ZB_PACKED_PRE struct zb_apsme_set_confirm_s
   zb_ret_t   status;       /*!< The result of the request to write the AIB Attribute. */
   zb_aps_aib_attr_id_t aib_attr;  /*!< The identifier of the AIB attribute that was written. */
 } ZB_PACKED_STRUCT zb_apsme_set_confirm_t;
-
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
-
-/**
- * @brief APSME-BIND.request primitive.
- * @param param - index of buffer containing request data (see @ref
- * zb_apsme_binding_req_t).
- *
- * @deprecated This function will be moved to the private header in November 2022. Use @ref
- * zb_zdo_bind_req() instead.
- */
-void zb_apsme_bind_request(zb_uint8_t param);
-
-/**
- * @brief APSME-UNBIND.request primitive.
- * @param param - index of buffer containing request data (see @ref
- * zb_apsme_binding_req_t).
- *
- * @deprecated This function will be moved to the private header in November 2022. Use @ref
- * zb_zdo_unbind_req() instead.
- */
-void zb_apsme_unbind_request(zb_uint8_t param);
-
-/**
- *@brief Perform unbind all entries. This custom function and it is not described
- * in Zigbee specification.
- * @param param - not used.
- *
- * @deprecated This function will be moved to the private header in November 2022. Use @ref
- * zb_zdo_unbind_all_local() instead.
- */
-void zb_apsme_unbind_all(zb_uint8_t param);
-
-/**
- * @brief Checks if the binding with specified parameters exists
- *
- * @deprecated This function will be moved to the private header in November 2022. Use @ref
- * zb_zdo_check_binding_request() instead.
- */
-void zb_aps_check_binding_request(zb_bufid_t param);
-
-/**
- * @brief APSME-ADD-GROUP.request primitive.
- *
- * @param param - index of buffer with parameter. See @ref zb_apsme_add_group_req_t.
- *
- * @deprecated This function will be moved to the private header in November 2022. Use @ref
- * zb_zdo_add_group_req() instead.
- */
-void zb_apsme_add_group_request(zb_uint8_t param);
-
-/**
- * @brief APSME-REMOVE-GROUP.request primitive.
- *
- * @internal
- * Use macro @ref ZDO_REGISTER_CALLBACK to register APSME-REMOVE-GROUP.confirm callback.
- * @endinternal
- * @param param - index of buffer with parameter. See @ref zb_apsme_remove_group_req_t.
- *
- * @deprecated This function will be moved to the private header in November 2022. Use @ref
- * zb_zdo_remove_group_req() instead.
- *
- */
-void zb_apsme_remove_group_request(zb_uint8_t param);
-
-/**
- * @brief APSME-REMOVE-ALL-GROUPS.request primitive.
- *
- * @internal
- * Use macro @ref ZDO_REGISTER_CALLBACK to register APSME-REMOVE-ALL-GROUPS.confirm callback.
- * @endinternal
- * @param param - index of buffer with parameter. See @ref zb_apsme_remove_all_groups_req_t.
- *
- * @deprecated This function will be moved to the private header in November 2022. Use @ref
- * zb_zdo_remove_all_groups_req() instead.
- *
- */
-void zb_apsme_remove_all_groups_request(zb_uint8_t param);
 
 /** @} */ /* APS management service data structures and API. */
 
 /*! @} */ /* aps_api */
 
+/** @addtogroup aps_api
+ * @{
+ */
+
+/** @addtogroup aps_lk_mgmt APS application link keys management API
+ * @{
+ */
+
+/**
+ * @brief Start application link key establishment procedure (see BDB 3.1, 7.4)
+ *
+ * Raises application signal ZB_ZDO_SIGNAL_APP_KEY_READY when the procedure is ended.
+ *
+ * @param param buffer ID
+ * @param partner_addr 64-bit address of partner device.
+ * @return zb_ret_t: RET_OK if the procedure starts correctly.
+ *                   RET_INVALID_PARAMETER if partner address equal to one of the reserved ieee addresses or equal to TC address.
+ *                   RET_INVALID_STATE if device is in distributed network or hasn't joined any network.
+ *                   RET_OPERATION_FAILED if the procedure failed for internal reasons.
+ *
+ * @note Such request can't be used to correctly request app link key in SE mode.
+ *       In order to request app link key in SE mode, use zb_se_start_aps_key_establishment function.
+ */
+zb_ret_t zb_aps_request_link_key(zb_bufid_t param, zb_ieee_addr_t partner_addr);
+
+
+#ifndef ZB_COORDINATOR_ONLY
+/**
+ * @brief Disable/enable automatic handling for application link key establishment procedure.
+ *
+ * If FALSE (enabled):
+ *  1. zb_aps_request_link_key starts the procedure.
+ *  2. Stack checks the security level of partner.
+ *  3. Stack verifies the app link key.
+ *  4. Stack raises ZB_ZDO_SIGNAL_APP_KEY_READY with RET_OK if the step 2 and step 3 finished successfully
+ *     or with error status.
+ *
+ * If TRUE (disabled):
+ *  1. zb_aps_request_link_key starts the procedure.
+ *  2. Stack checks the security level of partner and sends ZB_BDB_SIGNAL_PARTNER_INFO_FOR_APP_LK_RECEIVED signal.
+ *  3. Application analyzes a partner information and calls zb_accept_and_verify_app_link_key_for_dev() to continue
+ *     the procedure or zb_delete_app_link_key_for_dev() to abort.
+ *  4. Stack verifies the app link key.
+ *  5a. stack raises ZB_ZDO_SIGNAL_APP_KEY_READY with RET_OK if the step 4 finished successfully.
+ *  5b. stack raises ZB_BDB_SIGNAL_APP_LK_VERIFICATION_FAILED signal if the step 4 failed. In this case app link key
+ *      doesn't delete automatically and application can decide to keep it (for example, if the partner is pre-r23 device).
+ *      Otherwise, application can delete unverified application key via zb_delete_app_link_key_for_dev().
+ *
+ * We recommend using automatic handling in networks with BDB 3.1 devices only and disabling it for mixed networks.
+ *
+ * @param val ZB_TRUE if automatic handling is disabled
+ *            ZB_FALSE if automatic handling is enabled
+ * @note by default: val == ZB_FALSE
+ */
+void zb_disable_partner_link_key_autohandling(zb_bool_t val);
+
+
+/**
+ * Uses in handler of ZB_BDB_SIGNAL_PARTNER_INFO_FOR_APP_LK_RECEIVED only.
+ * Accept partner link key and start verification of it according application link key establishment procedure (see BDB 3.1, 7.4).
+ * @note uses only if `zb_disable_partner_link_key_autohandling` policy is TRUE.
+ *
+ * @param param buffer ID
+ * @param partner_addr 64-bit address of partner device.
+ *
+ * @return zb_ret_t: RET_OK if no errors occurred.
+ *                   RET_UNAUTHORIZED if the `zb_disable_partner_link_key_autohandling` policy is FALSE.
+ *                   RET_INVALID_PARAMETER_1 if the buffer ID equals zero.
+ */
+zb_ret_t zb_accept_and_verify_app_link_key_for_dev(zb_bufid_t param, zb_ieee_addr_t partner_addr);
+
+
+/**
+ * Uses in handlers of ZB_BDB_SIGNAL_PARTNER_INFO_FOR_APP_LK_RECEIVED and ZB_BDB_SIGNAL_APP_LK_VERIFICATION_FAILED.
+ * Stop application link key establishment procedure and delete partner link key if it exist.
+ *
+ * @param partner_addr 64-bit address of partner device.
+ *
+ * @return zb_ret_t: RET_OK
+ *                   RET_NOT_FOUND
+ */
+zb_ret_t zb_delete_app_link_key_for_dev(zb_ieee_addr_t partner_addr);
+
+#endif /* !ZB_COORDINATOR_ONLY */
+/** @} */ /* APS application link keys management API */
+
+/** @} */ /* aps_api */
 
 #ifdef APS_FRAGMENTATION
-
-void zb_aps_add_max_trans_size(zb_uint16_t short_addr, zb_uint16_t max_trans_size, zb_uint8_t max_buffer_size);
-zb_uint16_t zb_aps_get_max_trans_size(zb_uint16_t short_addr);
 zb_uint8_t zb_aps_get_max_buffer_size(zb_uint16_t short_addr);
-
 #endif
 
 
@@ -551,7 +529,7 @@ zb_uint8_t zb_aps_get_max_buffer_size(zb_uint16_t short_addr);
  *
  * @param param - index of buffer with an APS user payload
  */
-typedef void (*zb_aps_user_payload_callback_t)(zb_uint8_t param);
+typedef void (*zb_aps_user_payload_callback_t)(zb_cb_param_t param);
 
 /*!
  * @brief
@@ -591,7 +569,7 @@ typedef enum zb_aps_user_payload_cb_status_e
  * @return RET_INVALID_PARAMETER_3 - if the payload_size parameter is too large
  */
 zb_ret_t zb_aps_send_user_payload(
-  zb_uint8_t param,
+  zb_bufid_t param,
   zb_addr_u dst_addr,
   zb_uint16_t profile_id,
   zb_uint16_t cluster_id,
@@ -612,7 +590,7 @@ zb_ret_t zb_aps_send_user_payload(
  * @return Pointer to an APS payload;
  * @return NULL if a buffer is invalid or an aps_payload_size pointer is invalid.
  */
-zb_uint8_t *zb_aps_get_aps_payload(zb_uint8_t param, zb_uint8_t *aps_payload_size);
+zb_uint8_t *zb_aps_get_aps_payload(zb_bufid_t param, zb_uint8_t *aps_payload_size);
 
 /*!
  * @brief Set callback to notify results of transmitting

@@ -79,7 +79,7 @@ zb_uint8_t zb_zcl_ota_upgrade_get_ota_status(zb_uint8_t endpoint)
 }
 
 
-void zcl_ota_abort_and_set_tc(zb_uint8_t param)
+void zcl_ota_abort_and_set_tc(zb_cb_param_t param)
 {
   zb_zcl_cluster_handler_t cluster_handler;
 

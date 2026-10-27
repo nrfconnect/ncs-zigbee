@@ -64,9 +64,10 @@
 
 zb_zcl_wwah_attr_t wwah_attr;
 
-void zb_zcl_wwah_periodic_checkin_countdown(zb_uint8_t param);
-void zb_zcl_wwah_recounter_checkin(void);
-void zb_zcl_wwah_periodic_checkin_timeout(zb_uint8_t param);
+void zb_zcl_wwah_periodic_checkin_countdown(zb_cb_param_t param);
+void zb_zcl_wwah_periodic_checkin_timeout(zb_cb_param_t param);
+
+static void zb_zcl_wwah_handle_checkin_status(zb_zcl_status_t checkin_status);
 
 static const zb_uint8_t gs_wwah_server_received_commands[] =
 {
@@ -86,11 +87,11 @@ zb_discover_cmd_list_t gs_wwah_server_cmd_list =
 
 zb_ret_t check_value_wwah(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 
-zb_bool_t zb_zcl_process_wwah_specific_commands_srv(zb_uint8_t param);
+zb_bool_t zb_zcl_process_wwah_specific_commands_srv(zb_cb_param_t param);
 
 zb_uint8_t wwah_endpoint = 0;
 
-void get_pib_max_frame_retries_confirm(zb_uint8_t param)
+void get_pib_max_frame_retries_confirm(zb_cb_param_t param)
 {
   zb_mlme_get_confirm_t *conf = (zb_mlme_get_confirm_t *)zb_buf_begin(param);
   zb_uint8_t *ptr = ((zb_uint8_t *)conf) + sizeof(zb_mlme_get_confirm_t);
@@ -108,7 +109,7 @@ void get_pib_max_frame_retries_confirm(zb_uint8_t param)
   zb_buf_free(param);
 }
 
-void get_pib_max_frame_retries(zb_uint8_t param)
+void get_pib_max_frame_retries(zb_cb_param_t param)
 {
   zb_mlme_get_request_t *req = NULL;
 
@@ -118,19 +119,6 @@ void get_pib_max_frame_retries(zb_uint8_t param)
   req->iface_id = ZB_PIBCACHE_PRIMARY_IFACE();
 
   zb_multimac_mlme_get_request_proxy(param);
-}
-
-static zb_bool_t wwah_handle_read_attr_resp(zb_bufid_t param)
-{
-  zb_bool_t processed = ZB_FALSE;
-  zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
-
-  if (zb_zcl_wwah_periodic_checkin_block_zcl_cmd(cmd_info))
-  {
-    processed = zb_zcl_wwah_periodic_checkin_read_attr_handle(param);
-  }
-
-  return processed;
 }
 
 void zb_zcl_wwah_init_server(void)
@@ -148,7 +136,6 @@ void zb_zcl_wwah_init_server(void)
     )
   {
     wwah_endpoint = get_endpoint_by_cluster(ZB_ZCL_CLUSTER_ID_WWAH, ZB_ZCL_CLUSTER_SERVER_ROLE);
-    WWAH_CTX().periodic_checkins.poll_method = ZB_ZCL_WWAH_PERIODIC_CHECKINS_NOT_SUPPORTED;
     WWAH_CTX().periodic_checkins.tsn = ZB_ZDO_INVALID_TSN;
 
     WWAH_CTX().wwah_hub_endpoint = 0; /* Will set it after matching */
@@ -177,8 +164,9 @@ void zb_zcl_wwah_init_server(void)
     ZB_MEMSET(WWAH_CTX().use_trust_center_for_cluster_table, (zb_uint8_t)ZB_ZCL_WWAH_CLUSTER_ID_FREE_RECORD, sizeof(WWAH_CTX().use_trust_center_for_cluster_table));
     WWAH_CTX().use_trust_center_for_cluster_table_cnt = 0;
 
-    ZCL_SELECTOR().block_zcl_cmd = zb_zcl_wwah_periodic_checkin_block_zcl_cmd;
-    ZCL_SELECTOR().read_attr_resp_handler = wwah_handle_read_attr_resp;
+#ifdef ZB_HA_ENABLE_POLL_CONTROL_SERVER
+    ZCL_SELECTOR().poll_control_checkin_notifier = zb_zcl_wwah_handle_checkin_status;
+#endif /* ZB_HA_ENABLE_POLL_CONTROL_SERVER */
 
     /* TODO: Place f&b checking for endpoint*/
   }
@@ -208,7 +196,7 @@ void zb_zcl_wwah_init_server_attr(void)
   wwah_attr.pending_network_update_panid = ZB_ZCL_WWAH_PENDING_NETWORK_UPDATE_PANID_DEFAULT_VALUE;
   wwah_attr.ota_max_offline_duration = 0;
 
-  zb_zcl_wwah_stop_periodic_checkin();
+  zb_bdb_tc_connectivity_stop_checking();
   zb_zcl_wwah_stop_bad_parent_recovery();
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_wwah_init_server_attr", (FMT__0));
@@ -227,13 +215,13 @@ zb_ret_t check_value_wwah(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *
 /*
  * Invoke User App with WWAH command.
  */
-void zb_zcl_wwah_invoke_user_app(zb_uint8_t param, zb_uint16_t endpoint16)
+void zb_zcl_wwah_invoke_user_app(zb_bufid_t param, zb_uint16_t endpoint16)
 {
   /* Unused without trace. */
   ZVUNUSED(endpoint16);
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_invoke_user_app %hx endpoint %d",
-      (FMT__H_D, param, endpoint16));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_invoke_user_app %x endpoint %d",
+      (FMT__D_D, param, endpoint16));
   zb_buf_free(param);
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_wwah_invoke_user_app", (FMT__0));
@@ -522,7 +510,7 @@ zb_bool_t zb_zcl_wwah_check_if_wwah_rejoin_enabled(void)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_enable_aps_link_key_authorization_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_enable_aps_link_key_authorization_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_wwah_cluster_list_t payload = { 0 };
@@ -530,7 +518,7 @@ zb_ret_t zb_zcl_wwah_enable_aps_link_key_authorization_handler(zb_uint8_t param)
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uindex_t i;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_aps_link_key_authorization_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_aps_link_key_authorization_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -572,14 +560,14 @@ zb_ret_t zb_zcl_wwah_enable_aps_link_key_authorization_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_disable_aps_link_key_authorization_handler(zb_uint8_t param){
+zb_ret_t zb_zcl_wwah_disable_aps_link_key_authorization_handler(zb_bufid_t param){
   zb_ret_t ret = RET_OK;
   zb_zcl_wwah_cluster_list_t payload = { 0 };
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uindex_t i;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_aps_link_key_authorization_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_aps_link_key_authorization_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -619,7 +607,7 @@ zb_ret_t zb_zcl_wwah_disable_aps_link_key_authorization_handler(zb_uint8_t param
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_aps_link_key_authorization_query_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_aps_link_key_authorization_query_handler(zb_bufid_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_zcl_parse_status_t status;
@@ -627,7 +615,7 @@ zb_ret_t zb_zcl_wwah_aps_link_key_authorization_query_handler(zb_uint8_t param)
   zb_uint16_t cluster_id;
   zb_bool_t allowed;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_aps_link_key_authorization_query_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_aps_link_key_authorization_query_handler %d", (FMT__D, param));
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   ZB_ZCL_WWAH_GET_APS_LINK_KEY_AUTHORIZATION_QUERY(param, cluster_id, status);
@@ -659,7 +647,7 @@ zb_ret_t zb_zcl_wwah_aps_link_key_authorization_query_handler(zb_uint8_t param)
 }
 
 #ifdef ZB_JOIN_CLIENT
-void zb_zcl_wwah_request_key(zb_uint8_t param)
+void zb_zcl_wwah_request_key(zb_cb_param_t param)
 {
   zb_apsme_request_key_req_t *req = ZB_BUF_GET_PARAM(param, zb_apsme_request_key_req_t);
   TRACE_MSG(TRACE_ZCL1, "Scheduling apsme request key", (FMT__0));
@@ -671,18 +659,18 @@ void zb_zcl_wwah_request_key(zb_uint8_t param)
   ZB_SCHEDULE_CALLBACK(zb_secur_apsme_request_key, param);
 }
 
-zb_ret_t zb_zcl_wwah_request_new_aps_link_key_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_request_new_aps_link_key_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_request_new_aps_link_key_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_request_new_aps_link_key_handler %d", (FMT__D, param));
 
   zb_buf_get_out_delayed(zb_zcl_wwah_request_key);
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_wwah_request_new_aps_link_key_handler", (FMT__0));
   return ret;
 }
-zb_ret_t zb_zcl_wwah_enable_wwah_app_event_retry_algorithm_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_enable_wwah_app_event_retry_algorithm_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_bool_t enable_bool = ZB_TRUE;
@@ -690,7 +678,7 @@ zb_ret_t zb_zcl_wwah_enable_wwah_app_event_retry_algorithm_handler(zb_uint8_t pa
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_wwah_app_event_retry_algorithm_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_wwah_app_event_retry_algorithm_handler %x", (FMT__D, param));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -736,12 +724,12 @@ zb_ret_t zb_zcl_wwah_enable_wwah_app_event_retry_algorithm_handler(zb_uint8_t pa
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_disable_wwah_app_event_retry_algorithm_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_disable_wwah_app_event_retry_algorithm_handler(zb_bufid_t param)
 {
   zb_ret_t ret;
   zb_bool_t disable_bool = ZB_FALSE;
   zb_zcl_parsed_hdr_t cmd_info;
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_wwah_app_event_retry_algorithm_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_wwah_app_event_retry_algorithm_handler %d", (FMT__D, param));
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   ZB_ZCL_SET_ATTRIBUTE(wwah_endpoint,
@@ -764,13 +752,13 @@ zb_ret_t zb_zcl_wwah_disable_wwah_app_event_retry_algorithm_handler(zb_uint8_t p
   return ret;
 }
 
-void zb_zcl_wwah_send_request_time(zb_uint8_t param)
+void zb_zcl_wwah_send_request_time(zb_cb_param_t param)
 {
   zb_uint8_t *cmd_ptr;
   zb_ret_t ret = WWAH_CTX().time_server_endpoint == 0 ? RET_ERROR : RET_OK;
   zb_uint8_t time_client_endpoint = get_endpoint_by_cluster(ZB_ZCL_CLUSTER_ID_TIME, ZB_ZCL_CLUSTER_CLIENT_ROLE);
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_send_request_time param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_send_request_time param %d", (FMT__D, param));
   if (ret == RET_OK)
   {
     if (!param)
@@ -805,7 +793,7 @@ void zb_zcl_wwah_send_request_time(zb_uint8_t param)
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_wwah_send_request_time", (FMT__0));
 }
 
-static void zb_zcl_wwah_match_desc_time_cb(zb_uint8_t param)
+static void zb_zcl_wwah_match_desc_time_cb(zb_cb_param_t param)
 {
   zb_bufid_t buf = param;
   zb_uint8_t *zdp_cmd = zb_buf_begin(buf);
@@ -823,7 +811,7 @@ static void zb_zcl_wwah_match_desc_time_cb(zb_uint8_t param)
   }
 }
 
-static void zb_zcl_wwah_match_desc_time(zb_uint8_t param)
+static void zb_zcl_wwah_match_desc_time(zb_cb_param_t param)
 {
   if (!param)
   {
@@ -850,7 +838,7 @@ static void zb_zcl_wwah_match_desc_time(zb_uint8_t param)
   }
 }
 
-zb_ret_t zb_zcl_wwah_update_time(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_update_time(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
 
@@ -870,12 +858,12 @@ zb_ret_t zb_zcl_wwah_update_time(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_request_time_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_request_time_handler(zb_bufid_t param)
 {
   zb_ret_t ret;
 
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_request_time_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_request_time_handler %d", (FMT__D, param));
 
   ret = zb_zcl_wwah_update_time(0);
 
@@ -883,13 +871,13 @@ zb_ret_t zb_zcl_wwah_request_time_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_enable_wwah_rejoin_algorithm_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_enable_wwah_rejoin_algorithm_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_wwah_enable_wwah_rejoin_algorithm_t payload;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_wwah_rejoin_algorithm_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_wwah_rejoin_algorithm_handler %d", (FMT__D, param));
 
   ZB_ZCL_WWAH_GET_ENABLE_WWAH_REJOIN_ALGORITHM(param, payload, status);
   if (status != ZB_ZCL_PARSE_STATUS_SUCCESS )
@@ -921,14 +909,14 @@ zb_ret_t zb_zcl_wwah_enable_wwah_rejoin_algorithm_handler(zb_uint8_t param)
 }
 
 
-zb_ret_t zb_zcl_wwah_disable_wwah_rejoin_algorithm_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_disable_wwah_rejoin_algorithm_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_bool_t enable_bool = ZB_FALSE;
 
   ZVUNUSED(param);
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_wwah_rejoin_algorithm_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_wwah_rejoin_algorithm_handler %d", (FMT__D, param));
 
   ZB_ZCL_SET_ATTRIBUTE(wwah_endpoint,
                        ZB_ZCL_CLUSTER_ID_WWAH,
@@ -1016,14 +1004,14 @@ zb_ret_t zb_zcl_wwah_get_rejoin_tmo(zb_uint16_t attempt, zb_time_t *tmo)
 
 #endif  /* ZB_JOIN_CLIENT */
 
-zb_ret_t zb_zcl_wwah_set_ias_zone_enrollment_method_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_set_ias_zone_enrollment_method_handler(zb_bufid_t param)
 {
   zb_uint8_t enrollment_method;
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
   zb_ret_t ret = RET_OK;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_set_ias_zone_enrollment_method_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_set_ias_zone_enrollment_method_handler %d", (FMT__D, param));
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   ZB_ZCL_WWAH_GET_SET_IAS_ZONE_ENROLLMENT_METHOD(param, enrollment_method, status);
@@ -1046,11 +1034,11 @@ zb_ret_t zb_zcl_wwah_set_ias_zone_enrollment_method_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_clear_binding_table_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_clear_binding_table_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_clear_binding_table_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_clear_binding_table_handler %d", (FMT__D, param));
 
   apsme_forget_device();
 
@@ -1058,14 +1046,14 @@ zb_ret_t zb_zcl_wwah_clear_binding_table_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_enable_periodic_router_check_ins_handler(zb_uint8_t param){
+zb_ret_t zb_zcl_wwah_enable_periodic_router_check_ins_handler(zb_bufid_t param){
   zb_ret_t ret = RET_OK;
   zb_uint16_t payload;
   zb_zcl_parse_status_t status;
   zb_bool_t enable_bool = ZB_TRUE;
   zb_zcl_attr_t *attr_desc;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_periodic_router_check_ins_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_periodic_router_check_ins_handler %d", (FMT__D, param));
   ZB_ZCL_WWAH_GET_ENABLE_PERIODIC_ROUTER_CHECK_INS(param, payload, status);
   if (status != ZB_ZCL_PARSE_STATUS_SUCCESS || payload == 0)
   {
@@ -1099,9 +1087,10 @@ zb_ret_t zb_zcl_wwah_enable_periodic_router_check_ins_handler(zb_uint8_t param){
                              ZB_FALSE);
         /* If we fail, trace is given and assertion is triggered */
         ret = zb_nvram_write_dataset(ZB_NVRAM_ZCL_WWAH_DATA);
-        WWAH_CTX().periodic_checkins.keepalive_base = payload;
-        WWAH_CTX().periodic_checkins.keepalive_jitter = 0;
-        zb_zcl_wwah_start_periodic_checkin();
+        zb_bdb_tc_connectivity_set_initial_backoff_time(payload);
+        bdb_tc_connectivity_set_jitter(0);
+        /* Start in a such way to not ignore disallowed flag that may be set only by user. */
+        zb_bdb_tc_connectivity_autostart_checking_after_bdb();
       }
     }
   }
@@ -1109,12 +1098,12 @@ zb_ret_t zb_zcl_wwah_enable_periodic_router_check_ins_handler(zb_uint8_t param){
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_disable_periodic_router_check_ins_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_disable_periodic_router_check_ins_handler(zb_bufid_t param)
 {
   zb_ret_t ret;
   zb_bool_t disable_bool = ZB_FALSE;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_periodic_router_check_ins_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_periodic_router_check_ins_handler %d", (FMT__D, param));
   ZB_ZCL_SET_ATTRIBUTE(wwah_endpoint,
                        ZB_ZCL_CLUSTER_ID_WWAH,
                        ZB_ZCL_CLUSTER_SERVER_ROLE,
@@ -1123,17 +1112,17 @@ zb_ret_t zb_zcl_wwah_disable_periodic_router_check_ins_handler(zb_uint8_t param)
                        ZB_FALSE);
   /* If we fail, trace is given and assertion is triggered */
   ret = zb_nvram_write_dataset(ZB_NVRAM_ZCL_WWAH_DATA);
-  zb_zcl_wwah_stop_periodic_checkin();
+  zb_bdb_tc_connectivity_stop_checking();
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_wwah_disable_periodic_router_check_ins_handler, ret %d", (FMT__D, ret));
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_set_mac_poll_cca_wait_time_handler(zb_uint8_t param){
+zb_ret_t zb_zcl_wwah_set_mac_poll_cca_wait_time_handler(zb_bufid_t param){
   zb_ret_t ret = RET_OK;
   zb_uint8_t payload;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_set_mac_poll_cca_wait_time_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_set_mac_poll_cca_wait_time_handler %d", (FMT__D, param));
   ZB_ZCL_WWAH_GET_SET_MAC_POLL_CCA_WAIT_TIME(param, payload, status);
   if (status != ZB_ZCL_PARSE_STATUS_SUCCESS )
   {
@@ -1219,7 +1208,7 @@ zb_ret_t zb_zcl_wwah_set_pending_panid(zb_uint16_t n_panid)
 }
 
 
-zb_ret_t zb_zcl_wwah_set_pending_network_update_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_set_pending_network_update_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_wwah_set_pending_network_update_t payload;
@@ -1227,7 +1216,7 @@ zb_ret_t zb_zcl_wwah_set_pending_network_update_handler(zb_uint8_t param)
   zb_uint8_t channel;
   zb_uint16_t pan_id;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_set_pending_network_update_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_set_pending_network_update_handler %d", (FMT__D, param));
 
   ZB_ZCL_WWAH_GET_SET_PENDING_NETWORK_UPDATE(param, payload, status);
   if (status != ZB_ZCL_PARSE_STATUS_SUCCESS )
@@ -1253,14 +1242,14 @@ zb_ret_t zb_zcl_wwah_set_pending_network_update_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_require_aps_acks_on_unicasts_handler(zb_uint8_t param){
+zb_ret_t zb_zcl_wwah_require_aps_acks_on_unicasts_handler(zb_bufid_t param){
   zb_ret_t ret = RET_OK;
   zb_zcl_wwah_cluster_list_t payload = { 0 };
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uindex_t i;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_require_aps_acks_on_unicasts_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_require_aps_acks_on_unicasts_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -1298,10 +1287,10 @@ zb_ret_t zb_zcl_wwah_require_aps_acks_on_unicasts_handler(zb_uint8_t param){
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_remove_aps_acks_on_unicasts_requirement_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_remove_aps_acks_on_unicasts_requirement_handler(zb_bufid_t param)
 {
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_remove_aps_acks_on_unicasts_requirement_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_remove_aps_acks_on_unicasts_requirement_handler %d", (FMT__D, param));
   ZB_MEMSET(WWAH_CTX().aps_ack_exempt_table, (zb_uint8_t)ZB_ZCL_WWAH_CLUSTER_ID_FREE_RECORD,
             sizeof(WWAH_CTX().aps_ack_exempt_table));
   WWAH_CTX().aps_ack_exempt_table_cnt = 0;
@@ -1309,13 +1298,13 @@ zb_ret_t zb_zcl_wwah_remove_aps_acks_on_unicasts_requirement_handler(zb_uint8_t 
   return RET_OK;
 }
 
-zb_ret_t zb_zcl_wwah_aps_ack_requirement_query_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_aps_ack_requirement_query_handler(zb_bufid_t param)
 {
   zb_uint8_t *resp_data;
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uindex_t i;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_aps_ack_requirement_query_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_aps_ack_requirement_query_handler %d", (FMT__D, param));
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
   ZB_ZCL_WWAH_SEND_APS_ACK_REQUIREMENT_QUERY_RESPONSE_START(param, cmd_info.seq_number, WWAH_CTX().aps_ack_exempt_table_cnt, resp_data);
   for(i = 0; i < WWAH_CTX().aps_ack_exempt_table_cnt; ++i)
@@ -1335,14 +1324,14 @@ zb_ret_t zb_zcl_wwah_aps_ack_requirement_query_handler(zb_uint8_t param)
   return RET_BUSY;
 }
 
-zb_ret_t zb_zcl_wwah_debug_report_query_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_debug_report_query_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_uint8_t payload;
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
   zb_zcl_wwah_debug_report_t *out;
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_debug_report_query_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_debug_report_query_handler %d", (FMT__D, param));
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   ZB_ZCL_WWAH_GET_DEBUG_REPORT_QUERY(param, payload, status);
@@ -1386,7 +1375,7 @@ zb_ret_t zb_zcl_wwah_debug_report_query_handler(zb_uint8_t param)
 }
 
 
-zb_ret_t zb_zcl_wwah_survey_beacons_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_survey_beacons_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
 
@@ -1450,8 +1439,11 @@ zb_ret_t zb_zcl_wwah_survey_beacons_handler(zb_uint8_t param)
   return ret;
 }
 
-void zb_zcl_wwah_send_survey_beacons_response(zb_bufid_t obuf, zb_uint16_t buf)
+void zb_zcl_wwah_send_survey_beacons_response(zb_cb_param_t param)
 {
+  zb_bufid_t obuf = ZB_UNPACK_BUF_REF(param);
+  zb_bufid_t buf = (zb_bufid_t)ZB_UNPACK_USER_PARAM(param);
+
   if (obuf == 0)
   {
     zb_buf_get_out_delayed_ext(zb_zcl_wwah_send_survey_beacons_response, buf, 0);
@@ -1474,8 +1466,8 @@ void zb_zcl_wwah_send_survey_beacons_response(zb_bufid_t obuf, zb_uint16_t buf)
       (zb_uint8_t*)zb_buf_begin(obuf)
       + ZB_ZCL_GET_HEADER_SIZE(*(zb_uint8_t*)zb_buf_begin(obuf));
 
-    TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_send_survey_beacons_response, buf %hd, obuf %hd, beacons_number %hd",
-      (FMT__H_H_H, buf, obuf, resp_params->parents.count_potential_parents));
+    TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_send_survey_beacons_response, buf %d, obuf %d, beacons_number %hd",
+      (FMT__D_D_H, buf, obuf, resp_params->parents.count_potential_parents));
 
     ZB_ZCL_WWAH_SEND_SURVEY_BEACONS_RESPONSE_ADD_ALL(
       ptr,
@@ -1497,12 +1489,12 @@ void zb_zcl_wwah_send_survey_beacons_response(zb_bufid_t obuf, zb_uint16_t buf)
   }
 }
 
-zb_ret_t zb_zcl_wwah_disable_ota_downgrades_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_disable_ota_downgrades_handler(zb_bufid_t param)
 {
   zb_ret_t ret;
   zb_bool_t disable_bool = ZB_TRUE;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_ota_downgrades_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_ota_downgrades_handler %d", (FMT__D, param));
   ZB_ZCL_SET_ATTRIBUTE(wwah_endpoint,
                        ZB_ZCL_CLUSTER_ID_WWAH,
                        ZB_ZCL_CLUSTER_SERVER_ROLE,
@@ -1542,23 +1534,23 @@ zb_ret_t zb_zcl_wwah_set_leave_without_rejoin(zb_bool_t n_enabled)
 }
 
 
-zb_ret_t zb_zcl_wwah_disable_mgmt_leave_without_rejoin_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_disable_mgmt_leave_without_rejoin_handler(zb_bufid_t param)
 {
   zb_ret_t ret;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_mgmt_leave_without_rejoin_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_mgmt_leave_without_rejoin_handler %d", (FMT__D, param));
   ret = zb_zcl_wwah_set_leave_without_rejoin(ZB_FALSE);
   zb_wwah_set_leave_without_rejoin_allowed(ZB_FALSE);
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_wwah_disable_mgmt_leave_without_rejoin_handler, ret %d", (FMT__D, ret));
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_disable_touchlink_interpan_message_support_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_disable_touchlink_interpan_message_support_handler(zb_bufid_t param)
 {
   zb_ret_t ret;
   zb_bool_t disable_bool = ZB_FALSE;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_touchlink_interpan_message_support_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_touchlink_interpan_message_support_handler %d", (FMT__D, param));
 
   /* can be enabled but not disabled */
   ZB_ZCL_SET_ATTRIBUTE(wwah_endpoint,
@@ -1637,11 +1629,11 @@ static zb_ret_t zdo_wwah_set_parent_classification_state(zb_bool_t is_enabled)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_enable_wwah_parent_classification_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_enable_wwah_parent_classification_handler(zb_bufid_t param)
 {
   zb_ret_t ret;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_wwah_parent_classification_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_wwah_parent_classification_handler %d", (FMT__D, param));
 
   ret = zdo_wwah_set_parent_classification_state(ZB_TRUE);
 
@@ -1649,11 +1641,11 @@ zb_ret_t zb_zcl_wwah_enable_wwah_parent_classification_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_disable_wwah_parent_classification_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_disable_wwah_parent_classification_handler(zb_bufid_t param)
 {
   zb_ret_t ret;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_wwah_parent_classification_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_wwah_parent_classification_handler %d", (FMT__D, param));
 
   ret = zdo_wwah_set_parent_classification_state(ZB_FALSE);
 
@@ -1690,11 +1682,11 @@ zb_ret_t zb_zcl_wwah_set_require_lk_encryption(zb_bool_t n_require)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_enable_tc_security_on_nwk_key_rotation_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_enable_tc_security_on_nwk_key_rotation_handler(zb_bufid_t param)
 {
   zb_ret_t ret;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_tc_security_on_nwk_key_rotation_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_tc_security_on_nwk_key_rotation_handler %d", (FMT__D, param));
 
   /* WWAH ZCL Cluster Definition:
    * If TCSecurityOnNwkKeyRotationEnabled Attribute is set to TRUE,
@@ -1712,7 +1704,7 @@ zb_ret_t zb_zcl_wwah_enable_tc_security_on_nwk_key_rotation_handler(zb_uint8_t p
 /**
  * @param sig variable of type @ref zb_zcl_wwah_bad_parent_recovery_signal_t
  */
-void zb_zcl_wwah_bad_parent_recovery_tmo(zb_bufid_t sig);
+void zb_zcl_wwah_bad_parent_recovery_tmo(zb_cb_param_t sig);
 
 
 /**
@@ -1738,7 +1730,17 @@ void zb_zcl_wwah_restart_bad_parent_recovery(zb_bufid_t sig)
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_wwah_restart_bad_parent_recovery", (FMT__0));
 }
 
-void zb_zcl_wwah_bad_parent_recovery_signal(zb_bufid_t sig)
+static void zb_zcl_wwah_handle_checkin_status(zb_zcl_status_t checkin_status)
+{
+  zb_zcl_wwah_bad_parent_recovery_signal_t signal = checkin_status == ZB_ZCL_STATUS_SUCCESS
+                                                    ? ZB_ZCL_WWAH_BAD_PARENT_RECOVERY_POLL_CONTROL_CHECK_IN_OK
+                                                    : ZB_ZCL_WWAH_BAD_PARENT_RECOVERY_POLL_CONTROL_CHECK_IN_FAILED;
+  TRACE_MSG(TRACE_ZCL1, "zb_zcl_wwah_handle_checkin_status %hd", (FMT__H, checkin_status));
+
+  zb_zcl_wwah_bad_parent_recovery_signal(signal);
+}
+
+void zb_zcl_wwah_bad_parent_recovery_signal(zb_zcl_wwah_bad_parent_recovery_signal_t sig)
 {
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_bad_parent_recovery_signal sig %hd", (FMT__H, sig));
 
@@ -1811,23 +1813,25 @@ void zb_zcl_wwah_start_bad_parent_recovery(void)
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_wwah_start_bad_parent_recovery", (FMT__0));
 }
 
-void zb_zcl_wwah_bad_parent_recovery_tmo(zb_bufid_t sig)
+void zb_zcl_wwah_bad_parent_recovery_tmo(zb_cb_param_t param)
 {
+  zb_uint16_t sig = ZB_UNPACK_LOW_U16_FROM_U32(param);
+
   TRACE_MSG(TRACE_ZCL1, "zb_zcl_wwah_start_bad_parent_recovery_tmo: sig %hd", (FMT__H, sig));
   zb_zcl_wwah_stop_bad_parent_recovery();
   bdb_start_rejoin_recovery(
-    0,
+    ZB_PACK_2_U16_IN_U32(0,
     (sig == ZB_ZCL_WWAH_BAD_PARENT_RECOVERY_POLL_CONTROL_CHECK_IN_FAILED) ?
     BDB_COMM_REJOIN_REASON_POLL_CONTROL_CHECK_IN :
-    BDB_COMM_REJOIN_REASON_UNSPECIFIED);
+    BDB_COMM_REJOIN_REASON_UNSPECIFIED));
 }
 
-zb_ret_t zb_zcl_wwah_enable_wwah_bad_parent_recovery_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_enable_wwah_bad_parent_recovery_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_bool_t enable_bool = ZB_TRUE;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_wwah_bad_parent_recovery_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_wwah_bad_parent_recovery_handler %d", (FMT__D, param));
 
   ZB_ZCL_SET_ATTRIBUTE(wwah_endpoint,
                        ZB_ZCL_CLUSTER_ID_WWAH,
@@ -1843,12 +1847,12 @@ zb_ret_t zb_zcl_wwah_enable_wwah_bad_parent_recovery_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_disable_wwah_bad_parent_recovery_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_disable_wwah_bad_parent_recovery_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_bool_t enable_bool = ZB_FALSE;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_wwah_bad_parent_recovery_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_wwah_bad_parent_recovery_handler %d", (FMT__D, param));
 
   ZB_ZCL_SET_ATTRIBUTE(wwah_endpoint,
                        ZB_ZCL_CLUSTER_ID_WWAH,
@@ -1899,11 +1903,11 @@ zb_ret_t zb_zcl_wwah_set_configuration_mode(zb_bool_t n_allowed)
 }
 
 
-zb_ret_t zb_zcl_wwah_enable_configuration_mode_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_enable_configuration_mode_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_configuration_mode_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_enable_configuration_mode_handler %d", (FMT__D, param));
 
   ret = zb_zcl_wwah_set_configuration_mode(ZB_TRUE);
   zb_wwah_set_configuration_mode(ZB_TRUE);
@@ -1912,11 +1916,11 @@ zb_ret_t zb_zcl_wwah_enable_configuration_mode_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_disable_configuration_mode_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_disable_configuration_mode_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_configuration_mode_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_disable_configuration_mode_handler %d", (FMT__D, param));
 
   ret = zb_zcl_wwah_set_configuration_mode(ZB_FALSE);
   zb_wwah_set_configuration_mode(ZB_FALSE);
@@ -1925,7 +1929,7 @@ zb_ret_t zb_zcl_wwah_disable_configuration_mode_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_use_trust_center_for_cluster_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_use_trust_center_for_cluster_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_wwah_cluster_list_t payload = { 0 };
@@ -1934,7 +1938,7 @@ zb_ret_t zb_zcl_wwah_use_trust_center_for_cluster_handler(zb_uint8_t param)
   zb_uindex_t i;
   zb_uint16_t cluster_role;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_use_trust_center_for_cluster_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_use_trust_center_for_cluster_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -1988,13 +1992,13 @@ zb_ret_t zb_zcl_wwah_use_trust_center_for_cluster_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_wwah_trust_center_for_cluster_server_query_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_wwah_trust_center_for_cluster_server_query_handler(zb_bufid_t param)
 {
   zb_uint8_t *resp_data;
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uindex_t i;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_trust_center_for_cluster_server_query_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_trust_center_for_cluster_server_query_handler %d", (FMT__D, param));
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
   ZB_ZCL_WWAH_SEND_TRUST_CENTER_FOR_CLUSTER_SERVER_QUERY_RESPONSE_START(param, cmd_info.seq_number, WWAH_CTX().use_trust_center_for_cluster_table_cnt, resp_data);
   for(i = 0; i < WWAH_CTX().use_trust_center_for_cluster_table_cnt; ++i)
@@ -2014,7 +2018,7 @@ zb_ret_t zb_zcl_wwah_trust_center_for_cluster_server_query_handler(zb_uint8_t pa
   return RET_BUSY;
 }
 
-void zb_zcl_wwah_send_power_descriptor_change(zb_uint8_t param)
+void zb_zcl_wwah_send_power_descriptor_change(zb_cb_param_t param)
 {
   TRACE_MSG(TRACE_ZCL1, "> zb_zcl_wwah_send_power_descriptor_change", (FMT__0));
   ZB_ZCL_WWAH_SEND_POWER_DESCRIPTOR_CHANGE(param,
@@ -2038,43 +2042,52 @@ void zb_zcl_wwah_schedule_send_power_descriptor_change(void)
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_wwah_schedule_send_power_descriptor_change", (FMT__0));
 }
 
-void zb_zcl_wwah_match_desc_resp_handle(zb_uint8_t param)
+void zb_zcl_wwah_match_desc_resp_handle(zb_cb_param_t param)
 {
   zb_zdo_match_desc_resp_t *resp = (zb_zdo_match_desc_resp_t*)zb_buf_begin(param);
   zb_uint8_t *match_ep;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_periodic_checkin_match_desc_resp_handle param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_periodic_checkin_match_desc_resp_handle param %d", (FMT__D, param));
 
-  if (resp->status == ZB_ZDP_STATUS_SUCCESS
-      && resp->tsn == WWAH_CTX().periodic_checkins.tsn
-      && resp->match_len > 0)
+  switch(bdb_tc_connectivity_get_current_method())
   {
-    /* Match EP list follows right after response header */
-    match_ep = (zb_uint8_t*)(resp + 1);
-    WWAH_CTX().periodic_checkins.endpoint = *match_ep;
+    case BDB_TC_CONNECTIVITY_METHOD_WWAH_SPECIFIC:
+      if (resp->status == ZB_ZDP_STATUS_SUCCESS
+        && resp->match_len > 0)
+      {
+        match_ep = (zb_uint8_t*)(resp + 1);
+        WWAH_CTX().periodic_checkins.endpoint = *match_ep;
+        TRACE_MSG(TRACE_ZCL1, "Found endpoint %hd", (FMT__H, *match_ep));
+        zb_zcl_wwah_recounter_checkin();
+      }
+      else
+      {
+        /* Previously, the logic was to shop polling if TC doesn't support any method.
+           Stop checking is such case. */
+        zb_bdb_tc_connectivity_stop_checking();
+      }
+      zb_buf_free(param);
+      break;
 
-    ZB_SCHEDULE_ALARM_CANCEL(zb_zcl_wwah_periodic_checkin_match_desc_req_delayed, ZB_ALARM_ALL_CB);
-    zb_zcl_wwah_recounter_checkin();
+    default:
+      ZB_ASSERT(0);
+      zb_buf_free(param);
+      break;
   }
-  zb_buf_free(param);
+
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_wwah_periodic_checkin_match_desc_resp_handle", (FMT__0));
 }
 
-void zb_zcl_wwah_periodic_checkin_match_desc_req_delayed(zb_uint8_t param)
-{
-  ZVUNUSED(param);
-  ++WWAH_CTX().periodic_checkins.poll_method;
-  zb_buf_get_out_delayed(zb_zcl_wwah_periodic_checkin_match_desc_req);
-}
-
-void zb_zcl_wwah_periodic_checkin_match_desc_req(zb_uint8_t param)
+void zb_zcl_wwah_periodic_checkin_match_desc_req(zb_cb_param_t param)
 {
   zb_zdo_match_desc_param_t *req;
   zb_af_endpoint_desc_t *ep_desc = NULL;
   zb_uint16_t tc_short_addr = zb_aib_get_trust_center_short_address();
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_periodic_checkin_match_desc_req %hd", (FMT__H, param));
+  zb_uint8_t bdb_selected_method = bdb_tc_connectivity_get_current_method();
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_periodic_checkin_match_desc_req method %hd, param %d",
+           (FMT__H_D, bdb_selected_method, param));
 
-  if (WWAH_CTX().periodic_checkins.poll_method != ZB_ZCL_WWAH_PERIODIC_CHECKINS_NOT_SUPPORTED)
+  if (bdb_selected_method == BDB_TC_CONNECTIVITY_METHOD_WWAH_SPECIFIC)
   {
     req = zb_buf_initial_alloc(param, sizeof(zb_zdo_match_desc_param_t) + (1) * sizeof(zb_uint16_t));
 
@@ -2088,31 +2101,15 @@ void zb_zcl_wwah_periodic_checkin_match_desc_req(zb_uint8_t param)
     * 2) leverage the Keepalive Server if supported.
     * As discussed second method has more priority. */
 
-    switch (WWAH_CTX().periodic_checkins.poll_method)
+    ep_desc = get_endpoint_by_cluster_with_role(ZB_ZCL_CLUSTER_ID_BASIC,
+                                                ZB_ZCL_CLUSTER_CLIENT_ROLE);
+    if (ep_desc)
     {
-      case ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_KEEPALIVE:
-        ep_desc = get_endpoint_by_cluster_with_role(ZB_ZCL_CLUSTER_ID_KEEP_ALIVE,
-                                                    ZB_ZCL_CLUSTER_CLIENT_ROLE);
-        if (ep_desc)
-        {
-          req->cluster_list[0] = ZB_ZCL_CLUSTER_ID_KEEP_ALIVE;
-          break;
-        }
-        ++WWAH_CTX().periodic_checkins.poll_method;
-        /* FALLTHROUGH */
-      case ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_CLUSTER_REVISION:
-        ep_desc = get_endpoint_by_cluster_with_role(ZB_ZCL_CLUSTER_ID_BASIC,
-                                                    ZB_ZCL_CLUSTER_CLIENT_ROLE);
-        if (ep_desc)
-        {
-          req->cluster_list[0] = ZB_ZCL_CLUSTER_ID_BASIC;
-          break;
-        }
-        /* FALLTHROUGH */
-      default:
-        TRACE_MSG(TRACE_ERROR, "Keep-alive polling method not found.", (FMT__0));
-        ZB_ASSERT(0);
-        break;
+      req->cluster_list[0] = ZB_ZCL_CLUSTER_ID_BASIC;
+    }
+    else
+    {
+      TRACE_MSG(TRACE_ERROR, "Cluster revision attribute method not found.", (FMT__0));
     }
 
     /* Verify ep_desc assignment. It will unrecoverably fail if ep_desc is NULL */
@@ -2124,16 +2121,11 @@ void zb_zcl_wwah_periodic_checkin_match_desc_req(zb_uint8_t param)
 
     WWAH_CTX().periodic_checkins.tsn = zb_zdo_match_desc_req(param, zb_zcl_wwah_match_desc_resp_handle);
 
-    if (WWAH_CTX().periodic_checkins.tsn != ZB_ZDO_INVALID_TSN)
-    {
-      ZB_SCHEDULE_ALARM(zb_zcl_wwah_periodic_checkin_match_desc_req_delayed, 0,
-                        ZB_ZCL_WWAH_PERIODIC_CHECKINS_CLUSTER_MATCH_DESC_TIME);
-    }
-    else
+    if (WWAH_CTX().periodic_checkins.tsn == ZB_ZDO_INVALID_TSN)
     {
       TRACE_MSG(TRACE_ZCL1, "tc poll finished: can not send match desc", (FMT__0));
-      zb_zcl_wwah_stop_periodic_checkin();
-      bdb_start_rejoin_recovery(param, BDB_COMM_REJOIN_REASON_UNSPECIFIED);
+      zb_bdb_tc_connectivity_stop_checking();
+      bdb_start_rejoin_recovery(ZB_PACK_2_U16_IN_U32(param, BDB_COMM_REJOIN_REASON_UNSPECIFIED));
     }
   }
   else
@@ -2143,50 +2135,65 @@ void zb_zcl_wwah_periodic_checkin_match_desc_req(zb_uint8_t param)
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_wwah_periodic_checkin_match_desc_req", (FMT__0));
 }
 
-void zb_zcl_wwah_start_periodic_checkin(void)
+zb_uint8_t zb_zcl_wwah_periodic_checkins_select_method_and_start_discovery(zb_bufid_t param, zb_uint16_t first_method)
 {
   /* Get trust center IEEE */
   zb_uint16_t tc_short_addr = zb_aib_get_trust_center_short_address();
-  zb_zcl_attr_t *attr_desc;
   zb_uint8_t endpoint;
+  zb_uint8_t selected_method = BDB_TC_CONNECTIVITY_METHOD_NOT_SUPPORTED;
+  zb_ret_t ret = RET_OK;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_start_periodic_checkin", (FMT__0));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_periodic_checkins_select_method_and_start_discovery", (FMT__0));
 
   endpoint = get_endpoint_by_cluster(ZB_ZCL_CLUSTER_ID_WWAH, ZB_ZCL_CLUSTER_SERVER_ROLE);
-  if (endpoint)
+  if (endpoint
+      && !ZB_IS_DEVICE_ZC()
+      && zb_get_rx_on_when_idle()
+      && !zb_aib_trust_center_address_zero()
+      && tc_short_addr != ZB_UNKNOWN_SHORT_ADDR
+      && zb_zcl_wwah_check_if_periodic_router_check_ins_enabled())
   {
-    attr_desc = zb_zcl_get_attr_desc_a(endpoint, ZB_ZCL_CLUSTER_ID_WWAH,
-                                       ZB_ZCL_CLUSTER_SERVER_ROLE,
-                                       ZB_ZCL_ATTR_WWAH_ROUTER_CHECK_IN_ENABLED_ID);
-    ZB_ASSERT(attr_desc);
+    TRACE_MSG(TRACE_ZCL1, "zb_zcl_wwah_periodic_checkins_select_method_and_start_discovery: start method %d",
+             (FMT__D, first_method));
 
-    /* Check it was not started before */
-    if (ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc) == ZB_TRUE &&
-        !ZB_IS_DEVICE_ZC() &&
-        zb_get_rx_on_when_idle() &&
-        WWAH_CTX().periodic_checkins.endpoint == 0 &&
-        WWAH_CTX().periodic_checkins.poll_method == ZB_ZCL_WWAH_PERIODIC_CHECKINS_NOT_SUPPORTED)
+    switch(first_method)
     {
-      TRACE_MSG(TRACE_ZCL1, "zb_zcl_wwah_start_periodic_checkin: start", (FMT__0));
-      /* Send Match Desc - Keep-Alive cluster */
-      if (!zb_aib_trust_center_address_zero() &&
-          tc_short_addr != ZB_UNKNOWN_SHORT_ADDR)
-      {
-        WWAH_CTX().periodic_checkins.poll_method = ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_KEEPALIVE;
-        zb_buf_get_out_delayed(zb_zcl_wwah_periodic_checkin_match_desc_req);
-      }
+      case BDB_TC_CONNECTIVITY_METHOD_NOT_SUPPORTED:
+      case BDB_TC_CONNECTIVITY_METHOD_KEEPALIVE:
+        selected_method = BDB_TC_CONNECTIVITY_METHOD_KEEPALIVE;
+        ret = bdb_tc_connectivity_discover_keepalive_server(param);
+
+        /* It means that keep-alive client wasn't found on this device. */
+        if (ret != RET_NOT_FOUND)
+        {
+          break;
+        }
+      /* If not found keepalive, fallback to WWAH specific (it reads cluster revision)*/
+      /* FALLTHROUGH */
+      case BDB_TC_CONNECTIVITY_METHOD_WWAH_SPECIFIC:
+        selected_method = BDB_TC_CONNECTIVITY_METHOD_WWAH_SPECIFIC;
+        ZB_SCHEDULE_CALLBACK(zb_zcl_wwah_periodic_checkin_match_desc_req, param);
+        break;
+
+      default:
+        ZB_ASSERT(ZB_FALSE);
+        zb_buf_free(param);
+        break;
     }
   }
-  TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_wwah_start_periodic_checkin", (FMT__0));
+
+  TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_wwah_periodic_checkins_select_method_and_start_discovery ret %hd", (FMT__H, ret));
+
+  return selected_method;
 }
 
-void zb_zcl_wwah_periodic_checkin_countdown(zb_uint8_t param)
+void zb_zcl_wwah_periodic_checkin_countdown(zb_cb_param_t param)
 {
   ZVUNUSED(param);
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_wwah_periodic_checkin_countdown", (FMT__0));
   if (WWAH_CTX().periodic_checkins.countdown > 0)
   {
-    ZB_SCHEDULE_ALARM(zb_zcl_wwah_periodic_checkin_countdown, 0, ZB_TIME_ONE_SECOND * WWAH_CTX().periodic_checkins.countdown);
+    ZB_SCHEDULE_ALARM(zb_zcl_wwah_periodic_checkin_countdown, 0, ZB_SECONDS_TO_BEACON_INTERVAL(WWAH_CTX().periodic_checkins.countdown));
     TRACE_MSG(TRACE_ZCL1, "cd move %d", (FMT__D, WWAH_CTX().periodic_checkins.countdown));
     WWAH_CTX().periodic_checkins.countdown = 0;
   }
@@ -2201,111 +2208,60 @@ void zb_zcl_wwah_stop_periodic_checkin(void)
 {
   WWAH_CTX().periodic_checkins.countdown = 0;
   WWAH_CTX().periodic_checkins.endpoint = 0;
-  WWAH_CTX().periodic_checkins.poll_method = ZB_ZCL_WWAH_PERIODIC_CHECKINS_NOT_SUPPORTED;
   ZB_SCHEDULE_ALARM_CANCEL(zb_zcl_wwah_periodic_checkin_countdown, ZB_ALARM_ALL_CB);
-
-#if defined ZB_ROUTER_ROLE
-  nwk_set_tc_connectivity(0);
-#endif
 }
 
-void zb_zcl_wwah_periodic_checkin_timeout(zb_uint8_t param)
+void zb_zcl_wwah_periodic_checkin_timeout(zb_cb_param_t param)
 {
-  zb_bool_t is_fail = ZB_FALSE;
-
   ZVUNUSED(param);
-  TRACE_MSG(TRACE_ZCL1, "zb_zcl_wwah_periodic_checkin_timeout param %hd", (FMT__H, param));
-  if (WWAH_CTX().periodic_checkins.poll_method == ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_KEEPALIVE)
+  TRACE_MSG(TRACE_ZCL1, "zb_zcl_wwah_periodic_checkin_timeout", (FMT__0, param));
+
+  if (bdb_tc_connectivity_get_current_method() == BDB_TC_CONNECTIVITY_METHOD_WWAH_SPECIFIC)
   {
-    /* After 3 failed Keepalive attempts, the device SHALL perform the rejoin. */
-    ++WWAH_CTX().periodic_checkins.failure_cnt;
-    if (WWAH_CTX().periodic_checkins.failure_cnt >= ZB_ZCL_WWAH_PERIODIC_CHECKINS_MAX_FAILURE_CNT)
-    {
-      is_fail = ZB_TRUE;
-    }
-    else
-    {
-      zb_zcl_wwah_recounter_checkin();
-    }
-  }
-  if (WWAH_CTX().periodic_checkins.poll_method == ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_CLUSTER_REVISION || is_fail)
-  {
-    zb_zcl_wwah_stop_periodic_checkin();
-    bdb_start_rejoin_recovery(0, BDB_COMM_REJOIN_REASON_UNSPECIFIED);
+    zb_bdb_tc_connectivity_stop_checking();
+    bdb_start_rejoin_recovery(ZB_PACK_2_U16_IN_U32(0, BDB_COMM_REJOIN_REASON_UNSPECIFIED));
   }
 }
 
-void zb_zcl_wwah_periodic_checkin_tc_poll(zb_uint8_t param)
+void zb_zcl_wwah_periodic_checkin_tc_poll(zb_cb_param_t param)
 {
   zb_ret_t ret = RET_BUSY;
   zb_uint8_t *cmd_ptr;
   zb_uint16_t tc_short_addr = zb_aib_get_trust_center_short_address();
   zb_af_endpoint_desc_t *ep_desc = NULL;
-
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_periodic_checkin_tc_poll param %hd", (FMT__H, param));
-
-  ZB_ASSERT(WWAH_CTX().periodic_checkins.endpoint &&
-            WWAH_CTX().periodic_checkins.poll_method < ZB_ZCL_WWAH_PERIODIC_CHECKINS_NOT_SUPPORTED &&
-            tc_short_addr != ZB_UNKNOWN_SHORT_ADDR);
+  zb_uint8_t curr_method = bdb_tc_connectivity_get_current_method();
 
 
-  switch (WWAH_CTX().periodic_checkins.poll_method)
-  {
-    case ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_KEEPALIVE:
-    {
-      ZB_ZCL_GENERAL_INIT_READ_ATTR_REQ(param, cmd_ptr, ZB_ZCL_ENABLE_DEFAULT_RESPONSE);
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_periodic_checkin_tc_poll param %d", (FMT__D, param));
 
-      ZB_ZCL_GENERAL_ADD_ID_READ_ATTR_REQ(cmd_ptr, ZB_ZCL_ATTR_KEEP_ALIVE_TC_KEEP_ALIVE_BASE_ID);
-      ZB_ZCL_GENERAL_ADD_ID_READ_ATTR_REQ(cmd_ptr, ZB_ZCL_ATTR_KEEP_ALIVE_TC_KEEP_ALIVE_JITTER_ID);
+  ZB_ASSERT(WWAH_CTX().periodic_checkins.endpoint
+            && curr_method == BDB_TC_CONNECTIVITY_METHOD_WWAH_SPECIFIC
+            && tc_short_addr != ZB_UNKNOWN_SHORT_ADDR);
 
-      ep_desc = get_endpoint_by_cluster_with_role(ZB_ZCL_CLUSTER_ID_KEEP_ALIVE,
-                                                  ZB_ZCL_CLUSTER_CLIENT_ROLE);
-      ZB_ASSERT(ep_desc);
+  ZB_ZCL_GENERAL_INIT_READ_ATTR_REQ_A(param,
+                                      cmd_ptr,
+                                      ZB_ZCL_FRAME_DIRECTION_TO_SRV,
+                                      ZB_ZCL_ENABLE_DEFAULT_RESPONSE);
+  ZB_ZCL_GENERAL_ADD_ID_READ_ATTR_REQ(cmd_ptr, ZB_ZCL_ATTR_GLOBAL_CLUSTER_REVISION_ID);
 
-      ret = zb_zcl_finish_and_send_packet(param,
-                                          cmd_ptr,
-                                          (zb_addr_u *)(&tc_short_addr),
-                                          ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-                                          WWAH_CTX().periodic_checkins.endpoint,
-                                          ep_desc->ep_id,
-                                          get_profile_id_by_endpoint(ep_desc->ep_id),
-                                          ZB_ZCL_CLUSTER_ID_KEEP_ALIVE,
-                                          NULL);
-    }
-    break;
+  ep_desc = get_endpoint_by_cluster_with_role(ZB_ZCL_CLUSTER_ID_BASIC,
+                                              ZB_ZCL_CLUSTER_CLIENT_ROLE);
+  ZB_ASSERT(ep_desc);
 
-    case ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_CLUSTER_REVISION:
-    {
-      ZB_ZCL_GENERAL_INIT_READ_ATTR_REQ_A(param,
-                                          cmd_ptr,
-                                          ZB_ZCL_FRAME_DIRECTION_TO_SRV,
-                                          ZB_ZCL_ENABLE_DEFAULT_RESPONSE);
-      ZB_ZCL_GENERAL_ADD_ID_READ_ATTR_REQ(cmd_ptr, ZB_ZCL_ATTR_GLOBAL_CLUSTER_REVISION_ID);
-
-      ep_desc = get_endpoint_by_cluster_with_role(ZB_ZCL_CLUSTER_ID_BASIC,
-                                                  ZB_ZCL_CLUSTER_CLIENT_ROLE);
-      ZB_ASSERT(ep_desc);
-
-      ret = zb_zcl_finish_and_send_packet(param,
-                                          cmd_ptr,
-                                          (zb_addr_u *)(&tc_short_addr),
-                                          ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-                                          WWAH_CTX().periodic_checkins.endpoint,
-                                          ep_desc->ep_id,
-                                          get_profile_id_by_endpoint(ep_desc->ep_id),
-                                          ZB_ZCL_CLUSTER_ID_BASIC,
-                                          NULL);
-    }
-    break;
-
-    default:
-      ZB_ASSERT(0);
-      break;
-  }
+  ret = zb_zcl_finish_and_send_packet(param,
+                                      cmd_ptr,
+                                      (zb_addr_u *)(&tc_short_addr),
+                                      ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
+                                      WWAH_CTX().periodic_checkins.endpoint,
+                                      ep_desc->ep_id,
+                                      get_profile_id_by_endpoint(ep_desc->ep_id),
+                                      ZB_ZCL_CLUSTER_ID_BASIC,
+                                      NULL);
 
   if (ret != RET_OK)
   {
-    ++WWAH_CTX().periodic_checkins.failure_cnt;
+    zb_bdb_tc_connectivity_stop_checking();
+    bdb_start_rejoin_recovery(ZB_PACK_2_U16_IN_U32((ret != RET_OK) ? param : 0, BDB_COMM_REJOIN_REASON_UNSPECIFIED));
   }
   else
   {
@@ -2313,85 +2269,43 @@ void zb_zcl_wwah_periodic_checkin_tc_poll(zb_uint8_t param)
     /* Need to wait some time for the answer (unicast). Minimum border is
      * ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY * ZB_N_APS_MAX_FRAME_RETRIES, but intermediate
      * hops may add some additional delay. */
+      /* If successfully scheduled, timer will be closed in */
     ZB_SCHEDULE_ALARM(zb_zcl_wwah_periodic_checkin_timeout, 0, ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY * ZB_N_APS_MAX_FRAME_RETRIES);
-  }
-
-  if ((WWAH_CTX().periodic_checkins.poll_method == ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_KEEPALIVE &&
-      WWAH_CTX().periodic_checkins.failure_cnt >= ZB_ZCL_WWAH_PERIODIC_CHECKINS_MAX_FAILURE_CNT) ||
-      (WWAH_CTX().periodic_checkins.poll_method == ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_CLUSTER_REVISION &&
-      (zb_bool_t)WWAH_CTX().periodic_checkins.failure_cnt))
-  {
-    zb_zcl_wwah_stop_periodic_checkin();
-    bdb_start_rejoin_recovery((ret != RET_OK) ? param : 0, BDB_COMM_REJOIN_REASON_UNSPECIFIED);
-  }
-  else if (ret != RET_OK)
-  {
-    /* Reschedule next read attempt. */
-    ZB_SCHEDULE_CALLBACK(zb_zcl_wwah_periodic_checkin_tc_poll, param);
   }
 }
 
-zb_bool_t zb_zcl_wwah_periodic_checkin_read_attr_handle(zb_uint8_t param)
+zb_bool_t zb_zcl_wwah_periodic_checkin_read_attr_handle(zb_bufid_t param)
 {
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
   zb_zcl_read_attr_res_t *resp = NULL;
   zb_uint8_t read_attr_resp_cnt = 0;
   zb_uint16_t cluster_id = cmd_info->cluster_id;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_periodic_checkin_read_attr_handle param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_wwah_periodic_checkin_read_attr_handle param %d", (FMT__D, param));
   ZB_SCHEDULE_ALARM_CANCEL(zb_zcl_wwah_periodic_checkin_timeout, ZB_ALARM_ALL_CB);
 
   do
   {
     ZB_ZCL_GENERAL_GET_NEXT_READ_ATTR_RES(param, resp);
 
-    if (resp && resp->status == ZB_ZCL_STATUS_SUCCESS)
+    if (resp
+        && resp->status == ZB_ZCL_STATUS_SUCCESS
+        && cluster_id == ZB_ZCL_CLUSTER_ID_BASIC)
     {
-      if (cluster_id == ZB_ZCL_CLUSTER_ID_KEEP_ALIVE)
-      {
-        if (resp->attr_id == ZB_ZCL_ATTR_KEEP_ALIVE_TC_KEEP_ALIVE_BASE_ID)
-        {
-          WWAH_CTX().periodic_checkins.keepalive_base = resp->attr_value[0] * 60;
-          TRACE_MSG(TRACE_ZCL1, "keep-alive: base %hd minutes", (FMT__H, WWAH_CTX().periodic_checkins.keepalive_base));
-        }
-        else if (resp->attr_id == ZB_ZCL_ATTR_KEEP_ALIVE_TC_KEEP_ALIVE_JITTER_ID)
-        {
-          ZB_HTOLE16(&WWAH_CTX().periodic_checkins.keepalive_jitter, resp->attr_value);
-          TRACE_MSG(TRACE_ZCL1, "keep-alive: jitter %hd seconds", (FMT__H, WWAH_CTX().periodic_checkins.keepalive_jitter));
-        }
-        ++read_attr_resp_cnt;
-      }
-      else if (cluster_id == ZB_ZCL_CLUSTER_ID_BASIC)
-      {
-        ++read_attr_resp_cnt;
-      }
+      ++read_attr_resp_cnt;
     }
   }
   while (resp);
 
-  if (!read_attr_resp_cnt ||
-      (WWAH_CTX().periodic_checkins.poll_method == ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_KEEPALIVE &&
-       read_attr_resp_cnt != 2))
+  if (read_attr_resp_cnt == 0)
   {
-    ++WWAH_CTX().periodic_checkins.failure_cnt;
-  }
-
-  if ((WWAH_CTX().periodic_checkins.poll_method == ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_KEEPALIVE &&
-      WWAH_CTX().periodic_checkins.failure_cnt == ZB_ZCL_WWAH_PERIODIC_CHECKINS_MAX_FAILURE_CNT) ||
-      (WWAH_CTX().periodic_checkins.poll_method == ZB_ZCL_WWAH_PERIODIC_CHECKINS_READ_CLUSTER_REVISION &&
-      WWAH_CTX().periodic_checkins.failure_cnt))
-  {
-    zb_zcl_wwah_stop_periodic_checkin();
-    bdb_start_rejoin_recovery(param, BDB_COMM_REJOIN_REASON_UNSPECIFIED);
+    zb_bdb_tc_connectivity_stop_checking();
+    bdb_start_rejoin_recovery(ZB_PACK_2_U16_IN_U32(param, BDB_COMM_REJOIN_REASON_UNSPECIFIED));
     param = 0;
   }
   else
   {
     zb_zcl_wwah_recounter_checkin();
-    /* restore hub connectivity */
-#if defined ZB_ROUTER_ROLE
-    nwk_set_tc_connectivity(1);
-#endif
   }
 
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_wwah_periodic_checkin_read_attr_handle", (FMT__0));
@@ -2414,19 +2328,18 @@ zb_bool_t zb_zcl_wwah_periodic_checkin_block_zcl_cmd(zb_zcl_parsed_hdr_t *cmd_in
     WWAH_CTX().periodic_checkins.endpoint == ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).src_endpoint &&
     WWAH_CTX().periodic_checkins.tsn == cmd_info->seq_number &&
     WWAH_CTX().periodic_checkins.countdown == 0 &&
-    (cmd_info->cluster_id == ZB_ZCL_CLUSTER_ID_BASIC ||
-    cmd_info->cluster_id == ZB_ZCL_CLUSTER_ID_KEEP_ALIVE) &&
+    (cmd_info->cluster_id == ZB_ZCL_CLUSTER_ID_BASIC) &&
     zb_zcl_wwah_check_if_periodic_router_check_ins_enabled());
 }
 
 void zb_zcl_wwah_recounter_checkin(void)
 {
-  if (WWAH_CTX().periodic_checkins.poll_method != ZB_ZCL_WWAH_PERIODIC_CHECKINS_NOT_SUPPORTED &&
-      WWAH_CTX().periodic_checkins.endpoint != 0)
+  if (bdb_tc_connectivity_get_current_method() == BDB_TC_CONNECTIVITY_METHOD_WWAH_SPECIFIC
+      && WWAH_CTX().periodic_checkins.endpoint != 0)
   {
-    TRACE_MSG(TRACE_ZCL1, "recounter zb_zcl_wwah_update_tc_connection", (FMT__0));
+    TRACE_MSG(TRACE_ZCL1, "zb_zcl_wwah_recounter_checkin", (FMT__0));
     ZB_SCHEDULE_ALARM_CANCEL(zb_zcl_wwah_periodic_checkin_countdown, ZB_ALARM_ALL_CB);
-    WWAH_CTX().periodic_checkins.countdown = WWAH_CTX().periodic_checkins.keepalive_base + ZB_RANDOM_VALUE(WWAH_CTX().periodic_checkins.keepalive_jitter);
+    WWAH_CTX().periodic_checkins.countdown = zb_bdb_tc_connectivity_get_initial_backoff_time() + ZB_RANDOM_JTR(zb_bdb_tc_connectivity_get_jitter());
     zb_zcl_wwah_periodic_checkin_countdown(0);
   }
 }
@@ -2435,25 +2348,25 @@ void zb_zcl_wwah_update_tc_connection(zb_uint16_t short_addr)
 {
   zb_uint16_t tc_short_addr;
   if (zb_is_wwah_server() &&
-      WWAH_CTX().periodic_checkins.poll_method != ZB_ZCL_WWAH_PERIODIC_CHECKINS_NOT_SUPPORTED)
+      bdb_tc_connectivity_get_current_method() != BDB_TC_CONNECTIVITY_METHOD_NOT_SUPPORTED)
   {
     tc_short_addr = zb_aib_get_trust_center_short_address();
     if (tc_short_addr != ZB_UNKNOWN_SHORT_ADDR && tc_short_addr == short_addr)
     {
-      zb_zcl_wwah_recounter_checkin();
+      bdb_tc_connectivity_restart_timer();
     }
   }
 }
 
-zb_bool_t zb_zcl_process_wwah_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_wwah_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
   zb_ret_t ret = RET_OK;
 
   TRACE_MSG( TRACE_ZCL1,
-             "> zb_zcl_process_wwah_specific_commands: buf %hd",
-             (FMT__H, param));
+             "> zb_zcl_process_wwah_specific_commands: buf %d",
+             (FMT__D, param));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -2702,7 +2615,7 @@ zb_bool_t zb_zcl_process_wwah_specific_commands(zb_uint8_t param)
 }
 
 
-zb_bool_t zb_zcl_process_wwah_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_wwah_specific_commands_srv(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -2712,7 +2625,7 @@ zb_bool_t zb_zcl_process_wwah_specific_commands_srv(zb_uint8_t param)
   return zb_zcl_process_wwah_specific_commands(param);
 }
 
-void zb_zcl_wwah_trace_ctx(zb_uint8_t param)
+void zb_zcl_wwah_trace_ctx(zb_bufid_t param)
 {
   zb_uint8_t i = 0;
   ZVUNUSED(param);
@@ -2787,6 +2700,9 @@ void zb_nvram_read_wwah_dataset(
     ZB_MEMCPY((zb_uint8_t*)&WWAH_CTX().periodic_checkins,
               (zb_uint8_t*)&ds.periodic_checkins,
               sizeof(zb_zcl_wwah_periodic_checkins_data_t));
+
+    zb_bdb_tc_connectivity_set_initial_backoff_time(WWAH_CTX().periodic_checkins.keepalive_base);
+    bdb_tc_connectivity_set_jitter(WWAH_CTX().periodic_checkins.keepalive_jitter);
 
     WWAH_CTX().periodic_checkins.tsn = 0;
     WWAH_CTX().periodic_checkins.failure_cnt = 0;
@@ -3002,6 +2918,9 @@ zb_ret_t zb_nvram_write_wwah_dataset(zb_uint8_t page, zb_uint32_t pos)
   ds.wwah_behavior = WWAH_CTX().wwah_behavior;
   ds.aps_link_key_enabled_by_default = WWAH_CTX().aps_link_key_enabled_by_default;
 
+  WWAH_CTX().periodic_checkins.keepalive_base = zb_bdb_tc_connectivity_get_initial_backoff_time();
+  WWAH_CTX().periodic_checkins.keepalive_jitter = zb_bdb_tc_connectivity_get_jitter();
+
   ZB_MEMCPY((zb_uint8_t*)&ds.periodic_checkins,
             (zb_uint8_t*)&WWAH_CTX().periodic_checkins,
             sizeof(zb_zcl_wwah_periodic_checkins_data_t));
@@ -3175,7 +3094,6 @@ void wwah_post_commissioning_actions(void)
 {
   if (zb_is_wwah_server())
   {
-    zb_zcl_wwah_start_periodic_checkin();
     zb_zcl_wwah_start_bad_parent_recovery();
   }
 }

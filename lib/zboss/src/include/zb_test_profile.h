@@ -259,7 +259,7 @@ zb_buffer_test_response_param_t;
    @snippet tp_aps_bv_21_i_zed2.c zb_test_profile_indication
 
  */
-void zb_test_profile_indication(zb_uint8_t param);
+void zb_test_profile_indication(zb_cb_param_t param);
 
 /**
     Send counted packet
@@ -267,7 +267,7 @@ void zb_test_profile_indication(zb_uint8_t param);
 
     @param param - buffer with command data
  */
-void tp_send_counted_packet(zb_uint8_t param);
+void tp_send_counted_packet(zb_cb_param_t param);
 
 
 /**
@@ -276,7 +276,7 @@ void tp_send_counted_packet(zb_uint8_t param);
 
     @param param - buffer with command data
  */
-void tp_send_counted_packet_ext(zb_uint8_t param);
+void tp_send_counted_packet_ext(zb_cb_param_t param);
 
 /**
    Send packet by short address destination
@@ -299,7 +299,7 @@ void tp_send_counted_packet_ext(zb_uint8_t param);
    @snippet doxygen_snippets.dox? tp_send_req_by_short_zdo_test_profile_c
  */
 void tp_send_req_by_short_ext(zb_uint16_t command_id,
-                            zb_uint8_t param,
+                            zb_bufid_t param,
                             zb_uint16_t profile_id,
                             zb_uint16_t addr,
                             zb_uint8_t addr_mode,
@@ -318,7 +318,7 @@ void tp_send_req_by_short_ext(zb_uint16_t command_id,
     @snippet tp_r21_bv-25_gzr_r.c zb_tp_transmit_counted_packets_req_ext
 
  */
-void zb_tp_transmit_counted_packets_req_ext(zb_uint8_t param, zb_callback_t cb);
+void zb_tp_transmit_counted_packets_req_ext(zb_bufid_t param, zb_callback_t cb);
 
 
 /**
@@ -336,7 +336,7 @@ void zb_tp_transmit_counted_packets_req_ext(zb_uint8_t param, zb_callback_t cb);
    @snippet doxygen_snippets.dox tp_send_req_by_short_zdo_test_profile_c
  */
 void tp_send_req_by_short(zb_uint16_t command_id,
-                          zb_uint8_t param,
+                          zb_bufid_t param,
                           zb_uint16_t profile_id,
                           zb_uint16_t addr,
                           zb_uint8_t addr_mode,
@@ -354,7 +354,7 @@ void tp_send_req_by_short(zb_uint16_t command_id,
     @snippet tp_aps_bv_09_zc.c zb_tp_transmit_counted_packets_req
 
  */
-void zb_tp_transmit_counted_packets_req(zb_uint8_t param, zb_callback_t cb);
+void zb_tp_transmit_counted_packets_req(zb_bufid_t param, zb_callback_t cb);
 
 /**
     Send ACK
@@ -363,7 +363,7 @@ void zb_tp_transmit_counted_packets_req(zb_uint8_t param, zb_callback_t cb);
 
     Internal
  */
-void tp_packet_ack(zb_uint8_t param);
+void tp_packet_ack(zb_bufid_t param);
 
 /**
     Send packet
@@ -374,7 +374,7 @@ void tp_packet_ack(zb_uint8_t param);
     @snippet TP_PRO_BV-46/tp_pro_bv-46_zc.c tp_pro_bv-46_zc
 
  */
-void zb_tp_buffer_test_request(zb_uint8_t param, zb_callback_t cb);
+void zb_tp_buffer_test_request(zb_bufid_t param, zb_callback_t cb);
 
 /**
     Send packet
@@ -385,7 +385,7 @@ void zb_tp_buffer_test_request(zb_uint8_t param, zb_callback_t cb);
     @snippet tp_zdo_bv_12_zed1.c zb_tp_buffer_test_request_EP
 
  */
-void zb_tp_buffer_test_request_EP(zb_uint8_t param, zb_callback_t cb);
+void zb_tp_buffer_test_request_EP(zb_bufid_t param, zb_callback_t cb);
 
 /**
     Send packet broadcast
@@ -409,19 +409,19 @@ void zb_tp_buffer_test_request_EP_brdcast(zb_uint8_t param, zb_callback_t cb);
     }
     @endcode
  */
-void zb_tp_device_announce(zb_uint8_t param);
+void zb_tp_device_announce(zb_bufid_t param);
 
-void zb_send_buf_test_req_signal(zb_uint8_t param, zb_ret_t status);
+void zb_send_buf_test_req_signal(zb_bufid_t param, zb_ret_t status);
 
 #ifdef USE_COUNTER_RES_REQ
-void zb_tp_retrive_packet_count(zb_uint8_t param);
+void zb_tp_retrive_packet_count(zb_bufid_t param);
 #endif
 
 #if defined ZB_PRO_STACK && defined ZB_TEST_CUSTOM_LINK_STATUS && defined ZB_ROUTER_ROLE
 /* Custom link status command for testing purpose only
  * (allow to send cmd from some predefined address)
  */
-zb_bool_t zb_tp_send_link_status_command(zb_uint8_t param, zb_uint16_t short_addr);
+zb_bool_t zb_tp_send_link_status_command(zb_bufid_t param, zb_uint16_t short_addr);
 #endif
 
 #endif /* #ifdef ZB_TEST_PROFILE */

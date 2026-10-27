@@ -374,7 +374,7 @@ typedef struct zb_zcl_ota_upgrade_server_insert_file_s
  *
  * @note OTA file must be saved in memory until call zb_zcl_ota_upgrade_remove_file
 */
-zb_ret_t zb_zcl_ota_upgrade_insert_file(zb_uint8_t param);
+zb_ret_t zb_zcl_ota_upgrade_insert_file(zb_bufid_t param);
 
 #define ZB_ZCL_OTA_UPGRADE_INSERT_FILE(buf, ep, i, file, upgrade_tm, notify, ret_code) \
 {                                                                       \
@@ -404,7 +404,7 @@ typedef struct zb_zcl_ota_upgrade_server_remove_file_s
  *
  * @note After calling this command OTA file may be removed from memory
 */
-zb_ret_t zb_zcl_ota_upgrade_remove_file(zb_uint8_t param);
+zb_ret_t zb_zcl_ota_upgrade_remove_file(zb_bufid_t param);
 
 #define ZB_ZCL_OTA_UPGRADE_REMOVE_FILE(buf, ep, i, ret_code)        \
 {                                                                   \
@@ -500,7 +500,7 @@ typedef ZB_PACKED_PRE struct zb_zcl_ota_upgrade_srv_upgrade_end_param_s
  * For client initiate search Upgrade server
  @param param - empty buffer
 */
-void zb_zcl_ota_upgrade_init_client(zb_uint8_t param);
+void zb_zcl_ota_upgrade_init_client(zb_cb_param_t param);
 
 /** @brief Start OTA Upgrade client with pre-defined OTA Upgrade Server attributes
  * (without Service Discovery)
@@ -520,7 +520,7 @@ void zb_zcl_ota_upgrade_stop_client(void);
  *  @param param - buffer to be resumed
  *  @param upgrade_status - application upgrade status @see zb_zcl_ota_upgrade_status_e
  */
-void zb_zcl_ota_upgrade_resume_client(zb_uint8_t param, zb_uint8_t upgrade_status);
+void zb_zcl_ota_upgrade_resume_client(zb_bufid_t param, zb_uint8_t upgrade_status);
 
 /*! @brief Set Frequency request server about new upgrade file (minutes)
  * @param endpoint - endpoint of the OTA cluster
@@ -546,7 +546,7 @@ typedef struct zb_zcl_ota_upgrade_client_variable_s
   zb_uint16_t hw_version;
   zb_uint8_t max_data_size;
   zb_uint8_t img_block_req_sent;
-  zb_uint8_t pending_img_block_resp;
+  zb_bufid_t pending_img_block_resp;
 } zb_zcl_ota_upgrade_client_variable_t;
 
 #endif /* defined ZB_HA_ENABLE_OTA_UPGRADE_CLIENT || defined DOXYGEN */
@@ -2184,7 +2184,7 @@ void zb_zcl_ota_upgrade_set_ota_status(zb_uint8_t endpoint, zb_uint8_t status);
 
 zb_uint8_t zb_zcl_ota_upgrade_get_ota_status(zb_uint8_t endpoint);
 
-void zb_zcl_ota_upgrade_send_upgrade_end_req(zb_uint8_t param, zb_uint8_t status);
+void zb_zcl_ota_upgrade_send_upgrade_end_req(zb_bufid_t param, zb_uint8_t status);
 
 void zb_zcl_ota_restart_after_rejoin(zb_uint8_t endpoint);
 
@@ -2205,10 +2205,10 @@ zb_ret_t zb_zcl_check_value_ota_upgrade(zb_uint16_t attr_id, zb_uint8_t endpoint
  *  @param endpoint - endpoint for OTA Upgrade
  *  @param param - buffer to be aborted
  */
-void zcl_ota_abort(zb_uint8_t endpoint, zb_uint8_t param);
+void zcl_ota_abort(zb_uint8_t endpoint, zb_bufid_t param);
 
 #ifdef ZB_ZCL_SUPPORT_CLUSTER_WWAH
-void zcl_ota_abort_and_set_tc(zb_uint8_t param);
+void zcl_ota_abort_and_set_tc(zb_cb_param_t param);
 #endif
 
 #endif /* defined ZB_HA_ENABLE_OTA_UPGRADE_CLIENT || defined DOXYGEN */

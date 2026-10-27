@@ -156,6 +156,16 @@ typedef struct zb_zcl_keep_alive_attrs_s
 #define ZB_ZCL_DECLARE_KEEP_ALIVE_ATTR_LIST(attr_list, attrs) \
     ZB_ZCL_DECLARE_KEEP_ALIVE_ATTR_LIST_FULL(attr_list, &attrs.base, &attrs.jitter )
 
+/** @brief Declare attributes static structure and attribute list for Keep-Alive cluster using default values.
+ *  @param attrs_name     attrs_name - name of static structure that contains Keep-Alive attributes.
+ *  @param attr_list_name attr_list_name - name of attribute list variable that may be used to declare cluster list.
+ */
+#define ZB_ZCL_DECLARE_KEEP_ALIVE_ATTRS_AND_LIST(attrs_name, attr_list_name)  \
+  static zb_zcl_keep_alive_attrs_t attrs_name = {                             \
+    .base = ZB_ZCL_ATTR_KEEP_ALIVE_TC_KEEP_ALIVE_BASE_DEFAULT_VALUE,          \
+    .jitter = ZB_ZCL_ATTR_KEEP_ALIVE_TC_KEEP_ALIVE_JITTER_DEFAULT_VALUE       \
+  };                                                                          \
+  ZB_ZCL_DECLARE_KEEP_ALIVE_ATTR_LIST(attr_list_name, attrs_name)
 
 /*! @} */ /* Keep-Alive cluster definitions */
 

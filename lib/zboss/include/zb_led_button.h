@@ -169,21 +169,21 @@ void zb_osif_led_button_init(void);
  *
  * @param led_no - id of the LED in board (check platform specific headers to identify LED)
  */
-void zb_osif_led_on(zb_uint8_t led_no);
+void zb_osif_led_on(zb_cb_param_t led_no);
 
 /* Set a LED off
  * It must be initialized first.
  *
  * @param led_no - id of the LED in board (check platform specific headers to identify LED)
  */
-void zb_osif_led_off(zb_uint8_t led_no);
+void zb_osif_led_off(zb_cb_param_t led_no);
 
 /* Invert a LED off
  * It must be initialized first.
  *
  * @param led_no - id of the LED in board (check platform specific headers to identify LED)
  */
-void zb_osif_led_toggle(zb_uint8_t led_no);
+void zb_osif_led_toggle(zb_cb_param_t led_no);
 
 
 /* Get the current button tate
@@ -202,7 +202,7 @@ zb_bool_t zb_osif_button_state(zb_uint8_t arg);
  */
 zb_bool_t zb_setup_buttons_cb(zb_callback_t cb);
 
-void zb_osif_button_cb(zb_uint8_t arg);
+void zb_osif_button_cb(zb_cb_param_t arg);
 
 
 /* Button indexes utilized by applications

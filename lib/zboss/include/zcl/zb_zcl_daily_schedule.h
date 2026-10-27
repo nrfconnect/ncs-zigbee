@@ -561,7 +561,7 @@ typedef ZB_PACKED_PRE struct zb_zcl_daily_schedule_get_day_profile_payload_s
  * @param cb - Callback which should be called when the ZCL stack receives
  * APS ack.
  */
-void zb_zcl_daily_schedule_send_cmd_publish_schedule(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_daily_schedule_send_cmd_publish_schedule(zb_bufid_t param, const zb_addr_u *dst_addr,
                                                zb_aps_addr_mode_t dst_addr_mode,
                                                zb_uint8_t dst_ep, zb_uint8_t src_ep,
                                                const zb_zcl_daily_schedule_publish_schedule_payload_t *pl,
@@ -578,7 +578,7 @@ void zb_zcl_daily_schedule_send_cmd_publish_schedule(zb_uint8_t param, const zb_
  * @param cb - Callback which should be called when the ZCL stack receives
  * APS ack.
  */
-void zb_zcl_daily_schedule_send_cmd_publish_day_profile(zb_uint8_t param,
+void zb_zcl_daily_schedule_send_cmd_publish_day_profile(zb_bufid_t param,
   const zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep, zb_uint8_t src_ep,
   const zb_zcl_daily_schedule_publish_day_profile_payload_t *pl,
@@ -596,7 +596,7 @@ void zb_zcl_daily_schedule_send_cmd_publish_day_profile(zb_uint8_t param,
  * @param cb - Callback which should be called when the ZCL stack receives
  * APS ack.
  */
-void zb_zcl_daily_schedule_send_cmd_get_schedule(zb_uint8_t param,
+void zb_zcl_daily_schedule_send_cmd_get_schedule(zb_bufid_t param,
   const zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep, zb_uint8_t src_ep,
   const zb_zcl_daily_schedule_get_schedule_payload_t *pl,
@@ -614,7 +614,7 @@ void zb_zcl_daily_schedule_send_cmd_get_schedule(zb_uint8_t param,
  * @param cb - Callback which should be called when the ZCL stack receives
  * APS ack.
  */
-void zb_zcl_daily_schedule_send_cmd_get_day_profile(zb_uint8_t param,
+void zb_zcl_daily_schedule_send_cmd_get_day_profile(zb_bufid_t param,
   const zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep, zb_uint8_t src_ep,
   const zb_zcl_daily_schedule_get_day_profile_payload_t *pl,
@@ -631,7 +631,7 @@ void zb_zcl_daily_schedule_send_cmd_get_day_profile(zb_uint8_t param,
  * @param cb - Callback which should be called when the ZCL stack receives
  * APS ack.
  */
-void zb_zcl_daily_schedule_send_cmd_get_schedule_cancellation(zb_uint8_t param,
+void zb_zcl_daily_schedule_send_cmd_get_schedule_cancellation(zb_bufid_t param,
   const zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep, zb_uint8_t src_ep,
   zb_callback_t cb
@@ -648,7 +648,7 @@ void zb_zcl_daily_schedule_send_cmd_get_schedule_cancellation(zb_uint8_t param,
  * @param cb - Callback which should be called when the ZCL stack receives
  * APS ack.
  */
-void zb_zcl_daily_schedule_send_cmd_cancel_schedule(zb_uint8_t param,
+void zb_zcl_daily_schedule_send_cmd_cancel_schedule(zb_bufid_t param,
   const zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep, zb_uint8_t src_ep,
   const zb_zcl_daily_schedule_cancel_schedule_payload_t *pl,
@@ -664,7 +664,7 @@ void zb_zcl_daily_schedule_send_cmd_cancel_schedule(zb_uint8_t param,
  * @param cb - Callback which should be called when the ZCL stack receives
  * APS ack.
  */
-void zb_zcl_daily_schedule_send_cmd_cancel_all_schedules(zb_uint8_t param,
+void zb_zcl_daily_schedule_send_cmd_cancel_all_schedules(zb_bufid_t param,
   const zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep, zb_uint8_t src_ep,
   zb_callback_t cb

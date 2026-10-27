@@ -47,7 +47,6 @@
 #ifdef ZB_TEST_PROFILE
 #include "zb_test_profile.h"
 #endif /* ZB_TEST_PROFILE */
-#include "zb_zdo_rjb.h"
 #include "zb_zdo.h"
 #include "zdo_diagnostics.h"
 #include "zboss_api_zdo.h"
@@ -130,20 +129,20 @@ typedef struct zp_zdo_handle_s
   zb_bitbool_t channel_update_disabled:1;   /*!< if !0, Channel update is disabled */
   zb_bitbool_t tx_fail_debug_enabled:1;     /*!< if !0, ZC broadcasts zdo_unsol_enh_update_notify with tx failures info */
   zb_bitbool_t local_leave_in_progress:1;   /*!< if !0, Local leave is in progress */
-  zb_uint8_t permit_joining_param;          /*!< if !0, nlme-permit_joining will
+  zb_bufid_t permit_joining_param;          /*!< if !0, nlme-permit_joining will
                                              * be executed */
   zb_uint8_t permit_duration;               /*!< data for permit_joining */
-  zb_uint8_t dev_annce_param;               /*!< if !0, this is buffer id - device announce
+  zb_bufid_t dev_annce_param;               /*!< if !0, this is buffer id - device announce
                                              * is sent */
-  zb_uint8_t key_sw;                        /*!< if !0, key switch is sent and must switch
+  zb_bufid_t key_sw;                        /*!< if !0, key switch is sent and must switch
                                              * the key after this buffer sent  */
-  zb_uint8_t mgmt_leave_resp_buf;           /*!< if !0, nlme_leave_request for itself will be executed
+  zb_bufid_t mgmt_leave_resp_buf;           /*!< if !0, nlme_leave_request for itself will be executed
                                              * set after device was requested to leave the network
                                              * via mgmt_leave_req */
-  zb_uint8_t key_upd_resp_param;            /* if !0, this is buffer id - key update resp is sent */
-  zb_uint8_t verify_key_param;              /* if !0, this is buffer id - verify key is sent */
-  zb_uint8_t secur_challenge_rsp_param;     /* if !0, this is buffer id - sec_callenge_rsp is sent */
-  zb_uint8_t auth_token_rsp_param;          /* if !0, this is buffer id - get_auth_token_rsp is sent */
+  zb_bufid_t key_upd_resp_param;            /* if !0, this is buffer id - key update resp is sent */
+  zb_bufid_t verify_key_param;              /* if !0, this is buffer id - verify key is sent */
+  zb_bufid_t secur_challenge_rsp_param;     /* if !0, this is buffer id - sec_callenge_rsp is sent */
+  zb_bufid_t auth_token_rsp_param;          /* if !0, this is buffer id - get_auth_token_rsp is sent */
   zb_zdo_rejoin_ctx_t rejoin_ctx;
 #ifdef ZB_MACSPLIT_HOST
   zb_bool_t start_no_autostart;              /*!< if ZB_TRUE, device started with start_no_autostart
@@ -255,7 +254,7 @@ typedef struct zb_joining_list_ctx_s
   zb_uint8_t tsn;
   zb_uint16_t dst_addr;
   zb_callback_t broadcast_confirm_cb;
-  zb_uint8_t original_buffer;
+  zb_bufid_t original_buffer;
 
   /* context for announce */
   zb_uint8_t next_start_index;
@@ -303,9 +302,10 @@ typedef struct zb_zdo_channel_panid_change_ctx_s
   zb_bool_t is_panid_change;
   zb_uint16_t next_panid;
   zb_uint32_t next_channel;
-  zb_uint8_t current_key_pair_idx;
+  zb_aps_key_pair_ref_t current_key_pair_idx;
   zb_uint16_t error_cnt;
   zb_bool_t reiterated;
+  zb_uint8_t nwk_key_sec_num;
   zb_callback_t cb;
 } zb_zdo_channel_panid_change_ctx_t;
 
@@ -352,6 +352,19 @@ typedef struct zb_zdo_globals_s
   zb_uint8_t      flags;                            /*!< */
   zb_bitfield_t   zdo_ed_scan_busy:1;
   zb_bitfield_t   leave_req_allowed:1; /*! allow/deny ZDO leave request */
+
+  /*!
+   * Policy of switch key errors processing
+   *
+   * @see ZB_ZDO_SWITCH_KEY_ERROR_PROCESSING_AUTOMATICALLY - ZCL Keepalive polling will be restarted to ping TC:
+   * - if successful, nothing will be done;
+   * - in case of error TC rejoin will be performed.
+   *
+   * @see ZB_ZDO_SWITCH_KEY_ERROR_PROCESSING_MANUALLY - @see ZB_ZDO_SWITCH_KEY_ERROR signal
+   * will be sent to the application, that should make a decision
+   */
+  zb_bitfield_t   switch_key_err_proc_policy:1;
+
   zb_uint8_t      long_timer; /*!< Long timer, in minutes */
   zb_callback_t   long_timer_cb; /*!< Callback for long timer */
   zb_uint8_t      long_timer_param; /*!< Parameter for long timer */
@@ -389,13 +402,6 @@ typedef struct zb_zdo_globals_s
       zb_bitfield_t enhanced:1;
     }
     nwk_upd_req;
-    struct zb_get_peer_short_addr_s
-    {
-      zb_address_ieee_ref_t dst_addr_ref;   /*!< */
-      zb_callback_t cb;                     /*!< */
-      zb_uint8_t param;                     /*!< */
-    }
-    get_short_addr_ctx;
 #ifndef ZB_LITE_NO_END_DEVICE_BIND
     struct zb_zdo_end_device_bind_ctx_s
     {
@@ -405,7 +411,7 @@ typedef struct zb_zdo_globals_s
 
       struct zb_zdo_bind_device_info_s
       {
-        zb_uint8_t end_device_bind_param; /*!< Reference to buffer with
+        zb_bufid_t end_device_bind_param; /*!< Reference to buffer with
                                            * end_device_bind_req command */
         zb_uint16_t binding_target;  /*!< The address of the target for the binding */
         zb_uint8_t  src_endp;        /*!< The endpoint on the binding device */
@@ -439,10 +445,6 @@ typedef struct zb_zdo_globals_s
   test_prof_ctx;
 #endif
 
-#ifdef ZB_REJOIN_BACKOFF
-  zb_zdo_rejoin_backoff_t zdo_rejoin_backoff;
-#endif
-
   zb_device_annce_cb_t device_annce_cb;  /*!< This CB is called on receiving device_annce command */
   zb_callback_t leave_ind_cb;  /*!< Callback for NWK leave indication from child */
   zb_zdo_responce_cb_t zb_zdo_responce_cb;
@@ -459,28 +461,19 @@ typedef struct zb_zdo_globals_s
 
   zb_uint8_t nwk_upd_notify_pkt_limit;
 
+  /* Array to store buf ref and tsn for nwk_addr/node_desc at parallel requests */
 #ifndef ZB_CONFIGURABLE_MEM
-  zb_uint8_t nwk_addr_req_pending_tsns[ZB_N_BUF_IDS]; /* Address search feature: TSNs of nwk_addr_req pkt for
-                                             * every buffer */
-  zb_uint8_t nwk_addr_req_pending_mask[(ZB_N_BUF_IDS + 7U) / 8U];  /* Address search feature: mask of pending pkt for
-                                             * every buffer */
+  zb_parallel_nwk_addr_and_node_req_t nwk_node_parallel_req[ZB_N_PARALLEL_NWK_NODE_REQ];
 #else
-  /* Pointers are set in zb_init_configurable_mem() */
-  zb_uint8_t *nwk_addr_req_pending_tsns;
-  zb_uint8_t *nwk_addr_req_pending_mask;
+  zb_parallel_nwk_addr_and_node_req_t *nwk_node_parallel_req;
 #endif  /* ZB_CONFIGURABLE_MEM */
-
-#ifdef APS_FRAGMENTATION
-#ifndef ZB_CONFIGURABLE_MEM
-  zb_uint8_t node_desc_req_pending_mask[(ZB_N_BUF_IDS + 7U) / 8U];  /* Node Desc feature: mask of pending pkt for
-                                             * every buffer */
-#else
-  zb_uint8_t *node_desc_req_pending_mask;
-#endif /* ZB_CONFIGURABLE_MEM */
-#endif /* APS_FRAGMENTATION */
 
   zb_callback_t continue_start_after_nwk_cb;
   zb_callback_t nlme_reset_cb;
+  zb_callback_t ed_timeout_cb; /*!< Cb to ZDO. Needed to notify it about ED timeout response status.
+                                    It is set only on first ED timeout req attempt after join/rejoin/resuming normal operation on network.
+                                    It is cleared on reception of ED timeout response (or after timeout on nwk layer).
+                                    Buffer should contain zb_nwk_ed_timeout_response_param_t in its tail. */
 
 #ifdef ZB_FILTER_OUT_CLUSTERS
   zdo_cluster_filters_t cluster_filters;
@@ -517,6 +510,7 @@ typedef struct zb_zdo_globals_s
   zb_zdo_channel_panid_change_ctx_t channel_panid_change_ctx;
 #endif
 } zb_zdo_globals_t;
+ZB_ASSERT_COMPILE_DECL(ZB_N_PARALLEL_NWK_NODE_REQ < ZB_UINT8_MAX);
 
 #define ZDO_CTX() ZG->zdo
 
@@ -527,6 +521,11 @@ typedef struct zb_zdo_globals_s
 
 #if defined ZB_COORDINATOR_ROLE
 #define CHANNEL_PANID_CHANGE_CTX() ZDO_CTX().channel_panid_change_ctx
+/* NWK key update procedure uses the same logic as channel/panid change, so we can reuse this context.
+ * Note: only one procedure can be performed at a time - channel change, pan_id change or nwk key update */
+#define NWK_KEY_CHANGE_CTX() ZDO_CTX().channel_panid_change_ctx
+#define ZB_NWK_KEY_SEQ_NUM_UNUSED (0xffu)
+#define ZB_NWK_KEY_UPDATE_DELAY (ZB_MILLISECONDS_TO_BEACON_INTERVAL(250U))
 #endif
 
 #if defined(ZDO_DIAGNOSTICS)
@@ -551,27 +550,27 @@ typedef struct zb_zdo_globals_s
 #endif /* !NCP_MODE_HOST */
 
 /* Converts a buffer with data into a packed signal with the data */
-void zb_app_signal_pack_with_data(zb_uint8_t param, zb_uint32_t signal_code, zb_int16_t status);
+void zb_app_signal_pack_with_data(zb_bufid_t param, zb_uint32_t signal_code, zb_int16_t status);
 /* Buffer is replaced with signal information, data_size bytes are reserved for additional signal data */
-void *zb_app_signal_pack(zb_uint8_t param, zb_uint32_t signal_code, zb_int16_t status, zb_uint8_t data_size);
+void *zb_app_signal_pack(zb_bufid_t param, zb_uint32_t signal_code, zb_int16_t status, zb_uint8_t data_size);
 
-void *zb_app_signal_pack_with_detailed_status(zb_uint8_t param, zb_uint32_t signal_code,
+void *zb_app_signal_pack_with_detailed_status(zb_bufid_t param, zb_uint32_t signal_code,
                                               zb_ret_t status, zb_uint8_t data_size);
 /* NWK channel manager */
-void zb_zdo_check_channel_conditions(zb_uint8_t param);
+void zb_zdo_check_channel_conditions(zb_cb_param_t param);
 
 #if defined ZB_JOINING_LIST_SUPPORT && defined ZB_ROUTER_ROLE
-zb_bool_t zb_ieee_joining_list_schedule(zb_callback_t func, zb_uint8_t param);
+zb_bool_t zb_ieee_joining_list_schedule(zb_callback_t func, zb_bufid_t param);
 void zb_ieee_joining_list_cb_completed(void);
 void zb_ieee_joining_list_op_delay(void);
-zb_bool_t zb_ieee_joining_list_put_cb(zb_callback_t func, zb_uint8_t param);
+zb_bool_t zb_ieee_joining_list_put_cb(zb_callback_t func, zb_bufid_t param);
 void zb_joining_list_reset_clear_timer(void);
 #endif /* defined ZB_JOINING_LIST_SUPPORT && defined ZB_ROUTER_ROLE */
 
-void zb_zdo_forced_parent_link_failure(zb_uint8_t param);
+void zb_zdo_forced_parent_link_failure(zb_cb_param_t param);
 
 #ifdef SNCP_MODE
-void zb_zdo_poll_parent_single(zb_uint8_t param, zb_callback_t cb);
+void zb_zdo_poll_parent_single(zb_bufid_t param, zb_callback_t cb);
 #endif
 
 /*! @endcond */

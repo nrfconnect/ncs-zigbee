@@ -44,6 +44,7 @@
 #define ZB_TRACE_FILE_ID 13982
 
 #include "zb_common.h"
+#include "zb_zcl.h"
 
 /*
  * Check if WWAH server behaviour is enabled

@@ -138,14 +138,6 @@
  */
 typedef zb_uint8_t zb_nwk_status_t;
 
-/** @brief Multicast types mode. */
-typedef enum zb_nwk_multicast_mode_e
-{
-  ZB_NWK_MULTICAST_MODE_NONMEMBER                    = 0x00, /**< Multicast non-member mode*/
-  ZB_NWK_MULTICAST_MODE_MEMBER                       = 0x01  /**< Multicast member mode*/
-}
-zb_nwk_multicast_mode_t;
-
 /**
  * @name NLDE non-spec extension values
  * @anchor nlde_tx_opt
@@ -207,9 +199,6 @@ typedef struct zb_nlde_data_req_s
                                   * through the network. */
   zb_uint8_t addr_mode;    /**< The type of destination address supplied by the DstAddr parameter,
                              * see @ref address_modes  */
-  zb_uint8_t nonmember_radius; /**< The distance, in hops, that a multicast frame will be relayed
-                                 * by nodes not a member of the group. A value of 0x07 is treated
-                                 * as infinity.  */
   zb_uint8_t discovery_route; /**< The DiscoverRoute parameter may be used to control route
                                 * discovery operations for the transit of this frame (see
                                 * sub-clause3.6.3.5): 0x00 = suppress route discovery 0x01 = enable
@@ -259,7 +248,7 @@ typedef struct zb_nlde_data_req_s
   * This function return immediately.
   *
   * Later @ref zb_nlde_data_confirm will be called to pass NLDE-DATA.request result up.
-  * @param param - parameters structure, see @ref zb_nlde_data_req_t. This variable does not pass
+  * @param cb_param - parameters structure, see @ref zb_nlde_data_req_t. This variable does not pass
   * to other levels, so it can be local variable in the caller.
   * @b Example:
   * @code
@@ -285,7 +274,7 @@ typedef struct zb_nlde_data_req_s
   *   }
   * @endcode
   */
-void zb_nlde_data_request(zb_uint8_t param);
+void zb_nlde_data_request(zb_cb_param_t cb_param);
 
 /** @brief NLDE-DATA.confirm primitive.
   *
@@ -294,25 +283,25 @@ void zb_nlde_data_request(zb_uint8_t param);
   * @note zb_nlde_data_confirm must be defined in the APS layer!
   * NWK layer just calls this function.  NWK and lower lagers does not free nsdu. APS must do it (or it can reuse
   * it, transmit to the another address etc).
-  * @param param - sent packet, see @ref zb_buf_t. APS must free or reuse it. Following packet
+  * @param cb_param - sent packet, see @ref zb_buf_t. APS must free or reuse it. Following packet
   * fields are used:
   * @li status - The status of the corresponding request. Can take values: INVALID_REQUEST,
   * MAX_FRM_COUNTER, NO_KEY, BAD_CCM_OUTPUT, ROUTE_ERROR, BT_TABLE_FULL, FRAME_NOT_BUFFERED or any
   * status values returned from security suite or the MCPS-DATA.confirm primitive.
   * @li handle - The handle associated with the NSDU being confirmed.
  */
-void zb_nlde_data_confirm(zb_uint8_t param);
+void zb_nlde_data_confirm(zb_cb_param_t cb_param);
 
 /** @brief NLDE-DATA.indication primitive.
   *
   * This function called via scheduler by the NWK layer to pass incoming data packet to the APS
   * layer.
   * @note zb_nlde_data_indication() must be defined in the APS layer! WK layer just calls this function.
-  * @param param - The set of octets comprising the NSDU to be transferred (with length).
+  * @param cb_param - The set of octets comprising the NSDU to be transferred (with length).
   *
   * Other fields got from MAC nsdu by macros
   */
-void zb_nlde_data_indication(zb_uint8_t param);
+void zb_nlde_data_indication(zb_cb_param_t cb_param);
 
 /** @} */ /* NWK data service. */
 
@@ -346,7 +335,7 @@ zb_nlme_get_request_t;
   * @snippet start_ze.c zb_nlme_get_request
   *
   */
-void zb_nlme_get_request(zb_uint8_t param);
+void zb_nlme_get_request(zb_bufid_t param);
 
 /** @brief Arguments of the NLME-GET.confirm routine. */
 typedef ZB_PACKED_PRE struct zb_nlme_get_confirm_s
@@ -376,7 +365,7 @@ zb_nlme_set_request_t;
   * @snippet start_ze.c zb_nlme_set_request
   *
   */
-void zb_nlme_set_request(zb_uint8_t param);
+void zb_nlme_set_request(zb_bufid_t param);
 
 /** @brief Arguments of the NLME-SET.confirm routine. */
 typedef ZB_PACKED_PRE struct zb_nlme_set_confirm_s
@@ -405,10 +394,10 @@ typedef zb_zdo_active_scan_request_t zb_nlme_network_discovery_request_t;
    zb_nlme_network_discovery_request_t
    @return nothing
  */
-void zb_nlme_network_discovery_request(zb_uint8_t param);
+void zb_nlme_network_discovery_request(zb_cb_param_t param);
 
 
-void zb_nwk_cancel_network_discovery(zb_bufid_t buf);
+void zb_nwk_cancel_network_discovery(zb_cb_param_t buf);
 
 
 typedef zb_zdo_active_scan_resp_t zb_nlme_network_discovery_confirm_t;
@@ -429,7 +418,7 @@ typedef zb_zdo_active_scan_resp_t zb_nlme_network_discovery_confirm_t;
  * ZB_SCHEDULE_CALLBACK(zb_nlme_network_discovery_confirm, param);
  * @endcode
  */
-void zb_nlme_network_discovery_confirm(zb_uint8_t param);
+void zb_nlme_network_discovery_confirm(zb_cb_param_t param);
 
 #endif /* ZB_JOIN_CLIENT */
 
@@ -465,9 +454,9 @@ zb_nlme_network_formation_request_t;
 
    @snippet zdo_app.c zb_nlme_network_formation_request
  */
-void zb_nlme_network_formation_request(zb_uint8_t param);
+void zb_nlme_network_formation_request(zb_cb_param_t cb_param);
 
-void zb_nwk_cancel_network_formation(zb_bufid_t param);
+void zb_nwk_cancel_network_formation(zb_cb_param_t param);
 
 #endif /* ZB_FORMATION */
 
@@ -490,8 +479,31 @@ zb_nlme_network_formation_confirm_t;
    zb_nlme_network_formation_confirm_t
    @return RET_OK on success, error code otherwise.
  */
-void zb_nlme_network_formation_confirm(zb_uint8_t param);
+void zb_nlme_network_formation_confirm(zb_cb_param_t param);
 #endif /* ZB_FORMATION */
+
+/**
+   Arguments of the NLME-PERMIT_JOINING.request routine.
+*/
+typedef ZB_PACKED_PRE struct zb_nlme_permit_joining_request_s
+{
+  zb_uint8_t permit_duration; /**< Time in seconds during which the coordinator
+                               * or router will allow associations */
+} ZB_PACKED_STRUCT
+zb_nlme_permit_joining_request_t;
+
+/**
+   NLME-PERMIT-JOINING.request primitive
+
+   Allow/disallow network joining
+
+   @param param - buffer containing parameters - @see
+   zb_nlme_network_formation_request_t
+   @return RET_OK on success, error code otherwise.
+
+   Use zb_zdo_mgmt_permit_joining_req() instead.
+ */
+void zb_nlme_permit_joining_request(zb_cb_param_t param);
 
 /**
    Arguments of the NLME-NETWORK-FORMATION.confirm routine.
@@ -513,7 +525,7 @@ zb_nlme_permit_joining_confirm_t;
 
    @snippet nwk_cr_permit_join.c zb_nlme_permit_joining_confirm
  */
-void zb_nlme_permit_joining_confirm(zb_uint8_t param);
+void zb_nlme_permit_joining_confirm(zb_cb_param_t param);
 
 /**
    Arguments of the NLME-START-ROUTER.request routine.
@@ -539,7 +551,7 @@ zb_nlme_start_router_request_t;
    @snippet nwk_route_disc/nwk_route_discovery.c zb_nlme_start_router_request
 
  */
-void zb_nlme_start_router_request(zb_uint8_t param);
+void zb_nlme_start_router_request(zb_cb_param_t param);
 
 /**
    Arguments of the NLME-START-ROUTER.confirm routine.
@@ -563,7 +575,7 @@ zb_nlme_start_router_confirm_t;
      NWK_CONFIRM_STATUS((zb_bufid_t )ZB_BUF_FROM_REF(param), ZB_NWK_STATUS_INVALID_REQUEST, zb_nlme_start_router_confirm);
    @endcode
  */
-void zb_nlme_start_router_confirm(zb_uint8_t param);
+void zb_nlme_start_router_confirm(zb_cb_param_t param);
 
 
 /* ED Scan functions were under ZB_ROUTER_ROLE ifdef,
@@ -574,11 +586,11 @@ void zb_nlme_start_router_confirm(zb_uint8_t param);
 
    Start energy scan
 
-   @param param - buffer containing parameters - @see
+   @param cb_param - buffer containing parameters - @see
    zb_nlme_ed_scan_request_t
    @return RET_OK on success, error code otherwise.
  */
-void zb_nlme_ed_scan_request(zb_uint8_t param);
+void zb_nlme_ed_scan_request(zb_cb_param_t cb_param);
 
 /**
    Arguments of the NLME-ED-SCAN.confirm routine.
@@ -600,7 +612,7 @@ zb_nlme_ed_scan_confirm_t;
    zb_nlme_ed_scan_confirm_t
    @return RET_OK on success, error code otherwise.
  */
-void zb_nlme_ed_scan_confirm(zb_uint8_t param);
+void zb_nlme_ed_scan_confirm(zb_cb_param_t param);
 
 /**
  *  @brief Parameters of the custom NLME-BEACON-SURVEY.request
@@ -621,13 +633,13 @@ ZB_PACKED_STRUCT zb_nlme_beacon_survey_scan_request_t;
  *  @param param - buffer containing
  *         @zb_nlme_beacon_survey_scan_request_t
  */
-void zb_nlme_beacon_survey_scan(zb_uint8_t param);
+void zb_nlme_beacon_survey_scan(zb_cb_param_t param);
 
 /**
  *  @brief Report the results of the Beacon Survey scan
  *  @param param - buffer containing @zb_mac_scan_confirm_t
  */
-void zb_nlme_beacon_survey_scan_confirm(zb_uint8_t param);
+void zb_nlme_beacon_survey_scan_confirm(zb_bufid_t param);
 
 /**
    Network join method.
@@ -685,7 +697,7 @@ zb_nlme_join_request_t;
    @snippet nwk_leave/zdo_start_zr.c zb_nlme_join_request
 
  */
-void zb_nlme_join_request(zb_uint8_t param);
+void zb_nlme_join_request(zb_cb_param_t cb_param);
 
 /**
    Arguments of the NLME-JOIN.indication routine.
@@ -715,7 +727,7 @@ zb_nlme_join_indication_t;
    zb_nlme_join_indication_t
    @return RET_OK on success, error code otherwise.
  */
-void zb_nlme_join_indication(zb_uint8_t param);
+void zb_nlme_join_indication(zb_cb_param_t param);
 
 /**
    Arguments of the NLME-JOIN.confirm routine.
@@ -740,7 +752,7 @@ zb_nlme_join_confirm_t;
 
    @snippet doxygen_snippets.dox zb_nlme_join_confirm_nwk_nwk_join_c
  */
-void zb_nlme_join_confirm(zb_uint8_t param);
+void zb_nlme_join_confirm(zb_cb_param_t param);
 
 /**
    Arguments of the NLME-DIRECT-JOIN.request routine.
@@ -762,7 +774,7 @@ zb_nlme_direct_join_request_t;
    zb_nlme_direct_join_request_t
    @return RET_OK on success, error code otherwise.
  */
-void zb_nlme_direct_join_request(zb_uint8_t param);
+void zb_nlme_direct_join_request(zb_cb_param_t param);
 #endif /* ZB_ENABLE_ZLL && ZB_ROUTER_ROLE */
 
 /**
@@ -785,7 +797,7 @@ zb_nlme_direct_join_confirm_t;
    zb_nlme_direct_join_confirm_t
    @return RET_OK on success, error code otherwise.
  */
-void zb_nlme_direct_join_confirm(zb_uint8_t param);
+void zb_nlme_direct_join_confirm(zb_cb_param_t param);
 #endif /* ZB_ENABLE_ZLL && ZB_ROUTER_ROLE */
 
 /**
@@ -804,12 +816,12 @@ zb_nlme_leave_request_t;
 
    Leave the network
 
-   @param param - buffer containing parameters - @see
+   @param cb_param - buffer containing parameters - @see
    zb_nlme_leave_request_t
    @return RET_OK on success, error code otherwise.
 
  */
-void zb_nlme_leave_request(zb_uint8_t param);
+void zb_nlme_leave_request(zb_cb_param_t cb_param);
 
 /**
    NLME-LEAVE.indication primitive
@@ -824,7 +836,7 @@ void zb_nlme_leave_request(zb_uint8_t param);
     zb_nlme_leave_indication_t *request = NULL;
     request = ZB_BUF_GET_PARAM(ZB_BUF_FROM_REF(param), zb_nlme_leave_indication_t);
 
-    if (addr_ref == (zb_address_ieee_ref_t)-1)
+    if (addr_ref == ZB_ADDRESS_IEEE_REF_NONE)
     {
       ZB_IEEE_ADDR_ZERO(request->device_address);
     }
@@ -836,7 +848,7 @@ void zb_nlme_leave_request(zb_uint8_t param);
     ZB_SCHEDULE_CALLBACK(zb_nlme_leave_indication, param);
    @endcode
  */
-void zb_nlme_leave_indication(zb_uint8_t param);
+void zb_nlme_leave_indication(zb_cb_param_t param);
 
 /**
    Arguments of the NLME-LEAVE.confirm routine.
@@ -853,7 +865,7 @@ zb_nlme_leave_confirm_t;
 
    Report the results of the direct join request.
 
-   @param param - buffer containing results - @see
+   @param cb_param - buffer containing results - @see
    zb_nlme_leave_confirm_t
    @return RET_OK on success, error code otherwise.
 
@@ -871,7 +883,7 @@ zb_nlme_leave_confirm_t;
       ZB_SCHEDULE_CALLBACK(zb_nlme_leave_confirm, param);
    @endcode
  */
-void zb_nlme_leave_confirm(zb_uint8_t param);
+void zb_nlme_leave_confirm(zb_cb_param_t cb_param);
 
 /**
    Arguments of the NLME-RESET.request routine.
@@ -893,7 +905,7 @@ zb_nlme_reset_request_t;
 
    @snippet zdo_app.c zb_nlme_reset_request
  */
-void zb_nlme_reset_request(zb_uint8_t param);
+void zb_nlme_reset_request(zb_cb_param_t param);
 
 /**
    Arguments of the NLME-RESET.confirm routine.
@@ -917,7 +929,7 @@ zb_nlme_reset_confirm_t;
        NWK_CONFIRM_STATUS(buf, ZB_NWK_STATUS_INVALID_REQUEST, zb_nlme_reset_confirm);
    @endcode
  */
-void zb_nlme_reset_confirm(zb_uint8_t param);
+void zb_nlme_reset_confirm(zb_cb_param_t param);
 
 /**
    Arguments of the NLME-SYNC.request routine.
@@ -941,7 +953,7 @@ zb_nlme_sync_request_t;
 
    @snippet nwk_sync_ze.c zb_nlme_sync_request
  */
-void zb_nlme_sync_request(zb_uint8_t param);
+void zb_nlme_sync_request(zb_cb_param_t param);
 
 /**
    Arguments of the NLME-SYNC.confirm routine.
@@ -961,7 +973,7 @@ zb_nlme_sync_confirm_t;
    zb_nlme_sync_confirm_t
    @return RET_OK on success, error code otherwise.
  */
-void zb_nlme_sync_confirm(zb_uint8_t param);
+void zb_nlme_sync_confirm(zb_cb_param_t param);
 
 /**
    NLME-STATUS.indication primitive
@@ -979,7 +991,7 @@ void zb_nlme_sync_confirm(zb_uint8_t param);
     ZB_SCHEDULE_CALLBACK(zb_nlme_status_indication, param);
    @endcode
  */
-void zb_nlme_status_indication(zb_uint8_t param);
+void zb_nlme_status_indication(zb_cb_param_t param);
 
 /**
    Arguments of the NLME-ROUTE-DISCOVERY.request routine.
@@ -1005,7 +1017,7 @@ zb_nlme_route_discovery_request_t;
    @return RET_OK on success, error code otherwise.
 
  */
-void zb_nlme_route_discovery_request(zb_uint8_t param);
+void zb_nlme_route_discovery_request(zb_cb_param_t param);
 
 /**
    Arguments of the NLME-ROUTE-DISCOVERY.confirm routine.
@@ -1025,7 +1037,7 @@ zb_nlme_route_discovery_confirm_t;
    zb_nlme_route_discovery_confirm_t
    @return RET_OK on success, error code otherwise.
  */
-void zb_nlme_route_discovery_confirm(zb_uint8_t param);
+void zb_nlme_route_discovery_confirm(zb_cb_param_t param);
 #endif  /* #ifndef ZB_LITE_NO_NLME_ROUTE_DISCOVERY */
 
 /** @} */ /* NWK management service. */
@@ -1056,7 +1068,7 @@ zb_nlme_send_status_t;
 /** @brief Send status indication primitive.
   *
   * Send status to the remote device.
-  * @param param - request params, see @ref zb_nlme_send_status_s.
+  * @param cb_param - request params, see @ref zb_nlme_send_status_s.
   * @return nothing.
   * @b Example:
   * @code
@@ -1072,7 +1084,7 @@ zb_nlme_send_status_t;
   * }
   * @endcode
  */
-void zb_nlme_send_status(zb_uint8_t param);
+void zb_nlme_send_status(zb_cb_param_t cb_param);
 
 /**
    Send info about address redirects using Network Status command with non-standard code
@@ -1080,7 +1092,7 @@ void zb_nlme_send_status(zb_uint8_t param);
    @param param - buffer id or 0
    @param redir_cnt - nuymber of redirects in the address table
  */
-void zb_nlme_send_redirect_ref_status(zb_uint8_t param, zb_uint16_t redir_cnt);
+void zb_nlme_send_redirect_ref_status(zb_cb_param_t cb_param);
 
 /** @endcond */ /* internals_doc */
 
@@ -1188,27 +1200,6 @@ void zb_nwk_init(void);
   */
 #define ZB_LINK_QUALITY_1_IS_BETTER(lqi1, lqi2) ((lqi1) > (lqi2))
 
-
-#if defined ZB_PRO_STACK && !defined ZB_NO_NWK_MULTICAST
-/** @brief NWK multicast control. */
-typedef ZB_PACKED_PRE struct zb_nwk_multicast_control_field_s
-{
-  /* Better not use bitfields for protocols, use bitmask instead. But keep it now: multicast is already obsolete in r21. */
-#ifdef ZB_LITTLE_ENDIAN
-    zb_bitfield_t multicast_mode:2;          /**< */
-    zb_bitfield_t nonmember_radius:3;        /**< */
-    zb_bitfield_t max_nonmember_radius:3;    /**< */
-#else
-    zb_bitfield_t max_nonmember_radius:3;    /**< */
-    zb_bitfield_t nonmember_radius:3;        /**< */
-    zb_bitfield_t multicast_mode:2;          /**< */
-#endif
-} ZB_PACKED_STRUCT
-zb_nwk_multicast_control_field_t;
-#endif  /* multicast */
-
-#define ZB_NWK_MULTICAST_CONTROL_FIELD_SIZE 1U
-
 /** \par macros to manipulate with nwk packet header. */
 
 /** @brief NWK packet header.
@@ -1227,20 +1218,13 @@ typedef ZB_PACKED_PRE struct zb_nwk_nwk_hdr_s
   zb_uint8_t                       seq_num;             /**< Sequence Number */
   zb_ieee_addr_t                   dst_ieee_addr;       /**< Destination 64-bit address */
   zb_ieee_addr_t                   src_ieee_addr;       /**< Source 64-bit address */
-#if defined ZB_PRO_STACK && !defined ZB_NO_NWK_MULTICAST
-  zb_nwk_multicast_control_field_t mcast_control;       /**< NWK multicast control */
-#else
-  zb_uint8_t                       mcast_control;
-#endif
 } ZB_PACKED_STRUCT zb_nwk_hdr_t;
 
 typedef ZB_PACKED_PRE struct zb_nwk_alloc_hdr_req_s
 {
-#ifndef ZB_NO_NWK_MULTICAST
-  zb_bool_t      is_multicast;
-#endif
   zb_bool_t      is_secured;
   zb_bool_t      is_cmd_frame;
+  zb_bool_t      no_source_route;
   zb_bool_t      is_has_src_ieee;
   zb_bool_t      is_has_dst_ieee;
   zb_uint16_t    src_addr;
@@ -1333,23 +1317,6 @@ typedef ZB_PACKED_PRE struct zb_apsde_data_ind_params_s
    @param r - 'discover route' value.
  */
 #define ZB_NWK_FRAMECTL_SET_DISCOVER_ROUTE(fctl, r) ((fctl)[ZB_PKT_16B_ZERO_BYTE] |= ((r) << 6U))
-
-#ifndef ZB_NO_NWK_MULTICAST
-/** @brief Get multicast flag from the NWK header Frame Control field.
-
-   @param fctl - Frame Control Field of NWK header.
-*/
-#define ZB_NWK_FRAMECTL_GET_MULTICAST_FLAG(fctl) (((fctl)[ZB_PKT_16B_FIRST_BYTE]) & 1U)
-#else
-#define ZB_NWK_FRAMECTL_GET_MULTICAST_FLAG(fctl) 0U
-#endif
-
-/** @brief Set multicast flag in the NWK header Frame Control field.
-
-   @param fctl - Frame Control Field of NWK header.
-   @param m - multicast flag value.
- */
-#define ZB_NWK_FRAMECTL_SET_MULTICAST_FLAG(fctl, m) ((fctl)[ZB_PKT_16B_FIRST_BYTE] |= (m))
 
 /** @brief Get 'security' from the NWK header Frame Control field.
 
@@ -1445,39 +1412,23 @@ typedef ZB_PACKED_PRE struct zb_apsde_data_ind_params_s
   ((fctl)[ZB_PKT_16B_FIRST_BYTE] |= (((d) << 3U) | ((s) << 4U)))
 
 /** @brief Return size of the header part up to addresses.
-
-   @param is_multicast - use multicast flag.
    @return header part size.
  */
-#ifdef ZB_NO_NWK_MULTICAST
-#define ZB_NWK_SHORT_HDR_SIZE(is_multicast) ZB_OFFSETOF(zb_nwk_hdr_t, dst_ieee_addr)
-#else
-#define ZB_NWK_SHORT_HDR_SIZE(is_multicast) \
-  (ZB_OFFSETOF(zb_nwk_hdr_t, dst_ieee_addr) + ((is_multicast) ? 1U : 0U))
-#endif
+#define ZB_NWK_SHORT_HDR_SIZE() ZB_OFFSETOF(zb_nwk_hdr_t, dst_ieee_addr)
 
 /** @brief Return hdr size with only one extended address present.
 
-   @param is_multicast - is use multicast flag.
    @return header part size.
  */
-#define ZB_NWK_HALF_HDR_SIZE(is_multicast)  \
-  (ZB_OFFSETOF(zb_nwk_hdr_t, src_ieee_addr) + ((is_multicast) ? 1U : 0U))
+#define ZB_NWK_HALF_HDR_SIZE()  \
+  (ZB_OFFSETOF(zb_nwk_hdr_t, src_ieee_addr))
 
 /** @brief Return full size of the header with extended addresses.
 
-   @param is_multicast - is use multicast flag.
    @return header part size.
  */
-#define ZB_NWK_FULL_HDR_SIZE(is_multicast)  \
-  (ZB_OFFSETOF(zb_nwk_hdr_t, mcast_control) + ((is_multicast) ? 1U : 0U))
-
-#if defined ZB_PRO_STACK && !defined ZB_NO_NWK_MULTICAST
-#define ZB_NWK_IS_MULTICAST_MEMBER_MODE(mac_dst, nwk_frame_ctl)                                \
-  ( ZB_NWK_IS_ADDRESS_BROADCAST(mac_dst) && ZB_NWK_FRAMECTL_GET_MULTICAST_FLAG(nwk_frame_ctl))
-#else
-#define ZB_NWK_IS_MULTICAST_MEMBER_MODE(mac_dst, nwk_frame_ctl) 0U
-#endif
+#define ZB_NWK_FULL_HDR_SIZE()  \
+  (sizeof(zb_nwk_hdr_t))
 
 /** @brief Calculate network header size.
    @param fctl - pointer on NWK header.
@@ -1485,29 +1436,14 @@ typedef ZB_PACKED_PRE struct zb_apsde_data_ind_params_s
  */
 zb_ushort_t zb_nwk_hdr_base_size(zb_uint8_t *fctl);
 
-#if defined ZB_PRO_STACK && !defined ZB_NO_NWK_MULTICAST
-
-#define ZB_RREQ_MC_MASK 0xBF
-#define ZB_RREP_MC_MASK 0xBF
-#define ZB_SET_RREQ_MULTICAST(a,b) ( a = (a & ZB_RREQ_MC_MASK) | b<<6U )
-#define ZB_GET_RREQ_MULTICAST(a) ( (a & (~ZB_RREQ_MC_MASK)) >>6U )
-#define ZB_SET_RREP_MULTICAST(a,b) ( a = (a & ZB_RREP_MC_MASK) | b<<6U )
-#define ZB_GET_RREP_MULTICAST(a) ( (a & (~ZB_RREP_MC_MASK)) >>6U )
-
-#else
-
-#define ZB_SET_RREQ_MULTICAST(a,b)
-#define ZB_GET_RREQ_MULTICAST(a) 0
-#define ZB_SET_RREP_MULTICAST(a,b)
-#define ZB_GET_RREP_MULTICAST(a) 0
-
-#endif  /* multicast */
-
 /** @brief Get size of base part of NWK header (without src route and security headers). */
 #define ZB_NWK_HDR_GET_BASE_SIZE( nwk_hdr ) \
     zb_nwk_hdr_base_size(((zb_nwk_hdr_t *)nwk_hdr)->frame_control)
-/* Get size of NWK header */
 
+/* Get size of NWK header.
+   This function assumes that hdr points to buffer
+    sand additional fields (like source_route fields) are present if corresponding bit set
+    and can be accessed despite they are located after hdr. */
 #define ZB_NWK_HDR_SIZE( nwk_hdr ) zb_get_nwk_header_size(nwk_hdr)
 
 /**
@@ -1753,19 +1689,19 @@ typedef zb_nwk_rejoin_response_t zb_nwk_commis_response_t;
 #define ZB_LEAVE_PL_GET_REMOVE_CHILDREN(pl)  (((pl) >> 7U) & 1U)
 
 #ifdef ZB_JOIN_CLIENT
-void zb_nwk_do_leave(zb_uint8_t param, zb_uint8_t rejoin);
+void zb_nwk_do_leave(zb_bufid_t param, zb_uint8_t rejoin);
 #else
 #define zb_nwk_do_leave(param, rejoin)
 #endif
 
-void zb_nwk_do_rejoin_after_leave(zb_uint8_t param);
+void zb_nwk_do_rejoin_after_leave(zb_cb_param_t param);
 
-void zb_nwk_rejoin_sync_pibcache_with_mac(zb_uint8_t param, zb_callback_t cb);
+void zb_nwk_rejoin_sync_pibcache_with_mac(zb_bufid_t param, zb_callback_t cb);
 
 /**
    Forget remote device or myself
  */
-void zb_nwk_forget_device(zb_uint8_t addr_ref);
+void zb_nwk_forget_device(zb_cb_param_t addr_ref);
 
 #if defined ZB_PRO_STACK && !defined ZB_LITE_NO_SOURCE_ROUTING && defined ZB_ROUTER_ROLE
 zb_nwk_rrec_t * nwk_find_src_route_for_packet(zb_uint16_t dst_addr);
@@ -1777,13 +1713,19 @@ void zb_nwk_source_routing_record_delete(zb_uint16_t addr);
 void zb_nwk_source_delete_routes_by_first_hop_addr(zb_uint16_t first_hop_addr);
 #endif
 
+typedef struct zb_nwk_update_beacon_payload_s
+{
+  zb_callback_t cb;    /*!< Callback to be called after request is completed */
+} zb_nwk_update_beacon_payload_request_t;
+
 /**
    Update beacon payload in the PIB.
 
    To be called after any network configuration change: formation, join etc.
    As a side effect increments NIB Update id.
  */
-void zb_nwk_update_beacon_payload(zb_uint8_t param);
+void zb_nwk_update_beacon_payload(zb_cb_param_t param, zb_callback_t cb);
+void zb_nwk_update_beacon_payload_with_no_cb(zb_cb_param_t param);
 
 /**
    3.4.9 Network Report Command
@@ -1883,7 +1825,7 @@ zb_bool_t zb_nwk_check_aging(void);
 
 #if defined ZB_MAC_POWER_CONTROL
 /* Send NWK Link Power Delta command */
-void zb_nwk_link_power_delta_alarm(zb_uint8_t param);
+void zb_nwk_link_power_delta_alarm(zb_cb_param_t param);
 
 /* Handle received Link Power Delta command */
 void zb_nwk_handle_link_power_delta_command(zb_bufid_t buf,
@@ -1895,7 +1837,7 @@ void zb_nwk_handle_link_power_delta_command(zb_bufid_t buf,
 /**
 Send End device timeout request command
  */
-void zb_nwk_ed_send_timeout_req(zb_uint8_t param);
+void zb_nwk_ed_send_timeout_req(zb_cb_param_t param);
 
 /**
 End device timeout request command handler
@@ -1972,8 +1914,11 @@ zb_ret_t zb_nwk_test_dev_annce(zb_uint16_t addr, zb_ieee_addr_t ieee_addr);
   @param value_size - size of attribute value
   @param cb - callback for run after
  */
-void zb_nwk_pib_set(zb_uint8_t param, zb_uint8_t iface_id, zb_uint8_t attr, void *value,
-                    zb_ushort_t value_size, zb_callback_t cb);
+void zb_nwk_pib_set_func(zb_bufid_t param, zb_uint8_t iface_id, zb_uint8_t attr, void *value,
+                         zb_ushort_t value_size, zb_callback_t cb);
+/** See @ref zb_nwk_pib_set_func() */
+#define zb_nwk_pib_set(param, iface_id, attr, value, value_size, cb) \
+  zb_nwk_pib_set_func(ZB_UNPACK_BUF_REF(param), (iface_id), (attr), (value), (value_size), (cb))
 
 /**
   Get NWK PIB attribute
@@ -1983,7 +1928,10 @@ void zb_nwk_pib_set(zb_uint8_t param, zb_uint8_t iface_id, zb_uint8_t attr, void
   @param attr - attribute ID
   @param cb - callback for run after
  */
-void zb_nwk_pib_get(zb_uint8_t param, zb_uint8_t iface_id, zb_uint8_t attr, zb_callback_t cb);
+void zb_nwk_pib_get_func(zb_bufid_t param, zb_uint8_t iface_id, zb_uint8_t attr, zb_callback_t cb);
+/** See @ref zb_nwk_pib_get_func() */
+#define zb_nwk_pib_get(param, iface_id, attr, cb) \
+  zb_nwk_pib_get_func(ZB_UNPACK_BUF_REF(param), (iface_id), (attr), (cb))
 
 /*
   Alloc and fill nwk hdr, return pointer to the allocated hdr
@@ -1991,8 +1939,8 @@ void zb_nwk_pib_get(zb_uint8_t param, zb_uint8_t iface_id, zb_uint8_t attr, zb_c
 zb_nwk_hdr_t *nwk_alloc_and_fill_hdr(zb_bufid_t buf,
                                      zb_uint16_t src_addr,
                                      zb_uint16_t dst_addr,
-                                     zb_bool_t is_multicast, zb_bool_t is_secured,
-                                     zb_bool_t is_cmd_frame, zb_bool_t force_long);
+                                     zb_bool_t is_secured, zb_bool_t is_cmd_frame,
+                                     zb_bool_t force_long);
 
 /**
   Alloc and fill place for nwk command, return pointer to the command payload.
@@ -2008,6 +1956,9 @@ void *nwk_alloc_and_fill_cmd(zb_bufid_t buf, zb_uint8_t cmd, zb_uint8_t cmd_size
 
   @param hdr - NWK header
   @return size of NWK header
+  @note This function assumes that hdr points to buffer
+          and additional fields (like source_route fields) are present if corresponding bit set
+          and can be accessed despite they are located after hdr.
 
   @code
   zb_uint8_t hdr_size = zb_get_nwk_header_size(hdr);
@@ -2025,16 +1976,9 @@ void zb_nwk_nib_init(zb_bool_t is_first);
 
 void zb_nwk_handle_init(void);
 
-#if defined ZB_PRO_STACK && !defined ZB_NO_NWK_MULTICAST
-zb_nwk_multicast_control_field_t *zb_get_mc_field_from_header(zb_nwk_hdr_t *hdr);
-#define GET_NWK_MCF( nwk_hdr ) (*( zb_get_mc_field_from_header(nwk_hdr)))
-#else
-#define GET_NWK_MCF( nwk_hdr ) nwk_hdr->mcast_control
-#endif
-
 /* Send network status with value 0x0B-Source route failure */
 #if defined ZB_PRO_STACK && defined ZB_ROUTER_ROLE
-void zb_send_nwk_status_source_route_fail(zb_uint8_t param, zb_uint16_t src_addr);
+void zb_send_nwk_status_source_route_fail(zb_cb_param_t cb_param);
 #endif
 
 
@@ -2064,7 +2008,7 @@ void zb_nwk_set_dev_associate_cb(zb_addr_assignment_cb_t cb);
 #ifndef ZB_LITE_NO_LINK_COST
  /**
   * Convert LQA to Link Cost
-  * 
+  *
   * R23 Core specification Section 3.6.4.1 Routing Cost Table 3-72. Link Cost to LQA Mapping
  */
 #define NWK_LQA_2_COST(lqa) (((lqa) <= (zb_uint8_t)16U) ? (zb_uint8_t)7U : \
@@ -2103,7 +2047,7 @@ void zb_nwk_set_dev_associate_cb(zb_addr_assignment_cb_t cb);
    Convert cost to LQI
    To be used for testing, like in TP/PRO-BV-04
  */
-#define NWK_COST_TO_LQI(cost)   (zb_uint8_t)((7U - (cost)) << 5U)
+#define NWK_COST_TO_LQI(cost)   (zb_uint8_t)(cost == (zb_uint8_t)1u ? (zb_uint8_t)255u : ((7U - (cost)) << 5U))
 
 /** @} */
 
@@ -2111,7 +2055,7 @@ void zb_nwk_set_dev_associate_cb(zb_addr_assignment_cb_t cb);
 void zb_check_oom_status(zb_uint8_t param);
 
 #ifdef ZB_SEND_OOM_STATUS
-void zb_oom_status_confirm(zb_uint8_t param);
+void zb_oom_status_confirm(zb_cb_param_t param);
 #endif /* ZB_SEND_OOM_STATUS */
 #endif /* ZB_CHECK_OOM_STATUS */
 
@@ -2145,7 +2089,14 @@ zb_bool_t zb_nwk_blacklist_is_empty(void);
 
 #endif
 
-void zb_nwk_unlock_in(zb_uint8_t param);
+#if defined ZB_ENHANCED_BEACON_SUPPORT
+/*
+ * Prepare enhanced beacon discovery
+ */
+void zb_nwk_prepare_enhanced_beacon_discovery(zb_bufid_t param);
+#endif /* ZB_ENHANCED_BEACON_SUPPORT */
+
+void zb_nwk_unlock_in(zb_bufid_t param);
 
 
 /**
@@ -2174,7 +2125,7 @@ void nwk_txstat_clear(void);
 #endif
 
 #ifdef ZB_FORMATION
-void zb_nwk_cont_without_formation(zb_uint8_t param);
+void zb_nwk_cont_without_formation(zb_cb_param_t param);
 #endif /* ZB_FORMATION */
 
 void zb_nwk_reset_route_expire(zb_uint16_t addr);
@@ -2183,7 +2134,7 @@ void zb_nwk_route_expire(zb_uint16_t addr);
 
 void zb_nwk_mesh_delete_routes_by_ref(zb_address_ieee_ref_t ref);
 
-void zb_nwk_load_pib(zb_uint8_t param);
+void zb_nwk_load_pib(zb_cb_param_t param);
 
 #if defined ZB_ASSERT_SEND_NWK_REPORT
 /* Send NWK Network Status pkt on assert with custom payload - epid is 0xdeadbeef + file_id + line_number */
@@ -2264,17 +2215,32 @@ typedef struct zb_nwk_direct_leave_req_s
 zb_nwk_direct_leave_req_t;
 
 zb_ret_t zb_nwk_get_neighbor_element(zb_uint16_t addr, zb_bool_t create_if_absent, zb_nwk_neighbor_element_t *update);
+void zb_nwk_update_neighbor_element(zb_neighbor_tbl_ent_t *nbt, zb_nwk_neighbor_element_t *update);
 zb_ret_t zb_nwk_set_neighbor_element(zb_uint16_t addr, zb_nwk_neighbor_element_t *update);
 
 zb_ret_t zb_nwk_delete_neighbor_by_short(zb_uint16_t addr);
 
-void zb_nwk_send_direct_leave_req(zb_uint8_t param);
+void zb_nwk_send_direct_leave_req(zb_cb_param_t cb_param);
 
 zb_bool_t nwk_is_lq_bad_for_direct(zb_int8_t rssi, zb_uint8_t lqi);
 void nwk_maybe_force_send_via_routing(zb_uint16_t addr);
 void nwk_set_send_via_routing(zb_neighbor_tbl_ent_t *nbt, zb_bool_t set);
 void nwk_reset_send_via_routing_aging(zb_neighbor_tbl_ent_t *nbt);
 zb_bool_t nwk_can_send_via_nbt(zb_neighbor_tbl_ent_t *nbt);
+
+/**
+ * @brief Forces link status TX.
+ *        It's allowed in Zigbee spec to send link statuses
+ *          more frequent than ZB_NIB_GET_LINK_STATUS_PERIOD.
+ *        If link status command hasn't been sent after (re)join yet,
+ *         then there is zb_nwk_link_status_alarm
+ *         with ZB_NWK_LINK_STATUS_INITIAL_CALL argument
+ *         is in scheduler queue.
+ *         In described case, sending won't be forced: buf will be freed.
+ *
+ * @param buf valid buffer ID.
+ */
+void zb_nwk_force_link_status_tx(zb_bufid_t buf);
 
 void nwk_internal_lock_in(void);
 void nwk_internal_unlock_in(void);
@@ -2289,7 +2255,7 @@ void nwk_mark_nwk_encr1(zb_bufid_t buf, zb_uint16_t file_id, zb_uint16_t line);
 void nwk_unmark_nwk_encr(zb_bufid_t buf);
 #define nwk_mark_nwk_encr(buf) nwk_mark_nwk_encr1((buf), ZB_TRACE_FILE_ID, __LINE__)
 
-void nwk_router_start_common(zb_uint8_t param);
+void nwk_router_start_common(zb_cb_param_t param, zb_callback_t cb);
 
 #ifdef ZB_FORMATION
 void zb_nwk_formation_force_link(void);
@@ -2320,8 +2286,8 @@ zb_uint32_t zb_nwk_get_octet_duration_us(void);
  * Even while you can't eliminate a function call, you can exclude additional calculations.
  * Function call can get time in octets and return time in BE.
  */
-#define ZB_NWK_OCTETS_TO_US(octets_cnt) ((octets_cnt) * ZB_NWK_OCTET_DURATION_US)
-#define ZB_NWK_OCTETS_TO_BI(octets_cnt) ZB_MILLISECONDS_TO_BEACON_INTERVAL(ZB_NWK_OCTETS_TO_US(octets_cnt) / 1000U)
+#define ZB_NWK_OCTETS_TO_US(octets_cnt) ((zb_uint64_t)(octets_cnt) * (zb_uint64_t)ZB_NWK_OCTET_DURATION_US)
+#define ZB_NWK_OCTETS_TO_BI(octets_cnt) ZB_MILLISECONDS_TO_BEACON_INTERVAL(ZB_NWK_OCTETS_TO_US(octets_cnt) / 1000UL)
 
 #define ZB_SET_R22_GU_BEHAVIOR(val) (ZB_NIB().r22_gu_behavior_enabled = (val))
 #define ZB_R22_GU_BEHAVIOR_ENABLED() (ZB_U2B(ZB_NIB().r22_gu_behavior_enabled))
@@ -2332,7 +2298,7 @@ zb_uint32_t zb_nwk_get_octet_duration_us(void);
 
 #if defined ZB_JOIN_CLIENT
 
-void zb_nwk_commissioning_req_put_tlv(zb_uint8_t param, zb_bool_t put_supported_kn_methods);
+void zb_nwk_commissioning_req_put_tlv(zb_bufid_t param, zb_bool_t put_supported_kn_methods);
 
 void zb_nwk_beacon_process_tlv(zb_uint8_t *tlv_ptr,
                                zb_uint8_t tlv_data_len,
@@ -2378,20 +2344,20 @@ void zb_disable_control4_emulator();
 void zb_enable_control4_emulator();
 #endif /* ZB_CONTROL4_NETWORK_SUPPORT */
 
-void zb_panid_conflict_set_new_panid(zb_bufid_t param, zb_uint16_t new_panid);
+void zb_panid_conflict_set_new_panid(zb_cb_param_t cb_param);
 
 /*
   Get source ieee address from nwk header
 */
 zb_ieee_addr_t *zb_nwk_get_src_long_from_hdr(zb_nwk_hdr_t *nwhdr);
 
-void nwk_panid_conflict_in_beacon(zb_uint8_t param);
+void nwk_panid_conflict_in_beacon(zb_bufid_t param);
 
-void zb_panid_conflict_got_network_report(zb_uint8_t param);
+void zb_panid_conflict_got_network_report(zb_bufid_t param);
 
-void zb_panid_conflict_nwk_upd_rcv(zb_uint8_t param);
+void zb_panid_conflict_nwk_upd_rcv(zb_bufid_t param);
 
-void nwk_panid_conflict_handle_r23_resp(zb_uint8_t param);
+void nwk_panid_conflict_handle_r23_resp(zb_bufid_t param);
 
 zb_uint8_t zb_nwk_calculate_raw_lqa(zb_uint8_t lqi, zb_int8_t rssi);
 
@@ -2454,9 +2420,23 @@ zb_bool_t zb_zdd_is_network_zbd_aware(void);
    ZB_CHECK_BIT_IN_BIT_VECTOR(&((ecdhe_ctx_ptr)->device_capability_extension_tlv_value), \
                               ZBD_DEVICE_CAPABILITY_EXTENSION_ZVD_BIT))
 
-void zb_nwk_advise_to_run_mtorr(zb_bool_t hi_pri);
 
-void zb_nwk_advise_to_delay_mtorr(void);
+/**
+ * @brief Starts reactive Many-to-One Route Discovery procedure
+ *
+ * @param rreq_originator originator of incoming Route Request
+ * @return zb_ret_t RET_OK - route discovery is started immediately.
+ *                  RET_BUSY - route discovery is delayed as it can not be started now.
+ *                  RET_INVALID_STATE - match descriptor request has been successfully scheduled.
+ */
+zb_ret_t zb_nwk_concentrator_initiate_reactive_mtorr(zb_uint16_t rreq_originator);
+
+/**
+ * @brief Advises NWK layer to start Many-to-One Route Discovery after some time delay
+ *
+ * @param min_delay_from_now
+*/
+void zb_nwk_concentrator_advise_mtorr(zb_time_t min_delay_from_now);
 
 void zb_nwk_mtor_got_rejoin(void);
 
@@ -2467,5 +2447,58 @@ void zb_nwk_mesh_send_pending_data(zb_uint16_t dest_addr);
 #ifdef ZB_ROUTER_ROLE
 zb_ret_t zb_check_address_conflict(zb_ieee_addr_t ieee_addr, zb_uint16_t short_addr);
 #endif /* ZB_ROUTER_ROLE */
+
+void zb_nwk_set_short_addr(zb_uint16_t short_addr);
+
+#if defined(ZB_ROUTER_ROLE) && defined(ZB_DENSE_NET_ROUTING_OPTIMIZATION)
+
+#define ZB_NWK_PATH_COST_SINGLE_HOP 1U
+#define ZB_NWK_PATH_COST_BEST_POSSIBLE_ROUTE 2U
+
+void zb_nwk_brrt_clear_entry_by_nwk_route_id(zb_uint8_t route_id);
+void zb_nwk_stop_route_discovery(zb_nwk_route_discovery_t *disc_ent);
+
+void zb_nwk_clear_routing_ctx_by_addr_ref(zb_address_ieee_ref_t addr_ref);
+void zb_nwk_add_route_entry(zb_uint16_t dst_addr, zb_uint16_t next_hop, zb_uint8_t rreq_type);
+
+#endif /* ZB_ROUTER_ROLE && ZB_DENSE_NET_ROUTING_OPTIMIZATION */
+
+void zb_nwk_add_neighbor_route(zb_uint16_t neighbor_short_addr, zb_uint8_t rreq_type);
+
+#if defined(ZB_ROUTER_ROLE) && !defined(ZB_LITE_NO_SOURCE_ROUTING)
+typedef struct zb_nwk_route_req_tlv_ctx_s
+{
+  struct
+  {
+    zb_bool_t presented;
+    zb_uint16_t routing_seq_num;
+    zb_uint8_t initial_radius;
+  } ext_routing_info;
+
+  struct
+  {
+    zb_bool_t presented;
+    zb_uint8_t disc_time;
+    zb_uint8_t max_src_route_len;
+  } concentrator_info;
+
+  struct
+  {
+    zb_bool_t presented;
+    zb_uint8_t addrs_cnt;
+    zb_uint16_t addrs_list[ZB_SOURCE_ROUTE_SOLICITATION_MAX_ADDRS];
+  } route_solicitation;
+} zb_nwk_route_req_tlv_ctx_t;
+
+void zb_nwk_rreq_handler_process_src_route_solicitation(
+  zb_uint16_t nwk_src_addr,
+  zb_uint16_t mac_src_addr,
+  const zb_nwk_cmd_rreq_t *rreq,
+  const zb_nwk_routing_t *rev_routing_ent,
+  const zb_nwk_route_req_tlv_ctx_t *rreq_tlv_ctx);
+
+zb_ret_t zb_nwk_src_route_solicitation_add_addr(zb_uint16_t addr);
+zb_ret_t zb_nwk_src_route_solicitation_remove_addr(zb_uint16_t addr);
+#endif /* ZB_ROUTER_ROLE && !ZB_LITE_NO_SOURCE_ROUTING */
 
 #endif /* ZB_NWK_H */

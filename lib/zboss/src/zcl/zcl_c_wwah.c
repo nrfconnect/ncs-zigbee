@@ -65,7 +65,7 @@ zb_discover_cmd_list_t gs_wwah_client_cmd_list =
   sizeof(gs_wwah_client_generated_commands), (zb_uint8_t *)gs_wwah_client_generated_commands
 };
 
-zb_bool_t zb_zcl_process_wwah_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_wwah_specific_commands_cli(zb_cb_param_t param);
 
 void zb_zcl_wwah_init_client()
 {
@@ -77,7 +77,7 @@ void zb_zcl_wwah_init_client()
                               zb_zcl_process_wwah_specific_commands_cli);
 }
 
-zb_bool_t zb_zcl_process_wwah_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_wwah_specific_commands_cli(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {

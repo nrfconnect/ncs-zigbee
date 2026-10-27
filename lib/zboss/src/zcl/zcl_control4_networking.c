@@ -87,12 +87,12 @@ zb_ret_t check_value_control4_networking_client(zb_uint16_t attr_id, zb_uint8_t 
 void zb_zcl_control4_networking_write_attr_hook_server(zb_uint8_t endpoint, zb_uint16_t attr_id, zb_uint8_t *new_value, zb_uint16_t manuf_code);
 void zb_zcl_control4_networking_write_attr_hook_client(zb_uint8_t endpoint, zb_uint16_t attr_id, zb_uint8_t *new_value);
 
-zb_bool_t zb_zcl_process_control4_networking_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_control4_networking_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_control4_networking_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_control4_networking_specific_commands_cli(zb_cb_param_t param);
 
-static void zb_zcl_control4_network_cluster_identify(zb_bufid_t buffer);
-static void zb_zcl_control4_network_cluster_announce(zb_bufid_t buffer);
-static void zb_zcl_control4_network_cluster_quiry_zap_info(zb_bufid_t buffer);
+static void zb_zcl_control4_network_cluster_identify(zb_cb_param_t param);
+static void zb_zcl_control4_network_cluster_announce(zb_cb_param_t param);
+static void zb_zcl_control4_network_cluster_quiry_zap_info(zb_cb_param_t buffer);
 
 static const zb_uint16_t control4_network_report_attr[] =
 {
@@ -173,9 +173,11 @@ zb_ret_t check_value_control4_networking_server(zb_uint16_t attr_id, zb_uint8_t 
    @param event - ZAP discovery event (zb_zcl_control4_zap_discover_event_t)
  */
 
-static void zb_zcl_control4_networking_zap_info_notify_user_app(zb_bufid_t buffer, zb_uint16_t event)
+static void zb_zcl_control4_networking_zap_info_notify_user_app(zb_cb_param_t param)
 {
   static zb_bool_t is_scheduled = ZB_FALSE;
+  zb_bufid_t buffer = ZB_UNPACK_BUF_REF(param);
+  zb_uint16_t event = ZB_UNPACK_USER_PARAM(param);
 
   if (!buffer)
   {
@@ -228,7 +230,7 @@ void zb_zcl_control4_networking_write_attr_hook_server(zb_uint8_t endpoint, zb_u
           ZB_ZCL_ATTR_GET16(new_value) != ZB_ZCL_CONTROL4_NETWORKING_ACCESS_POINT_NODE_ID_DEF_VALUE)
       {
         /* invoke user app */
-        zb_zcl_control4_networking_zap_info_notify_user_app(0, ZB_ZCL_CONTROL4_NETWORK_ZAP_UPDATED);
+        zb_zcl_control4_networking_zap_info_notify_user_app(ZB_PACK_2_U16_IN_U32(0, ZB_ZCL_CONTROL4_NETWORK_ZAP_UPDATED));
       }
     }
   }
@@ -247,13 +249,13 @@ void zb_zcl_control4_networking_write_attr_hook_server(zb_uint8_t endpoint, zb_u
           !ZB_IEEE_ADDR_CMP(new_value, default_ap_long_id))
       {
         /* invoke user app */
-        zb_zcl_control4_networking_zap_info_notify_user_app(0, ZB_ZCL_CONTROL4_NETWORK_ZAP_UPDATED);
+        zb_zcl_control4_networking_zap_info_notify_user_app(ZB_PACK_2_U16_IN_U32(0, ZB_ZCL_CONTROL4_NETWORK_ZAP_UPDATED));
       }
     }
   }
 }
 
-static zb_ret_t zb_zcl_process_control4_networking_immediate_announce_handler(zb_uint8_t param)
+static zb_ret_t zb_zcl_process_control4_networking_immediate_announce_handler(zb_bufid_t param)
 {
   zb_uint8_t *ptr;
   zb_uint8_t length, i;
@@ -304,13 +306,13 @@ static zb_ret_t zb_zcl_process_control4_networking_immediate_announce_handler(zb
   return ret;
 }
 
-zb_bool_t zb_zcl_process_control4_networking_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_control4_networking_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
   zb_ret_t ret = RET_OK;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_control4_networking_specific_commands: param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_control4_networking_specific_commands: param %d", (FMT__D, param));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -338,7 +340,7 @@ zb_bool_t zb_zcl_process_control4_networking_specific_commands(zb_uint8_t param)
   return processed;
 }
 
-zb_bool_t zb_zcl_process_control4_networking_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_control4_networking_specific_commands_srv(zb_cb_param_t param)
 {
   if (ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param)
   {
@@ -349,7 +351,7 @@ zb_bool_t zb_zcl_process_control4_networking_specific_commands_srv(zb_uint8_t pa
   return zb_zcl_process_control4_networking_specific_commands(param);
 }
 
-zb_bool_t zb_zcl_process_control4_networking_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_control4_networking_specific_commands_cli(zb_cb_param_t param)
 {
   if (ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param)
   {
@@ -483,7 +485,7 @@ static void zb_zcl_control4_network_cluster_schedule_announce(void)
   }
 }
 
-static void zb_zcl_control4_network_cluster_announce(zb_bufid_t buffer)
+static void zb_zcl_control4_network_cluster_announce(zb_cb_param_t buffer)
 {
   if (!buffer)
   {
@@ -496,7 +498,7 @@ static void zb_zcl_control4_network_cluster_announce(zb_bufid_t buffer)
   }
 }
 
-static void zb_zcl_control4_network_cluster_identify(zb_bufid_t buffer)
+static void zb_zcl_control4_network_cluster_identify(zb_cb_param_t buffer)
 {
   if (!ZB_ZCL_CONTROL4_NETWORK_IS_STOPPED())
   {
@@ -509,7 +511,7 @@ static void zb_zcl_control4_network_cluster_identify(zb_bufid_t buffer)
   }
 }
 
-static void zb_zcl_control4_network_cluster_read_zap_info_status(zb_uint8_t status)
+static void zb_zcl_control4_network_cluster_read_zap_info_status(zb_cb_param_t status)
 {
   static zb_uint8_t attempts = 0;
 
@@ -535,7 +537,7 @@ static void zb_zcl_control4_network_cluster_read_zap_info_status(zb_uint8_t stat
         /* Can't obtain ZAP information. Stop the cluster logic */
         attempts = 0;
         ZB_ZCL_CONTROL4_NETWORK_SET_STATE(ZB_ZCL_CONTROL4_NETWORK_STATE_STOPPED);
-        zb_zcl_control4_networking_zap_info_notify_user_app(0, ZB_ZCL_CONTROL4_NETWORK_ZAP_DISCOVER_FAILED);
+        zb_zcl_control4_networking_zap_info_notify_user_app(ZB_PACK_2_U16_IN_U32(0, ZB_ZCL_CONTROL4_NETWORK_ZAP_DISCOVER_FAILED));
       }
     }
   }
@@ -607,7 +609,7 @@ static void zb_zcl_control4_network_cluster_schedule_quiry_zap_info(void)
   }
 }
 
-static void zb_zcl_control4_network_cluster_quiry_zap_info(zb_bufid_t buffer)
+static void zb_zcl_control4_network_cluster_quiry_zap_info(zb_cb_param_t buffer)
 {
   if (!buffer)
   {
@@ -688,9 +690,9 @@ void zb_zcl_control4_network_cluster_read_attr_resp_handler(zb_bufid_t param)
   }
 }
 
-static void zb_zcl_control4_network_cluster_start_delayed(zb_bufid_t buffer)
+static void zb_zcl_control4_network_cluster_start_delayed(zb_cb_param_t param)
 {
-  ZVUNUSED(buffer);
+  ZVUNUSED(param);
 
   /* Start identification process */
   zb_buf_get_out_delayed(zb_zcl_control4_network_cluster_quiry_zap_info);
@@ -716,7 +718,7 @@ zb_ret_t zb_zcl_control4_network_cluster_start(void)
   /* Start Control4 Network cluster with random jitter delay */
   ZB_SCHEDULE_ALARM_CANCEL(zb_zcl_control4_network_cluster_start_delayed, 0);
   /* Start Control4 cluster after non-zero delay. Else Control4 test sometimes fails when C4 starts before Get Auth token resp complete. */
-  ZB_SCHEDULE_ALARM(zb_zcl_control4_network_cluster_start_delayed, 0, ZB_MILLISECONDS_TO_BEACON_INTERVAL(300u) + ZB_RANDOM_VALUE(ZB_TIME_ONE_SECOND));
+  ZB_SCHEDULE_ALARM(zb_zcl_control4_network_cluster_start_delayed, 0, ZB_MILLISECONDS_TO_BEACON_INTERVAL(300u) + ZB_RANDOM_JTR(ZB_TIME_ONE_SECOND));
   ZB_ZCL_CONTROL4_NETWORK_SET_STATE(ZB_ZCL_CONTROL4_NETWORK_STATE_SEARCHING_ZAP);
 
   return RET_OK;

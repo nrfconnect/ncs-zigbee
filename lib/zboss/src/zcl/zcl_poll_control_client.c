@@ -87,7 +87,7 @@ void zb_zcl_set_fast_poll_timeout(zb_uint8_t ep, zb_uint16_t fast_poll_timeout)
 }
 
 /** @brief Stop fast poll and schedule next Check-in command */
-static void zb_zcl_poll_control_stop_fast_poll_client(zb_uint8_t endpoint)
+static void zb_zcl_poll_control_stop_fast_poll_client(zb_cb_param_t endpoint)
 {
   zb_zcl_attr_t *attr_desc;
   zb_zcl_poll_control_client_status_t *client_data;
@@ -105,7 +105,7 @@ static void zb_zcl_poll_control_stop_fast_poll_client(zb_uint8_t endpoint)
 }
 
 /** @brief Check-in command */
-static zb_ret_t check_in_handler(zb_uint8_t param)
+static zb_ret_t check_in_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -176,7 +176,7 @@ static zb_ret_t check_in_handler(zb_uint8_t param)
 }
 
 /* specific commands handling - client side */
-zb_bool_t zb_zcl_process_poll_control_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_poll_control_specific_commands_cli(zb_cb_param_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -191,8 +191,8 @@ zb_bool_t zb_zcl_process_poll_control_specific_commands_cli(zb_uint8_t param)
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG( TRACE_ZCL1,
-             "> zb_zcl_process_poll_control_specific_commands_cli: param %hd, cmd %hd",
-             (FMT__H_H, param, cmd_info.cmd_id));
+             "> zb_zcl_process_poll_control_specific_commands_cli: param %d, cmd %hd",
+             (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_POLL_CONTROL == cmd_info.cluster_id);
   ZB_ASSERT(ZB_ZCL_FRAME_DIRECTION_TO_CLI == cmd_info.cmd_direction);

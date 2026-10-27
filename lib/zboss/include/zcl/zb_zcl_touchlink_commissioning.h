@@ -838,7 +838,7 @@ typedef ZB_PACKED_PRE struct zb_zll_commissioning_identify_req_param_s
  *  sent, and identify period is zero zus instructing the target to exit identify state.
  *  @li packet schedule error otherwise.
  */
-zb_ret_t zb_zll_identify(zb_uint8_t param);
+zb_ret_t zb_zll_identify(zb_bufid_t param);
 
 /************************** Reset to factory new command definitions ****************************/
 

@@ -74,6 +74,8 @@ void zb_zcl_diagnostics_init_server()
                               check_value_diagnostics_server,
                               (zb_zcl_cluster_write_attr_hook_t)NULL,
                               (zb_zcl_cluster_handler_t)NULL);
+
+  ZDO_DIAGNOSTICS_ENABLE(ZB_TRUE, NULL);
 }
 
 void zb_zcl_diagnostics_init_client()
@@ -85,12 +87,12 @@ void zb_zcl_diagnostics_init_client()
                               (zb_zcl_cluster_handler_t)NULL);
 }
 
-static void zb_zcl_diagnostics_sync_counters_cb(zb_uint8_t param)
+static void zb_zcl_diagnostics_sync_counters_cb(zb_cb_param_t param)
 {
   zdo_diagnostics_full_stats_t *full_stats = zb_buf_begin(param);
 
-  TRACE_MSG(TRACE_ZCL3, ">>zb_zcl_diagnostics_sync_counters_cb(), param %hd",
-            (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL3, ">>zb_zcl_diagnostics_sync_counters_cb(), param %d",
+            (FMT__D, param));
 
   TRACE_MSG(TRACE_ZCL3, "status 0x%hx", (FMT__H, full_stats->status));
 
@@ -120,12 +122,12 @@ static void zb_zcl_diagnostics_sync_counters_cb(zb_uint8_t param)
   TRACE_MSG(TRACE_ZCL3, "<<zb_zcl_diagnostics_sync_counters_cb()", (FMT__0));
 }
 
-zb_ret_t zb_zcl_diagnostics_sync_counters(zb_uint8_t cb_param, zb_callback_t cb)
+zb_ret_t zb_zcl_diagnostics_sync_counters(zb_cb_param_t cb_param, zb_callback_t cb)
 {
   zb_ret_t ret;
 
-  TRACE_MSG(TRACE_ZCL3, ">>zb_zcl_diagnostics_sync_counters(), cb_param %hd, cb 0x%p",
-            (FMT__H_P, cb_param, cb));
+  TRACE_MSG(TRACE_ZCL3, ">>zb_zcl_diagnostics_sync_counters(), cb_param %d, cb 0x%p",
+            (FMT__D_P, cb_param, cb));
 
   if (diagnostics_ctx_zcl.sync_data_cb == NULL)
   {

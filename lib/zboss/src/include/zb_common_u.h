@@ -46,14 +46,18 @@
 #include "zboss_api_core.h"
 
 /**
-   Generate random value between 0 to 0xffffffff (32 bit) for jitters
+   Generate random value between 0 to 0xffffffff (32 bit) for jitters.
+   max_value limits maximal value that will be returned, so
+    result will lie in a range from 0 to max_value including both values.
  */
-zb_uint32_t zb_random_jitter(void);
+zb_uint32_t zb_random_jitter(zb_uint32_t max_value);
 
 /**
-   Used only for jitters. Need to add a premonition to randoms
+   Used only for jitters. Need to add a premonition to randoms.
+   Generates random value in a range from 0 to max_value including both values.
+   max_value can't be greater than ZB_UINT32_MAX.
  */
-#define ZB_RANDOM_JTR(max_value) (zb_random_jitter() / (ZB_RAND_MAX / (zb_uint32_t)(max_value)))
+#define ZB_RANDOM_JTR(max_value) (zb_random_jitter((max_value)))
 
 /*! @} */
 

@@ -52,46 +52,46 @@ zb_ret_t zb_mm_register_interface(const zb_mac_interface_t *mac_interface, zb_ui
 
 zb_uint8_t zb_nwk_mm_get_freq_band(void);
 
-void zb_nlme_set_interface_request(zb_uint8_t param);
+void zb_nlme_set_interface_request(zb_bufid_t param);
 
-void zb_nlme_get_interface_request(zb_uint8_t param);
+void zb_nlme_get_interface_request(zb_bufid_t param);
 
 zb_uint8_t zb_multimac_get_iface_id_by_channel_page(zb_uint8_t page_idx, zb_uint8_t channel_idx);
 
 /* Multi-MAC proxy functions */
-void zb_nwk_handle_mlme_start_confirm(zb_uint8_t param);
-void zb_nwk_handle_mlme_reset_confirm(zb_uint8_t param);
-void zb_nwk_handle_mcps_data_confirm(zb_uint8_t param);
+void zb_nwk_handle_mlme_start_confirm(zb_cb_param_t param);
+void zb_nwk_handle_mlme_reset_confirm(zb_cb_param_t param);
+void zb_nwk_handle_mcps_data_confirm(zb_cb_param_t cb_param);
 
-void zb_multimac_mlme_start_request_proxy(zb_uint8_t param);
-void zb_multimac_mlme_start_confirm_proxy(zb_uint8_t param);
-void zb_multimac_mcps_data_request_proxy(zb_uint8_t param);
-void zb_multimac_mlme_set_request_proxy(zb_uint8_t param);
-void zb_multimac_mlme_reset_request_proxy(zb_uint8_t param);
-void zb_multimac_mlme_reset_confirm_proxy(zb_uint8_t param);
-void zb_multimac_mlme_get_request_proxy(zb_uint8_t param);
+void zb_multimac_mlme_start_request_proxy(zb_cb_param_t param);
+void zb_multimac_mlme_start_confirm_proxy(zb_cb_param_t param);
+void zb_multimac_mcps_data_request_proxy(zb_cb_param_t param);
+void zb_multimac_mlme_set_request_proxy(zb_cb_param_t param);
+void zb_multimac_mlme_reset_request_proxy(zb_cb_param_t param);
+void zb_multimac_mlme_reset_confirm_proxy(zb_cb_param_t param);
+void zb_multimac_mlme_get_request_proxy(zb_cb_param_t param);
 
-void zb_multimac_mlme_scan_request_proxy(zb_uint8_t param);
-void zb_multimac_mlme_scan_confirm_proxy(zb_uint8_t param);
+void zb_multimac_mlme_scan_request_proxy(zb_cb_param_t param);
+void zb_multimac_mlme_scan_confirm_proxy(zb_cb_param_t param);
 
-void zb_multimac_mcps_data_confirm_proxy(zb_uint8_t param);
+void zb_multimac_mcps_data_confirm_proxy(zb_cb_param_t param);
 
 /* MAC-Split interface API */
 #ifdef ZB_MACSPLIT_HOST
 void zb_mac_macsplit_host_init_instance(void);
 void zb_mac_macsplit_host_deinit_instance(void);
 
-void zb_mcps_data_request_macsplit(zb_uint8_t param);
-void zb_mlme_get_request_macsplit(zb_uint8_t param);
-void zb_mlme_set_request_macsplit(zb_uint8_t param);
-void zb_mlme_reset_request_macsplit(zb_uint8_t param);
-void zb_mlme_scan_request_macsplit(zb_uint8_t param);
-void zb_mlme_associate_request_macsplit(zb_uint8_t param);
-void zb_mlme_associate_response_macsplit(zb_uint8_t param);
-void zb_mlme_poll_request_macsplit(zb_uint8_t param);
-void zb_mlme_orphan_response_macsplit(zb_uint8_t param);
-void zb_mlme_start_request_macsplit(zb_uint8_t param);
-void zb_mac_resp_by_empty_frame_macsplit(zb_uint8_t param);
+void zb_mcps_data_request_macsplit(zb_cb_param_t param);
+void zb_mlme_get_request_macsplit(zb_cb_param_t param);
+void zb_mlme_set_request_macsplit(zb_cb_param_t param);
+void zb_mlme_reset_request_macsplit(zb_cb_param_t param);
+void zb_mlme_scan_request_macsplit(zb_cb_param_t param);
+void zb_mlme_associate_request_macsplit(zb_cb_param_t param);
+void zb_mlme_associate_response_macsplit(zb_cb_param_t param);
+void zb_mlme_poll_request_macsplit(zb_cb_param_t param);
+void zb_mlme_orphan_response_macsplit(zb_cb_param_t param);
+void zb_mlme_start_request_macsplit(zb_cb_param_t param);
+void zb_mac_resp_by_empty_frame_macsplit(zb_cb_param_t param);
 
 zb_ret_t zb_mac_logic_iteration_macsplit();
 #endif /* ZB_MACSPLIT_HOST */
@@ -102,7 +102,7 @@ zb_ret_t zb_mac_logic_iteration_macsplit();
  *
  * @param param
  */
-void zb_nwk_mm_sync_assoc(zb_uint8_t param);
+void zb_nwk_mm_sync_assoc(zb_cb_param_t param);
 
 
 void zb_multimac_mac_init(void);
@@ -160,9 +160,9 @@ zb_bool_t zb_mm_is_interface_active(zb_uint8_t iface_id);
 void zb_mm_set_iface_supported_channel_mask(zb_uint8_t iface_id, zb_uint8_t page_index, zb_uint32_t channel_mask);
 
 /**
- * @brief Registers new MAC-split host instance
+ * @brief Registers new MAC-Split host instance
  *
- * @param [out] iface_id - interface id of new MAC-split host instance
+ * @param [out] iface_id - interface id of new MAC-Split host instance
  * @return zb_ret_t - RET_OK for success, error code otherwise
  */
 zb_ret_t zb_mm_macsplit_host_register_and_enable_instance(zb_uint8_t *iface_id);

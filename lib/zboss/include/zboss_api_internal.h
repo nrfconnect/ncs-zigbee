@@ -69,7 +69,7 @@ typedef struct zb_mac_pending_data_s
 {
   zb_addr_u dst_addr;         /**< Destination address */
   zb_uint8_t      dst_addr_mode;    /**< Destination address mode @ref address_modes */
-  zb_uint8_t      pending_param;                 /**< Pointer to pending data */
+  zb_bufid_t      pending_param;                 /**< Pointer to pending data */
 }
 zb_mac_pending_data_t;
 
@@ -77,29 +77,42 @@ zb_mac_pending_data_t;
 /**
    APS retransmissions
  */
-typedef ZB_PACKED_PRE struct zb_aps_retrans_ent_s
-{
-  zb_address_ieee_ref_t addr_ref;       /*!< Destination address*/
-  zb_uint8_t   buf;                     /*!< Buffer index for retranslate */
-  zb_uint8_t   radius;                  /*!< Radius */
-  zb_uint8_t   aps_hdr_off_from_end;    /*!< APS Header offset from end of packet */
+typedef zb_uint8_t zb_aps_retrans_ent_ref_t;
+#define ZB_APS_RETRANS_ENT_REF_NONE ((zb_aps_retrans_ent_ref_t)-1)
 
+
+#define ZB_APS_RETRANS_RELAY_MSG_NO_RELAY 0U
+#define ZB_APS_RETRANS_RELAY_MSG_OUTGOING 1U
+#define ZB_APS_RETRANS_RELAY_MSG_FORWARD 2U
+
+#define ZB_APS_IS_RELAY_MSG_OUTGOING(msg_type) \
+  ((msg_type) == ZB_APS_RETRANS_RELAY_MSG_OUTGOING )
+
+
+ typedef ZB_PACKED_PRE struct zb_aps_retrans_ent_s
+{
+  zb_address_ieee_ref_t dst_addr_ref;   /*!< Destination address*/
+  zb_bufid_t    buf;                    /*!< Buffer index for retranslate */
+  zb_uint8_t    aps_hdr_off_from_end;   /*!< APS Header offset from end of packet,
+                                         *   For relay messages offset is stored for header of relay command itself */
+  zb_bitfield_t radius:6;               /*!< Radius */
+  zb_bitfield_t relay_msg_type:2;       /*!< Relay message type */
+  zb_bitfield_t relay_wait_nested_ack:1;/*!< Relay message has nested packet with Ack request */
   zb_bitfield_t aps_retries:3;  /*!< Number of attempts */
   zb_bitfield_t nwk_insecure:1; /*!< Flag 'Is NWK secure' */
   zb_bitfield_t state:3;        /*!< @see @ref aps_retrans_ent_state */
-  zb_bitfield_t relay:1;
+
+  zb_aps_retrans_ent_ref_t list_next; /*!< Next entry reference in linked list */
+
 } ZB_PACKED_STRUCT zb_aps_retrans_ent_t;
 
 #endif /* !ZB_MINIMAL_CONTEXT */
 
 typedef ZB_PACKED_PRE struct zb_cb_q_ent_s
 {
-  union {
-    zb_callback_t func_ptr;
-    zb_callback2_t func2_ptr;
-  } u;                           /*!< function to call  */
-  zb_uint16_t user_param;        /*!< user parameter */
-  zb_uint8_t param;              /*!< parameter to pass to 'func'  */
+  zb_callback_t func_ptr;
+  zb_cb_param_t param;          /*!< parameter to pass to 'func' packed 2 values of size u16 buf ref
+                                  * and user parameters (buf:user_param) */
 }
 ZB_PACKED_STRUCT
 zb_cb_q_ent_t;
@@ -113,17 +126,13 @@ zb_cb_q_ent_t;
 
    @return 'func_ptr' or 'func2_ptr'
  */
-#define ZB_CB_QENT_FPTR(ent, is2param) ((!(is2param)) ? (void*)((ent)->u.func_ptr) : (void*)((ent)->u.func2_ptr))
+#define ZB_CB_QENT_FPTR(ent) ((void*)((ent)->func_ptr))
 
 typedef ZB_PACKED_PRE struct zb_delayed_buf_q_ent_s
 {
-  union {
-    zb_callback_t func_ptr;
-    zb_callback2_t func2_ptr;
-  } u;                           /*!< function to call  */
-  zb_uint16_t   user_param;      /*!< user parameter */
-  zb_bitfield_t buf_cnt:7;       /*!< number of buffers to allocate */
-  zb_bitfield_t is_2param:1;     /*!< whether this is a 2param callback */
+  zb_callback_t func_ptr;      /*!< function to call  */
+  zb_uint16_t user_param;      /*!< user parameter */
+  zb_uint8_t buf_cnt;          /*!< number of buffers to allocate */
 }
 ZB_PACKED_STRUCT
 zb_delayed_buf_q_ent_t;
@@ -136,7 +145,11 @@ zb_delayed_buf_q_ent_t;
 
    @return 'func_ptr' or 'func2_ptr'
  */
+#if 0
 #define ZB_DELAYED_BUF_QENT_FPTR(ent) (((ent)->is_2param == 0U) ? (void*)((ent)->u.func_ptr) : (void*)((ent)->u.func2_ptr))
+#else
+#define ZB_DELAYED_BUF_QENT_FPTR(ent) ((void*)((ent)->func_ptr))
+#endif
 
 #define ZB_LQA_ARR_SIZE 2
 
@@ -147,8 +160,8 @@ typedef ZB_PACKED_PRE struct zb_tm_q_ent_s
 {
   zb_callback_t func;           /*!< function to call  */
   zb_time_t run_time;           /*!< time to run at  */
-  zb_uint8_t param;             /*!< parameter to pass to 'func'  */
-  ZB_POOLED_LIST8_FIELD(next);
+  zb_cb_param_t param;          /*!< parameter to pass to 'func'  */
+  ZB_POOLED_LIST16_FIELD(next);
 }
 ZB_PACKED_STRUCT
 zb_tm_q_ent_t;
@@ -192,10 +205,19 @@ typedef ZB_PACKED_PRE struct zb_aps_device_key_pair_array_s
 
   /* The reserved value is uses 16 bits now,
    * but actual max value requires 10 bits */
-  zb_uint16_t outgoing_frame_counter_reserved;
+  zb_lbitfield_t outgoing_frame_counter_reserved:10;
+  zb_lbitfield_t key_attr:2; /*!< attributes of the key @ref zb_secur_key_attributes_t */
+  zb_lbitfield_t nvram_ds_version:2; /*!< dataset version stored at "nvram_offset" address in NVRAM.
+                                      *   Previous dataset versions may be stored in NVRAM during
+                                      *   migration from previous version until first page migration
+                                      *   or dataset rewriting. */
+  zb_lbitfield_t reserved:2;
 
   /* This counter uses in challenge rsp, 16 bits should be enough */
+  /* TODO: move the field into separate context */
   zb_uint16_t challenge_counter;
+
+  zb_address_ieee_ref_t device_addr_ref;
 } ZB_PACKED_STRUCT zb_aps_device_key_pair_array_t;
 
 
@@ -266,25 +288,17 @@ typedef ZB_PACKED_PRE struct zb_nwk_routing_s /* do not pack for IAR */
   zb_bitfield_t no_route_cache:1;        /*!< Dest does not store source routes. */
   zb_bitfield_t many_to_one:1;           /*!< Dest is the concentrator and many-to-one
                                           * request was used  */
+  /* TODO: implement `route_record_required` flag in neighbor table as optimization of route records count */
   zb_bitfield_t route_record_required:1; /*!< Route record command frame should
                                           * be sent to the dest prior to the
-                                          * next data packet */
+                                          * next data packet.
+                                          * The flag value is checked only for packets from ZR device itself and
+                                          * not checked for child ZED. */
 #endif
-#ifndef ZB_NO_NWK_MULTICAST
-  zb_bitfield_t group_id_flag:1; /*!< Indicates that dest_addr is a Group ID */
-#endif
-#if ZB_NWK_ROUTING_TABLE_EXPIRY < 64U
-  zb_bitfield_t expiry:6;  /*!< expiration time. max value -
-                            * ZB_NWK_ROUTING_TABLE_EXPIRY (60) */
-#else
+  zb_bitfield_t reserved:2;
   zb_uint8_t expiry;
-#endif
-#if !defined ZB_CONFIGURABLE_MEM && ZB_IEEE_ADDR_TABLE_SIZE <= 127U
-  zb_bitfield_t next_hop_addr_ref:7;
-#else
-  zb_uint8_t next_hop_addr_ref; /*!< ref to network address of the next
+  zb_address_ieee_ref_t next_hop_addr_ref; /*!< ref to network address of the next
                                             * hop on the way to the destination */
-#endif
   zb_uint16_t dest_addr; /*!< 16-bit network address or Group ID of this route */
 } ZB_PACKED_STRUCT
 zb_nwk_routing_t;
@@ -295,8 +309,9 @@ zb_nwk_routing_t;
 typedef struct zb_nwk_route_discovery_s /* do not pack for IAR */
 {
   zb_bitfield_t used:1; /*!< 1 if entry is used, 0 - otherwise   */
-  zb_bitfield_t expiration_time:7; /*!< Countdown timer indicating when route
+  zb_bitfield_t expiration_time:6; /*!< Countdown timer indicating when route
                                     * discovery expires. ZB_NWK_ROUTE_DISCOVERY_EXPIRY 10 */
+  zb_bitfield_t rrep_tx_failed:1; /*!< if RREP tX failed last time  */
   zb_uint8_t request_id; /*!< Sequence number for a route request */
   /* TODO: use 1 byte - index in the translation table */
   zb_uint16_t source_addr; /*!< 16-bit network address of the route
@@ -331,7 +346,7 @@ typedef struct zb_nwk_rrec_s    /* do not pack for IAR */
 
 typedef ZB_PACKED_PRE struct zb_aps_dup_tbl_ent_s
 {
-  zb_uint8_t addr_ref;          /*!< Reference to addr_map */
+  zb_address_ieee_ref_t addr_ref;          /*!< Reference to addr_map */
   zb_uint8_t counter;                      /*!< APS frame counter */
   zb_bitfield_t clock:6;                   /*!< Expiry clock counter. Be sure it can hold 2*ZB_APS_DUP_INITIAL_CLOCK */
   zb_bitfield_t is_unicast:1;              /*!< Is delivery mode unicast */
@@ -356,13 +371,6 @@ typedef ZB_PACKED_PRE struct zb_aps_bind_long_dst_addr_s
   zb_address_ieee_ref_t dst_addr;        /*!< destination address as ref from nwkAddressMap */
   zb_uint8_t            dst_end;         /*!< destination endpoint */
 } ZB_PACKED_STRUCT zb_aps_bind_long_dst_addr_t;
-
-#ifndef ZB_CONFIGURABLE_MEM
-#define ZB_APS_BIND_TRANS_TABLE_SIZE ((ZB_IOBUF_POOL_SIZE + 15U)/16U *4U)
-
-/* it should be 4-byte aligned if it is stored in NVRAM */
-#define ZB_SINGLE_TRANS_INDEX_SIZE (((ZB_APS_BIND_TRANS_TABLE_SIZE + 31U) / 32U) * 4U)
-#endif
 
 /**
    Global binding table - destination part
@@ -405,16 +413,6 @@ typedef ZB_PACKED_PRE struct zb_neighbor_tbl_ent_s /* not need to pack it at IAR
 
   zb_bitfield_t             device_type:2; /*!< Neighbor device type - @see @ref nwk_device_type */
 
-  zb_bitfield_t             depth:4; /*!< The network depth of this
-                                       device. A value of 0x00
-                                       indicates that this device is the
-                                       Zigbee coordinator for the
-                                       network.  */
-
-  zb_bitfield_t             send_via_routing:1;  /*!< Due to bad link to that device send packets
-                                                  *   via NWK routing.
-                                                  */
-
   zb_bitfield_t             relationship:3; /*!< The relationship between the
                                               neighbor and the current device:
                                               0x00=neighbor is the parent
@@ -434,20 +432,31 @@ typedef ZB_PACKED_PRE struct zb_neighbor_tbl_ent_s /* not need to pack it at IAR
    * can head the device but it can't hear us. Now that functionality is
    * implemented using outgoing_cost field. */
 
-  zb_bitfield_t             keepalive_received:1; /*!< This value indicates at least one keepalive
-                                                   *   has been received from the end device since
-                                                   *   the router has rebooted.
-                                                   */
-
-  zb_bitfield_t             mac_iface_idx:5;  /*!< An index into the MAC Interface Table
+  zb_bitfield_t             mac_iface_idx:3;  /*!< An index into the MAC Interface Table
                                                * indicating what interface the neighbor or
                                                * child is bound to. */
 
+  zb_bitfield_t             forward_failure_cnt:3;  /*!< Transmit failures during routing */
   zb_bitfield_t             transmit_failure_cnt:4;  /*!< Transmit failure counter (used to initiate
                                                       * device address
                                                       * search). */
   zb_bitfield_t             zvd_ephemeral_session_is_started:1; /*!< ZDD should be able to track ZVD session */
-  zb_bitfield_t             reserved:1;
+
+  zb_lbitfield_t            rx_on_when_idle:1; /*!< Indicates if neighbor receiver
+                                                  enabled during idle periods:
+                                                  TRUE = Receiver is on
+                                                  FALSE = Receiver is off
+                                                  This field should be present for
+                                                  entries that record the parent or
+                                                  children of a Zigbee router or
+                                                  Zigbee coordinator.  */
+
+  zb_lbitfield_t            keepalive_received:1; /*!< This value indicates at least one keepalive
+                                                    *   has been received from the end device since
+                                                    *   the router has rebooted.
+                                                    */
+
+  zb_lbitfield_t            nwk_timeout:4; /*!< End device timeout - @see @ref nwk_requested_timeout */
 
   zb_uint8_t                lqa;  /*!< Link quality. Also used to calculate
                                    * incoming cost */
@@ -465,6 +474,9 @@ typedef ZB_PACKED_PRE struct zb_neighbor_tbl_ent_s /* not need to pack it at IAR
 
 #if !defined ZB_ED_ROLE && defined ZB_MAC_DUTY_CYCLE_MONITORING
   zb_bitbool_t is_subghz:1;        /*!< if 1, this is Sub-GHz device */
+  /* Fields to be used by r22 & SE 1.4 SubGHz cluster. Note: that fields are meaningful only
+   * for r22 GB SubGhz with Star topology (no ZRs)! r23 NA & EU SubGHz supposes presence of SubGHz ZRs where
+   * SubGHz cluster can not be implemented by storing that values in nbt! */
   zb_bitbool_t suspended:1;        /*!< if 1, SuspendZCLMessages was sent to the device */
   zb_lbitfield_t pkt_count:22;       /*!< count of packets received from this device */
 #define MAX_NBT_PKT_COUNT ((1u<<22U)-1U)
@@ -505,27 +517,14 @@ typedef ZB_PACKED_PRE struct zb_neighbor_tbl_ent_s /* not need to pack it at IAR
                                                      * decremented once every nwkLinkStatusPeriod */
       zb_bitfield_t          router_inbound_act:4; /*!< Incremented whenever the local device is used by this neighbor as a next hop
                                                     * for a data packet; decremented once every nwkLinkStatusPeriod */
+#if 0
+      zb_uint16_t            routing_seq_num; /*!< Routing sequence number */
+#endif
     } ZB_PACKED_STRUCT r;
 
     ZB_PACKED_PRE struct ed_s
     {
-      zb_lbitfield_t          rx_on_when_idle:1; /*!< Indicates if neighbor receiver
-                                                      enabled during idle periods:
-                                                      TRUE = Receiver is on
-                                                      FALSE = Receiver is off
-                                                      This field should be present for
-                                                      entries that record the parent or
-                                                      children of a Zigbee router or
-                                                      Zigbee coordinator.  */
-
-      zb_lbitfield_t          keepalive_received:1; /*!< This value indicates at least one keepalive
-                                                       *   has been received from the end device since
-                                                       *   the router has rebooted.
-                                                       */
-
-      zb_lbitfield_t          nwk_timeout:4; /*!< End device timeout - @see @ref nwk_requested_timeout */
-
-      zb_lbitfield_t          time_to_expire:26; /*Time stamp for ED aging*/
+      zb_time_t          time_to_expire; /*Time stamp for ED aging*/
     } ZB_PACKED_STRUCT ed;
   } dev;
 } ZB_PACKED_STRUCT
@@ -541,7 +540,7 @@ zb_neighbor_tbl_ent_t;
  */
 #define ZB_NEIGHBOR_ENT_RX_ON_WHEN_IDLE(nbt)                                              \
   (((nbt)->device_type != ZB_NWK_DEVICE_TYPE_ED) ||                                       \
-    ((nbt)->device_type == ZB_NWK_DEVICE_TYPE_ED && ZB_U2B((nbt)->dev.ed.rx_on_when_idle)))
+    ((nbt)->device_type == ZB_NWK_DEVICE_TYPE_ED && ZB_U2B((nbt)->rx_on_when_idle)))
 
 /**
    Returns outgoing cost of route for the neighbor device.
@@ -551,7 +550,8 @@ zb_neighbor_tbl_ent_t;
    @return Outgoing cost of route
  */
 #define ZB_NEIGHBOR_ENT_GET_OUTGOING_COST(nbt)                                              \
-  ((ZB_NWK_IS_ZC_OR_ZR((nbt)->device_type)) ? (nbt)->dev.r.outgoing_cost : ZB_NWK_STATIC_PATH_COST)
+  ((ZB_NWK_IS_ZC_OR_ZR((nbt)->device_type)) ? (nbt)->dev.r.outgoing_cost :                  \
+    (((nbt)->device_type == ZB_NWK_DEVICE_TYPE_ED) ? 0U : ZB_NWK_STATIC_PATH_COST))
 
 /**
    Determines whether the neighbor device permits joining.
@@ -574,10 +574,10 @@ size of this table is 6 entries.  This table is described in Table
  */
 typedef ZB_PACKED_PRE struct zb_nwk_disc_tbl_ent_s
 {
-  zb_ieee_addr_compressed_t long_addr; /*!< 64-bit address (packed) */
+  zb_ieee_addr_t            long_addr; /*!< 64-bit address (packed) */
   zb_uint16_t               short_addr; /*!< 16-bit network address of the device. If -1, entry is free */
   zb_bitfield_t             used:1;         /*!< Record has used */
-  zb_bitfield_t             panid_ref:5; /*!< ref to the extended Pan id  */
+  zb_bitfield_t             panid_ref:7; /*!< ref to the extended Pan id  */
   zb_bitfield_t             permit_joining:1; /*!< A value of TRUE indicates that at
                                                 least one Zigbee router on the
                                                 network currently permits joining,
@@ -607,7 +607,6 @@ typedef ZB_PACKED_PRE struct zb_nwk_disc_tbl_ent_s
   zb_bitfield_t             tlv_found:1;
   zb_bitfield_t             support_kn_methods_tlv_found:1;
 
-  zb_bitfield_t             stack_profile:2; /*!< Zigbee stack profile id.   */
   zb_bitfield_t             channel_page:5; /*!< The current channel page occupied by the network. Max page # 31. Page 0 - 2.4GHz */
 
   zb_bitfield_t             device_type:2; /*!< Neighbor device type - \see
@@ -632,8 +631,8 @@ b.	If  ParentPreference indicates ?CSL Support? preferred, then parents advertis
   zb_bitfield_t             mac_iface_idx:2;  /*!< An index into the MAC Interface Table
                                                * indicating what interface the neighbor or
                                                * child is bound to. */
+  zb_bitfield_t             join_retry_cnt:4;
   zb_bitfield_t             pan_coordinator:1;
-  zb_bitfield_t             reserved:4;
 } ZB_PACKED_STRUCT
 zb_nwk_disc_tbl_ent_t;
 
@@ -831,5 +830,19 @@ zb_ncp_pending_calls_t;
 #endif /* NCP_MODE && !NCP_MODE_HOST */
 
 #endif /* !ZB_MINIMAL_CONTEXT */
+
+/* Parallel nwk_addr and node_desc req types */
+typedef zb_uint8_t zb_parallel_req_types_t;
+#define ZB_PARALLEL_REQ_NWK_ADDR_TYPE  0x00U
+#define ZB_PARALLEL_REQ_NODE_DESC_TYPE 0x01U
+
+/* Structure for parallel requests nwk_addr and node_desc */
+typedef ZB_PACKED_PRE struct zb_parallel_nwk_addr_and_node_req_s
+{
+  zb_bufid_t buf_ref;  /* Buf ref for pending pkt */
+  zb_uint8_t tsn;      /* TSN for nwk_addr_req pkt */
+  zb_uint8_t req_type; /* Parallel req type: nwk_addr or node_desc */
+} ZB_PACKED_STRUCT
+zb_parallel_nwk_addr_and_node_req_t;
 
 #endif /* ZB_ZBOSS_API_INTERNAL_H */

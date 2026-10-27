@@ -74,8 +74,8 @@ zb_discover_cmd_list_t gs_scenes_server_cmd_list =
   sizeof(gs_scenes_client_received_commands), gs_scenes_client_received_commands
 };
 
-zb_bool_t zb_zcl_process_scenes_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_scenes_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_scenes_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_scenes_specific_commands_cli(zb_cb_param_t param);
 zb_ret_t check_value_scenes(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 
 void zb_zcl_scenes_init_server()
@@ -145,46 +145,46 @@ zb_ret_t check_value_scenes(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t
 /** @internal @brief Processes Store scene command
     @param param - reference number of the command buffer
 */
-static void zb_zcl_scenes_process_store_scene_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info);
+static void zb_zcl_scenes_process_store_scene_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info);
 
 /** @internal @brief Processes Add scene command
     @param param - reference number of the command buffer
 */
-static void zb_zcl_scenes_process_add_scene_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info, zb_bool_t is_enhanced);
+static void zb_zcl_scenes_process_add_scene_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info, zb_bool_t is_enhanced);
 
 /** @internal @brief Processes View scene command
     @param param - reference number of the command buffer
 */
-static void zb_zcl_scenes_process_view_scene_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info, zb_bool_t is_enhanced);
+static void zb_zcl_scenes_process_view_scene_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info, zb_bool_t is_enhanced);
 
 /** @internal @brief Processes Remove scene command
     @param param - reference number of the command buffer
 */
-static void zb_zcl_scenes_process_remove_scene_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info);
+static void zb_zcl_scenes_process_remove_scene_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info);
 
 /** @internal @brief Processes Remove all scenes command
     @param param - reference number of the command buffer
 */
-static void zb_zcl_scenes_process_remove_all_scenes_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info);
+static void zb_zcl_scenes_process_remove_all_scenes_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info);
 
 /** @internal @brief Processes Get scene membership command
     @param param - reference number of the command buffer
 */
-static void zb_zcl_scenes_process_get_scene_membership_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info);
+static void zb_zcl_scenes_process_get_scene_membership_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info);
 
 /** @internal @brief Processes Recall scene command
     @param param - reference number of the command buffer
 */
-static void zb_zcl_scenes_process_recall_scene_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info);
+static void zb_zcl_scenes_process_recall_scene_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info);
 
 #ifndef ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED
 /** @internal @brief Processes Copy Scene command
     @param param - reference number of the command buffer
 */
-static void zb_zcl_scenes_process_copy_scene(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info);
+static void zb_zcl_scenes_process_copy_scene(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info);
 #endif /* !ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED */
 
-zb_bool_t zb_zcl_process_scenes_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_scenes_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -193,7 +193,7 @@ zb_bool_t zb_zcl_process_scenes_specific_commands(zb_uint8_t param)
   TRACE_MSG(
       TRACE_ZCL1,
       "> zb_zcl_process_scenes_specific_commands: param %d, cmd %d",
-      (FMT__H_H, param, cmd_info.cmd_id));
+      (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_SCENES == cmd_info.cluster_id);
 
@@ -253,10 +253,10 @@ zb_bool_t zb_zcl_process_scenes_specific_commands(zb_uint8_t param)
       (FMT__H, processed));
 
   return processed;
-} /* zb_bool_t zb_zcl_process_scenes_specific_commands(zb_uint8_t param) */
+} /* zb_bool_t zb_zcl_process_scenes_specific_commands(zb_bufid_t param) */
 
 
-zb_bool_t zb_zcl_process_scenes_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_scenes_specific_commands_srv(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -267,7 +267,7 @@ zb_bool_t zb_zcl_process_scenes_specific_commands_srv(zb_uint8_t param)
 }
 
 
-zb_bool_t zb_zcl_process_scenes_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_scenes_specific_commands_cli(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -277,7 +277,7 @@ zb_bool_t zb_zcl_process_scenes_specific_commands_cli(zb_uint8_t param)
   return zb_zcl_process_scenes_specific_commands(param);
 }
 
-zb_uint8_t zb_zcl_scenes_process_store_scene(zb_uint8_t param, zb_zcl_scenes_store_scene_req_t* req, const zb_zcl_parsed_hdr_t *cmd_info)
+zb_uint8_t zb_zcl_scenes_process_store_scene(zb_bufid_t param, zb_zcl_scenes_store_scene_req_t* req, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_uint8_t store_scene_status = ZB_ZCL_STATUS_SUCCESS;
 
@@ -292,7 +292,7 @@ zb_uint8_t zb_zcl_scenes_process_store_scene(zb_uint8_t param, zb_zcl_scenes_sto
   return store_scene_status;
 }
 
-static void zb_zcl_scenes_process_store_scene_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static void zb_zcl_scenes_process_store_scene_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_scenes_store_scene_req_t* req;
   zb_zcl_scenes_store_scene_req_t req_copy;
@@ -306,8 +306,8 @@ static void zb_zcl_scenes_process_store_scene_command(zb_uint8_t param, const zb
 
   TRACE_MSG(
       TRACE_ZCL1,
-      "> zb_zcl_scenes_process_store_scene_command param %hd",
-      (FMT__H, param));
+      "> zb_zcl_scenes_process_store_scene_command param %d",
+      (FMT__D, param));
 
   ZB_ZCL_SCENES_GET_STORE_SCENE_REQ(param, req);
 
@@ -414,9 +414,9 @@ static void zb_zcl_scenes_process_store_scene_command(zb_uint8_t param, const zb
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_scenes_process_store_scene_command", (FMT__0));
-} /* void zb_zcl_scenes_process_store_scene_command(zb_uint8_t param) */
+} /* void zb_zcl_scenes_process_store_scene_command(zb_bufid_t param) */
 
-static void zb_zcl_scenes_process_add_scene_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info, zb_bool_t is_enhanced)
+static void zb_zcl_scenes_process_add_scene_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info, zb_bool_t is_enhanced)
 {
   zb_zcl_scenes_add_scene_req_t* req;
   zb_zcl_scenes_add_scene_req_t req_copy;
@@ -431,8 +431,8 @@ static void zb_zcl_scenes_process_add_scene_command(zb_uint8_t param, const zb_z
 
   TRACE_MSG(
       TRACE_ZCL1,
-      "> zb_zcl_scenes_process_add_scene_command param %hd",
-      (FMT__H, param));
+      "> zb_zcl_scenes_process_add_scene_command param %d",
+      (FMT__D, param));
 
 #ifdef ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED
   ZVUNUSED(is_enhanced);
@@ -563,9 +563,9 @@ static void zb_zcl_scenes_process_add_scene_command(zb_uint8_t param, const zb_z
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_scenes_process_add_scene_command", (FMT__0));
-}/* void zb_zcl_scenes_process_add_scene_command(zb_uint8_t param) */
+}/* void zb_zcl_scenes_process_add_scene_command(zb_bufid_t param) */
 
-static void zb_zcl_scenes_process_view_scene_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info, zb_bool_t is_enhanced)
+static void zb_zcl_scenes_process_view_scene_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info, zb_bool_t is_enhanced)
 {
   zb_zcl_scenes_view_scene_req_t* req;
   zb_zcl_scenes_view_scene_req_t req_copy;
@@ -576,8 +576,8 @@ static void zb_zcl_scenes_process_view_scene_command(zb_uint8_t param, const zb_
 
   TRACE_MSG(
       TRACE_ZCL1,
-      "> zb_zcl_scenes_process_view_scene_command param %hd",
-      (FMT__H, param));
+      "> zb_zcl_scenes_process_view_scene_command param %d",
+      (FMT__D, param));
 
 #ifdef ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED
   ZVUNUSED(is_enhanced);
@@ -670,9 +670,9 @@ static void zb_zcl_scenes_process_view_scene_command(zb_uint8_t param, const zb_
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_scenes_process_view_scene_command", (FMT__0));
-} /* void zb_zcl_scenes_process_view_scene_command(zb_uint8_t param) */
+} /* void zb_zcl_scenes_process_view_scene_command(zb_bufid_t param) */
 
-static void zb_zcl_scenes_process_remove_scene_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static void zb_zcl_scenes_process_remove_scene_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_scenes_remove_scene_req_t* req;
   zb_zcl_scenes_remove_scene_req_t req_copy;
@@ -689,8 +689,8 @@ static void zb_zcl_scenes_process_remove_scene_command(zb_uint8_t param, const z
 
   TRACE_MSG(
       TRACE_ZCL1,
-      "> zb_zcl_scenes_process_remove_scene_command param %hd",
-      (FMT__H, param));
+      "> zb_zcl_scenes_process_remove_scene_command param %d",
+      (FMT__D, param));
 
   ZB_ZCL_SCENES_GET_REMOVE_SCENE_REQ(param, req);
 
@@ -789,9 +789,9 @@ static void zb_zcl_scenes_process_remove_scene_command(zb_uint8_t param, const z
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_scenes_process_remove_scene_command", (FMT__0));
-} /* void zb_zcl_scenes_process_remove_scene_command(zb_uint8_t param) */
+} /* void zb_zcl_scenes_process_remove_scene_command(zb_bufid_t param) */
 
-zb_uint8_t zb_zcl_scenes_process_remove_all_scenes(zb_uint8_t param, zb_zcl_scenes_remove_all_scenes_req_t* req, const zb_zcl_parsed_hdr_t *cmd_info)
+zb_uint8_t zb_zcl_scenes_process_remove_all_scenes(zb_bufid_t param, zb_zcl_scenes_remove_all_scenes_req_t* req, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_uint8_t remove_all_scenes_status = ZB_ZCL_STATUS_SUCCESS;
 
@@ -806,7 +806,7 @@ zb_uint8_t zb_zcl_scenes_process_remove_all_scenes(zb_uint8_t param, zb_zcl_scen
   return remove_all_scenes_status;
 }
 
-static void zb_zcl_scenes_process_remove_all_scenes_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static void zb_zcl_scenes_process_remove_all_scenes_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_scenes_remove_all_scenes_req_t* req;
   zb_zcl_scenes_remove_all_scenes_req_t req_copy;
@@ -818,8 +818,8 @@ static void zb_zcl_scenes_process_remove_all_scenes_command(zb_uint8_t param, co
 
   TRACE_MSG(
       TRACE_ZCL1,
-      "> zb_zcl_scenes_process_remove_all_scenes_command param %hd",
-      (FMT__H, param));
+      "> zb_zcl_scenes_process_remove_all_scenes_command param %d",
+      (FMT__D, param));
 
   ZB_ZCL_SCENES_GET_REMOVE_ALL_SCENES_REQ(param, req);
 
@@ -911,17 +911,17 @@ static void zb_zcl_scenes_process_remove_all_scenes_command(zb_uint8_t param, co
   }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_scenes_process_remove_all_scenes_command", (FMT__0));
-} /* void zb_zcl_scenes_process_remove_all_scenes_command(zb_uint8_t param) */
+} /* void zb_zcl_scenes_process_remove_all_scenes_command(zb_bufid_t param) */
 
-static void zb_zcl_scenes_process_get_scene_membership_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static void zb_zcl_scenes_process_get_scene_membership_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_scenes_get_scene_membership_req_t* req;
   zb_zcl_scenes_get_scene_membership_req_t req_copy;
 
   TRACE_MSG(
       TRACE_ZCL1,
-      "> zb_zcl_scenes_process_get_scene_membership_command param %hd",
-      (FMT__H, param));
+      "> zb_zcl_scenes_process_get_scene_membership_command param %d",
+      (FMT__D, param));
 
   ZB_ZCL_SCENES_GET_GET_SCENE_MEMBERSHIP_REQ(param, req);
 
@@ -962,9 +962,9 @@ static void zb_zcl_scenes_process_get_scene_membership_command(zb_uint8_t param,
       TRACE_ZCL1,
       "< zb_zcl_scenes_process_get_scene_membership_command",
       (FMT__0));
-} /* zb_zcl_scenes_process_get_scene_membership_command(zb_uint8_t param) */
+} /* zb_zcl_scenes_process_get_scene_membership_command(zb_bufid_t param) */
 
-zb_uint8_t zb_zcl_scenes_process_recall_scene(zb_uint8_t param, zb_zcl_scenes_recall_scene_req_t* req, const zb_zcl_parsed_hdr_t *cmd_info)
+zb_uint8_t zb_zcl_scenes_process_recall_scene(zb_bufid_t param, zb_zcl_scenes_recall_scene_req_t* req, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_uint8_t recall_scene_status = ZB_ZCL_STATUS_SUCCESS;
 
@@ -978,7 +978,7 @@ zb_uint8_t zb_zcl_scenes_process_recall_scene(zb_uint8_t param, zb_zcl_scenes_re
   return recall_scene_status;
 }
 
-static void zb_zcl_scenes_process_recall_scene_command(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static void zb_zcl_scenes_process_recall_scene_command(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_scenes_recall_scene_req_t* req;
   /* Initialize req_copy to fix 'uninitialized value' warning */
@@ -986,7 +986,7 @@ static void zb_zcl_scenes_process_recall_scene_command(zb_uint8_t param, const z
   zb_zcl_status_t recall_scene_status = ZB_ZCL_STATUS_FAIL;
   zb_uint8_t req_len;
 
-  TRACE_MSG( TRACE_ZCL1, "> zb_zcl_scenes_process_recall_scene_command param %hd", (FMT__H, param));
+  TRACE_MSG( TRACE_ZCL1, "> zb_zcl_scenes_process_recall_scene_command param %d", (FMT__D, param));
 
   ZB_ZCL_SCENES_GET_RECALL_SCENE_REQ(param, req, req_len);
 
@@ -1068,16 +1068,18 @@ static void zb_zcl_scenes_process_recall_scene_command(zb_uint8_t param, const z
       TRACE_ZCL1,
       "< zb_zcl_scenes_process_recall_scene_command",
       (FMT__0));
-} /* zb_zcl_scenes_process_recall_scene_command(zb_uint8_t param) */
+} /* zb_zcl_scenes_process_recall_scene_command(zb_bufid_t param) */
 
-void zb_zcl_scenes_remove_all_scenes_in_all_endpoints_by_group_id(zb_uint8_t param, zb_uint16_t group_id)
+void zb_zcl_scenes_remove_all_scenes_in_all_endpoints_by_group_id(zb_cb_param_t cb_param)
 {
   zb_zcl_scenes_remove_all_scenes_req_t req;
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_uint16_t group_id = ZB_UNPACK_USER_PARAM(cb_param);
 
   TRACE_MSG(
       TRACE_ZCL1,
-      "> zb_zcl_scenes_remove_all_scenes_in_all_endpoints_by_group_id param %hd group_id 0x%x",
-      (FMT__H_D, param, group_id));
+      "> zb_zcl_scenes_remove_all_scenes_in_all_endpoints_by_group_id param %d group_id 0x%x",
+      (FMT__D_D, param, group_id));
 
   req.group_id = group_id;
 
@@ -1094,12 +1096,12 @@ void zb_zcl_scenes_remove_all_scenes_in_all_endpoints_by_group_id(zb_uint8_t par
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_scenes_remove_all_scenes_in_all_endpoints_by_group_id", (FMT__0));
 }/* void zb_zcl_scenes_remove_scenes_in_all_endpoints(zb_uint16_t...) */
 
-void zb_zcl_scenes_remove_all_scenes_in_all_endpoints(zb_uint8_t param)
+void zb_zcl_scenes_remove_all_scenes_in_all_endpoints(zb_cb_param_t param)
 {
   TRACE_MSG(
       TRACE_ZCL1,
-      "> zb_zcl_scenes_remove_all_scenes_in_all_endpoints param %hd",
-      (FMT__H, param));
+      "> zb_zcl_scenes_remove_all_scenes_in_all_endpoints param %d",
+      (FMT__D, param));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
     ZB_ZCL_SCENES_INTERNAL_REMOVE_ALL_SCENES_ALL_ENDPOINTS_ALL_GROUPS_CB_ID, RET_ERROR, NULL, NULL, NULL);
@@ -1283,13 +1285,13 @@ void zb_zcl_scenes_send_recall_scene_req(zb_bufid_t buffer,
 
 #ifndef ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED
 
-static void zb_zcl_scenes_process_copy_scene(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static void zb_zcl_scenes_process_copy_scene(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_scenes_copy_scene_req_t* req;
   zb_zcl_scenes_copy_scene_req_t req_copy;
   zb_uint8_t num_copied_scenes = 0x00U;
 
-  TRACE_MSG(TRACE_ZCL1, ">>zb_zcl_scenes_process_copy_scene(), param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">>zb_zcl_scenes_process_copy_scene(), param %d", (FMT__D, param));
 
   /* Initialize with invalid IDs */
   req_copy.group_id_from = 0xFF;
@@ -1372,7 +1374,7 @@ static void zb_zcl_scenes_process_copy_scene(zb_uint8_t param, const zb_zcl_pars
 
   TRACE_MSG(TRACE_ZCL1, "<<zb_zcl_scenes_process_copy_scene()", (FMT__0));
 
-} /* void zb_zcl_scenes_process_copy_scene(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info) */
+} /* void zb_zcl_scenes_process_copy_scene(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info) */
 
 #endif /* !ZB_ZCL_SCENES_OPTIONAL_COMMANDS_DISABLED */
 

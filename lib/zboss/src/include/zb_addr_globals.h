@@ -38,7 +38,7 @@
  * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/* PURPOSE: Address compression, hash and etc.
+/* PURPOSE: Addresses table entry, hash and etc.
 */
 
 #ifndef ZB_ADDR_GLOBALS_H
@@ -74,38 +74,6 @@
 #include "zb_pooled_list.h"
 #include "zb_address.h"
 
-
-/**
-   Manufacturer part of IEEE address
-*/
-typedef ZB_PACKED_PRE struct zb_dev_manufacturer_s
-{
-  zb_uint8_t device_manufacturer[3]; /*!< Manufacturer identifier - 3 octets */
-}
-ZB_PACKED_STRUCT
-zb_dev_manufacturer_t;
-
-/**
- * @name Address redirect type
- * @anchor mac_command_frame_id
- *
- * Note: These values were members of `enum zb_addr_redirect_type_e` type but were converted to a
- * set of macros due to MISRA violations.
- */
-/** @{ */
-/** Regular record */
-#define ZB_ADDR_REDIRECT_NONE 0x00U
-/** Entry contains only short address and redirects to regular record with both addresses */
-#define ZB_ADDR_REDIRECT_SHORT 0x01U
-/** Entry contains only IEEE address and redirects to regular record with both addresses*/
-#define ZB_ADDR_REDIRECT_IEEE 0x02U
-/** @} */
-
-
-/* redirect/direct data structures are killed: they are the same actually. */
-/* zb_address_map_t is moved to zb_address.h */
-
-
 /**
    ext Pan ID and short Pan ID -> pan ref map
  */
@@ -123,29 +91,32 @@ typedef ZB_PACKED_PRE struct zb_pan_id_map_s
 */
 typedef struct zb_addr_globals_s
 {
-  zb_uint8_t used_manufacturer[ZB_DEV_MANUFACTURER_TABLE_SIZE / 8U + 1U];   /*!<
-                                                                           * dev_manufacturer
-                                                                           * usage mask  */
-  zb_dev_manufacturer_t dev_manufacturer[ZB_DEV_MANUFACTURER_TABLE_SIZE]; /*!<
-                                                                           * Manufacturers
-                                                                           * array */
-
   zb_pan_id_map_t pan_map[ZB_PANID_TABLE_SIZE]; /*!< Pan ID's hash */
   zb_uint8_t used_pan_addr[ZB_PANID_TABLE_SIZE / 8U + 1U]; /*!< pan_addr usage mask  */
 
 #ifndef ZB_CONFIGURABLE_MEM
   zb_address_map_t addr_map[ZB_IEEE_ADDR_TABLE_SIZE]; /*!< Address map - open
                                                        * hash by 64-bit address */
-  zb_uint8_t short_sorted[ZB_IEEE_ADDR_TABLE_SIZE]; /*!< 16-bits address sort array */
+  zb_address_ieee_ref_t short_sorted[ZB_IEEE_ADDR_TABLE_SIZE]; /*!< 16-bits address sort array */
+
 #else
   zb_address_map_t *addr_map;
-  zb_uint8_t *short_sorted;
+  zb_address_ieee_ref_t *short_sorted;
 #endif
+
   zb_ushort_t n_elements;                            /*!< # of elements in the
                                                      * address translation table  */
   zb_ushort_t n_sorted_elements; /*!< # of elements in the short_sorted[] */
   zb_ushort_t clock_i;           /*!< # of elements in the addr_map[] */
 } zb_addr_globals_t;
+
+#ifndef ZB_CONFIGURABLE_MEM
+#ifdef ZB_USE_1_BYTE_ADDR_REF
+ZB_ASSERT_COMPILE_DECL(ZB_IEEE_ADDR_TABLE_SIZE <= (zb_ushort_t)ZB_UINT8_MAX);
+#else
+ZB_ASSERT_COMPILE_DECL(ZB_IEEE_ADDR_TABLE_SIZE <= ZB_UINT16_MAX);
+#endif
+#endif /* ZB_CONFIGURABLE_MEM */
 
 
 /*! @} */

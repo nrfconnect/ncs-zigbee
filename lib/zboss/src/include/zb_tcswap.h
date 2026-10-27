@@ -171,7 +171,7 @@ typedef struct
   /* save/load volatile part */
   zb_uint8_t state;        //!< @see zb_tcsw_load_stage_t
   zb_uint_t  size;
-  zb_uint_t  dev_idx;
+  zb_aps_key_pair_ref_t  dev_idx;
   union
   {
     zb_tcsw_global_t global;

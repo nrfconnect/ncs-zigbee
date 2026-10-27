@@ -251,7 +251,7 @@ zb_zcl_reporting_flags_t;
 /************************** Reporting functions declarations **********************************/
 
 #ifdef ZB_ZCL_ENABLE_DEFAULT_REPORT_ATTR_PROCESSING
-void zb_zcl_report_attr_cmd_handler(zb_uint8_t param);
+void zb_zcl_report_attr_cmd_handler(zb_bufid_t param);
 #endif
 
 void zb_zcl_report_received(zb_uint8_t ep, zb_uint16_t cluster_id, zb_uint8_t cluster_role, zb_uint16_t attr_id);
@@ -279,7 +279,7 @@ zb_zcl_reporting_info_t* zb_zcl_find_reporting_info_manuf(  zb_uint8_t ep,
 zb_zcl_reporting_info_t* zb_zcl_get_next_reporting_info(
   zb_zcl_reporting_info_t *rep_info_init, zb_uint8_t is_manuf_spec);
 
-void zb_zcl_reporting_cb(zb_uint8_t param);
+void zb_zcl_reporting_cb(zb_cb_param_t param);
 
 void zb_zcl_save_reported_value(zb_zcl_reporting_info_t *rep_info, zb_zcl_attr_t* attr_desc);
 

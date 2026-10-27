@@ -67,7 +67,7 @@ zb_discover_cmd_list_t gs_price_server_cmd_list =
 
 typedef zb_uint8_t *(*zb_price_put_payload_cb_t)(zb_uint8_t *, const void *);
 
-zb_bool_t zb_zcl_process_s_price_specific_commands(zb_uint8_t param);
+zb_bool_t zb_zcl_process_s_price_specific_commands(zb_cb_param_t param);
 
 static zb_ret_t check_value_price(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 
@@ -187,7 +187,7 @@ static inline const zb_uint8_t *zb_zcl_price_ack_get_payload_from_data(
 }
 
 void zb_zcl_price_send_cmd_price_ack_tsn(
-  zb_uint8_t param,
+  zb_bufid_t param,
   const zb_addr_u *dst_addr,
   zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep,
@@ -215,7 +215,7 @@ void zb_zcl_price_send_cmd_price_ack_tsn(
 }
 
 void zb_zcl_price_send_cmd_price_ack(
-  zb_uint8_t param,
+  zb_bufid_t param,
   const zb_addr_u *dst_addr,
   zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep,
@@ -232,7 +232,7 @@ void zb_zcl_price_send_cmd_price_ack(
 }
 
 void zb_zcl_price_send_cmd_get_current_price(
-  zb_uint8_t param,
+  zb_bufid_t param,
   const zb_addr_u *dst_addr,
   zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep,
@@ -264,7 +264,7 @@ void zb_zcl_price_send_cmd_get_current_price(
   );
 }
 
-void zb_zcl_price_send_cmd_get_scheduled_prices(zb_uint8_t param,
+void zb_zcl_price_send_cmd_get_scheduled_prices(zb_bufid_t param,
   const zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep, zb_uint8_t src_ep,
   const zb_zcl_price_get_scheduled_prices_payload_t *payload,
@@ -288,7 +288,7 @@ void zb_zcl_price_send_cmd_get_scheduled_prices(zb_uint8_t param,
 }
 
 void zb_zcl_price_send_cmd_publish_price(
-  zb_uint8_t param,
+  zb_bufid_t param,
   const zb_addr_u *dst_addr,
   zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep,
@@ -365,7 +365,7 @@ static zb_uint8_t zb_zcl_price_calculate_publish_tier_labels_payload_size(zb_zcl
 }
 
 
-void zb_zcl_price_send_cmd_publish_tier_labels(zb_uint8_t param, zb_addr_u *dst_addr,
+void zb_zcl_price_send_cmd_publish_tier_labels(zb_bufid_t param, zb_addr_u *dst_addr,
                                                     zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                     zb_uint8_t src_ep,
                                                     zb_zcl_price_publish_tier_labels_payload_t *payload,
@@ -406,7 +406,7 @@ static zb_bool_t zb_price_publish_price_payload_is_valid(
 }
 
 /* Notify user about PriceAck command. */
-static zb_bool_t zb_zcl_price_process_price_ack(zb_uint8_t param,
+static zb_bool_t zb_zcl_price_process_price_ack(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_price_ack_payload_t  pl_in = ZB_ZCL_PRICE_ACK_PAYLOAD_INIT;
@@ -458,7 +458,7 @@ static zb_bool_t zb_zcl_price_process_price_ack(zb_uint8_t param,
 }
 
 
-static zb_bool_t zb_zcl_price_process_get_scheduled_prices(zb_uint8_t param,
+static zb_bool_t zb_zcl_price_process_get_scheduled_prices(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_price_get_scheduled_prices_payload_t pl_in = ZB_ZCL_PRICE_GET_SCHEDULED_PRICES_PAYLOAD_INIT;
@@ -508,7 +508,7 @@ static zb_bool_t zb_zcl_price_process_get_scheduled_prices(zb_uint8_t param,
 }
 
 
-static zb_bool_t zb_zcl_price_process_get_tier_labels(zb_uint8_t param,
+static zb_bool_t zb_zcl_price_process_get_tier_labels(zb_bufid_t param,
                                                       const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_price_get_tier_labels_payload_t pl_in;
@@ -564,7 +564,7 @@ static zb_bool_t zb_zcl_price_process_get_tier_labels(zb_uint8_t param,
 
 
 /* Get payload information from user and send PublishPrice to the client. */
-static void zb_zcl_price_process_get_current_price(zb_uint8_t param,
+static void zb_zcl_price_process_get_current_price(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_bool_t                                price_data_is_available = ZB_FALSE;
@@ -638,7 +638,7 @@ static void zb_zcl_price_process_get_current_price(zb_uint8_t param,
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_price_process_get_current_price", (FMT__0));
 }
 
-static zb_bool_t zb_zcl_process_price_server_commands(zb_uint8_t param,
+static zb_bool_t zb_zcl_process_price_server_commands(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_bool_t       processed = ZB_FALSE;
@@ -665,7 +665,7 @@ static zb_bool_t zb_zcl_process_price_server_commands(zb_uint8_t param,
   return processed;
 }
 
-zb_bool_t zb_zcl_process_s_price_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_s_price_specific_commands(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_bool_t           processed = ZB_FALSE;
@@ -679,7 +679,7 @@ zb_bool_t zb_zcl_process_s_price_specific_commands(zb_uint8_t param)
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_s_price_specific_commands, "
-            "param=%hd, cmd_id=%hd", (FMT__H_H, param, cmd_info.cmd_id));
+            "param=%d, cmd_id=%hd", (FMT__D_H, param, cmd_info.cmd_id));
 
   /* ZB_ASSERT(cmd_info.profile_id == ZB_AF_SE_PROFILE_ID); */
   ZB_ASSERT(cmd_info.cluster_id == ZB_ZCL_CLUSTER_ID_PRICE);

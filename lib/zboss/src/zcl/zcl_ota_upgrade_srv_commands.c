@@ -78,7 +78,7 @@ static zb_discover_cmd_list_t gs_ota_upgrade_server_cmd_list =
   sizeof(gs_ota_upgrade_client_received_commands), gs_ota_upgrade_client_received_commands
 };
 
-static zb_bool_t zb_zcl_process_ota_upgrade_specific_commands_srv(zb_uint8_t param);
+static zb_bool_t zb_zcl_process_ota_upgrade_specific_commands_srv(zb_cb_param_t param);
 
 void zb_zcl_ota_upgrade_init_srv()
 {
@@ -91,16 +91,16 @@ void zb_zcl_ota_upgrade_init_srv()
 
 static zb_ieee_addr_t zb_zcl_ota_upgrade_def_address = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 static zb_ret_t zcl_ota_upgrade_srv_query_img_invoke_user_app(
-  zb_uint8_t param, zb_zcl_addr_t *zcl_addr,
+  zb_bufid_t param, zb_zcl_addr_t *zcl_addr,
   zb_uint16_t image_type, zb_uint16_t manufacturer_code, zb_uint32_t version, zb_uint8_t *table_idx);
 static void zcl_ota_upgrade_srv_upgrade_started_invoke_user_app(
-  zb_uint8_t param, zb_zcl_addr_t *zcl_addr,
+  zb_bufid_t param, zb_zcl_addr_t *zcl_addr,
   zb_uint16_t image_type, zb_uint32_t version);
 static void zcl_ota_upgrade_srv_upgrade_aborted_invoke_user_app(
-  zb_uint8_t param, zb_zcl_addr_t *zcl_addr,
+  zb_bufid_t param, zb_zcl_addr_t *zcl_addr,
   zb_uint16_t image_type, zb_uint32_t version);
 static zb_ret_t zcl_ota_upgrade_srv_upgrade_end_invoke_user_app(
-  zb_uint8_t param, zb_zcl_addr_t *zcl_addr, zb_uint8_t status,
+  zb_bufid_t param, zb_zcl_addr_t *zcl_addr, zb_uint8_t status,
   zb_uint16_t image_type, zb_uint32_t version, zb_uint32_t* upgrade_time);
 
 /******************************** Helper function ****************************************/
@@ -177,7 +177,7 @@ void zb_zcl_ota_upgrade_init_server(zb_uint8_t endpoint, zb_zcl_ota_upgrade_next
 }
 
 /* public API */
-zb_ret_t zb_zcl_ota_upgrade_insert_file(zb_uint8_t param)
+zb_ret_t zb_zcl_ota_upgrade_insert_file(zb_bufid_t param)
 {
   zb_zcl_ota_upgrade_server_insert_file_t* insert_data =
       ZB_BUF_GET_PARAM(param, zb_zcl_ota_upgrade_server_insert_file_t);
@@ -185,7 +185,7 @@ zb_ret_t zb_zcl_ota_upgrade_insert_file(zb_uint8_t param)
   zb_zcl_ota_upgrade_server_variable_t *vars;
   zb_uint8_t endpoint;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_insert_file %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_insert_file %x", (FMT__D, param));
 
   endpoint = insert_data->endpoint;
 
@@ -256,7 +256,7 @@ zb_ret_t zb_zcl_ota_upgrade_insert_file(zb_uint8_t param)
 }
 
 /* public API */
-zb_ret_t zb_zcl_ota_upgrade_remove_file(zb_uint8_t param)
+zb_ret_t zb_zcl_ota_upgrade_remove_file(zb_bufid_t param)
 {
   zb_zcl_ota_upgrade_server_remove_file_t* remove_data =
       ZB_BUF_GET_PARAM(param, zb_zcl_ota_upgrade_server_remove_file_t);
@@ -264,7 +264,7 @@ zb_ret_t zb_zcl_ota_upgrade_remove_file(zb_uint8_t param)
 
   zb_zcl_ota_upgrade_server_variable_t *vars = get_upgrade_server_variables(remove_data->endpoint);
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_remove_file %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_remove_file %x", (FMT__D, param));
 
   if(remove_data->index < vars->table_length)
   {
@@ -346,7 +346,7 @@ void zb_zcl_ota_upgrade_send_query_next_image_response(zb_zcl_parsed_hdr_t *zcl_
 }
 
 /** @brief Query Next Image Request command */
-static zb_ret_t query_next_image_handler(zb_uint8_t param)
+static zb_ret_t query_next_image_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_NOT_FOUND;
   zb_zcl_ota_upgrade_query_next_image_t payload;
@@ -482,7 +482,7 @@ void zb_zcl_ota_upgrade_send_image_block_response(zb_zcl_parsed_hdr_t *zcl_heade
 }
 
 /** @brief Image Block Request command */
-static zb_ret_t image_block_handler(zb_uint8_t param)
+static zb_ret_t image_block_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_uint8_t max_data_size = ZB_ZCL_OTA_UPGRADE_QUERY_IMAGE_BLOCK_DATA_SIZE_MAX;
@@ -491,7 +491,7 @@ static zb_ret_t image_block_handler(zb_uint8_t param)
   zb_zcl_parsed_hdr_t cmd_info;
   zb_zcl_parsed_hdr_t *cmd_info_p = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
 
-  TRACE_MSG(TRACE_ZCL1, "> image_block_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> image_block_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, cmd_info_p, sizeof(zb_zcl_parsed_hdr_t));
 
@@ -594,14 +594,14 @@ static zb_ret_t image_block_handler(zb_uint8_t param)
 
 #if 0
 /** @brief Image Page Request command */
-static zb_ret_t image_page_handler(zb_uint8_t param)
+static zb_ret_t image_page_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ota_upgrade_image_page_t payload;
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, "> image_page_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> image_page_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -628,7 +628,7 @@ static zb_ret_t image_page_handler(zb_uint8_t param)
 #endif /*0*/
 
 /** @brief Upgrade End Request command */
-static zb_ret_t upgrade_end_handler(zb_uint8_t param)
+static zb_ret_t upgrade_end_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ota_upgrade_upgrade_end_t payload;
@@ -636,7 +636,7 @@ static zb_ret_t upgrade_end_handler(zb_uint8_t param)
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uint32_t upgrade_time = ZB_ZCL_OTA_UPGRADE_UPGRADE_TIME_DEF_VALUE;
 
-  TRACE_MSG(TRACE_ZCL1, "> upgrade_end_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> upgrade_end_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -721,14 +721,14 @@ static zb_ret_t upgrade_end_handler(zb_uint8_t param)
 }
 
 /** @brief Query Specific File command */
-static zb_ret_t query_specific_file_handler(zb_uint8_t param)
+static zb_ret_t query_specific_file_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ota_upgrade_query_specific_file_t payload;
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, "> query_specific_file_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> query_specific_file_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -810,13 +810,13 @@ static zb_ret_t query_specific_file_handler(zb_uint8_t param)
 
 
 /** @brief Default Response command */
-static zb_uint8_t zb_zcl_process_ota_upgrade_default_response_commands_srv(zb_uint8_t param)
+static zb_uint8_t zb_zcl_process_ota_upgrade_default_response_commands_srv(zb_bufid_t param)
 {
   zb_uint8_t ret = ZB_FALSE;
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
   zb_zcl_default_resp_payload_t* default_res;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_ota_upgrade_default_response_commands %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_ota_upgrade_default_response_commands %x", (FMT__D, param));
 
   if( cmd_info -> cmd_direction == ZB_ZCL_FRAME_DIRECTION_TO_CLI &&
       cmd_info -> is_common_command &&
@@ -853,14 +853,14 @@ static zb_uint8_t zb_zcl_process_ota_upgrade_default_response_commands_srv(zb_ui
 
 
 static zb_ret_t zcl_ota_upgrade_srv_query_img_invoke_user_app(
-  zb_uint8_t param, zb_zcl_addr_t *zcl_addr,
+  zb_bufid_t param, zb_zcl_addr_t *zcl_addr,
   zb_uint16_t image_type, zb_uint16_t manufacturer_code, zb_uint32_t version, zb_uint8_t *table_idx)
 {
   zb_ret_t ret;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, "> zcl_ota_upgrade_srv_query_img_invoke_user_app, param %hd",
-            (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zcl_ota_upgrade_srv_query_img_invoke_user_app, param %d",
+            (FMT__D, param));
   ret = RET_NOT_FOUND;
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
   if (ZCL_CTX().device_cb)
@@ -890,11 +890,11 @@ static zb_ret_t zcl_ota_upgrade_srv_query_img_invoke_user_app(
 
 
 static void zcl_ota_upgrade_srv_upgrade_started_invoke_user_app(
-  zb_uint8_t param, zb_zcl_addr_t *zcl_addr,
+  zb_bufid_t param, zb_zcl_addr_t *zcl_addr,
   zb_uint16_t image_type, zb_uint32_t version)
 {
-  TRACE_MSG(TRACE_ZCL1, "> zcl_ota_upgrade_srv_upgrade_started_invoke_user_app, param %hd",
-            (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zcl_ota_upgrade_srv_upgrade_started_invoke_user_app, param %d",
+            (FMT__D, param));
 
   if (ZCL_CTX().device_cb)
   {
@@ -916,11 +916,11 @@ static void zcl_ota_upgrade_srv_upgrade_started_invoke_user_app(
 
 
 static void zcl_ota_upgrade_srv_upgrade_aborted_invoke_user_app(
-  zb_uint8_t param, zb_zcl_addr_t *zcl_addr,
+  zb_bufid_t param, zb_zcl_addr_t *zcl_addr,
   zb_uint16_t image_type, zb_uint32_t version)
 {
-    TRACE_MSG(TRACE_ZCL1, "> zcl_ota_upgrade_srv_upgrade_aborted_invoke_user_app, param %hd",
-            (FMT__H, param));
+    TRACE_MSG(TRACE_ZCL1, "> zcl_ota_upgrade_srv_upgrade_aborted_invoke_user_app, param %d",
+            (FMT__D, param));
 
   if (ZCL_CTX().device_cb)
   {
@@ -941,13 +941,13 @@ static void zcl_ota_upgrade_srv_upgrade_aborted_invoke_user_app(
 }
 
 static zb_ret_t zcl_ota_upgrade_srv_upgrade_end_invoke_user_app(
-  zb_uint8_t param, zb_zcl_addr_t *zcl_addr, zb_uint8_t status,
+  zb_bufid_t param, zb_zcl_addr_t *zcl_addr, zb_uint8_t status,
   zb_uint16_t image_type, zb_uint32_t version, zb_uint32_t *upgrade_time)
 {
   zb_ret_t ret;
 
-  TRACE_MSG(TRACE_ZCL1, "> zcl_ota_upgrade_srv_upgrade_end_invoke_user_app, param %hd",
-            (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zcl_ota_upgrade_srv_upgrade_end_invoke_user_app, param %d",
+            (FMT__D, param));
   ret = RET_NOT_FOUND;
   if (ZCL_CTX().device_cb)
   {
@@ -972,7 +972,7 @@ static zb_ret_t zcl_ota_upgrade_srv_upgrade_end_invoke_user_app(
 }
 
 
-static zb_bool_t zb_zcl_process_ota_srv_upgrade_specific_commands(zb_uint8_t param)
+static zb_bool_t zb_zcl_process_ota_srv_upgrade_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -982,7 +982,7 @@ static zb_bool_t zb_zcl_process_ota_srv_upgrade_specific_commands(zb_uint8_t par
 
   TRACE_MSG( TRACE_ZCL1,
              "> zb_zcl_process_ota_upgrade_specific_commands: param %d, cmd %d",
-             (FMT__H_H, param, cmd_info.cmd_id));
+             (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_OTA_UPGRADE == cmd_info.cluster_id);
 
@@ -1051,7 +1051,7 @@ static zb_bool_t zb_zcl_process_ota_srv_upgrade_specific_commands(zb_uint8_t par
   return processed;
 }
 
-zb_bool_t zb_zcl_process_ota_upgrade_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_ota_upgrade_specific_commands_srv(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {

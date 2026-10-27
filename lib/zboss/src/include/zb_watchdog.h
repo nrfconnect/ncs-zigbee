@@ -74,7 +74,7 @@ typedef enum zb_watchdog_types_e
 
 void zb_add_watchdog(zb_uint8_t wd_number, zb_time_t timeout);
 void zb_kick_watchdog(zb_uint8_t wd_number);
-void zb_watchdog_scheduler(zb_uint8_t param);
+void zb_watchdog_scheduler(zb_cb_param_t param);
 void zb_stop_watchdog(zb_uint8_t wd_number);
 void zb_enable_watchdog(zb_uint8_t wd_number);
 void zb_disable_watchdog(zb_uint8_t wd_number);

@@ -50,6 +50,8 @@
 /*! \addtogroup channel_page */
 /*! @{ */
 
+#define ZB_INVALID_CHANNEL_MASK_VALUE          0U
+
 #define ZB_CHANNEL_PAGE_PAGE_BITMASK           0xF8000000u
 #define ZB_CHANNEL_PAGE_MASK_BITMASK           0x07FFFFFFu
 
@@ -553,6 +555,15 @@ zb_uint8_t zb_channel_page_list_get_channels_num(zb_channel_list_t list,
                                                  zb_uint8_t         idx);
 
 /**
+ * @brief Check the channel page list for emptiness
+ *
+ * @param list - channel page list
+ * @return ZB_TRUE if all list is empty.
+ */
+zb_bool_t zb_channel_page_list_is_empty(zb_channel_list_t list);
+
+
+/**
  * @brief Counts a number of set channels in the provided channel mask.
  *
  * @param page - channel page
@@ -561,6 +572,7 @@ zb_uint8_t zb_channel_page_list_get_channels_num(zb_channel_list_t list,
  * @return a number of set channels
  */
 zb_uint8_t zb_channel_mask_get_channels_num(zb_uint8_t page, zb_uint32_t channel_mask);
+
 
 #ifdef ZB_MAC_CONFIGURABLE_TX_POWER
 /**

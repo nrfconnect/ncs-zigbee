@@ -68,18 +68,6 @@
 #define TRACE_ADDR_FORWARD
 #endif  /* ZB_DEBUG_ADDR */
 
-/**
-   Compressed IEEE address. One byte  device manufacturer - reference to
-   \see zb_dev_manufacturer_t array.
-*/
-typedef ZB_PACKED_PRE struct zb_ieee_addr_compressed_s
-{
-  zb_uint8_t dev_manufacturer; /*!< Index from dev manufacturer array */
-  zb_uint8_t device_id[5]; /*!< Device ID */
-}
-ZB_PACKED_STRUCT
-zb_ieee_addr_compressed_t;
-
 /*! @endcond */
 
 
@@ -90,94 +78,155 @@ zb_ieee_addr_compressed_t;
 */
 typedef zb_uint8_t zb_address_pan_id_ref_t;
 
+#define ZB_ADDRESS_PAN_ID_REF_NONE ((zb_address_pan_id_ref_t)(-1))
 
 /**
    IEEE address reference
-
    Should be used inside protocol tables instead of 64/16-bit IEEE.
 */
+#ifndef ZB_NO_BIG_NET
+typedef zb_uint16_t zb_address_ieee_ref_t;
+#else
 typedef zb_uint8_t zb_address_ieee_ref_t;
+#endif /* !ZB_NO_BIG_NET */
 
 /*! @cond internals_doc */
 
 /**
-   64-bit / 16-bit address map
+   Element index in sorted short addresses table
+   Should be used to get short address by its index by
+   \ref zb_address_by_sorted_table_index function.
+*/
+typedef zb_address_ieee_ref_t zb_sorted_address_idx_t;
+
+/*! @endcond */
+
+/**
+   NONE IEEE address reference
+*/
+#define ZB_ADDRESS_IEEE_REF_NONE ((zb_address_ieee_ref_t)(-1))
+
+/**
+   First IEEE address reference
+*/
+#define ZB_ADDRESS_IEEE_REF_FIRST ((zb_address_ieee_ref_t)(0U))
+
+#define ZB_ADDRESS_SORTED_IDX_NONE ((zb_sorted_address_idx_t)(-1))
+
+/**
+ * Neighbor reference (index in neighbor table)
+ */
+typedef zb_uint8_t zb_nwk_neighbor_ref_t;
+
+#define ZB_NWK_NEIGHBOR_REF_NONE ((zb_uint8_t)-1)
+
+/*! @cond internals_doc */
+
+/**
+ * @brief IEEE address location in NVRAM
+ *
+ * NVRAM offset divided by 4 (relative to the NVRAM page start)
+ * (all NVRAM records are aligned by 4 bytes)
+ */
+typedef zb_uint16_t zb_address_location_t;
+
+#define ZB_ADDRESS_LOCATION_NONE ((zb_uint16_t)-1)
+
+/**
+ * @name Address redirect type
+ * @anchor zb_addr_redirect_type_t
+ *
+ * Note: These values were members of `enum zb_addr_redirect_type_e` type but were converted to a
+ * set of macros due to MISRA violations.
+ */
+/** @{ */
+/** Regular entry without redirect */
+#define ZB_ADDR_REDIRECT_NONE 0x00U
+/** Entry contains both short and IEEE addresses and linked with secondary entry that contains only short address */
+#define ZB_ADDR_REDIRECT_PRIMARY 0x01U
+/** Entry doesn't contain any address and redirects to primary entry with both addresses */
+#define ZB_ADDR_REDIRECT_SECONDARY 0x02U
+/** @} */
+
+typedef zb_uint8_t zb_addr_redirect_type_t;
+
+#ifdef ZB_DEBUG_ADDR_EXT
+
+#define ZB_ADDR_USAGE_TYPE_NONE 0U
+#define ZB_ADDR_USAGE_TYPE_ALLOC 1U
+#define ZB_ADDR_USAGE_TYPE_DELETE 2U
+#define ZB_ADDR_USAGE_TYPE_LOCK 3U
+#define ZB_ADDR_USAGE_TYPE_UNLOCK 4U
+
+typedef zb_uint8_t zb_addr_usage_type_t;
+
+typedef struct zb_addr_usage_s
+{
+  zb_uint8_t type;
+  zb_uint16_t file;
+  zb_uint16_t line;
+} zb_addr_usage_t;
+
+typedef struct zb_addr_debug_ctx_s
+{
+  zb_bool_t verification_pending;
+
+  zb_addr_usage_t usage_alloc;
+  zb_addr_usage_t usage_delete;
+  zb_addr_usage_t usages[ZB_DEBUG_ADDR_EXT_ADDR_USAGES_CNT];
+} zb_addr_debug_ctx_t;
+
+#endif /* ZB_DEBUG_ADDR_EXT */
+
+/**
+   64-bit / 16-bit address map (8 bytes)
 */
 typedef ZB_PACKED_PRE struct zb_address_map_s
 {
-  zb_ieee_addr_compressed_t  ieee_addr; /*!< Compressed IEEE address */
-  zb_uint16_t                addr; /*!< 16-bit device address */
-  zb_address_ieee_ref_t      redirect_ref; /*!< Reference to redirected or regular record */
+  zb_uint8_t lock_cnt;            /*!< lock counter (active references counter), not locked if 0 */
+  zb_bitfield_t used:1;           /*!< if 0, this entry is free (never used)  */
+  zb_bitfield_t redirect_type:2;  /*!< redirect type (see \ref zb_addr_redirect_type_t) */
+  zb_bitfield_t padding:5;        /*!< Explicit padding bits */
 
-  zb_bitfield_t              lock_cnt:8; /*!< lock counter. not locked if 0  */
-  zb_bitfield_t              used:1; /*!< if 0, this entry is free (never used)  */
-  zb_bitfield_t              has_address_conflict:1; /*!< Set to 1 if device discovers address conflict
-                                                      *   Cleared when conflict is resolved:
-                                                      *   - Device that discovers conflict sending  Network Status
-                                                      *   - or another Network Status with identical payload was received  */
-  zb_bitfield_t              padding:1; /*!< Explicit padding bits  */
-  zb_bitfield_t              ieee_req_in_progr:1; /*!< ieee request for that arrdess is in progress */
-  zb_bitfield_t              clock:1;    /*!< clock value for the clock usage algorithm  */
-  zb_bitfield_t              redirect_type:2; /*!< redirect type @ref addr_redirect_type */
-  zb_bitfield_t              pending_for_delete:1;    /*!< record is pending for deletion  */
+#ifdef ZB_DEBUG_ADDR_EXT
+  zb_addr_debug_ctx_t dbg_ctx;
+#endif /* ZB_DEBUG_ADDR_EXT */
 
+  /* primary or secondary (for redirected entries) data */
+  union
+  {
+    /* Primary entry data */
+    ZB_PACKED_PRE struct zb_address_map_primary_s
+    {
+      zb_address_location_t ieee_addr_location; /*!< IEEE address location in NVRAM,
+                                                 *   used for primary entries */
+      zb_uint16_t addr; /*!< 16-bit device address, used for primary entries */
+      zb_nwk_neighbor_ref_t neighbor_ref; /*!< Reference to neighbor (index in neighbor table) */
+
+      zb_bitfield_t has_address_conflict:1; /*!< Set to 1 if device discovers address conflict
+                                             *   Cleared when conflict is resolved:
+                                             *   - Device that discovers conflict sending Network Status
+                                             *   - or another Network Status with identical payload was received */
+      zb_bitfield_t ieee_req_in_progr:1; /*!< ieee request for that address is in progress */
+      zb_bitfield_t clock:1;    /*!< clock value for the clock usage algorithm */
+      zb_bitfield_t pending_for_delete:1;    /*!< record is pending for deletion */
+      zb_bitfield_t padding:4; /*!< Explicit padding bits */
+    } ZB_PACKED_STRUCT primary;
+
+    /* Secondary entry data (for entries redirected to primary entries) */
+    ZB_PACKED_PRE struct zb_address_map_secondary_s
+    {
+      zb_address_ieee_ref_t redirect_ref;  /*!< Reference to primary record */
+      zb_uint8_t padding[4]; /*!< Explicit padding bits */
+    } ZB_PACKED_STRUCT secondary;
+  } u;
 } ZB_PACKED_STRUCT zb_address_map_t;
 
-
-/**
-   \par work with compressed addresses
- */
-
-/*
-  * AS: Fixed wrong division 64-bit extended address into
-  * manufacturer specific and device unique parts.
-*/
-#define ZB_ADDRESS_DECOMPRESS(address, compressed_address)               \
-do                                                                      \
-{                                                                       \
-  if (ZB_ADDRESS_COMPRESSED_IS_UNKNOWN(compressed_address))               \
-  {                                                                     \
-    ZB_64BIT_ADDR_UNKNOWN(address);                                     \
-  }                                                                     \
-  else                                                                  \
-  {                                                                     \
-    ZB_MEMCPY(&((address)[5]),                                          \
-              &(ZG->addr.dev_manufacturer[(compressed_address).dev_manufacturer].device_manufacturer[0]), \
-              (sizeof((address)[0]) * 3U));                              \
-    ZB_MEMCPY(&((address)[0]), &((compressed_address).device_id[0]), (sizeof((address)[0]) * 5U)); \
-                                                                        \
-  }                                                                     \
-}                                                                       \
-while (0)
-
-/*
-#define ZB_ADDRESS_COMPRESSED_CMP(one, two) (             \
-    (one).dev_manufacturer == (two).dev_manufacturer      \
-  && (one).device_id[0] == (two).device_id[0]             \
-  && (one).device_id[1] == (two).device_id[1]             \
-  && (one).device_id[2] == (two).device_id[2]             \
-  && (one).device_id[3] == (two).device_id[3]             \
-  && (one).device_id[4] == (two).device_id[4] )
-*/
-zb_bool_t zb_address_compressed_cmp(const zb_ieee_addr_compressed_t *one, const zb_ieee_addr_compressed_t *two);
-#define ZB_ADDRESS_COMPRESSED_CMP(one, two) zb_address_compressed_cmp(&one, &two)
-
-#define ZB_ADDRESS_COMPRESSED_COPY(dest, src)                       \
-  ZB_MEMCPY(&(dest).dev_manufacturer, &(src).dev_manufacturer, sizeof(zb_ieee_addr_compressed_t))
-
-  /* g_zero_addr is declared as ZB_CONST which allows IAR to place it in CODE memory.
-     Compiled this by IAR 7.60 for 8051.
-     This placement changes pointer type making it unusable
-     Is this cast needed here?
-  */
-#define ZB_ADDRESS_COMPRESSED_IS_ZERO(dest)      \
-  (ZB_MEMCMP(&(dest).dev_manufacturer, (void const *)g_zero_addr, sizeof(zb_ieee_addr_compressed_t)) == 0)
-
-#define ZB_ADDRESS_COMPRESSED_IS_UNKNOWN(dest)      \
-  (ZB_MEMCMP(&(dest).dev_manufacturer, (void const *)g_unknown_ieee_addr, sizeof(zb_ieee_addr_compressed_t)) == 0)
-
-#define ZB_ADDRESS_COMPRESS_UNKNOWN(dest)     \
-  (ZB_MEMCPY(&(dest).dev_manufacturer, (void const *)g_unknown_ieee_addr, sizeof(zb_ieee_addr_compressed_t)))
+#ifdef ZB_DEBUG_ADDR_EXT
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_address_map_t) == 8U + sizeof(zb_addr_debug_ctx_t));
+#else
+ZB_ASSERT_COMPILE_DECL(sizeof(zb_address_map_t) == 8U);
+#endif
 
 /**
    Add Pan ID to address storage and return reference.
@@ -201,7 +250,7 @@ zb_bool_t zb_address_compressed_cmp(const zb_ieee_addr_compressed_t *one, const 
 @endcode
 
  */
-zb_ret_t zb_address_set_pan_id(zb_uint16_t short_pan_id, zb_ext_pan_id_t pan_id, zb_address_pan_id_ref_t *ref);
+zb_ret_t zb_address_set_pan_id(zb_uint16_t short_pan_id, const zb_ext_pan_id_t pan_id, zb_address_pan_id_ref_t *ref);
 
 
 /**
@@ -242,7 +291,7 @@ void zb_address_get_pan_id(zb_address_pan_id_ref_t pan_id_ref, zb_ext_pan_id_t p
    @return nothing
 
  */
-void zb_address_clear_pan_id_table(zb_ext_pan_id_t pan_id);
+void zb_address_clear_pan_id_table(const zb_ext_pan_id_t pan_id);
 
 /**
    Clears whole Pan ID table
@@ -272,7 +321,7 @@ void zb_address_reset_pan_id_table(void);
     }
 @endcode
  */
-zb_ret_t zb_address_get_pan_id_ref(zb_ext_pan_id_t pan_id, zb_address_pan_id_ref_t *ref);
+zb_ret_t zb_address_get_pan_id_ref(const zb_ext_pan_id_t pan_id, zb_address_pan_id_ref_t *ref);
 
 /**
    Get short Pan ID with reference.
@@ -316,7 +365,7 @@ void zb_address_get_short_pan_id(zb_address_pan_id_ref_t pan_id_ref, zb_uint16_t
     }
 @endcode
  */
-zb_bool_t zb_address_cmp_pan_id_by_ref(zb_address_pan_id_ref_t pan_id_ref, zb_ext_pan_id_t pan_id);
+zb_bool_t zb_address_cmp_pan_id_by_ref(zb_address_pan_id_ref_t pan_id_ref, const zb_ext_pan_id_t pan_id);
 
 /**
    Update long/short address pair. Create the pair if not exist. Optionally, lock.
@@ -347,7 +396,15 @@ zb_bool_t zb_address_cmp_pan_id_by_ref(zb_address_pan_id_ref_t pan_id_ref, zb_ex
 @endcode
 
  */
-zb_ret_t zb_address_update(zb_ieee_addr_t ieee_address, zb_uint16_t short_address, zb_bool_t lock, zb_address_ieee_ref_t *ref_p);
+#define zb_address_update(ieee_address, short_address, lock, ref_p) \
+  zb_address_update_func(TRACE_ADDR_CALL (ieee_address), (short_address), (lock), (ref_p))
+
+zb_ret_t zb_address_update_func(TRACE_ADDR_PROTO
+  const zb_ieee_addr_t ieee_address,
+  zb_uint16_t short_address,
+  zb_bool_t lock,
+  zb_address_ieee_ref_t *ref_p);
+
 
 /**
    Update address pair if one or oth of its component were unknown.
@@ -356,9 +413,15 @@ zb_ret_t zb_address_update(zb_ieee_addr_t ieee_address, zb_uint16_t short_addres
    @param short_address - short address
    @return RET_OK or error code
  */
-zb_ret_t zb_address_update_if_absent(zb_ieee_addr_t ieee_address, zb_uint16_t short_address);
+#define zb_address_update_if_absent(ieee_address, short_address) \
+  zb_address_update_if_absent_func(TRACE_ADDR_CALL (ieee_address), (short_address))
 
-void zb_long_address_update_by_ref(zb_ieee_addr_t ieee_address, zb_address_ieee_ref_t ref);
+zb_ret_t zb_address_update_if_absent_func(TRACE_ADDR_PROTO const zb_ieee_addr_t ieee_address, zb_uint16_t short_address);
+
+#define zb_long_address_update_by_ref(ieee_address, ref) \
+  zb_long_address_update_by_ref_func(TRACE_ADDR_CALL (ieee_address), (ref))
+
+void zb_long_address_update_by_ref_func(TRACE_ADDR_PROTO const zb_ieee_addr_t ieee_address, zb_address_ieee_ref_t ref);
 
 /**
    Get address with address reference.
@@ -378,7 +441,13 @@ void zb_long_address_update_by_ref(zb_ieee_addr_t ieee_address, zb_address_ieee_
 @endcode
 
  */
-void zb_address_by_ref(zb_ieee_addr_t ieee_address, zb_uint16_t *short_address_p, zb_address_ieee_ref_t ref);
+#define zb_address_by_ref(ieee_address, short_address_p, ref) \
+  zb_address_by_ref_func(TRACE_ADDR_CALL (ieee_address), (short_address_p), (ref))
+
+void zb_address_by_ref_func(
+  TRACE_ADDR_PROTO zb_ieee_addr_t ieee_address,
+  zb_uint16_t *short_address_p,
+  zb_address_ieee_ref_t ref);
 
 /**
    Get IEEE address with address reference.
@@ -399,7 +468,10 @@ void func(zb_neighbor_tbl_ent_t *nbt)
 @endcode
 
  */
-void zb_address_ieee_by_ref(zb_ieee_addr_t ieee_address, zb_address_ieee_ref_t ref);
+#define zb_address_ieee_by_ref(ieee_address, ref) \
+  zb_address_ieee_by_ref_func(TRACE_ADDR_CALL (ieee_address), (ref))
+
+void zb_address_ieee_by_ref_func(TRACE_ADDR_PROTO zb_ieee_addr_t ieee_address, zb_address_ieee_ref_t ref);
 
 
 /**
@@ -422,7 +494,10 @@ void zb_address_ieee_by_ref(zb_ieee_addr_t ieee_address, zb_address_ieee_ref_t r
 @endcode
 
  */
-void zb_address_short_by_ref(zb_uint16_t *short_address_p, zb_address_ieee_ref_t ref);
+#define zb_address_short_by_ref(short_address_p, ref) \
+  zb_address_short_by_ref_func(TRACE_ADDR_CALL (short_address_p), (ref))
+
+void zb_address_short_by_ref_func(TRACE_ADDR_PROTO zb_uint16_t *short_address_p, zb_address_ieee_ref_t ref);
 
 /**
    Get address ref by long address, optionally create if not exist, optionally lock.
@@ -451,8 +526,14 @@ void zb_address_short_by_ref(zb_uint16_t *short_address_p, zb_address_ieee_ref_t
 @endcode
 
  */
-zb_ret_t zb_address_by_ieee(const zb_ieee_addr_t ieee, zb_bool_t create, zb_bool_t lock, zb_address_ieee_ref_t *ref_p);
+#define zb_address_by_ieee(ieee, create, lock, ref_p) \
+  zb_address_by_ieee_func(TRACE_ADDR_CALL (ieee), (create), (lock), (ref_p))
 
+zb_ret_t zb_address_by_ieee_func(
+   TRACE_ADDR_PROTO const zb_ieee_addr_t ieee,
+   zb_bool_t create,
+   zb_bool_t lock,
+   zb_address_ieee_ref_t *ref_p);
 
 
 /**
@@ -466,7 +547,10 @@ zb_ret_t zb_address_by_ieee(const zb_ieee_addr_t ieee, zb_bool_t create, zb_bool
 
    @return RET_OK or RET_NOT_FOUND
 */
-zb_ret_t zb_address_get_by_ieee(const zb_ieee_addr_t ieee, zb_address_ieee_ref_t *ref_p);
+#define zb_address_get_by_ieee(ieee, ref_p) \
+  zb_address_get_by_ieee_func(TRACE_ADDR_CALL (ieee), (ref_p))
+
+zb_ret_t zb_address_get_by_ieee_func(TRACE_ADDR_PROTO const zb_ieee_addr_t ieee, zb_address_ieee_ref_t *ref_p);
 
 
 
@@ -481,7 +565,12 @@ zb_ret_t zb_address_get_by_ieee(const zb_ieee_addr_t ieee, zb_address_ieee_ref_t
 
    @return RET_OK or RET_NOT_FOUND
 */
-zb_ret_t zb_address_get_by_ieee_lk(const zb_ieee_addr_t ieee, zb_address_ieee_ref_t *ref_p);
+#define zb_address_get_by_ieee_lk(ieee, ref_p) \
+  zb_address_get_by_ieee_lk_func(TRACE_ADDR_CALL (ieee), (ref_p))
+
+zb_ret_t zb_address_get_by_ieee_lk_func(
+  TRACE_ADDR_PROTO const zb_ieee_addr_t ieee,
+  zb_address_ieee_ref_t *ref_p);
 
 
 /**
@@ -497,7 +586,10 @@ zb_ret_t zb_address_get_by_ieee_lk(const zb_ieee_addr_t ieee, zb_address_ieee_re
    @par
 
  */
-zb_uint16_t zb_address_short_by_ieee(const zb_ieee_addr_t ieee_address);
+#define zb_address_short_by_ieee(ieee_address) \
+  zb_address_short_by_ieee_func(TRACE_ADDR_CALL (ieee_address))
+
+zb_uint16_t zb_address_short_by_ieee_func(TRACE_ADDR_PROTO const zb_ieee_addr_t ieee_address);
 
 
 /**
@@ -512,7 +604,10 @@ zb_uint16_t zb_address_short_by_ieee(const zb_ieee_addr_t ieee_address);
    @snippet light_sample_HA_1_2_bulb/light_coordinator_HA_1_2_bulb/light_zc_HA_1_2_bulb.c address_ieee_by_short
 
  */
-zb_ret_t zb_address_ieee_by_short(zb_uint16_t short_addr, zb_ieee_addr_t ieee_address);
+#define zb_address_ieee_by_short(short_addr, ieee_address) \
+  zb_address_ieee_by_short_func(TRACE_ADDR_CALL (short_addr), (ieee_address))
+
+zb_ret_t zb_address_ieee_by_short_func(TRACE_ADDR_PROTO zb_uint16_t short_addr, zb_ieee_addr_t ieee_address);
 
 
 /**
@@ -531,8 +626,15 @@ zb_ret_t zb_address_ieee_by_short(zb_uint16_t short_addr, zb_ieee_addr_t ieee_ad
    @snippet simple_gw/simple_gw.c address_by_short
 
  */
-zb_ret_t zb_address_by_short(zb_uint16_t short_address, zb_bool_t create, zb_bool_t lock, zb_address_ieee_ref_t *ref_p);
+#define zb_address_by_short(short_address, create, lock, ref_p) \
+  zb_address_by_short_func(TRACE_ADDR_CALL (short_address), (create), (lock), (ref_p))
 
+
+zb_ret_t zb_address_by_short_func(
+   TRACE_ADDR_PROTO zb_uint16_t short_address,
+   zb_bool_t create,
+   zb_bool_t lock,
+   zb_address_ieee_ref_t *ref_p);
 
 
 /**
@@ -547,8 +649,10 @@ zb_ret_t zb_address_by_short(zb_uint16_t short_address, zb_bool_t create, zb_boo
    @return RET_OK or RET_NOT_FOUND
 
  */
+#define zb_address_get_by_short(short_address, ref_p) \
+  zb_address_get_by_short_func(TRACE_ADDR_CALL (short_address), (ref_p))
 
-zb_ret_t zb_address_get_by_short(zb_uint16_t short_address, zb_address_ieee_ref_t *ref_p);
+zb_ret_t zb_address_get_by_short_func(TRACE_ADDR_PROTO zb_uint16_t short_address, zb_address_ieee_ref_t *ref_p);
 
 /**
    Get address reference by short address, lock address
@@ -562,8 +666,10 @@ zb_ret_t zb_address_get_by_short(zb_uint16_t short_address, zb_address_ieee_ref_
    @return RET_OK or RET_NOT_FOUND
 
  */
+#define zb_address_get_by_short_lk(short_address, ref_p) \
+  zb_address_get_by_short_lk_func(TRACE_ADDR_CALL (short_address), (ref_p))
 
-zb_ret_t zb_address_get_by_short_lk(zb_uint16_t short_address, zb_address_ieee_ref_t *ref_p);
+zb_ret_t zb_address_get_by_short_lk_func(TRACE_ADDR_PROTO zb_uint16_t short_address, zb_address_ieee_ref_t *ref_p);
 
 
 /*! @cond internals_doc */
@@ -585,7 +691,7 @@ zb_ret_t zb_address_get_by_short_lk(zb_uint16_t short_address, zb_address_ieee_r
     }
 @endcode
  */
-zb_ret_t zb_address_by_sorted_table_index(zb_ushort_t index, zb_address_ieee_ref_t *ref_p);
+zb_ret_t zb_address_by_sorted_table_index(zb_sorted_address_idx_t index, zb_address_ieee_ref_t *ref_p);
 /*! @endcond */
 
 /**
@@ -598,6 +704,12 @@ zb_ret_t zb_address_by_sorted_table_index(zb_ushort_t index, zb_address_ieee_ref
 zb_bool_t zb_address_is_locked(zb_address_ieee_ref_t ref);
 
 
+#define zb_address_get_primary_entry(addr_ref) \
+  zb_address_get_primary_entry_func(TRACE_ADDR_CALL (addr_ref))
+
+zb_address_map_t *zb_address_get_primary_entry_func(
+  TRACE_ADDR_PROTO zb_address_ieee_ref_t addr_ref);
+
 /**
 
    Increase address lock counter, when it used in some table.
@@ -607,7 +719,8 @@ zb_bool_t zb_address_is_locked(zb_address_ieee_ref_t ref);
 
    @return RET_OK or RET_ERROR
  */
-#define zb_address_lock(ref) zb_address_lock_func(TRACE_ADDR_CALL ref)
+#define zb_address_lock(ref) \
+  zb_address_lock_func(TRACE_ADDR_CALL (ref))
 
 zb_ret_t zb_address_lock_func(TRACE_ADDR_PROTO zb_address_ieee_ref_t ref);
 
@@ -618,7 +731,8 @@ zb_ret_t zb_address_lock_func(TRACE_ADDR_PROTO zb_address_ieee_ref_t ref);
 
    @param ref - IEEE/network address pair reference
  */
-#define zb_address_unlock(ref) zb_address_unlock_func(TRACE_ADDR_CALL ref)
+#define zb_address_unlock(ref) \
+  zb_address_unlock_func(TRACE_ADDR_CALL (ref))
 
 void zb_address_unlock_func(TRACE_ADDR_PROTO zb_address_ieee_ref_t ref);
 
@@ -629,62 +743,13 @@ void zb_address_unlock_func(TRACE_ADDR_PROTO zb_address_ieee_ref_t ref);
 
    @param ref - IEEE/network address pair reference
  */
-zb_ret_t zb_address_delete(zb_address_ieee_ref_t ref);
+#define zb_address_delete(ref) \
+  zb_address_delete_func(TRACE_ADDR_CALL (ref))
+
+zb_ret_t zb_address_delete_func(TRACE_ADDR_PROTO zb_address_ieee_ref_t ref);
 
 
 /*! @cond internals_doc */
-
-/**
-   Compress long address: store manufacturer address part elsewhere
-
-   This routine packs 8 bytes address to 6 bytes
-
-   @param address - uncompressed address
-   @param compressed_address - (out) compressed address
-
-   @b Example
-@code
-  void func(zb_address_pan_id_ref_t panid_ref, zb_ieee_addr_t long_addr, zb_ext_neighbor_tbl_ent_t **enbt)
-  {
-    zb_ieee_addr_compressed_t compressed_addr;
-    zb_ieee_addr_compress(long_addr, &compressed_addr);
-
-    for (i = 0 ; i < ZG->nwk.neighbor.ext_neighbor_used ; ++i)
-    {
-      if (ZG->nwk.neighbor.ext_neighbor[i].panid_ref == panid_ref
-          && ZB_ADDRESS_COMPRESSED_CMP(ZG->nwk.neighbor.ext_neighbor[i].long_addr, compressed_addr))
-      {
-         *enbt = &ZG->nwk.neighbor.ext_neighbor[i];
-      }
-    }
-  }
-@endcode
- */
-void zb_ieee_addr_compress(const zb_ieee_addr_t address, zb_ieee_addr_compressed_t *compressed_address);
-
-
-/**
-   Decompress compressed long address.
-
-   This routine unpacks 6 bytes address to 8 bytes
-
-   @param address - (out) uncompressed address
-   @param compressed_address - compressed address
-
-   @b Example
-@code
-    zb_ieee_addr_t long_address;
-    if (ZG->nwk.neighbor.ext_neighbor[i].short_addr != (zb_uint16_t)~0)
-    {
-      if (!ZB_ADDRESS_COMPRESSED_IS_UNKNOWN(ZG->nwk.neighbor.ext_neighbor[i].long_addr))
-      {
-        zb_ieee_addr_decompress(long_address, &ZG->nwk.neighbor.ext_neighbor[i].long_addr);
-        zb_address_update(long_address, ZG->nwk.neighbor.ext_neighbor[i].short_addr, ZB_FALSE, &addr_ref);
-      }
-    }
-@endcode
- */
-void zb_ieee_addr_decompress(zb_ieee_addr_t address, zb_ieee_addr_compressed_t *compressed_address);
 
 /**
    Check that two address refs refer to the one address.
@@ -709,21 +774,54 @@ zb_bool_t zb_address_in_use(zb_address_ieee_ref_t ref);
 /**
  * @brief Check if address tables have enough memory for the new address
  *
-   @param new_addr - new uncompressed IEEE address
+   @param new_addr - new IEEE address
  * @return zb_bool_t ZB_TRUE if there is enough memory, ZB_FALSE otherwise.
  */
 zb_bool_t zb_address_check_mem_for_new_addr(const zb_ieee_addr_t new_addr);
+
+
+/**
+   Reset address map.
+
+   It is the caller's responsibility to ensure that no addr ref is in use since all addr refs will be invalidated.
+
+   @return RET_OK or error code
+ */
+void zb_address_reset(void);
+
+#define zb_address_setup_ieee_disc(short_addr) zb_address_setup_ieee_disc_func(TRACE_ADDR_CALL (short_addr))
+zb_bool_t zb_address_setup_ieee_disc_func(TRACE_ADDR_PROTO zb_uint16_t short_addr);
+
+#define zb_address_done_ieee_disc(short_addr) zb_address_done_ieee_disc_func(TRACE_ADDR_CALL (short_addr))
+void zb_address_done_ieee_disc_func(TRACE_ADDR_PROTO zb_uint16_t short_addr);
+
+#define zb_address_setup_short_disc(ref) zb_address_setup_short_disc_func(TRACE_ADDR_CALL (ref))
+zb_bool_t zb_address_setup_short_disc_func(TRACE_ADDR_PROTO zb_address_ieee_ref_t ref);
+
+#define zb_address_done_short_disc(ref) zb_address_done_short_disc_func(TRACE_ADDR_CALL (ref))
+void zb_address_done_short_disc_func(TRACE_ADDR_PROTO zb_address_ieee_ref_t ref);
+
+#define zb_address_setup_addr_conflict(ref) zb_address_setup_addr_conflict_func(TRACE_ADDR_CALL (ref))
+zb_bool_t zb_address_setup_addr_conflict_func(TRACE_ADDR_PROTO zb_address_ieee_ref_t ref);
+
+#define zb_address_done_addr_conflict(ref) zb_address_done_addr_conflict_func(TRACE_ADDR_CALL (ref))
+zb_bool_t zb_address_done_addr_conflict_func(TRACE_ADDR_PROTO zb_address_ieee_ref_t ref);
+
+/* Neighbor table reference */
+
+void zb_address_clear_neighbor_refs(void);
+
+#define zb_address_get_neighbor_ref(ref) \
+  zb_address_get_neighbor_ref_func(TRACE_ADDR_CALL (ref))
+
+zb_nwk_neighbor_ref_t zb_address_get_neighbor_ref_func(TRACE_ADDR_PROTO zb_address_ieee_ref_t ref);
+
+#define zb_address_set_neighbor_ref(ref, neighbor_ref) \
+  zb_address_set_neighbor_ref_func(TRACE_ADDR_CALL (ref), (neighbor_ref))
+
+void zb_address_set_neighbor_ref_func(TRACE_ADDR_PROTO zb_address_ieee_ref_t ref, zb_nwk_neighbor_ref_t neighbor_ref);
+
 /*! @endcond */
-
-zb_bool_t zb_address_setup_ieee_disc(zb_uint16_t short_addr);
-
-void zb_address_done_ieee_disc(zb_uint16_t short_addr);
-
-zb_bool_t zb_address_setup_short_disc(zb_address_ieee_ref_t ref);
-
-void zb_address_done_short_disc(zb_address_ieee_ref_t ref);
-
-void zb_address_dump_redirs(void);
 
 /*! @} */
 

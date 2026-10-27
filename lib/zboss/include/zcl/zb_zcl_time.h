@@ -153,7 +153,7 @@ void zb_zcl_time_server_synchronize(zb_uint8_t endpoint, zb_zcl_time_sync_time_s
  * @details Handles read attribute response while time synchronization process running.
  *          If time synchronization process is not started or finished there will be no processing.
  */
-zb_bool_t zb_zcl_time_server_read_attr_handle(zb_uint8_t param);
+zb_bool_t zb_zcl_time_server_read_attr_handle(zb_bufid_t param);
 
 
 /** @defgroup ZB_ZCL_TIME_ATTRS Time cluster attributes

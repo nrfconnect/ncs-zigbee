@@ -114,7 +114,7 @@
  */
 #define ZB_LIST_FIELD(type, name) type name ## _next; type name ## _prev
 
-#if defined DEBUG && defined __GNUC__
+#if defined(ZB_LIST_CHECK_ENT_ENABLED) && defined(__GNUC__)
 #define ZB_LIST_CHECK_ENT(list, name, ent) do { \
  {                                              \
    typeof(ent) tmp;                             \
@@ -126,7 +126,7 @@
 } while(0)
 #else
 #define ZB_LIST_CHECK_ENT(list, name, ent) do{}while(0)
-#endif
+#endif /* ZB_LIST_CHECK_ENT_ENABLED && __GNUC__ */
 
 /* Macro for debugging adding duplicates to the list */
 #define ZB_LIST_CHECK_ENT1(list, name, ent, type) do{ \

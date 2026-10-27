@@ -131,6 +131,7 @@ zb_dump_hdr_t;
 
 #if defined ZB_TRAFFIC_DUMP_ON
 void zb_dump_put_2buf(zb_uint8_t *buf1, zb_uint_t len1, const zb_uint8_t *buf2, zb_uint_t len2, zb_mac_transport_type_t dump_type, zb_bool_t is_w);
+void zb_dump_put_console_data(zb_uint8_t *data, zb_uint_t len);
 #endif /* ZB_TRAFFIC_DUMP_ON */
 
 

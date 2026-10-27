@@ -72,10 +72,8 @@ void zb_ha_process_sas(void)
     ZB_PIBCACHE_NETWORK_ADDRESS() = ZB_HA_SAS_SHORT_ADDRESS;
     ZB_PIBCACHE_PAN_ID() = ZB_HA_SAS_PAN_ID;
     ZB_EXTPANID_COPY(ZB_NIB_EXT_PAN_ID(), g_zb_ha_sas_default_ext_pan_id);
-#ifndef DEBUG
     zb_aib_channel_page_list_set_2_4GHz_mask(ZB_HA_SAS_CHANNEL_MASK); /* MMDEVSTUBS */
-#endif
-    ZB_IEEE_ADDR_ZERO(ZB_AIB().trust_center_address);
+    zb_aib_set_trust_center_address(g_zero_addr);
   }
   COMM_CTX().discovery_ctx.nwk_scan_attempts = ZB_HA_SAS_SCAN_ATTEMPTS;
   COMM_CTX().discovery_ctx.nwk_time_btwn_scans = ZB_HA_SAS_TIME_BTWN_SCANS;

@@ -10,6 +10,7 @@
 #define ZB_MAC_PLATFORM_H__
 
 #include "zb_macll.h"
+#include "zb_ll_radio_api.h"
 
 
 #define ZB_MAC_HARDWARE_PB_MATCHING
@@ -46,6 +47,15 @@ typedef struct zb_transceiver_ctx_s
 zb_transceiver_ctx_t;
 
 
+/**
+   Re-assert ZIG->pending_data_queue for configurable-memory ZR/ZC builds.
+
+   Hooked into the platform macros that monolithic MAC already expands before it
+   walks or writes the pending (indirect TX) queue, so the stack needs no call
+   site of its own. No-op on builds without a MAC pending queue.
+*/
+void zb_nrf_mac_pending_data_queue_ensure(void);
+
 
 /**
    Tail size for mac packet
@@ -60,7 +70,10 @@ zb_transceiver_ctx_t;
 #define ZB_MAC_PACKET_LENGTH_SIZE                        ZB_MACLL_PACKET_LENGTH_SIZE
 #define ZB_MAC_EXTRA_DATA_SIZE                           ZB_MACLL_EXTRA_DATA_SIZE /* rssi & lqi - see zb_macll_metadata_t */
 
-#define ZB_TRANSCEIVER_INIT_RADIO()
+/* Radio bring-up itself is done by the nRF 802.15.4 driver, but this macro is the
+ * earliest platform hook monolithic MAC expands on every interface enable, i.e.
+ * before any pending-queue access can happen. */
+#define ZB_TRANSCEIVER_INIT_RADIO()                      zb_nrf_mac_pending_data_queue_ensure()
 #define ZB_TRANSCEIVER_DEINIT_RADIO()
 
 /* According to BZ#14383 and J#ZB-72 this workaround is not needed, if it is needed to put
@@ -124,6 +137,9 @@ zb_transceiver_ctx_t;
 #define ZB_TRANSCEIVER_SRC_MATCH_DELETE_IEEE_ADDR(index, ieee_addr) \
   zb_macll_src_match_set_pending_bit((zb_uint8_t *)(ieee_addr), ZB_TRUE, ZB_TRUE)
 
+#define ZB_TRANSCEIVER_SRC_MATCH_IEEE_SET_PENDING_BIT_FOR_ASSOCIATION(ieee_addr, value) \
+  ZB_TRANSCEIVER_SRC_MATCH_IEEE_SET_PENDING_BIT(ieee_addr, value)
+
 #define ZB_TRANSCEIVER_SRC_MATCH_TBL_DROP()              zb_macll_src_match_tbl_drop()
 
 
@@ -175,7 +191,11 @@ zb_transceiver_ctx_t;
 
 #define ZB_TRANS_RECV_PACKET(buf)                        zb_macll_get_next_packet(buf)
 #define ZB_MAC_TRANS_CLEAR_PENDING_BIT()
-#define ZB_MAC_TRANS_SET_PENDING_BIT()
+/* Nordic keeps the pending bit in the radio driver source-match table, so this macro
+ * carries no radio work. The stack expands it at the top of
+ * zb_mac_put_data_to_pending_queue(), which is the last point before the queue is
+ * indexed on an indirect TX. */
+#define ZB_MAC_TRANS_SET_PENDING_BIT()                   zb_nrf_mac_pending_data_queue_ensure()
 
 /**
    Get LQI value

@@ -99,7 +99,7 @@ extern zb_uint_t gc_child_hash_table_size;
 #define ZB_CHILD_HASH_TABLE_SIZE gc_child_hash_table_size
 #endif  /* ZB_MAC_SOFTWARE_PB_MATCHING */
 
-extern zb_uint_t gc_neighbor_table_size;
+extern zb_uint8_t gc_neighbor_table_size;
 #define ZB_NEIGHBOR_TABLE_SIZE gc_neighbor_table_size
 
 extern zb_uint_t gc_nwk_disc_table_size;
@@ -126,7 +126,7 @@ extern zb_uint8_t gc_single_trans_index_size;
 extern zb_uint_t gc_sched_stack_unprotected_q_size;
 #define ZB_SCHEDULER_Q_SIZE_PROTECTED_STACK_POOL gc_sched_stack_unprotected_q_size
 
-extern zb_uint8_t gc_nwk_max_source_routes;
+extern zb_uint_t gc_nwk_max_source_routes;
 #define ZB_NWK_MAX_SRC_ROUTES gc_nwk_max_source_routes
 
 extern zb_uint8_t gc_zdo_key_negotiations_num;
@@ -190,7 +190,7 @@ extern zb_intr_globals_t g_izb;
 #include "zb_sleep.h"
 #include "zb_signals.h"
 #include "zb_bufpool_globals.h"
-#if (!(defined ZB_MACSPLIT_DEVICE)) || (defined ZB_TH_ENABLED) || (defined ZB_DIAGNOSTIC_FEATURES_ENABLED)
+#if (!(defined ZB_MACSPLIT_DEVICE)) || (defined ZB_TH_ENABLED)
 #include "zb_addr_globals.h"
 #include "zb_nwk_globals.h"
 #include "zb_aps_globals.h"
@@ -203,8 +203,11 @@ extern zb_intr_globals_t g_izb;
 #include "zboss_api_tl.h"
 #endif
 
-#include "zb_ha.h"
-#include "zb_zcl.h"
+#if !defined(ZB_DO_NOT_CHECK_ZCL_BY_MISRA)
+#if defined(ZB_ENABLE_ZCL) || defined(ZB_ENABLE_ZGPD_ATTR_REPORTING)
+#include "zboss_api_zcl.h"
+#endif /* ZB_ENABLE_ZCL || ZB_ENABLE_ZGPD_ATTR_REPORTING */
+#endif /* !ZB_DO_NOT_CHECK_ZCL_BY_MISRA */
 
 #ifdef ZB_ENABLE_ZLL
 #include "zll/zb_zll_common.h"
@@ -268,9 +271,9 @@ typedef struct zb_sec_globals_s
   zb_bufid_t              encryption_buf[ZB_NWK_MAC_IFACE_TBL_SIZE]; /* buffer used for NWK encryption */
 
 /* 08/22/2018 EE CR:MINOR APS_FRAME_SECURITY is never used now. */
-/* MAC-split host is not considered as alien MAC in multi-MAC configuration, but
+/* MAC-Split host is not considered as alien MAC in multi-MAC configuration, but
  * it also requires second encryption buffer */
-#if defined ZB_ALIEN_MAC || defined ZB_ENABLE_ZGP_SECUR || defined APS_FRAME_SECURITY || !defined ZB_MAC_INTERFACE_SINGLE
+#if defined ZB_ALIEN_MAC || defined ZB_ENABLE_ZGP || defined APS_FRAME_SECURITY || !defined ZB_MAC_INTERFACE_SINGLE
   zb_bufid_t              encryption_buf2[ZB_NWK_MAC_IFACE_TBL_SIZE]; /* buffer used for APS encryption */
 #endif
 #if defined TC_SWAPOUT && defined ZB_COORDINATOR_ROLE
@@ -305,7 +308,7 @@ typedef struct zb_sec_globals_s
     @returns ZB_TRUE if apsme_request_key.indication  will be dropped
              ZB_FALSE if command will be proceeded as usual
 */
-typedef zb_bool_t (*zb_req_key_ind_cb_t) (zb_uint8_t param, zb_uint16_t keypair_i);
+typedef zb_bool_t (*zb_req_key_ind_cb_t) (zb_cb_param_t param, zb_uint16_t keypair_i);
 
 /** @brief Informs application that CCM was calculated (before frame will be encrypted)
     @param ccm_p - pointer to calculated ccm (16 bytes in length)
@@ -338,14 +341,14 @@ typedef void (*zb_aps_secur_counter_hack_cb_t) (zb_uint32_t *p_sec_counter);
     @returns ZB_TRUE if request primitive will be dropped
              ZB_FALSE otherwise
 */
-typedef zb_bool_t (*zb_req_call_cb_t) (zb_uint8_t param);
+typedef zb_bool_t (*zb_req_call_cb_t) (zb_cb_param_t param);
 
 /** @brief Called on ZDO CLI command receiving.
     @param param - buffer index
     @returns ZB_TRUE if the command was handled by application side
              ZB_FALSE otherwise
 */
-typedef zb_bool_t (*zb_zdo_af_handler_cb) (zb_uint8_t param, zb_uint16_t cb_param);
+typedef zb_bool_t (*zb_zdo_af_handler_cb) (zb_cb_param_t param, zb_uint16_t cb_param);
 
 #ifdef ZB_MAC_MONOLITHIC
 /**
@@ -354,8 +357,20 @@ typedef zb_bool_t (*zb_zdo_af_handler_cb) (zb_uint8_t param, zb_uint16_t cb_para
  * @returns ZB_TRUE if confirm should be dropped before processing on upper layers
  *          ZB_FALSE otherwise
  */
-typedef zb_bool_t (*zb_mac_pending_data_confirm_cb) (zb_uint8_t param);
+typedef zb_bool_t (*zb_mac_pending_data_confirm_cb) (zb_cb_param_t param);
 #endif /* ZB_MAC_MONOLITHIC */
+
+/**
+ * @brief Called on mcps data indication after frame has been decrypted,
+ *        but before any other action has been done.
+ * @param zb_bufid_t param - buffer which contains NWK-decrypted packet.
+ *                           NWK header is at beginning of the buffer)
+ * @return ZB_TRUE if packet has been intercepted by application and
+ *                 its processing should be terminated.
+ *                 Its up to application whether to free buffer or not in this case.
+ *         ZB_FALSE if packet processing should be continued by ZBOSS.
+ */
+typedef zb_bool_t (*zb_nwk_frame_ind_handler_t) (zb_bufid_t param);
 
 /**
    Flags, callbacks and attributes for tests, allows to switch stack behavior in run-time.
@@ -420,13 +435,7 @@ typedef struct zb_cert_hacks_s
                                                                  authenticates device.
                                                                  @see zb_authenticate_dev */
 #endif /* defined(ZB_MAC_MONOLITHIC) || defined(ZB_MACSPLIT_HOST) */
-  zb_callback2_t                 deliver_conf_key_cb;       /*!< This callback called before TC
-                                                                 sends confirm key to joiner (TC
-                                                                 link key).
-                                                                 Passed up with buffer and keypair_i
-                                                                 (for joiners apsDeviceKeyPairSet entry)
-                                                                 in params.
-                                                                 @see test CS-NFS-TC-01. */
+
   zb_ccm_check_cb_t              ccm_check_cb;              /*!< Called before frame encryption.
                                                                  @see cs-nfs-tc-01 */
   zb_aps_secur_counter_hack_cb_t secur_aps_counter_hack_cb; /*!< Called before APS frame security
@@ -438,15 +447,35 @@ typedef struct zb_cert_hacks_s
                                                                  in arguments.
                                                                  @see fb-pre-tc-03a */
 
-  zb_callback_t mcps_data_confirm_handler_cb; /*!< Callback that will be called
+  zb_callback_t                  mcps_data_confirm_handler_cb; /*!< Callback that will be called
                                                                     when handling confirmation after
                                                                     completion of request.
                                                                     @see rtp_bdb_23 */
 
+  zb_callback_t                  beacon_pl_update_cb;          /*!< Callback that will be called synchronously
+                                                                    from nwk layer after beacon payload has been filled,
+                                                                    but before MLME-SET.request scheduling.
+                                                                    Buffer contains mlme_set_req and beacon payload that
+                                                                      will be set using MLME-SET.request.
+                                                                    This callback is needed to modify beacon payload.
+                                                                    Needed for GT-OFFNS-TC-03 test (BDB3.1). */
+  zb_uint8_t                     beacon_pl_len;               /*!< Length of beacon payload in octets
+                                                                    that will be set on next beacon payload update.
+                                                                    If this field set to 0, it doesn't change beacon payload size.
+                                                                     To set empty beacon payload use set_empty_beacon_payload flag.
+                                                                    Needed for GT-OFFNS-TC-03 test (BDB3.1). */
 #ifdef ZB_MAC_MONOLITHIC
   zb_mac_pending_data_confirm_cb pending_data_conf_handler_cb; /*!< Callback that will be handle confirm on data req.
                                                                   It will replace default callback, so this confirm won't be handled on upper layers. */
 #endif /* ZB_MAC_MONOLITHIC */
+
+  zb_nwk_frame_ind_handler_t nwk_frame_ind_handler_cb;         /*!< Callback called on mcps data indication after frame has been decrypted,
+                                                                    but before any other action has been done.
+                                                                    Returns TRUE if frame processing should be stopped:
+                                                                      - ZBOSS won't process buffer further.
+                                                                      - Application "owns" buffer in this case.
+                                                                        Its up to it whether to free buffer or not.
+                                                                    Returns FALSE if frame processing should be continued. */
 
   zb_bitfield_t override_tc_significance_flag: 1;              /*!< Allows to override default value
                                                                     of tc_significance in MgmtPermitJoin;
@@ -545,10 +574,11 @@ typedef struct zb_cert_hacks_s
   zb_bitfield_t frag_skip_node_descr:1; /*!< If set to 1, device will not send Node Descriptor
                                          * request to clarify max buffer size and max in/out
                                          * transfer size, it is already set to maximum possible */
+
   zb_bitfield_t frag_disable_custom_ack_timer:1; /*!< If set to 1, ZBOSS does sends APS acks for
                                                        fragmented transmissions only in the cases
                                                        required by the specs. */
-  zb_bitfield_t frag_disable_aps_acks:1;         /*!< If set to 1, don't send APS ack
+  zb_bitfield_t frag_disable_aps_acks:1;         /*!< If set to 1, ZBOSS doesn't send APS ack
                                                        for fragmented transmission. */
   zb_bitfield_t aps_counter_custom_setup:1;            //replace APS counter
   zb_uint8_t    aps_counter_custom_value;              //custom value of APS counter
@@ -588,6 +618,7 @@ typedef struct zb_cert_hacks_s
   zb_bitfield_t zdo_disable_auth_token_req:1;            /*!< Disable sending authentication token req */
   zb_bitfield_t zdo_disable_auth_token_rsp:1;            /*!< Disable sending authentication token rsp
                                                           *   and failure when rsp is absent */
+  zb_bitfield_t zdo_malformed_auth_token_rsp:1;         /* Auth token response sends malformed */
   zb_bitfield_t tlv_disable_frag_param_tlv:1;            /*!< Disable fragmentation parameter tlv
                                                           *   into node desc rsp */
   zb_bitfield_t retransmit_check:1;
@@ -685,8 +716,13 @@ typedef struct zb_cert_hacks_s
                                                   * r23/dlk/TC_16_03_DLK_NEGATIVE - TH_ZC */
   zb_uint8_t    zbd_outgoing_fc; /*!< Specified outgoing frame counter for BLE packets from ZDD */
   zb_bitfield_t disable_link_power_negotiation:1; /*!< Disable power negotiation */
+  zb_bitfield_t drop_node_desc_req:1; /* Device doesn't send node_desc_resp */
+  zb_bitfield_t prohibit_join:1; /* Device returns PAN_DENIED for assoc/nwk_commiss request */
   zb_bitfield_t disable_rejoin_after_key_switch_fail:1; /*!< Disable rejoin if key switch command was not proceeded */
   zb_bitfield_t disable_aps_sec_for_start_kn_req:1; /*!< Disable rejoin if key switch command was not proceeded */
+  zb_bitfield_t disable_partner_lk_verification:1; /*!< Device will not send verify key after receiving partner lk */
+  zb_bitfield_t expose_provisional_keys:1; /*!< Device will broadcast a provisional key after it is created */
+  zb_bitfield_t drop_sec_start_key_upd_req:1; /*!< Drop security start key update request */
 } zb_cert_hacks_t;
 
 #define ZB_CERT_HACKS() ZG->cert_hacks
@@ -702,7 +738,9 @@ typedef struct zb_cert_hacks_s
  */
 
 typedef zb_bool_t (*zb_reg_api_aps_retrans_table_cmd_access_cb_t) (
-  zb_uint8_t param, zb_uint16_t dest_addr, zb_uint8_t command, zb_bool_t with_ack);
+  zb_cb_param_t param, zb_uint16_t dest_addr, zb_uint8_t command, zb_bool_t with_ack);
+
+typedef zb_bool_t (*zb_reg_api_aps_packet_filter_cb_t) (const zb_aps_hdr_t *aps_hdr);
 
 typedef zb_bool_t (*zb_reg_api_aps_packet_filter_cb_t) (const zb_aps_hdr_t *aps_hdr);
 
@@ -774,7 +812,6 @@ typedef struct zb_reg_api_s
 
   zb_reg_api_aps_retrans_table_cmd_access_cb_t aps_retrans_table_cmd_access_cb; /*!< Allows to enable or disable access to add
                                                                                  *   new command entry to APS retransmission table. */
-
   zb_reg_api_aps_packet_filter_cb_t aps_incoming_packet_filter_cb; /*!< Allows to filter incoming APS packets by test conditions  */
 
 #if defined(ZB_MAC_MONOLITHIC)
@@ -802,7 +839,7 @@ typedef struct zb_reg_api_s
     zb_uint8_t n_skips; /* number of skips in one series */
     zb_uint8_t cur_skips_cnt; /* number of skips in current series */
     zb_uint8_t nwk_cmd_id; /* nwk cmd to skip acks */
-    zb_uint8_t param_to_catch_dsn; /* param used by NWK to notify MAC on when to store dsn */
+    zb_bufid_t param_to_catch_dsn; /* param used by NWK to notify MAC on when to store dsn */
     zb_uint_t dsn; /* dsn of expected mac ack. Larger than zb_uint8_t in order to store ZB_MAC_INVALID_DSN */
   } skip_mac_ack_on_nwk_cmd;
 #endif
@@ -812,6 +849,9 @@ typedef struct zb_reg_api_s
   zb_bool_t duplicate_nwk_comm_req_with_invalid_status; /*!< Duplicates received Network Commissioning Request, prepares and sends Response with invalid MAC status, and postpones processing of the original Request */
   zb_bool_t enable_delay_nwk_comm_rsp_handling;         /*!< Enables delaying Network Commissioning Response with error status processing while setting PIB attributes */
   zb_bool_t delay_nwk_comm_rsp_handling;                /*!< Delays processing Network Commissioning Response while setting PIB attributes */
+  zb_bool_t delay_join_failure_conf_handling;           /*!< Delays processing Join Failure Confirm */
+  zb_bool_t ignore_scanlist_join_attempts;              /*!< Ignore scanlist join attempts to simulate the last try immediately */
+  zb_bool_t next_scan_is_empty;                         /*!< Set best_parent to NULL after next first scan and reset this flag */
 } zb_reg_api_t;
 
 #define ZB_REGRESSION_TESTS_API() ZG->reg_api
@@ -827,9 +867,6 @@ typedef struct zb_reg_api_s
 zb_reg_api_t *zb_get_regression_tests_api(void);
 
 #else
-
-#define ZB_NWK_KEY_DISABLE() 0
-#define ZB_NWK_KEY_DISABLE_RESET()
 
 #define zb_get_regression_tests_api()
 
@@ -879,15 +916,14 @@ struct zb_globals_s
   zb_commissioning_ctx_t commissioning_ctx;
 #endif /* !defined ZB_MACSPLIT_DEVICE || defined ZB_TH_ENABLED */
 
-#if defined ZB_ENABLE_ZCL || defined ZB_ENABLE_ZGPD_ATTR_REPORTING
+#if !defined(ZB_DO_NOT_CHECK_ZCL_BY_MISRA)
+#if defined(ZB_ENABLE_ZCL) || defined(ZB_ENABLE_ZGPD_ATTR_REPORTING)
   zb_zcl_globals_t        zcl;      /*!< Global ZCL context - ZCL_CTX */
-#endif /* defined ZB_ENABLE_ZCL || defined ZB_ENABLE_ZGPD_ATTR_REPORTING */
+#endif /* ZB_ENABLE_ZCL || ZB_ENABLE_ZGPD_ATTR_REPORTING */
+#endif /* !ZB_DO_NOT_CHECK_ZCL_BY_MISRA */
 #if defined ZB_ENABLE_ZLL
   zb_zll_ctx_t            zll;
 #endif /* defined ZB_ENABLE_ZLL */
-#if defined ZB_ENABLE_ZGP_INFRA
-  zb_zgp_ctx_t            zgp;
-#endif /* defined ZB_ENABLE_ZGP_EP */
 #if defined ZB_USE_NVRAM
   zb_nvram_globals_t     nvram;     /*!< Global NVRAM context - ZB_NVRAM */
 #endif // defined ZB_USE_NVRAM

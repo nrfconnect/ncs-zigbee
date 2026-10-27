@@ -203,19 +203,19 @@ void zbd_set_zigbee_virtual_device_capability(zb_bool_t zvd_capability);
 zbd_tunnel_ctx_t* zbd_get_tunnel_context(zb_uint8_t ctx_id);
 
 /* BLE MAC interface API */
-void zb_mcps_data_request_ble(zb_uint8_t param);
-void zb_mlme_get_request_ble(zb_uint8_t param);
-void zb_mlme_set_request_ble(zb_uint8_t param);
-void zb_mlme_reset_request_ble(zb_uint8_t param);
-void zb_mlme_scan_request_ble(zb_uint8_t param);
-void zb_mac_cancel_scan_ble(zb_uint8_t param);
-void zb_mlme_associate_request_ble(zb_uint8_t param);
-void zb_mlme_associate_response_ble(zb_uint8_t param);
-void zb_mlme_poll_request_ble(zb_uint8_t param);
-void zb_mlme_orphan_response_ble(zb_uint8_t param);
-void zb_mlme_start_request_ble(zb_uint8_t param);
-void zb_mcps_purge_indirect_queue_request_ble(zb_uint8_t param);
-void zb_mac_resp_by_empty_frame_ble(zb_uint8_t param);
+void zb_mcps_data_request_ble(zb_cb_param_t param);
+void zb_mlme_get_request_ble(zb_cb_param_t param);
+void zb_mlme_set_request_ble(zb_cb_param_t param);
+void zb_mlme_reset_request_ble(zb_cb_param_t param);
+void zb_mlme_scan_request_ble(zb_cb_param_t param);
+void zb_mac_cancel_scan_ble(zb_cb_param_t param);
+void zb_mlme_associate_request_ble(zb_cb_param_t param);
+void zb_mlme_associate_response_ble(zb_cb_param_t param);
+void zb_mlme_poll_request_ble(zb_cb_param_t param);
+void zb_mlme_orphan_response_ble(zb_cb_param_t param);
+void zb_mlme_start_request_ble(zb_cb_param_t param);
+void zb_mcps_purge_indirect_queue_request_ble(zb_cb_param_t param);
+void zb_mac_resp_by_empty_frame_ble(zb_cb_param_t param);
 
 #define ZB_DIRECT_CTX() (ZG->zb_direct)
 #define ZB_DIRECT_GET_ROLE() (ZB_DIRECT_CTX().zbd_capability)

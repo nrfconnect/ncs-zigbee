@@ -38,7 +38,7 @@
 /**
  * NCP trasnport type - Serial (UART)
  */
-#define CONFIG_ZB_NCP_TRANSPORT_TYPE_SERIAL y
+/* #undef CONFIG_ZB_NCP_TRANSPORT_TYPE_SERIAL */
 
 /**
  * Enable UART serial interface for ZBOSS CLI
@@ -142,6 +142,14 @@
  * Off - ZB_TRACE_LOG_LEVEL
  */
 #define CONFIG_ZB_TRACE_LOG_LEVEL 2
+
+/**
+ * Use PSA crypto backend in ZBOSS stack
+ *
+ * Route ZBOSS cryptographic operations through PSA Crypto (nRF Security)
+ * instead of direct HW crypto hooks.
+ */
+#define CONFIG_ZB_PSA_CRYPTO y
 
 /**
  * Initialize and flush logger directly from ZBOSS kernel

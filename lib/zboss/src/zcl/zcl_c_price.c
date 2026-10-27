@@ -65,7 +65,7 @@ zb_discover_cmd_list_t gs_price_client_cmd_list =
 
 typedef zb_uint8_t *(*zb_price_put_payload_cb_t)(zb_uint8_t *, const void *);
 
-zb_bool_t zb_zcl_process_c_price_specific_commands(zb_uint8_t param);
+zb_bool_t zb_zcl_process_c_price_specific_commands(zb_cb_param_t param);
 
 
 static zb_ret_t check_value_price(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
@@ -95,7 +95,7 @@ static zb_ret_t check_value_price(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_u
 
 /* convert raw data into payload */
 static ZB_INLINE const zb_uint8_t *zb_zcl_price_publish_price_get_payload_from_data(
-  zb_zcl_price_publish_price_payload_t *payload, const zb_uint8_t param)
+  zb_zcl_price_publish_price_payload_t *payload, const zb_bufid_t param)
 {
   zb_uint8_t  nibble_buf = 0;
   zb_uint8_t *data = zb_buf_begin(param);
@@ -163,7 +163,7 @@ static ZB_INLINE const zb_uint8_t *zb_zcl_price_publish_price_get_payload_from_d
   return data;
 }
 
-void zb_zcl_price_send_cmd_get_tier_labels(zb_uint8_t param, zb_addr_u *dst_addr,
+void zb_zcl_price_send_cmd_get_tier_labels(zb_bufid_t param, zb_addr_u *dst_addr,
                                                 zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                 zb_uint8_t src_ep,
                                                 zb_zcl_price_get_tier_labels_payload_t *payload,
@@ -190,7 +190,7 @@ void zb_zcl_price_send_cmd_get_tier_labels(zb_uint8_t param, zb_addr_u *dst_addr
 }
 
 
-static void zb_zcl_price_process_publish_price(zb_uint8_t param,
+static void zb_zcl_price_process_publish_price(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_price_publish_price_payload_t   pl_in = ZB_ZCL_PRICE_PUBLISH_PRICE_PAYLOAD_INIT;
@@ -242,7 +242,7 @@ static void zb_zcl_price_process_publish_price(zb_uint8_t param,
 
 static const zb_uint8_t *zb_zcl_price_publish_tier_labels_parse_payload(
                                                     zb_zcl_price_publish_tier_labels_payload_t *pl,
-                                                    zb_uint8_t param)
+                                                    zb_bufid_t param)
 {
   zb_uint8_t *data = zb_buf_begin(param);
   zb_uint8_t data_size = zb_buf_len(param);
@@ -291,7 +291,7 @@ static const zb_uint8_t *zb_zcl_price_publish_tier_labels_parse_payload(
 }
 
 
-static void zb_zcl_price_process_publish_tier_labels(zb_uint8_t param,
+static void zb_zcl_price_process_publish_tier_labels(zb_bufid_t param,
                                                           const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_price_publish_tier_labels_payload_t pl_in;
@@ -322,7 +322,7 @@ static void zb_zcl_price_process_publish_tier_labels(zb_uint8_t param,
 }
 
 
-static zb_bool_t zb_zcl_process_price_client_commands(zb_uint8_t param,
+static zb_bool_t zb_zcl_process_price_client_commands(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_bool_t processed = ZB_FALSE;
@@ -354,7 +354,7 @@ static zb_bool_t zb_zcl_process_price_client_commands(zb_uint8_t param,
   return processed;
 }
 
-zb_bool_t zb_zcl_process_c_price_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_c_price_specific_commands(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_bool_t           processed = ZB_FALSE;
@@ -368,7 +368,7 @@ zb_bool_t zb_zcl_process_c_price_specific_commands(zb_uint8_t param)
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_c_price_specific_commands, "
-            "param=%hd, cmd_id=%hd", (FMT__H_H, param, cmd_info.cmd_id));
+            "param=%d, cmd_id=%hd", (FMT__D_H, param, cmd_info.cmd_id));
 
   /* ZB_ASSERT(cmd_info.profile_id == ZB_AF_SE_PROFILE_ID); */
   ZB_ASSERT(cmd_info.cluster_id == ZB_ZCL_CLUSTER_ID_PRICE);

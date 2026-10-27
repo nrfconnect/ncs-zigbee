@@ -58,7 +58,7 @@
           values are 0xffff, 0xfffd
 
  */
-void zb_secur_send_nwk_key_update_br(zb_uint8_t param);
+void zb_secur_send_nwk_key_update_br(zb_cb_param_t param);
 
 
 
@@ -78,7 +78,7 @@ void zb_secur_send_nwk_key_update_br(zb_uint8_t param);
    @param param - packet buffer with single parameter - broadcast address. If 0,
           send unicast.
  */
-void zb_secur_send_nwk_key_switch(zb_uint8_t param);
+void zb_secur_send_nwk_key_switch(zb_cb_param_t param);
 #endif /* ZB_COORDINATOR_ROLE */
 
 /*! @} */

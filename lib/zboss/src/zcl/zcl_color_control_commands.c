@@ -51,7 +51,7 @@
 #include "zb_zcl.h"
 #include "zb_aps.h"
 
-static void zb_zcl_color_control_update_color_attrbute(zb_uint8_t endpoint);
+static void zb_zcl_color_control_update_color_attribute(zb_uint8_t endpoint);
 
 /** @internal
     @{
@@ -76,9 +76,9 @@ static zb_discover_cmd_list_t gs_color_control_server_cmd_list =
 
 zb_ret_t check_value_color_control_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 zb_ret_t check_value_color_control_client(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
-zb_bool_t zb_zcl_process_color_control_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_color_control_specific_commands_cli(zb_uint8_t param);
-void zb_zcl_process_color_control_specific_commands_srv_2param(zb_uint8_t buf2_param, zb_uint16_t cmd_param);
+zb_bool_t zb_zcl_process_color_control_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_color_control_specific_commands_cli(zb_cb_param_t param);
+void zb_zcl_process_color_control_specific_commands_srv_2param(zb_cb_param_t param);
 
 void zb_zcl_color_control_init_server()
 {
@@ -246,7 +246,7 @@ static void zb_zcl_color_control_set_color_mode(zb_uint8_t endpoint, zb_uint8_t 
   {
     ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(attr_desc, mode);
     zb_zcl_color_control_set8(endpoint, ZB_ZCL_ATTR_COLOR_CONTROL_ENHANCED_COLOR_MODE_ID, mode);
-    zb_zcl_color_control_update_color_attrbute(endpoint);
+    zb_zcl_color_control_update_color_attribute(endpoint);
   }
 }
 
@@ -254,13 +254,13 @@ static void zb_zcl_color_control_set_color_mode(zb_uint8_t endpoint, zb_uint8_t 
     @param param - buffer with @see zb_zcl_color_control_invoke_user_t. Also use User App
     @return result invoke User App.
 */
-static zb_ret_t zb_zcl_color_control_invoke_user_and_set_attribute(zb_uint8_t param)
+static zb_ret_t zb_zcl_color_control_invoke_user_and_set_attribute(zb_bufid_t buf)
 {
   zb_ret_t status = RET_OK;
   zb_zcl_attr_t * attr_desc;
   zb_zcl_color_control_invoke_user_t user_data;
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_color_control_invoke_user_and_set_attribute %hd", (FMT__H, param));
-  ZB_MEMCPY(&user_data, ZB_BUF_GET_PARAM(param, zb_zcl_color_control_invoke_user_t),
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_color_control_invoke_user_and_set_attribute %hd", (FMT__D, buf));
+  ZB_MEMCPY(&user_data, ZB_BUF_GET_PARAM(buf, zb_zcl_color_control_invoke_user_t),
         sizeof(zb_zcl_color_control_invoke_user_t));
 
   attr_desc = zb_zcl_get_attr_desc_a(user_data.endpoint,
@@ -272,7 +272,7 @@ static zb_ret_t zb_zcl_color_control_invoke_user_and_set_attribute(zb_uint8_t pa
   {
     if( ZB_ZCL_GET_ATTRIBUTE_VAL_16(attr_desc) != user_data.new_value)
     {
-      ZB_ZCL_INVOKE_USER_APP_SET_ATTR_WITH_RESULT(param, user_data.endpoint,
+      ZB_ZCL_INVOKE_USER_APP_SET_ATTR_WITH_RESULT(buf, user_data.endpoint,
           ZB_ZCL_CLUSTER_ID_COLOR_CONTROL, attr_desc, &(user_data.new_value), status);
       TRACE_MSG(TRACE_ZCL2, "attr_desc %p new value %d", (FMT__P_D, attr_desc, user_data.new_value));
 
@@ -294,7 +294,7 @@ static zb_ret_t zb_zcl_color_control_invoke_user_and_set_attribute(zb_uint8_t pa
     zb_uint8_t val8 = (zb_uint8_t)(user_data.new_value);
     if( ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc) != val8)
     {
-      ZB_ZCL_INVOKE_USER_APP_SET_ATTR_WITH_RESULT(param, user_data.endpoint,
+      ZB_ZCL_INVOKE_USER_APP_SET_ATTR_WITH_RESULT(buf, user_data.endpoint,
         ZB_ZCL_CLUSTER_ID_COLOR_CONTROL, attr_desc, &val8, status);
       TRACE_MSG(TRACE_ZCL2, "attr_desc %p new value %hd", (FMT__P_H, attr_desc, val8));
       /* ZB_ZCL_SET_DIRECTLY_ATTR_VAL8(user_data.attr_desc, val8); */
@@ -413,7 +413,7 @@ static zb_uint8_t zb_zcl_color_control_color_temp_to_index(zb_uint16_t color_tem
   return index;
 }
 
-static void zb_zcl_color_control_update_color_attrbute(zb_uint8_t endpoint)
+static void zb_zcl_color_control_update_color_attribute(zb_uint8_t endpoint)
 {
   zb_uint8_t index;
   zb_uint8_t hue = ZB_ZCL_COLOR_CONTROL_CURRENT_HUE_DEFAULT_VALUE;
@@ -605,7 +605,7 @@ static void zb_zcl_color_control_update_color_attrbute(zb_uint8_t endpoint)
 /** @brief Update Color attributes when change Color Mode attribute
     @param endpoint - endpoint
 */
-static void zb_zcl_color_control_update_color_attrbute(zb_uint8_t endpoint)
+static void zb_zcl_color_control_update_color_attribute(zb_uint8_t endpoint)
 {
   zb_uint16_t r, g, b;
   zb_uint8_t hue;
@@ -709,7 +709,7 @@ static zb_bool_t zb_zcl_process_color_control_element_loop(zb_zcl_color_control_
       ZB_ZCL_CLUSTER_ID_COLOR_CONTROL, ZB_ZCL_CLUSTER_SERVER_ROLE, el_data->attr_id);
   ZB_ASSERT(attr_desc);
 
-  // calcutate new value
+  // calculate new value
   is_16bit = (attr_desc->type == ZB_ZCL_ATTR_TYPE_U16) ? ZB_TRUE : ZB_FALSE;
   val = (is_16bit) ? ZB_ZCL_GET_ATTRIBUTE_VAL_16(attr_desc) :
                      ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc);
@@ -748,7 +748,7 @@ static zb_bool_t zb_zcl_process_color_control_element_loop(zb_zcl_color_control_
   return (status==RET_OK && !is_finish) ? ZB_TRUE : ZB_FALSE;
 }
 
-static zb_bool_t color_control_check_req_options(zb_uint8_t param, zb_uint8_t endpoint)
+static zb_bool_t color_control_check_req_options(zb_bufid_t param, zb_uint8_t endpoint)
 {
   zb_zcl_color_control_req_options_t req_options;
   zb_bool_t res = ZB_TRUE;
@@ -806,7 +806,7 @@ static zb_bool_t color_control_check_req_options(zb_uint8_t param, zb_uint8_t en
       attr_desc = zb_zcl_get_attr_desc(cluster_desc, ZB_ZCL_ATTR_ON_OFF_ON_OFF_ID);
 
       if (attr_desc &&
-          !ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc) && /* On/Off attrbute is Off */
+          !ZB_ZCL_GET_ATTRIBUTE_VAL_8(attr_desc) && /* On/Off attribute is Off */
           !ZB_CHECK_BIT_IN_BIT_VECTOR(&options, ZB_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF)) /* ExecuteIfOff
                                                                                                * is False */
       {
@@ -830,7 +830,7 @@ static zb_bool_t color_control_check_req_options(zb_uint8_t param, zb_uint8_t en
  *
  * Its make separate for first and second (if need) attribute.
  * */
-static void zb_zcl_process_color_control_move_loop(zb_uint8_t param)
+static void zb_zcl_process_color_control_move_loop(zb_cb_param_t param)
 {
   zb_time_t current_time = ZB_TIMER_GET();
   zb_zcl_color_control_move_loop_t loop_data;
@@ -840,7 +840,7 @@ static void zb_zcl_process_color_control_move_loop(zb_uint8_t param)
   zb_int16_t delta;
   zb_bool_t is_non_stop_attr;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_color_control_move_loop %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_color_control_move_loop %d", (FMT__D, param));
 
   // save loop data - param buffer may change for invoke User App
   ZB_MEMCPY(&loop_data, ZB_BUF_GET_PARAM(param, zb_zcl_color_control_move_loop_t),
@@ -926,7 +926,7 @@ static void zb_zcl_process_color_control_move_loop(zb_uint8_t param)
  *
  * Its make separate for first and second (if need) attribute.
  * */
-static void zb_zcl_process_color_control_move_to_loop(zb_uint8_t param)
+static void zb_zcl_process_color_control_move_to_loop(zb_cb_param_t param)
 {
   zb_zcl_color_control_move_to_loop_t loop_data;
   zb_time_t current_time = ZB_TIMER_GET();
@@ -940,7 +940,7 @@ static void zb_zcl_process_color_control_move_to_loop(zb_uint8_t param)
   /* Unused without trace. */
   ZVUNUSED(status);
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_color_control_move_to_loop %hd curr_time %d", (FMT__H_D, param, current_time));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_color_control_move_to_loop %d curr_time %d", (FMT__D_D, param, current_time));
 
   ZB_MEMCPY(&loop_data, ZB_BUF_GET_PARAM(param, zb_zcl_color_control_move_to_loop_t),
       sizeof(zb_zcl_color_control_move_to_loop_t));
@@ -1070,7 +1070,7 @@ static void zb_zcl_process_color_control_move_to_loop(zb_uint8_t param)
  * Last process time = previous last process time plus time for steps (sharp).
  * New last process time <= Current lime.
  * */
-static void zb_zcl_process_color_control_step_loop(zb_uint8_t param)
+static void zb_zcl_process_color_control_step_loop(zb_cb_param_t param)
 {
   zb_zcl_color_control_step_loop_t loop_data;
   zb_zcl_color_control_loop_element_t element;
@@ -1079,7 +1079,7 @@ static void zb_zcl_process_color_control_step_loop(zb_uint8_t param)
   zb_uint8_t steps;
   zb_bool_t is_non_stop_attr;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_color_control_step_loop %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_color_control_step_loop %d", (FMT__D, param));
 
   ZB_MEMCPY(&loop_data, ZB_BUF_GET_PARAM(param, zb_zcl_color_control_step_loop_t),
       sizeof(zb_zcl_color_control_step_loop_t));
@@ -1149,7 +1149,7 @@ static void zb_zcl_process_color_control_step_loop(zb_uint8_t param)
  * */
 static void zb_zcl_process_color_control_stop(zb_callback_t func, zb_uint8_t size_loop_data)
 {
-  zb_uint8_t param;
+  zb_cb_param_t param;
 
   ZVUNUSED(size_loop_data);
 
@@ -1184,7 +1184,7 @@ static void zb_zcl_process_color_control_stop_all_commands(zb_uint8_t endpoint)
 ///////////////////
 /** @brief Move To Hue command
     @see ZCL spec, subclause 5.2.2.3.2 */
-static zb_ret_t zb_zcl_process_color_control_move_to_hue_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_move_to_hue_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_move_to_hue_req_t payload;
@@ -1269,7 +1269,7 @@ static zb_ret_t zb_zcl_process_color_control_move_to_hue_handler(zb_uint8_t para
 
 /** @brief Move Hue command
     @see ZCL8 spec, subclause 5.2.2.3.5 */
-static zb_ret_t zb_zcl_process_color_control_move_hue_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_move_hue_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_move_hue_req_t payload;
@@ -1340,7 +1340,7 @@ static zb_ret_t zb_zcl_process_color_control_move_hue_handler(zb_uint8_t param, 
 
 /** @brief Step Hue command
     @see ZCL spec, subclause 5.2.2.3.4 */
-static zb_ret_t zb_zcl_process_color_control_step_hue_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_step_hue_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_step_hue_req_t payload;
@@ -1408,7 +1408,7 @@ static zb_ret_t zb_zcl_process_color_control_step_hue_handler(zb_uint8_t param, 
 
 /** @brief Move To Saturation command
     @see ZCL spec, subclause 5.2.2.3.5 */
-static zb_ret_t zb_zcl_process_color_control_move_to_saturation_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_move_to_saturation_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_move_to_saturation_req_t payload;
@@ -1473,7 +1473,7 @@ static zb_ret_t zb_zcl_process_color_control_move_to_saturation_handler(zb_uint8
 
 /** @brief Move Saturation command
     @see ZCL spec, subclause 5.2.2.3.6 */
-static zb_ret_t zb_zcl_process_color_control_move_saturation_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_move_saturation_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_move_saturation_req_t payload;
@@ -1540,7 +1540,7 @@ static zb_ret_t zb_zcl_process_color_control_move_saturation_handler(zb_uint8_t 
 
 /** @brief Step Saturation command
     @see ZCL spec, subclause 5.2.2.3.7 */
-static zb_ret_t zb_zcl_process_color_control_step_saturation_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_step_saturation_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_step_saturation_req_t payload;
@@ -1606,7 +1606,7 @@ static zb_ret_t zb_zcl_process_color_control_step_saturation_handler(zb_uint8_t 
 
 /** @brief Move To Hue And Saturation command
     @see ZCL spec, subclause 5.2.2.3.8 */
-static zb_ret_t zb_zcl_process_color_control_move_to_hue_saturation_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_move_to_hue_saturation_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_move_to_hue_saturation_req_t payload;
@@ -1681,7 +1681,7 @@ static zb_ret_t zb_zcl_process_color_control_move_to_hue_saturation_handler(zb_u
 
 /** @brief Move To Color command
     @see ZCL spec, subclause 5.2.2.3.9 */
-static zb_ret_t zb_zcl_process_color_control_move_to_color_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_move_to_color_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_move_to_color_req_t payload;
@@ -1765,7 +1765,7 @@ static zb_ret_t zb_zcl_process_color_control_move_to_color_handler(zb_uint8_t pa
 
 /** @brief Move Color command
     @see ZCL spec, subclause 5.2.2.3.10 */
-static zb_ret_t zb_zcl_process_color_control_move_color_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_move_color_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_move_color_req_t payload;
@@ -1833,7 +1833,7 @@ static zb_ret_t zb_zcl_process_color_control_move_color_handler(zb_uint8_t param
 
 /** @brief Step Color command
     @see ZCL spec, subclause 5.2.2.3.11 */
-static zb_ret_t zb_zcl_process_color_control_step_color_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_step_color_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_step_color_req_t payload;
@@ -1899,7 +1899,7 @@ static zb_ret_t zb_zcl_process_color_control_step_color_handler(zb_uint8_t param
 
 /** @brief Move To Color Temperature command
     @see ZCL spec, subclause 5.2.2.3.12 */
-static zb_ret_t zb_zcl_process_color_control_move_to_color_temp_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_move_to_color_temp_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_move_to_color_temperature_req_t payload;
@@ -1980,7 +1980,7 @@ static zb_ret_t zb_zcl_process_color_control_move_to_color_temp_handler(zb_uint8
 
 /** @brief Enhanced Move To Hue command
     @see ZCL spec, subclause 5.2.2.3.14 */
-static zb_ret_t zb_zcl_process_color_control_enhanced_move_to_hue_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_enhanced_move_to_hue_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_enhanced_move_to_hue_req_t payload;
@@ -2062,7 +2062,7 @@ static zb_ret_t zb_zcl_process_color_control_enhanced_move_to_hue_handler(zb_uin
 
 /** @brief Enhanced Move Hue command
     @see ZCL spec, subclause 5.2.2.3.15 */
-static zb_ret_t zb_zcl_process_color_control_enhanced_move_hue_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_enhanced_move_hue_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_enhanced_move_hue_req_t payload;
@@ -2132,7 +2132,7 @@ static zb_ret_t zb_zcl_process_color_control_enhanced_move_hue_handler(zb_uint8_
 
 /** @brief Enhanced Step Hue command
     @see ZCL spec, subclause 5.2.2.3.16 */
-static zb_ret_t zb_zcl_process_color_control_enhanced_step_hue_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_enhanced_step_hue_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_enhanced_step_hue_req_t payload;
@@ -2199,7 +2199,7 @@ static zb_ret_t zb_zcl_process_color_control_enhanced_step_hue_handler(zb_uint8_
 
 /** @brief Enhanced Move To Hue Saturation command
     @see ZCL spec, subclause 5.2.2.3.17 */
-static zb_ret_t zb_zcl_process_color_control_enhanced_move_to_hue_saturation_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_enhanced_move_to_hue_saturation_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_enhanced_move_to_hue_saturation_req_t payload;
@@ -2280,7 +2280,7 @@ static zb_ret_t zb_zcl_process_color_control_enhanced_move_to_hue_saturation_han
  * and 'if (!is_finish) .. else ...' condition
  *
  * */
-static void zb_zcl_process_color_control_color_loop(zb_uint8_t param)
+static void zb_zcl_process_color_control_color_loop(zb_cb_param_t param)
 {
   zb_zcl_color_control_color_loop_set_t loop_data;
   zb_zcl_attr_t * attr_desc;
@@ -2288,7 +2288,7 @@ static void zb_zcl_process_color_control_color_loop(zb_uint8_t param)
   zb_time_t current_time = ZB_TIMER_GET();
   zb_uint8_t loop_active;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_color_control_color_loop %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_color_control_color_loop %d", (FMT__D, param));
 
  ZB_MEMCPY(&loop_data, ZB_BUF_GET_PARAM(param, zb_zcl_color_control_color_loop_set_t),
       sizeof(zb_zcl_color_control_color_loop_set_t));
@@ -2354,7 +2354,7 @@ static void zb_zcl_process_color_control_color_loop(zb_uint8_t param)
 
 /** @brief Process Color Loop Set command
     @see ZCL spec, subclause 5.2.2.3.18 */
-static zb_ret_t zb_zcl_process_color_control_color_loop_set_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_color_loop_set_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_color_loop_set_req_t payload;
@@ -2465,7 +2465,7 @@ static zb_ret_t zb_zcl_process_color_control_color_loop_set_handler(zb_uint8_t p
 
 /** @brief Process Color Loop Stop command
     @see ZCL spec, subclause 5.2.2.3.19 */
-static zb_ret_t zb_zcl_process_color_control_stop_move_step_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_stop_move_step_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -2507,7 +2507,7 @@ static zb_uint16_t zb_zcl_color_control_get_color_temperature_limit(
 
 /** @brief Process Move Color Temperature command
     @see ZCL spec, subclause 5.2.2.3.20 */
-static zb_ret_t zb_zcl_process_color_control_move_color_temp_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_move_color_temp_handler(zb_cb_param_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_move_color_temp_req_t payload;
@@ -2578,7 +2578,7 @@ static zb_ret_t zb_zcl_process_color_control_move_color_temp_handler(zb_uint8_t 
 
 /** @brief Process Step Color Temperature command
     @see ZCL spec, subclause 5.2.2.3.21 */
-static zb_ret_t zb_zcl_process_color_control_step_color_temp_handler(zb_uint8_t param, zb_uint8_t buf2_param)
+static zb_ret_t zb_zcl_process_color_control_step_color_temp_handler(zb_bufid_t param, zb_bufid_t buf2_param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_color_control_step_color_temp_req_t payload;
@@ -2644,7 +2644,7 @@ static zb_ret_t zb_zcl_process_color_control_step_color_temp_handler(zb_uint8_t 
   return ret;
 }
 
-zb_bool_t zb_zcl_process_color_control_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_color_control_specific_commands_srv(zb_cb_param_t param)
 {
   zb_bool_t processed = ZB_FALSE;
   zb_zcl_parsed_hdr_t *cmd_info;
@@ -2666,7 +2666,7 @@ zb_bool_t zb_zcl_process_color_control_specific_commands_srv(zb_uint8_t param)
 
   TRACE_MSG(TRACE_ZCL1,
             "> zb_zcl_process_color_control_specific_commands_srv: parambuf %d, cmd_id %d",
-            (FMT__H_H, param, cmd_info->cmd_id));
+            (FMT__D_H, param, cmd_info->cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_COLOR_CONTROL == cmd_info->cluster_id);
   ZB_ASSERT(ZB_ZCL_FRAME_DIRECTION_TO_SRV == cmd_info->cmd_direction);
@@ -2720,11 +2720,12 @@ zb_bool_t zb_zcl_process_color_control_specific_commands_srv(zb_uint8_t param)
   return processed;
 }
 
-void zb_zcl_process_color_control_specific_commands_srv_2param(zb_uint8_t buf2_param, zb_uint16_t cmd_param)
+void zb_zcl_process_color_control_specific_commands_srv_2param(zb_cb_param_t cb_param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_ret_t status = RET_OK;
-  zb_uint8_t param = cmd_param;
+  zb_bufid_t buf2_param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_bufid_t param = (zb_bufid_t)ZB_UNPACK_USER_PARAM(cb_param);
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -2839,7 +2840,7 @@ void zb_zcl_process_color_control_specific_commands_srv_2param(zb_uint8_t buf2_p
              (FMT__0));
 }
 
-zb_bool_t zb_zcl_process_color_control_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_color_control_specific_commands_cli(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {

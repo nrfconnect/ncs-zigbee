@@ -65,7 +65,7 @@ zb_discover_cmd_list_t gs_metering_server_cmd_list =
   sizeof(gs_metering_server_generated_commands), gs_metering_server_generated_commands
 };
 
-zb_bool_t zb_zcl_process_s_metering_specific_commands(zb_uint8_t param);
+zb_bool_t zb_zcl_process_s_metering_specific_commands(zb_cb_param_t param);
 
 static zb_ret_t check_value_metering(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 
@@ -471,7 +471,7 @@ static zb_int16_t zb_zcl_metering_calculate_publish_snapshot_payload_size(const 
 }
 
 
-void zb_zcl_metering_send_cmd_publish_snapshot(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_publish_snapshot(zb_bufid_t param, const zb_addr_u *dst_addr,
                                                     zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                     zb_uint8_t src_ep,
                                                     const zb_zcl_metering_publish_snapshot_payload_t *pl,
@@ -502,7 +502,7 @@ void zb_zcl_metering_send_cmd_publish_snapshot(zb_uint8_t param, const zb_addr_u
 }
 
 
-void zb_zcl_metering_send_cmd_request_fast_poll_mode_response(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_request_fast_poll_mode_response(zb_bufid_t param, const zb_addr_u *dst_addr,
                                                                    zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                                    zb_uint8_t src_ep,
                                                                    const zb_zcl_metering_request_fast_poll_mode_response_payload_t *pl,
@@ -536,7 +536,7 @@ void zb_zcl_metering_send_cmd_request_fast_poll_mode_response(zb_uint8_t param, 
 }
 
 
-void zb_zcl_metering_send_cmd_get_profile_response(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_get_profile_response(zb_bufid_t param, const zb_addr_u *dst_addr,
                                                         zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                         zb_uint8_t src_ep, const zb_zcl_metering_get_profile_response_payload_t *pl,
                                                         zb_uint8_t pl_size, zb_uint8_t tsn, zb_callback_t cb)
@@ -561,7 +561,7 @@ void zb_zcl_metering_send_cmd_get_profile_response(zb_uint8_t param, const zb_ad
 }
 
 
-void zb_zcl_metering_send_cmd_get_sampled_data_response(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_get_sampled_data_response(zb_bufid_t param, const zb_addr_u *dst_addr,
                                                              zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                              zb_uint8_t src_ep,
                                                              const zb_zcl_metering_get_sampled_data_response_payload_t *pl,
@@ -589,7 +589,7 @@ void zb_zcl_metering_send_cmd_get_sampled_data_response(zb_uint8_t param, const 
 
 
 static const zb_uint8_t *zb_zcl_metering_get_snapshot_data_parse_payload(zb_zcl_metering_get_snapshot_payload_t *pl,
-                                                                         zb_uint8_t param)
+                                                                         zb_bufid_t param)
 {
   zb_uint8_t *data = zb_buf_begin(param);
   zb_uint8_t data_size = zb_buf_len(param);
@@ -615,7 +615,7 @@ static const zb_uint8_t *zb_zcl_metering_get_snapshot_data_parse_payload(zb_zcl_
 
 static const zb_uint8_t *zb_zcl_metering_request_fast_poll_mode_parse_payload(
                                                 zb_zcl_metering_request_fast_poll_mode_payload_t *pl,
-                                                zb_uint8_t param)
+                                                zb_bufid_t param)
 {
   zb_uint8_t *data = zb_buf_begin(param);
   zb_uint8_t data_size = zb_buf_len(param);
@@ -638,7 +638,7 @@ static const zb_uint8_t *zb_zcl_metering_request_fast_poll_mode_parse_payload(
 
 
 static const zb_uint8_t *zb_zcl_metering_get_sampled_data_parse_payload(zb_zcl_metering_get_sampled_data_payload_t *pl,
-                                                                        zb_uint8_t param)
+                                                                        zb_bufid_t param)
 {
   zb_uint8_t *data = zb_buf_begin(param);
   zb_uint8_t data_size = zb_buf_len(param);
@@ -663,7 +663,7 @@ static const zb_uint8_t *zb_zcl_metering_get_sampled_data_parse_payload(zb_zcl_m
 
 
 static const zb_uint8_t *zb_zcl_metering_get_profile_parse_payload(zb_zcl_metering_get_profile_payload_t *pl,
-                                                                   zb_uint8_t param)
+                                                                   zb_bufid_t param)
 {
   zb_uint8_t *data = zb_buf_begin(param);
   zb_uint8_t data_size = zb_buf_len(param);
@@ -687,7 +687,7 @@ static const zb_uint8_t *zb_zcl_metering_get_profile_parse_payload(zb_zcl_meteri
 }
 
 
-static zb_bool_t zb_zcl_metering_process_request_fast_poll_mode(zb_uint8_t param,
+static zb_bool_t zb_zcl_metering_process_request_fast_poll_mode(zb_bufid_t param,
                                                                 const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_metering_request_fast_poll_mode_payload_t pl_in ;
@@ -739,7 +739,7 @@ static zb_bool_t zb_zcl_metering_process_request_fast_poll_mode(zb_uint8_t param
 }
 
 
-static zb_bool_t zb_zcl_metering_process_get_snapshot(zb_uint8_t param,
+static zb_bool_t zb_zcl_metering_process_get_snapshot(zb_bufid_t param,
                                                       const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_metering_get_snapshot_payload_t pl_in ;
@@ -795,7 +795,7 @@ static zb_bool_t zb_zcl_metering_process_get_snapshot(zb_uint8_t param,
 }
 
 
-static zb_bool_t zb_zcl_metering_process_get_sampled_data(zb_uint8_t param,
+static zb_bool_t zb_zcl_metering_process_get_sampled_data(zb_bufid_t param,
                                                           const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_metering_get_sampled_data_payload_t pl_in ;
@@ -850,7 +850,7 @@ static zb_bool_t zb_zcl_metering_process_get_sampled_data(zb_uint8_t param,
 }
 
 
-static zb_bool_t zb_zcl_metering_process_get_profile(zb_uint8_t param,
+static zb_bool_t zb_zcl_metering_process_get_profile(zb_bufid_t param,
                                                      const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_metering_get_profile_payload_t pl_in;
@@ -902,7 +902,7 @@ static zb_bool_t zb_zcl_metering_process_get_profile(zb_uint8_t param,
 }
 
 
-static zb_bool_t zb_zcl_process_metering_server_commands(zb_uint8_t param,
+static zb_bool_t zb_zcl_process_metering_server_commands(zb_bufid_t param,
                                                          const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_bool_t processed = ZB_FALSE;
@@ -929,7 +929,7 @@ static zb_bool_t zb_zcl_process_metering_server_commands(zb_uint8_t param,
 }
 
 
-zb_bool_t zb_zcl_process_s_metering_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_s_metering_specific_commands(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_bool_t           processed = ZB_FALSE;
@@ -943,7 +943,7 @@ zb_bool_t zb_zcl_process_s_metering_specific_commands(zb_uint8_t param)
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_s_metering_specific_commands, "
-            "param=%hd, cmd_id=%hd", (FMT__H_H, param, cmd_info.cmd_id));
+            "param=%d, cmd_id=%hd", (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(cmd_info.cluster_id == ZB_ZCL_CLUSTER_ID_METERING);
 

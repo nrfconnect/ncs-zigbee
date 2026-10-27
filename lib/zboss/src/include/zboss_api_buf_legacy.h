@@ -739,7 +739,7 @@ zb_ret_t zb_get_buf_delayed_2param(
 #ifdef ZB_DEBUG_BUFFERS
   zb_uint16_t from_file, zb_uint16_t from_line,
 #endif
-  zb_callback2_t callback,
+  zb_callback_t callback,
   zb_uint8_t buf_type,
   zb_bool_t use_2_param,
   zb_uint16_t user_param);

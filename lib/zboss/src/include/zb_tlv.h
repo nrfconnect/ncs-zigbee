@@ -87,7 +87,6 @@ typedef zb_uint8_t zb_tlv_tag_t;
 #define ZB_TLV_DIRECT_MANAGE_JOINERS_IEEE_ADDRESS         0x1BU
 #define ZB_TLV_DIRECT_MANAGE_JOINERS_CMD                  0x1CU
 #define ZB_TLV_DIRECT_TUNNEL_NPDU                         0x1DU
-/* Having variable length - is it legal for tlv? */
 /* ZB_TLV_DIRECT_STATUS_CODE_EXT  */
 /* 2.4.3.3.12.1 Beacon Survey Configuration TLV (ID=0) */
 #define ZB_TLV_BEACON_SURVEY_CONFIGURATION                0x1EU
@@ -122,8 +121,28 @@ typedef zb_uint8_t zb_tlv_tag_t;
 #define ZB_TLV_BEACON_APPENDIX_ENCAPSULATION              0x31U
 #define ZB_TLV_CONFIGURATION_MODE_PARAMETERS              0x32U
 #define ZB_TLV_DEVICE_CAPABILITY_EXTENSION                0x33U
-#define ZB_TLV_RESERVED_MAX                               0x34U
 
+/* Routing TLV */
+
+/* K.2 Route Request Command */
+/* K.2.1.1 Tag ID 0: Extended Route Information */
+#define ZB_TLV_ROUTE_REQ_EXTENDED_ROUTE_INFORMATION 0x34U
+/* K.2.1.2 Tag ID 1: Concentrator Information */
+#define ZB_TLV_ROUTE_REQ_CONCENTRATOR_INFORMATION 0x35U
+/* K.2.1.3 Tag ID 2: Source Route Solicitation */
+#define ZB_TLV_ROUTE_REQ_SOURCE_ROUTE_SOLICITATION 0x36U
+
+/* K.3 Route Reply Command */
+/* K.3.1.1 Tag ID 0: Extended Route Information */
+#define ZB_TLV_ROUTE_REPL_EXTENDED_ROUTE_INFORMATION 0x37U
+
+/* K.4 Network Status Command */
+/* K.4.1.1 Tag ID 0: Extended Route Information */
+#define ZB_TLV_NWK_STATUS_EXTENDED_ROUTE_INFORMATION 0x38U
+
+#define ZB_TLV_RESERVED_MAX                               0x39U
+
+#define ZB_TLV_LEN_VARIABLE (zb_uint8_t)(~0U)
 
 /**
  * Router Information TLV bitmask
@@ -226,7 +245,7 @@ void zb_tlv_put_tlv_hdr(zb_uint8_t **ptr, zb_tlv_tag_t tlv_tag);
  *
  * @return        - pointer to the TLV payload position
  */
-zb_uint8_t *zb_tlv_put_next(zb_uint8_t param, zb_tlv_tag_t tlv_tag);
+zb_uint8_t *zb_tlv_put_next(zb_bufid_t param, zb_tlv_tag_t tlv_tag);
 
 /**
  * Alloc space and put zb_tlv_status_t at the end of the buffer.
@@ -237,7 +256,7 @@ zb_uint8_t *zb_tlv_put_next(zb_uint8_t param, zb_tlv_tag_t tlv_tag);
  *
  * @return        - RET_OK if all OK
  */
-zb_ret_t zb_tlv_status_append(zb_uint8_t param, zb_tlv_tag_t tag, zb_uint8_t status);
+zb_ret_t zb_tlv_status_append(zb_bufid_t param, zb_tlv_tag_t tag, zb_uint8_t status);
 
 /**
  * Put Supported Key Negotiations Global TLV at the end of the packet.
@@ -247,7 +266,7 @@ zb_ret_t zb_tlv_status_append(zb_uint8_t param, zb_tlv_tag_t tag, zb_uint8_t sta
  * @param supported_key_methods - Key Negotiation Protocols Bitmask
  * @param supported_secrets     - Supported Pre-shared Secrets Bitmask
  */
-void zb_tlv_put_value_supported_key_neg_methods(zb_uint8_t param,
+void zb_tlv_put_value_supported_key_neg_methods(zb_bufid_t param,
                                                 zb_ieee_addr_t ieee_addr,
                                                 zb_uint8_t *supported_key_methods,
                                                 zb_uint8_t *supported_secrets);
@@ -259,7 +278,7 @@ void zb_tlv_put_value_supported_key_neg_methods(zb_uint8_t param,
  * @param node_id       - Source Device EUI64
  * @param transfer_size - Maximum Reassembled Input Buffer Size
  */
-void zb_tlv_put_value_fragmentation_parameters(zb_uint8_t param,
+void zb_tlv_put_value_fragmentation_parameters(zb_bufid_t param,
                                                zb_uint16_t node_id,
                                                zb_uint16_t transfer_size);
 
@@ -269,7 +288,7 @@ void zb_tlv_put_value_fragmentation_parameters(zb_uint8_t param,
  *
  * @param param       - buffer id
  */
-void zb_tlv_put_value_router_information(zb_uint8_t param);
+void zb_tlv_put_value_router_information(zb_bufid_t param);
 #endif
 
 /**
@@ -278,7 +297,7 @@ void zb_tlv_put_value_router_information(zb_uint8_t param);
  * @param param                    - buffer id
  * @param dev_capability_ext_value - bitmask indicating data about the device capability
  */
-void zb_tlv_put_value_device_capability_extension(zb_uint8_t param, zb_uint16_t dev_capability_ext_value);
+void zb_tlv_put_value_device_capability_extension(zb_bufid_t param, zb_uint16_t dev_capability_ext_value);
 
 /**
  * Put Key Negotiation Req Selected Key Negotiation Method TLV at the end of the packet.
@@ -288,7 +307,7 @@ void zb_tlv_put_value_device_capability_extension(zb_uint8_t param, zb_uint16_t 
  * @param selected_key_neg_method - Selected Key Enumeration
  * @param selected_psk_secret     - Selected Pre-shared Secret Enumeration
  */
-void zb_tlv_put_value_selected_key_neg_method(zb_uint8_t param,
+void zb_tlv_put_value_selected_key_neg_method(zb_bufid_t param,
                                               zb_ieee_addr_t ieee_addr,
                                               zb_uint8_t selected_key_neg_method,
                                               zb_uint8_t selected_psk_secret);
@@ -302,7 +321,7 @@ void zb_tlv_put_value_selected_key_neg_method(zb_uint8_t param,
  * @param param      - buffer id
  * @param passphrase - passphrase
  */
-void zb_tlv_put_value_symmetric_passphrase(zb_uint8_t param, zb_uint8_t *passphrase);
+void zb_tlv_put_value_symmetric_passphrase(zb_bufid_t param, zb_uint8_t *passphrase);
 
 #endif /* ZB_COORDINATOR_ROLE || ZB_ROUTER_ROLE */
 
@@ -313,7 +332,7 @@ void zb_tlv_put_value_symmetric_passphrase(zb_uint8_t param, zb_uint8_t *passphr
  * @param ieee_addr    - Source Device EUI64
  * @param public_point - Public Point
  */
-void put_val_start_k_neg_rq_rsp(zb_uint8_t param,
+void put_val_start_k_neg_rq_rsp(zb_bufid_t param,
                                 zb_ieee_addr_t ieee_addr,
                                 zb_uint8_t *public_point);
 
@@ -328,7 +347,7 @@ void put_val_start_k_neg_rq_rsp(zb_uint8_t param,
  * @param curve_id     - id of the curve, corresponding to the current key negotiation method
  * @param is_dlk       - if true, uses dlk tlvs, otherwise zigbee direct
  */
-void put_val_start_k_neg_rq_rsp_cmn(zb_uint8_t param,
+void put_val_start_k_neg_rq_rsp_cmn(zb_bufid_t param,
                                     zb_ieee_addr_t ieee_addr,
                                     zb_uint8_t *public_point,
                                     zb_uint8_t curve_id,
@@ -343,7 +362,7 @@ void put_val_start_k_neg_rq_rsp_cmn(zb_uint8_t param,
  *
  * @param param - buffer id
  */
-void zb_tlv_put_value_authentication_token(zb_uint8_t param);
+void zb_tlv_put_value_authentication_token(zb_bufid_t param);
 
 #endif /* ZB_JOIN_CLIENT */
 
@@ -527,7 +546,7 @@ zb_ret_t zb_tlv_parse_value_next_pan_id(zb_uint8_t *tlv_ptr,
  * @param param                 - buffer id
  * @param bitmask               - configuration parameters bitmask
  */
-void zb_tlv_put_value_conf_mode_param(zb_uint8_t param,
+void zb_tlv_put_value_conf_mode_param(zb_bufid_t param,
                                       zb_uint16_t *bitmask);
 
 /**
@@ -536,7 +555,7 @@ void zb_tlv_put_value_conf_mode_param(zb_uint8_t param,
  * @param param                 - buffer id
  * @param channel_mask          - channel mask
  */
-void zb_tlv_put_value_next_channel_change(zb_uint8_t param,
+void zb_tlv_put_value_next_channel_change(zb_bufid_t param,
                                           zb_uint32_t *channel_mask);
 
 /**
@@ -545,10 +564,10 @@ void zb_tlv_put_value_next_channel_change(zb_uint8_t param,
  * @param param                 - buffer id
  * @param pan_id                - pan id
  */
-void zb_tlv_put_value_next_pan_id(zb_uint8_t param,
+void zb_tlv_put_value_next_pan_id(zb_bufid_t param,
                                   zb_uint16_t *pan_id);
 
-void zb_tlv_put_panid_conflict_report(zb_uint8_t param);
+void zb_tlv_put_panid_conflict_report(zb_bufid_t param);
 
 
 #if defined ZB_JOIN_CLIENT
@@ -681,5 +700,183 @@ zb_ret_t zb_tlv_parse_value_authentication_token(zb_uint8_t *tlv_ptr,
                                                  zb_uint8_t *auth_token_id);
 
 #endif /* ZB_COORDINATOR_ROLE || ZB_ROUTER_ROLE */
+
+#if defined ZB_ROUTER_ROLE && defined(ZB_DENSE_NET_ROUTING_OPTIMIZATION)
+
+/**
+ * @brief Put Extended Route Information TLV at the end of the Route Request packet.
+ *
+ * The function may be called only when appropriate dense network optimization is enabled
+ * (see \ref nwk_rtg_optimization)
+ *
+ * @param param          - buffer id
+ * @param seq_number     - routing sequence number
+ * @param initial_radius - initial radius field value in the NWK header of the original Route Request
+ */
+void zb_tlv_put_value_route_req_extended_route_information(
+  zb_bufid_t param,
+  zb_uint16_t seq_number,
+  zb_uint8_t initial_radius);
+
+
+/**
+ * Parse Extended Route Information TLV at the end of the Route Request packet.
+ *
+ * The function may be called only when appropriate dense network optimization is enabled
+ * (see \ref nwk_rtg_optimization)
+ *
+ * @param tlv_ptr                 - pointer on the TLV
+ * @param tlv_data_len            - length of the data with TLVs
+ * @param[out] out_seq_number     - (out) routing sequence number
+ * @param[out] out_initial_radius - (out) initial radius
+ *
+ * @return RET_OK               - TLV is found and parsed successfully
+ *         RET_NOT_FOUND        - valid TLV is not found
+ */
+zb_ret_t zb_tlv_parse_value_route_req_extended_route_information(
+  const zb_uint8_t *tlv_ptr,
+  zb_uint8_t tlv_data_len,
+  zb_uint16_t *out_seq_number,
+  zb_uint8_t *out_initial_radius);
+
+/**
+ * @brief Put Concentrator Information TLV at the end of the Route Request packet.
+ *
+ * The function may be called only when appropriate dense network optimization is enabled
+ * (see \ref nwk_rtg_optimization)
+ *
+ * @param param             - buffer id
+ * @param disc_time         - concentrator discovery time (nwkConcentratorDiscoveryTime)
+ * @param max_src_route_len - max source route length (nwkMaxSourceRoute)
+ */
+void zb_tlv_put_value_route_req_concentrator_information(
+  zb_bufid_t param,
+  zb_uint8_t disc_time,
+  zb_uint8_t max_src_route_len);
+
+
+/**
+ * Parse Concentrator Information TLV.
+ *
+ * The function may be called only when appropriate dense network optimization is enabled
+ * (see \ref nwk_rtg_optimization)
+ *
+ * @param tlv_ptr                    - pointer on the TLV
+ * @param tlv_data_len               - length of the data with TLVs
+ * @param[out] out_disc_time         - (out) concentrator discovery time
+ * @param[out] out_max_src_route_len - (out) max source route length
+ *
+ * @return RET_OK               - TLV is found and parsed successfully
+ *         RET_NOT_FOUND        - valid TLV is not found
+ */
+zb_ret_t zb_tlv_parse_value_route_req_concentrator_information(
+  const zb_uint8_t *tlv_ptr,
+  zb_uint8_t tlv_data_len,
+  zb_uint8_t *out_disc_time,
+  zb_uint8_t *out_max_src_route_len);
+
+
+/**
+ * @brief Put header of Source Route Solicitation TLV at the end of the Route Request packet.
+ *
+ * The function may be called only when appropriate dense network optimization is enabled
+ * (see \ref nwk_rtg_optimization)
+ *
+ * @param param        - buffer id
+ * @param addrs_count  - total number of short addresses in TLV
+ * @param addrs_list   - list of network addresses to add into TLV value
+ */
+void zb_tlv_put_value_route_req_source_route_solicitation(
+  zb_bufid_t param,
+  zb_uint8_t addrs_count,
+  const zb_uint16_t *addrs_list);
+
+
+/**
+ * Parse Source Route Solicitation TLV.
+ *
+ * The function may be called only when appropriate dense network optimization is enabled
+ * (see \ref nwk_rtg_optimization)
+ *
+ * @param tlv_ptr                  - pointer on the TLV
+ * @param tlv_data_len             - length of the data with TLVs
+ * @param[out] out_addrs_count     - (out) total number of addresses in TLV
+ * @param[out] out_addrs_list      - (out) array to store addresses from TLV
+ * @param out_addrs_list_max_size  - max length of addresses array
+ *
+ * @return RET_OK               - TLV is found and parsed successfully
+ *         RET_NOT_FOUND        - valid TLV is not found
+ */
+zb_ret_t zb_tlv_parse_value_route_req_source_route_solicitation(
+  const zb_uint8_t *tlv_ptr,
+  zb_uint8_t tlv_data_len,
+  zb_uint8_t *out_addrs_count,
+  zb_uint16_t *out_addrs_list,
+  zb_uint8_t out_addrs_list_max_size);
+
+
+/**
+ * @brief Put Extended Route Information TLV at the end of the Route Reply packet.
+ *
+ * The function may be called only when appropriate dense network optimization is enabled
+ * (see \ref nwk_rtg_optimization)
+ *
+ * @param param          - buffer id
+ * @param seq_number     - routing sequence number
+ */
+void zb_tlv_put_value_route_repl_extended_route_information(
+  zb_bufid_t param,
+  zb_uint16_t seq_number);
+
+/**
+ * Parse Extended Route Information TLV at the end of the Route Reply packet.
+ *
+ * The function may be called only when appropriate dense network optimization is enabled
+ * (see \ref nwk_rtg_optimization)
+ *
+ * @param tlv_ptr             - pointer on the TLV
+ * @param tlv_data_len        - length of the data with TLVs
+ * @param[out] out_seq_number - (out) routing sequence number
+ *
+ * @return RET_OK               - TLV is found and parsed successfully
+ *         RET_NOT_FOUND        - valid TLV is not found
+ */
+zb_ret_t zb_tlv_parse_value_route_repl_extended_route_information(
+  const zb_uint8_t *tlv_ptr,
+  zb_uint8_t tlv_data_len,
+  zb_uint16_t *out_seq_number);
+
+/**
+ * @brief Put Extended Route Information TLV at the end of the Network Status packet.
+ *
+ * The function may be called only when appropriate dense network optimization is enabled
+ * (see \ref nwk_rtg_optimization)
+ *
+ * @param param          - buffer id
+ * @param seq_number     - routing sequence number
+ */
+void zb_tlv_put_value_nwk_status_extended_route_information(
+  zb_bufid_t param,
+  zb_uint16_t seq_number);
+
+
+/**
+ * Parse Extended Route Information TLV at the end of the Network Status packet.
+ *
+ * The function may be called only when appropriate dense network optimization is enabled
+ * (see \ref nwk_rtg_optimization)
+ *
+ * @param tlv_ptr             - pointer on the TLV
+ * @param tlv_data_len        - length of the data with TLVs
+ * @param[out] out_seq_number - (out) routing sequence number
+ *
+ * @return RET_OK               - TLV is found and parsed successfully
+ *         RET_NOT_FOUND        - valid TLV is not found
+ */
+zb_ret_t zb_tlv_parse_value_nwk_status_extended_route_information(
+  const zb_uint8_t *tlv_ptr,
+  zb_uint8_t tlv_data_len,
+  zb_uint16_t *out_seq_number);
+#endif /* ZB_ROUTER_ROLE && ZB_DENSE_NET_ROUTING_OPTIMIZATION */
 
 #endif /* ZB_TLV_H */

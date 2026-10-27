@@ -86,6 +86,12 @@ typedef struct type_name_prefix ## _s                                 \
 #define ZB_RING_BUFFER_CAPACITY(rb) ((sizeof((rb)->ring_buf) / sizeof((rb)->ring_buf[0])))
 
 /**
+ * Return size of ring buffer type
+ *
+ * @param rb - ring buffer pointer.
+ */
+#define ZB_RING_BUFFER_TYPE_SIZE(rb) (sizeof(*(rb)->ring_buf))
+/**
  * Return 1 if ring buffer is full
  *
  * @param rb - ring buffer pointer.
