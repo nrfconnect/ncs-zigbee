@@ -57,6 +57,7 @@ static struct k_work on_connect_work;
 static struct k_work on_disconnect_work;
 static struct bt_conn *current_conn;
 static struct nus_entry *nus_commands;
+static size_t nus_commands_count;
 
 static void connected(struct bt_conn *conn, uint8_t err)
 {
@@ -167,8 +168,18 @@ static int ble_utils_init(struct bt_nus_cb *nus_clbs,
 
 	LOG_INF("Bluetooth initialized");
 
-	if (IS_ENABLED(CONFIG_SETTINGS)) {
-		settings_load();
+	if (IS_ENABLED(CONFIG_BT_SETTINGS)) {
+		ret = settings_load_subtree("bt");
+		if (ret) {
+			LOG_ERR("Failed to load Bluetooth settings (error: %d)", ret);
+			goto end;
+		}
+	} else if (IS_ENABLED(CONFIG_SETTINGS)) {
+		ret = settings_load();
+		if (ret) {
+			LOG_ERR("Failed to load settings (error: %d)", ret);
+			goto end;
+		}
 	}
 
 	ret = bt_nus_init(nus_clbs);
@@ -193,7 +204,9 @@ static void nus_command_handler(struct bt_conn *conn,
 {
 	LOG_HEXDUMP_DBG(data, length, "NUS recv:");
 
-	for (struct nus_entry *p = nus_commands; p->cmd != NULL; p++) {
+	for (size_t i = 0; i < nus_commands_count; i++) {
+		struct nus_entry *p = &nus_commands[i];
+
 		if ((length >= strlen(p->cmd)) &&
 		    (!strncmp(p->cmd, (const char *)data, strlen(p->cmd)))) {
 			LOG_DBG("Matched cmd: %s", p->cmd);
@@ -207,7 +220,7 @@ static void nus_command_handler(struct bt_conn *conn,
 
 void nus_cmd_init(nus_connection_cb_t on_connect,
 		  nus_disconnection_cb_t on_disconnect,
-		  struct nus_entry *command_set)
+		  struct nus_entry *command_set, size_t command_count)
 {
 	struct bt_nus_cb nus_clbs = {
 		.received = nus_command_handler,
@@ -215,5 +228,7 @@ void nus_cmd_init(nus_connection_cb_t on_connect,
 	};
 
 	nus_commands = command_set;
+	nus_commands_count = command_count;
+
 	ble_utils_init(&nus_clbs, on_connect, on_disconnect);
 }

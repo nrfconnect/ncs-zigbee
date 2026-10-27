@@ -13,6 +13,8 @@
 #ifndef __NUS_CMD_H__
 #define __NUS_CMD_H__
 
+#include <stddef.h>
+
 /** @brief Type indicates function called when Bluetooth LE connection
  *         is established.
  *
@@ -48,9 +50,10 @@ struct nus_entry {
  * @param[in] on_disconnect Callback that will be called when BLE central
  *			    disconnects from the NUS service.
  * @param[in] command_set   A pointer to an array with NUS commands.
+ * @param[in] command_count Number of entries in @p command_set.
  */
 void nus_cmd_init(nus_connection_cb_t on_connect,
 		  nus_disconnection_cb_t on_disconnect,
-		  struct nus_entry *command_set);
+		  struct nus_entry *command_set, size_t command_count);
 
 #endif

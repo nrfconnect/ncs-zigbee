@@ -24,6 +24,9 @@
 	ZIGBEE_SETTINGS_SUBSYS_NAME "/" ZIGBEE_SETTINGS_KEY_SCENES_TABLE
 
 #if defined(CONFIG_SETTINGS)
+/** Mount the Settings backend without loading persisted keys. */
+int zigbee_settings_backend_init(void);
+
 /** Initialize the Settings backend shared by add-on libraries and PSA storage. */
 int zigbee_settings_subsys_init(void);
 #endif
