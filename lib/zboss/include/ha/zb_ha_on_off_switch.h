@@ -87,6 +87,9 @@
 #define ZB_HA_ON_OFF_SWITCH_IN_CLUSTER_NUM 3  /*!< On/Off switch IN clusters number */
 #define ZB_HA_ON_OFF_SWITCH_OUT_CLUSTER_NUM 4 /*!< On/Off switch OUT clusters number */
 
+#define ZB_HA_ON_OFF_SWITCH_BDB_SLEEPY_ZED_IN_CLUSTER_NUM 4  /*!< On/Off switch IN clusters number */
+#define ZB_HA_ON_OFF_SWITCH_BDB_SLEEPY_ZED_OUT_CLUSTER_NUM 4 /*!< On/Off switch OUT clusters number */
+
 #define ZB_HA_ON_OFF_SWITCH_CLUSTER_NUM                                      \
   (ZB_HA_ON_OFF_SWITCH_IN_CLUSTER_NUM + ZB_HA_ON_OFF_SWITCH_OUT_CLUSTER_NUM)
 
@@ -160,6 +163,83 @@
         )                                                                   \
     }
 
+/** @brief Declare cluster list for On/Off switch device in BDB mode (sleepy ZED)
+ *         This declaration differs from ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST
+ *          in Poll-Control cluster server declaration.
+ *          It is recommended to use Poll-Control cluster server for sleepy ZEDs
+ *            in order to poll TC using this cluster.
+    @param cluster_list_name - cluster list variable name
+    @param on_off_switch_config_attr_list - attribute list for On/off switch configuration cluster
+    @param basic_attr_list - attribute list for Basic cluster
+    @param identify_attr_list - attribute list for Identify cluster
+    @param poll_control_attr_list - attribute list for Poll Control cluster
+ */
+#define ZB_HA_DECLARE_ON_OFF_SWITCH_CLUSTER_LIST_BDB_SLEEPY_ZED(            \
+      cluster_list_name,                                                    \
+      on_off_switch_config_attr_list,                                       \
+      basic_attr_list,                                                      \
+      identify_attr_list,                                                   \
+      poll_control_attr_list)                                               \
+      zb_zcl_cluster_desc_t cluster_list_name[] =                           \
+      {                                                                     \
+        ZB_ZCL_CLUSTER_DESC(                                                \
+          ZB_ZCL_CLUSTER_ID_ON_OFF_SWITCH_CONFIG,                           \
+          ZB_ZCL_ARRAY_SIZE(on_off_switch_config_attr_list, zb_zcl_attr_t), \
+          (on_off_switch_config_attr_list),                                 \
+          ZB_ZCL_CLUSTER_SERVER_ROLE,                                       \
+          ZB_ZCL_MANUF_CODE_INVALID                                         \
+        ),                                                                  \
+        ZB_ZCL_CLUSTER_DESC(                                                \
+          ZB_ZCL_CLUSTER_ID_IDENTIFY,                                       \
+          ZB_ZCL_ARRAY_SIZE(identify_attr_list, zb_zcl_attr_t),             \
+          (identify_attr_list),                                             \
+          ZB_ZCL_CLUSTER_SERVER_ROLE,                                        \
+          ZB_ZCL_MANUF_CODE_INVALID                                         \
+        ),                                                                  \
+        ZB_ZCL_CLUSTER_DESC(                                                \
+          ZB_ZCL_CLUSTER_ID_BASIC,                                          \
+          ZB_ZCL_ARRAY_SIZE(basic_attr_list, zb_zcl_attr_t),                \
+          (basic_attr_list),                                                \
+          ZB_ZCL_CLUSTER_SERVER_ROLE,                                       \
+          ZB_ZCL_MANUF_CODE_INVALID                                         \
+        ),                                                                  \
+        ZB_ZCL_CLUSTER_DESC(                                                \
+          ZB_ZCL_CLUSTER_ID_POLL_CONTROL,                                   \
+          ZB_ZCL_ARRAY_SIZE(poll_control_attr_list, zb_zcl_attr_t),         \
+          (poll_control_attr_list),                                         \
+          ZB_ZCL_CLUSTER_SERVER_ROLE,                                       \
+          ZB_ZCL_MANUF_CODE_INVALID                                         \
+        ),                                                                  \
+        ZB_ZCL_CLUSTER_DESC(                                                \
+          ZB_ZCL_CLUSTER_ID_ON_OFF,                                         \
+          0,                                                                \
+          NULL,                                                             \
+          ZB_ZCL_CLUSTER_CLIENT_ROLE,                                       \
+          ZB_ZCL_MANUF_CODE_INVALID                                         \
+        ),                                                                  \
+        ZB_ZCL_CLUSTER_DESC(                                                \
+          ZB_ZCL_CLUSTER_ID_SCENES,                                         \
+          0,                                                                \
+          NULL,                                                             \
+          ZB_ZCL_CLUSTER_CLIENT_ROLE,                                       \
+          ZB_ZCL_MANUF_CODE_INVALID                                         \
+        ),                                                                  \
+        ZB_ZCL_CLUSTER_DESC(                                            \
+          ZB_ZCL_CLUSTER_ID_IDENTIFY,                                       \
+          0,                                                                \
+          NULL,                                                             \
+          ZB_ZCL_CLUSTER_CLIENT_ROLE,                                       \
+          ZB_ZCL_MANUF_CODE_INVALID                                         \
+        ),                                                              \
+        ZB_ZCL_CLUSTER_DESC(                                                \
+          ZB_ZCL_CLUSTER_ID_GROUPS,                                         \
+          0,                                                                \
+          NULL,                                                             \
+          ZB_ZCL_CLUSTER_CLIENT_ROLE,                                       \
+          ZB_ZCL_MANUF_CODE_INVALID                                         \
+        )                                                                   \
+    }
+
 
 /** @cond internals_doc */
 /** @brief Declare simple descriptor for On/Off switch device
@@ -192,6 +272,37 @@
     }                                                                                         \
   }
 
+/** @brief Declare simple descriptor for On/Off switch device in BDB mode (sleepy ZED)
+    @param ep_name - endpoint variable name
+    @param ep_id - endpoint ID
+    @param in_clust_num - number of supported input clusters
+    @param out_clust_num - number of supported output clusters
+    @note in_clust_num, out_clust_num should be defined by numeric constants, not variables or any
+    definitions, because these values are used to form simple descriptor type name
+*/
+#define ZB_ZCL_DECLARE_ON_OFF_SWITCH_SIMPLE_DESC_BDB_SLEEPY_ZED(ep_name, ep_id, in_clust_num, out_clust_num) \
+  ZB_DECLARE_SIMPLE_DESC(in_clust_num, out_clust_num);                                        \
+  ZB_AF_SIMPLE_DESC_TYPE(in_clust_num, out_clust_num) simple_desc_##ep_name =                 \
+  {                                                                                           \
+    ep_id,                                                                                    \
+    ZB_AF_HA_PROFILE_ID,                                                                      \
+    ZB_HA_ON_OFF_SWITCH_DEVICE_ID,                                                            \
+    ZB_HA_DEVICE_VER_ON_OFF_SWITCH,                                                           \
+    0,                                                                                        \
+    in_clust_num,                                                                             \
+    out_clust_num,                                                                            \
+    {                                                                                         \
+      ZB_ZCL_CLUSTER_ID_BASIC,                                                                \
+      ZB_ZCL_CLUSTER_ID_IDENTIFY,                                                             \
+      ZB_ZCL_CLUSTER_ID_POLL_CONTROL,                                                         \
+      ZB_ZCL_CLUSTER_ID_ON_OFF_SWITCH_CONFIG,                                                 \
+      ZB_ZCL_CLUSTER_ID_ON_OFF,                                                               \
+      ZB_ZCL_CLUSTER_ID_SCENES,                                                               \
+      ZB_ZCL_CLUSTER_ID_GROUPS,                                                               \
+      ZB_ZCL_CLUSTER_ID_IDENTIFY,                                                             \
+    }                                                                                         \
+  }
+
 /** @endcond */
 
 /** @brief Declare endpoint for On/off Switch device
@@ -205,6 +316,29 @@
       ep_id,                                                         \
       ZB_HA_ON_OFF_SWITCH_IN_CLUSTER_NUM,                            \
       ZB_HA_ON_OFF_SWITCH_OUT_CLUSTER_NUM);                          \
+  ZB_AF_DECLARE_ENDPOINT_DESC(ep_name,                                  \
+                              ep_id,                                    \
+      ZB_AF_HA_PROFILE_ID,                                           \
+      0,                                                             \
+      NULL,                                                          \
+      ZB_ZCL_ARRAY_SIZE(cluster_list, zb_zcl_cluster_desc_t),        \
+      cluster_list,                                                  \
+      (zb_af_simple_desc_1_1_t*)&simple_desc_##ep_name, \
+      0, NULL, /* No reporting ctx */           \
+      0, NULL) /* No CVC ctx */
+
+
+/** @brief Declare endpoint for On/off Switch device
+    @param ep_name - endpoint variable name
+    @param ep_id - endpoint ID
+    @param cluster_list - endpoint cluster list
+ */
+#define ZB_HA_DECLARE_ON_OFF_SWITCH_EP_BDB_SLEEPY_ZED(ep_name, ep_id, cluster_list) \
+  ZB_ZCL_DECLARE_ON_OFF_SWITCH_SIMPLE_DESC_BDB_SLEEPY_ZED(           \
+      ep_name,                                                       \
+      ep_id,                                                         \
+      ZB_HA_ON_OFF_SWITCH_BDB_SLEEPY_ZED_IN_CLUSTER_NUM,             \
+      ZB_HA_ON_OFF_SWITCH_BDB_SLEEPY_ZED_OUT_CLUSTER_NUM);           \
   ZB_AF_DECLARE_ENDPOINT_DESC(ep_name,                                  \
                               ep_id,                                    \
       ZB_AF_HA_PROFILE_ID,                                           \

@@ -426,13 +426,17 @@ ZB_PACKED_STRUCT zb_zcl_wwah_debug_report_t;
 
 typedef ZB_PACKED_PRE struct zb_zcl_wwah_periodic_checkins_data_s
 {
+  /* [0 bytes] */
   zb_uint8_t poll_method;
   zb_uint8_t tsn;
   zb_uint8_t endpoint;
   zb_uint8_t failure_cnt;
+  /* [4 bytes] */
   zb_uint32_t countdown;
+  /* [8 bytes] */
   zb_uint16_t keepalive_base; /* Base timeout in seconds*/
   zb_uint16_t keepalive_jitter;
+  /* [12 bytes] */
 } ZB_PACKED_STRUCT zb_zcl_wwah_periodic_checkins_data_t;
 
 typedef enum zb_zcl_wwah_bad_parent_recovery_signal_e
@@ -2505,13 +2509,13 @@ zb_bool_t zb_zcl_wwah_check_if_wwah_rejoin_enabled(void);
 void zb_zcl_wwah_schedule_send_power_descriptor_change(void);
 zb_bool_t zb_zcl_wwah_check_if_interpan_supported(void);
 zb_bool_t zb_zcl_wwah_check_if_downgrade_disabled(void);
-zb_bool_t zb_zcl_wwah_periodic_checkin_read_attr_handle(zb_uint8_t param);
+zb_bool_t zb_zcl_wwah_periodic_checkin_read_attr_handle(zb_bufid_t param);
 zb_bool_t zb_zcl_wwah_periodic_checkin_block_zcl_cmd(zb_zcl_parsed_hdr_t *cmd_info);
-void zb_zcl_wwah_periodic_checkin_tc_poll(zb_uint8_t param);
-void zb_zcl_wwah_periodic_checkin_match_desc_req(zb_uint8_t param);
-void zb_zcl_wwah_periodic_checkin_match_desc_req_delayed(zb_uint8_t param);
+void zb_zcl_wwah_periodic_checkin_tc_poll(zb_cb_param_t param);
+void zb_zcl_wwah_periodic_checkin_match_desc_req(zb_cb_param_t param);
+void zb_zcl_wwah_recounter_checkin(void);
 void zb_zcl_wwah_stop_periodic_checkin(void);
-void zb_zcl_wwah_start_periodic_checkin(void);
+zb_uint8_t zb_zcl_wwah_periodic_checkins_select_method_and_start_discovery(zb_bufid_t param, zb_uint16_t first_method);
 zb_bool_t zb_zcl_wwah_check_src_addr_for_cluster(zb_uint16_t short_addr, zb_uint16_t cluster_id);
 
 void zb_zcl_wwah_set_wwah_behavior(zb_uint8_t behavior);
@@ -2582,19 +2586,19 @@ typedef ZB_PACKED_PRE struct zb_zcl_wwah_context_s
 #define ZB_ZCL_WWAH_BAD_PARENT_RECOVERY_RSSI_IS_GOOD(rssi) (rssi >= -100)
 
 #ifdef ZB_ZCL_SUPPORT_CLUSTER_WWAH
-void zb_zcl_wwah_bad_parent_recovery_signal(zb_bufid_t sig);
+void zb_zcl_wwah_bad_parent_recovery_signal(zb_zcl_wwah_bad_parent_recovery_signal_t sig);
 
-zb_ret_t zb_zcl_wwah_request_new_aps_link_key_handler(zb_uint8_t param);
-zb_ret_t zb_zcl_wwah_enable_wwah_app_event_retry_algorithm_handler(zb_uint8_t param);
-zb_ret_t zb_zcl_wwah_disable_wwah_app_event_retry_algorithm_handler(zb_uint8_t param);
-zb_ret_t zb_zcl_wwah_request_time_handler(zb_uint8_t param);
-zb_ret_t zb_zcl_wwah_enable_wwah_rejoin_algorithm_handler(zb_uint8_t param);
-zb_ret_t zb_zcl_wwah_disable_wwah_rejoin_algorithm_handler(zb_uint8_t param);
+zb_ret_t zb_zcl_wwah_request_new_aps_link_key_handler(zb_bufid_t param);
+zb_ret_t zb_zcl_wwah_enable_wwah_app_event_retry_algorithm_handler(zb_bufid_t param);
+zb_ret_t zb_zcl_wwah_disable_wwah_app_event_retry_algorithm_handler(zb_bufid_t param);
+zb_ret_t zb_zcl_wwah_request_time_handler(zb_bufid_t param);
+zb_ret_t zb_zcl_wwah_enable_wwah_rejoin_algorithm_handler(zb_bufid_t param);
+zb_ret_t zb_zcl_wwah_disable_wwah_rejoin_algorithm_handler(zb_bufid_t param);
 
 void zb_zcl_wwah_init_server(void);
 void zb_zcl_wwah_init_server_attr(void);
 void zb_zcl_wwah_init_client(void);
-zb_ret_t zb_zcl_wwah_update_time(zb_uint8_t param);
+zb_ret_t zb_zcl_wwah_update_time(zb_bufid_t param);
 #endif /* ZB_ZCL_SUPPORT_CLUSTER_WWAH */
 
 #define ZB_ZCL_CLUSTER_ID_WWAH_SERVER_ROLE_INIT zb_zcl_wwah_init_server

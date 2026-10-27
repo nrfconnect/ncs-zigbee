@@ -158,7 +158,7 @@ typedef ZB_PACKED_PRE struct zb_aps_device_key_pair_set_v1_s
 } ZB_PACKED_STRUCT zb_aps_device_key_pair_nvram_v1_t;
 
 
-typedef ZB_PACKED_PRE struct zb_aps_device_key_pair_set_v2_s
+typedef ZB_PACKED_PRE struct zb_aps_device_key_pair_nvram_v2_t
 {
   zb_ieee_addr_t device_address;              /*!< Partner address */
   zb_uint8_t     link_key[ZB_CCM_KEY_SIZE];   /*!< Link key, see Spec. Not use in current
@@ -173,7 +173,7 @@ typedef ZB_PACKED_PRE struct zb_aps_device_key_pair_set_v2_s
 
   zb_bitfield_t  key_upd_method:3;            /*!< @ref zb_post_join_key_upd_method_t */
   zb_bitfield_t  initial_join_auth:3;         /*!< @ref zb_initial_join_auth_t */
-  zb_bitfield_t  key_attributes:2;            /*!< attributes of the key @ref zb_secur_key_attributes */
+  zb_bitfield_t  key_attributes:2;            /*!< attributes of the key @ref zb_secur_key_attributes_t */
   zb_bitfield_t  passphrase_update_allowed:1; /*!< PassphraseUpdateAllowed
                                                *   Update is allowed just after create, disallowed
                                                *   after Get Auth Token done. */
@@ -186,22 +186,64 @@ typedef ZB_PACKED_PRE struct zb_aps_device_key_pair_set_v2_s
   zb_uint8_t     supported_kn_methods; /*!< Supported Key negotiation methods */
   zb_uint8_t     supported_kn_secrets; /*!< Supported Key negotiation secrets */
 
-} ZB_PACKED_STRUCT zb_aps_device_key_pair_set_v2_t;
+} ZB_PACKED_STRUCT zb_aps_device_key_pair_nvram_v2_t;
 
-typedef zb_aps_device_key_pair_set_v2_t zb_aps_device_key_pair_nvram_t;
-typedef zb_aps_device_key_pair_set_v2_t zb_aps_device_key_pair_set_t;
+typedef ZB_PACKED_PRE struct zb_aps_device_key_pair_set_v3_s
+{
+  zb_uint16_t    device_addr_ref; /*!< Device address reference.
+                                          *   Locked when Key Pair is created and
+                                          *   unlocked when Key Pair is removed */
+  zb_uint8_t     reserved[2];
+
+  zb_uint8_t     link_key[ZB_CCM_KEY_SIZE];   /*!< Link key, see Spec. Not use in current
+                                                * release */
+  zb_uint8_t     passphrase[ZB_CCM_KEY_SIZE]; /*!< Passphrase */
+
+  /* 4.4.1.1[2] Security Processing of Outgoing[Incoming] Frames */
+  /* Moved to zb_aps_device_key_pair_array_t */
+  /* This fields were commented out after discussion with EE.
+   * ZB spec does not require to save APS key frame counters into NVRAM.
+   */
+
+  zb_bitfield_t  key_upd_method:3;            /*!< @ref zb_post_join_key_upd_method_t */
+  zb_bitfield_t  initial_join_auth:3;         /*!< @ref zb_initial_join_auth_t */
+  zb_bitfield_t  key_attributes:2;            /*!< attributes of the key @ref zb_secur_key_attributes_t */
+  zb_bitfield_t  passphrase_update_allowed:1; /*!< PassphraseUpdateAllowed
+                                               *   Update is allowed just after create, disallowed
+                                               *   after Get Auth Token done. */
+  zb_bitfield_t  aps_link_key_type:1;         /*!< @ref zb_secur_aps_link_key_type_t: unique vs global (r20 stuff) */
+  zb_bitfield_t  kn_methods_present:1; /*!< If true, then supported_kn_methods and supported_kn_secrets fields are present */
+  zb_bitfield_t  aps_frame_cnt_sync_supported:1;
+  zb_bitfield_t  use_unverified:1;      /*!< Allow to use unverified key to encrypting (for confirm key frame)*/
+  zb_bitfield_t  key_pair_removed:1; /*!< It is used in incremental APS Key Pair dataset to indicate that corresponding
+                                      *   key pair was removed */
+  zb_bitfield_t  psa_encrypted:1;    /*!< This flag is used to store link key and passphrase not explicitly using PSA master key */
+  zb_bitfield_t  reserved2: 1;
+
+  zb_uint8_t     supported_kn_methods; /*!< Supported Key negotiation methods */
+  zb_uint8_t     supported_kn_secrets; /*!< Supported Key negotiation secrets */
+
+  zb_uint32_t    outgoing_frame_counter; /*!< APS outgoing frame counter */
+} ZB_PACKED_STRUCT zb_aps_device_key_pair_set_v3_t;
+
+typedef zb_aps_device_key_pair_set_v3_t zb_aps_device_key_pair_nvram_t;
+typedef zb_aps_device_key_pair_set_v3_t zb_aps_device_key_pair_set_t;
 
 ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_aps_device_key_pair_nvram_t);
 
-#define ZB_APS_DEVICE_KEY_PAIR_CACHED (zb_uint32_t)0x07ffffffU
+#ifndef ZB_NO_BIG_NET
+typedef zb_uint16_t zb_aps_key_pair_ref_t;
+#else
+typedef zb_uint8_t zb_aps_key_pair_ref_t;
+#endif
+
+#define ZB_APS_KEY_PAIR_REF_NONE ((zb_aps_key_pair_ref_t)-1)
 
 /* zb_aps_device_key_pair_array_t moved to zboss_api_internal.h */
 
 typedef struct zb_aps_device_key_pair_storage_s
 {
-  zb_uint8_t  nvram_page;
-  zb_uint8_t  cached_i;
-  zb_uint16_t nvram_ds_ver;
+  zb_aps_key_pair_ref_t cached_i;
   zb_aps_device_key_pair_set_t cached;
 #ifndef ZB_CONFIGURABLE_MEM
   zb_aps_device_key_pair_array_t key_pair_set[ZB_N_APS_KEY_PAIR_ARR_MAX_SIZE]; /*!< APS Application Key pair table */
@@ -220,6 +262,10 @@ typedef ZB_PACKED_PRE struct zb_aps_device_key_pair_set_nvram_1_0_s
 #endif /* ZB_PLATFORM_CORTEX_M3 */
 } ZB_PACKED_STRUCT zb_aps_device_key_pair_set_nvram_1_0_t;
 
+
+#define ZB_APS_KEY_PAIR_ENT_USED(ent_idx)                                         \
+  (ZB_AIB().aps_device_key_pair_storage.key_pair_set[(ent_idx)].nvram_offset !=   \
+    ZB_APS_DEVICE_KEY_PAIR_NVRAM_LOCATION_NONE)
 
 /**
    APS Installcode structure for NVRAM
@@ -257,7 +303,7 @@ typedef struct zb_secur_ic_add_s
 {
   zb_uint8_t const *address;
   zb_uint8_t const *ic;
-  zb_uint8_t do_update;
+  zb_bool_t do_update;
   zb_uint8_t type;
 } zb_secur_ic_add_t;
 #endif
@@ -462,7 +508,7 @@ typedef enum zb_secur_frame_type_e
 
 #define ZB_SECUR_APS_FRAME_CNT_SYNC_IS_ENABLED(lk_cap) ((lk_cap) & 0x1U)
 
-#define ZB_SECUR_SET_APS_FRAME_CNT_SYNC(lk_cap) ((lk_cap) |= (1 << 0u))
+#define ZB_SECUR_SET_APS_FRAME_CNT_SYNC(lk_cap) ((lk_cap) |= (1U << 0u))
 
 #if 0
 #define ZB_SECUR_SET_BUF_MAC_ENCR(_pbuf) ((_pbuf)->u.hdr.encrypt_type |= ZB_SECUR_MAC_ENCR)
@@ -492,6 +538,12 @@ typedef enum zb_secur_frame_type_e
 #define ZB_SECUR_SET_CONF_MODE(bmask)         ((bmask) |= 0x01U) /* 1 if is restricted mode */
 #define ZB_SECUR_SET_LINK_KEY_ENC(bmask)      ((bmask) |= 0x02U)
 #define ZB_SECUR_SET_LEAVE_REQ_ALLOWED(bmask) ((bmask) |= 0x04U)
+
+#define ZB_SECUR_TC_VERSION_LEGACY_PRE_21          (20u)
+#define ZB_SECUR_TC_VERSION_23_OR_HIGHER           (23u)
+
+/* Maximum time a node will wait for a response for each primitive during a symmetric key exchange */
+#define ZB_SECUR_LINK_KEY_UPDATE_TIMEOUT (ZB_APS_SECURITY_TIME_OUT_PERIOD_IN_BEACON_INTERVAL())
 
 /**
    Initialize APS security data structures
@@ -583,7 +635,7 @@ zb_bool_t zb_sec_b6_hash(const zb_uint8_t *input, const zb_uint32_t input_len, z
    @param attr - key attribute to search.
    @return Key Pair Set structure
  */
-zb_aps_device_key_pair_set_t *zb_secur_get_link_key_by_address(zb_ieee_addr_t address,
+zb_aps_device_key_pair_set_t *zb_secur_get_link_key_by_address(const zb_ieee_addr_t address,
                                                                zb_secur_key_attributes_t attr);
 
 /**
@@ -597,8 +649,8 @@ zb_aps_device_key_pair_set_t *zb_secur_get_link_key_by_address(zb_ieee_addr_t ad
    @param attr - key attribute to search.
    @return keypair index if link key exists, -1 otherwise
  */
-zb_uint16_t zb_aps_keypair_get_index_by_addr(zb_ieee_addr_t dev_addr,
-                                             zb_secur_key_attributes_t attr);
+zb_aps_key_pair_ref_t zb_aps_keypair_get_index_by_addr(
+  const zb_ieee_addr_t dev_addr, zb_secur_key_attributes_t attr);
 
 #ifndef ZB_HW_ZB_AES128
 /*
@@ -791,7 +843,7 @@ zb_ret_t zb_nwk_secure_frame(zb_bufid_t src, zb_uint_t mac_hdr_size, zb_bufid_t 
    Attention: if frame unsecure failed, this function reuses packet buffer to
    send NWK status. Don't use the buffer if return code != RET_OK!
  */
-zb_ret_t zb_nwk_unsecure_frame(zb_uint8_t param);
+zb_ret_t zb_nwk_unsecure_frame(zb_bufid_t param);
 
 /**
    Allocate and fill space for auxiliary security header in the APS data or command frame.
@@ -835,13 +887,17 @@ void zb_aps_secure_frame_by_key(zb_bufid_t src, zb_bufid_t dst, zb_uint8_t *aps_
    Decrypt APS frame "on place"
 
    @param buf - (in/out) buffer holding frame
-   @param keypair_i_p - (out) index of APS keypair used to decrypt or (zb_uint16_t)-1 if used default TCLK
+   @param keypair_i_p - (out) index of APS keypair used to decrypt or ZB_APS_KEY_PAIR_REF_NONE if used default TCLK
    @param key_id_p - pointer to variable that contains key used to protect the frame
    @param is_verified_tclk - (out) ZB_TRUE if the frame was decrypted successfully using TCLK, ZB_FALSE otherwise
 
    @return RET_OK if successfully decrypted frame, error code otherwise
  */
-zb_ret_t zb_aps_unsecure_frame(zb_bufid_t buf, zb_uint16_t *keypair_i_p, zb_secur_key_id_t *key_id_p, zb_bool_t *is_verified_tclk);
+zb_ret_t zb_aps_unsecure_frame(
+  zb_bufid_t buf,
+  zb_aps_key_pair_ref_t *keypair_i_p,
+  zb_secur_key_id_t *key_id_p,
+  zb_bool_t *is_verified_tclk);
 
 /**
    Return size of APS aux secure header
@@ -849,7 +905,7 @@ zb_ret_t zb_aps_unsecure_frame(zb_bufid_t buf, zb_uint16_t *keypair_i_p, zb_secu
    @param secur_control - aux APS header secur_control field
    @return aux header size if ok or -1 if error (unknown key type)
  */
-zb_ushort_t zb_aps_secur_aux_size(zb_uint8_t secur_control);
+zb_uint16_t zb_aps_secur_aux_size(zb_uint8_t secur_control);
 
 #ifdef ZB_MAC_SECURITY
 /**
@@ -874,7 +930,7 @@ zb_ret_t zb_mac_secure_frame(zb_bufid_t src, zb_uint_t mac_hdr_size, zb_bufid_t 
 
    @return RET_OK if successfully decrypted frame, error code otherwise
  */
-zb_ret_t zb_mac_unsecure_frame(zb_uint8_t param);
+zb_ret_t zb_mac_unsecure_frame(zb_bufid_t param);
 #endif
 
 /**
@@ -897,7 +953,7 @@ typedef struct zb_apsme_transport_key_req_s
     {
       zb_uint8_t key[ZB_CCM_KEY_SIZE];     /*!< Key */
       zb_uint8_t key_seq_number;           /*!< Sequence Number */
-      zb_uint8_t use_parent;               /*!< Use parent - see 4.6.3 */
+      zb_bool_t use_parent;                /*!< Use parent - see 4.6.3 */
       zb_ieee_addr_t parent_address;       /*!< Parent Address */
     } nwk;                                 /*!< Use for transmit NWK key */
     struct apsme_transport_key_app_s
@@ -979,7 +1035,7 @@ typedef ZB_PACKED_PRE struct zb_apsme_update_device_pkt_s
 
    @param param - packet buffer filled be \see zb_transport_key_dsc_pkt_t
  */
-void zb_apsme_transport_key_request(zb_uint8_t param);
+void zb_apsme_transport_key_request(zb_cb_param_t param);
 #endif
 
 /**
@@ -1028,7 +1084,7 @@ typedef struct zb_apsme_switch_key_req_s
 
    @param param - packet buffer filled be \see zb_apsme_switch_key_req_t
  */
-void zb_apsme_switch_key_request(zb_uint8_t param);
+void zb_apsme_switch_key_request(zb_cb_param_t param);
 #endif
 
 /**
@@ -1050,7 +1106,7 @@ typedef struct zb_apsme_switch_key_ind_s
 } zb_apsme_switch_key_ind_t;
 
 
-void zb_aps_in_switch_key(zb_uint8_t param);
+void zb_aps_in_switch_key(zb_bufid_t param);
 
 
 /**
@@ -1087,7 +1143,7 @@ typedef ZB_PACKED_PRE struct zb_apsme_remove_device_ind_s
 
    @param param - packet buffer filled be \see zb_apsme_request_key_req_t
  */
-void zb_secur_apsme_remove_device(zb_uint8_t param);
+void zb_secur_apsme_remove_device(zb_cb_param_t param);
 #endif
 
 /**
@@ -1095,7 +1151,7 @@ void zb_secur_apsme_remove_device(zb_uint8_t param);
 
    @param param - packet buffer filled be \see zb_apsme_remove_device_pkt_t
  */
-void zb_aps_in_remove_device(zb_uint8_t param);
+void zb_aps_in_remove_device(zb_bufid_t param);
 
 /**
    APSME-REQUEST-KEY.request primitive parameters structure
@@ -1118,11 +1174,11 @@ typedef ZB_PACKED_PRE struct zb_apsme_request_key_pkt_s
  */
 typedef ZB_PACKED_PRE struct zb_apsme_request_key_ind_s
 {
-  zb_ieee_addr_t src_address;       /*!< Source address */
-  zb_uint8_t     key_type;          /*!< \see secur_request_key_types  */
-  zb_ieee_addr_t partner_address;   /*!< Partner address */
+  zb_ieee_addr_t        src_address;       /*!< Source address */
+  zb_uint8_t            key_type;          /*!< \see secur_request_key_types  */
+  zb_ieee_addr_t        partner_address;   /*!< Partner address */
 
-  zb_uint16_t    keypair_i;     /*!< index of keypair used to decrypt cmd */
+  zb_aps_key_pair_ref_t keypair_i;     /*!< index of keypair used to decrypt cmd, see @ref zb_aps_key_pair_ref_t */
 } ZB_PACKED_STRUCT zb_apsme_request_key_ind_t;
 
 /**
@@ -1203,7 +1259,7 @@ typedef struct zb_apsme_confirm_key_ind_s
 
    @param param - packet buffer filled be \see zb_apsme_request_key_req_t
  */
-void zb_secur_apsme_request_key(zb_uint8_t param);
+void zb_secur_apsme_request_key(zb_cb_param_t param);
 
 /**
    APSME-REQUEST-KEY.indication primitive
@@ -1213,9 +1269,10 @@ void zb_secur_apsme_request_key(zb_uint8_t param);
    @param key_id - the key used to protect the frame
  */
 #ifdef ZB_COORDINATOR_ROLE
-void zb_aps_in_request_key(zb_uint8_t param, zb_uint16_t keypair_i
-                           , zb_secur_key_id_t key_id
-                          );
+void zb_aps_in_request_key(
+  zb_bufid_t param,
+  zb_aps_key_pair_ref_t keypair_i,
+  zb_secur_key_id_t key_id);
 #endif
 
 /**
@@ -1223,7 +1280,7 @@ void zb_aps_in_request_key(zb_uint8_t param, zb_uint16_t keypair_i
 
    @param param - packet buffer filled be \see zb_apsme_update_device_req_t
  */
-void zb_apsme_update_device_request(zb_uint8_t param);
+void zb_apsme_update_device_request(zb_cb_param_t param);
 
 #ifdef ZB_FORMATION
 /**
@@ -1241,13 +1298,17 @@ void secur_nwk_generate_keys(void);
 /**
    Authenticate child after join
  */
-void secur_authenticate_child(zb_uint8_t param);
+void secur_authenticate_child(zb_cb_param_t param);
 
 #ifdef ZB_ROUTER_ROLE
 /**
    Remove from NBT unauthenticated device
  */
-void secur_forget_unauth_dev(zb_uint8_t addr_ref);
+
+void zb_secur_schedule_forget_unauth_dev(zb_cb_param_t addr_ref);
+void zb_secur_call_forget_unauth_dev_immediately(zb_cb_param_t addr_ref);
+
+void zb_secur_cancel_forget_unauth_dev_alarm(zb_cb_param_t addr_ref);
 #endif /* ZB_ROUTER_ROLE */
 
 
@@ -1258,6 +1319,11 @@ void secur_forget_unauth_dev(zb_uint8_t addr_ref);
    @return ref to NWK key from NWK keys table
  */
 zb_uint8_t *secur_nwk_key_by_seq(zb_ushort_t key_seq_number);
+
+/**
+  Get count of active APS keypair entries
+ */
+zb_uint_t zb_secur_aps_keypair_count(void);
 
 /**
   Update/create AIB Key-Pair table - legacy r22 call
@@ -1278,8 +1344,8 @@ zb_uint8_t *secur_nwk_key_by_seq(zb_ushort_t key_seq_number);
   @return pointer to the keypair updated/created or NULL in case of error
 
  */
-zb_aps_device_key_pair_set_t * zb_secur_update_key_pair(zb_ieee_addr_t address,
-                                                        zb_uint8_t* key,
+zb_aps_device_key_pair_set_t * zb_secur_update_key_pair(const zb_ieee_addr_t address,
+                                                        const zb_uint8_t* key,
                                                         zb_uint8_t key_type,
                                                         zb_uint8_t key_attr,
                                                         zb_uint8_t key_source);
@@ -1300,7 +1366,7 @@ zb_aps_device_key_pair_set_t * zb_secur_update_key_pair(zb_ieee_addr_t address,
   @return pointer to the keypair updated/created or NULL in case of error
 
  */
-zb_aps_device_key_pair_set_t * zb_secur_update_key_pair_ex(zb_ieee_addr_t address,
+zb_aps_device_key_pair_set_t * zb_secur_update_key_pair_ex(const zb_ieee_addr_t address,
                                                            const zb_uint8_t* key,
                                                            zb_uint8_t key_type,
                                                            zb_uint8_t key_attr,
@@ -1316,7 +1382,7 @@ zb_aps_device_key_pair_set_t * zb_secur_update_key_pair_ex(zb_ieee_addr_t addres
    @param idx - index from link key pair set
    @param dev_addr - pointer to store device address (addr from key pair if found, zero addr otherwise)
  */
-void zb_aps_keypair_get_addr_by_idx(zb_uint_t idx, zb_uint8_t *dev_addr);
+void zb_aps_keypair_get_addr_by_idx(zb_aps_key_pair_ref_t idx, zb_uint8_t *dev_addr);
 
 /**
    Get link key pair by specified index.
@@ -1324,17 +1390,17 @@ void zb_aps_keypair_get_addr_by_idx(zb_uint_t idx, zb_uint8_t *dev_addr);
    @param idx - index from link key pair set
    @return pointer to the keypair if it is found and NULL otherwise
  */
-zb_aps_device_key_pair_set_t* zb_aps_keypair_get_ent_by_idx(zb_uint_t idx);
+zb_aps_device_key_pair_set_t* zb_aps_keypair_get_ent_by_idx(zb_aps_key_pair_ref_t idx);
 
 /**
   Write/add key pair to AIB Key-Pair table
 
   @param ent - pointer to key pair entry
-  @param idx - index from link key pair set to write (or -1 to add new element)
+  @param idx - index from link key pair set to write (or @ref ZB_APS_KEY_PAIR_REF_NONE to add new element)
 
   @return status of operation - RET_OK for success, RET_ERROR otherwise
  */
-zb_ret_t zb_aps_keypair_write(zb_aps_device_key_pair_set_t *ent, zb_uint32_t idx);
+zb_ret_t zb_aps_keypair_write(zb_aps_device_key_pair_set_t *ent, zb_aps_key_pair_ref_t idx);
 
 /**
    Load link key pair by specified index.
@@ -1342,7 +1408,7 @@ zb_ret_t zb_aps_keypair_write(zb_aps_device_key_pair_set_t *ent, zb_uint32_t idx
    @param idx - index from link key pair set
    @return status of operation - RET_OK for success, RET_NOT_FOUND if key pair is not found
  */
-zb_ret_t zb_aps_keypair_load_by_idx(zb_uint_t idx);
+zb_ret_t zb_aps_keypair_load_by_idx(zb_aps_key_pair_ref_t idx);
 
 /**
    Read link key pair by specified index.
@@ -1351,7 +1417,7 @@ zb_ret_t zb_aps_keypair_load_by_idx(zb_uint_t idx);
    @param ent - pointer to the loaded key pair
    @return status of operation - RET_OK for success, RET_NOT_FOUND if key pair is not found
  */
-zb_ret_t zb_aps_keypair_read_by_idx(zb_uint_t idx, zb_aps_device_key_pair_nvram_t *ent);
+zb_ret_t zb_aps_keypair_read_by_idx(zb_aps_key_pair_ref_t idx, zb_aps_device_key_pair_nvram_t *ent);
 
 /**
    Parameters for APSME-TRANSPORT-KEY.indication primitive
@@ -1387,7 +1453,7 @@ typedef struct zb_apsme_transport_key_indication_s
 
    @param param - packet buffer filled be \see zb_apsme_transport_key_indication_t
  */
-void zb_apsme_transport_key_indication(zb_uint8_t param);
+void zb_apsme_transport_key_indication(zb_cb_param_t param);
 
 
 /**
@@ -1395,7 +1461,7 @@ void zb_apsme_transport_key_indication(zb_uint8_t param);
  *
  * @param param - output buffer
  */
-void zb_initiate_zdo_commissioning_authenticated(zb_uint8_t param);
+void zb_initiate_zdo_commissioning_authenticated(zb_cb_param_t param);
 
 
 /**
@@ -1409,7 +1475,7 @@ void secur_nwk_key_switch(zb_uint8_t key_number);
    Switch NWK key and send it via broadcast
  */
 #ifdef ZB_COORDINATOR_ROLE
-void zb_secur_switch_nwk_key_br(zb_uint8_t param);
+void zb_secur_switch_nwk_key_br(zb_cb_param_t param);
 #endif
 
 /**
@@ -1426,7 +1492,7 @@ zb_bool_t secur_nwk_key_is_empty(zb_uint8_t *key);
 
    @param param - packet buffer filled be \see zb_apsme_remove_device_ind_t
  */
-void zb_apsme_remove_device_indication(zb_uint8_t param);
+void zb_apsme_remove_device_indication(zb_cb_param_t param);
 
 
 /**
@@ -1435,7 +1501,7 @@ void zb_apsme_remove_device_indication(zb_uint8_t param);
    @param param - packet buffer filled be \see zb_apsme_request_key_ind_t
  */
 #ifdef ZB_COORDINATOR_ROLE
-void zb_apsme_request_key_indication(zb_uint8_t param);
+void zb_apsme_request_key_indication(zb_cb_param_t param);
 #endif
 
 /**
@@ -1443,7 +1509,7 @@ void zb_apsme_request_key_indication(zb_uint8_t param);
 
    @param param - packet buffer filled be \see zb_apsme_switch_key_ind_t
  */
-void zb_apsme_switch_key_indication(zb_uint8_t param);
+void zb_apsme_switch_key_indication(zb_cb_param_t param);
 
 
 /**
@@ -1454,7 +1520,10 @@ void zb_apsme_switch_key_indication(zb_uint8_t param);
    @param key_id - the key used to protect the frame
    @return nothing
  */
-void zb_aps_in_transport_key(zb_uint8_t param, zb_uint16_t keypair_i, zb_secur_key_id_t key_id);
+void zb_aps_in_transport_key(
+  zb_bufid_t param,
+  zb_aps_key_pair_ref_t keypair_i,
+  zb_secur_key_id_t key_id);
 
 /**
    Analyze trust frame by command ID, security level and key type
@@ -1465,7 +1534,10 @@ void zb_aps_in_transport_key(zb_uint8_t param, zb_uint16_t keypair_i, zb_secur_k
 
     @return 'frame is trust'
  */
-zb_bool_t zb_secur_aps_accept_policy(zb_uint8_t cmd_id, zb_bool_t secured, zb_uint16_t keypair_i);
+zb_bool_t zb_secur_aps_accept_policy(
+  zb_uint8_t cmd_id,
+  zb_bool_t secured,
+  zb_aps_key_pair_ref_t keypair_i);
 
 /**
    APSME-TUNNEL.indication primitive
@@ -1473,7 +1545,7 @@ zb_bool_t zb_secur_aps_accept_policy(zb_uint8_t cmd_id, zb_bool_t secured, zb_ui
 
    @param param - packet buffer filled be and APS command
  */
-void zb_aps_in_tunnel_cmd(zb_uint8_t param);
+void zb_aps_in_tunnel_cmd(zb_bufid_t param);
 
 #ifdef ZB_JOIN_CLIENT
 /**
@@ -1481,8 +1553,9 @@ void zb_aps_in_tunnel_cmd(zb_uint8_t param);
 
    @param param - packet buffer with request
  */
-void zb_zdo_secur_start_key_update_req_handle(zb_uint8_t param);
+void zb_zdo_secur_start_key_update_req_handle(zb_cb_param_t param);
 #endif  /* ZB_JOIN_CLIENT */
+
 
 /**
    Fills ctx with private key and public point key for CURVE25519 ECDHE process.
@@ -1538,14 +1611,14 @@ typedef struct zb_zdo_secur_get_authentication_token_req_send_param_s
 
    @param param - packet buffer for request
  */
-void zb_zdo_secur_ecdhe_start(zb_uint8_t param);
+void zb_zdo_secur_ecdhe_start(zb_cb_param_t param);
 
 /**
    Send Security Start Key Negotiation Reguest
 
    @param param - packet buffer for request
  */
-void zb_zdo_sec_st_key_neg_req_send(zb_uint8_t param);
+void zb_zdo_sec_st_key_neg_req_send(zb_cb_param_t param);
 #define zb_zdo_secur_start_key_negotiation_req_send zb_zdo_sec_st_key_neg_req_send
 
 /**
@@ -1554,7 +1627,7 @@ void zb_zdo_sec_st_key_neg_req_send(zb_uint8_t param);
 
    @param param - packet buffer with response
  */
-void start_key_neg_rsp_handle(zb_uint8_t param);
+void start_key_neg_rsp_handle(zb_bufid_t param);
 #define zb_zdo_secur_start_key_negotiation_rsp_handle start_key_neg_rsp_handle
 
 /**
@@ -1562,7 +1635,7 @@ void start_key_neg_rsp_handle(zb_uint8_t param);
 
    @param param - packet buffer for request
  */
-void zb_zdo_sec_get_auth_tok_req_snd(zb_uint8_t param);
+void zb_zdo_sec_get_auth_tok_req_snd(zb_cb_param_t param);
 #define zb_zdo_secur_get_authentication_token_req_send zb_zdo_sec_get_auth_tok_req_snd
 
 /**
@@ -1571,7 +1644,7 @@ void zb_zdo_sec_get_auth_tok_req_snd(zb_uint8_t param);
 
    @param param - packet buffer with response
  */
-void get_auth_token_rsp_handle(zb_uint8_t param);
+void get_auth_token_rsp_handle(zb_bufid_t param);
 #define zb_zdo_secur_get_authentication_token_rsp_handle get_auth_token_rsp_handle
 
 #endif /* ZB_JOIN_CLIENT */
@@ -1624,7 +1697,7 @@ typedef struct zb_zdo_secur_start_key_update_req_send_param_s
 
    @param param - packet buffer with request
  */
-void zb_zdo_secur_start_key_negotiation_req_handle(zb_uint8_t param);
+void zb_zdo_secur_start_key_negotiation_req_handle(zb_cb_param_t param);
 
 /**
  * Internal processing for the Handle Start Key Negotiation Request.
@@ -1647,7 +1720,7 @@ zb_ret_t zb_zdo_sec_st_key_neg_req_proc(
 
    @param param - packet buffer for response
  */
-void zb_zdo_sec_st_key_neg_rsp_send(zb_uint8_t param);
+void zb_zdo_sec_st_key_neg_rsp_send(zb_cb_param_t cb_param);
 #define zb_zdo_secur_start_key_negotiation_rsp_send zb_zdo_sec_st_key_neg_rsp_send
 
 /**
@@ -1664,14 +1737,14 @@ void zb_zdo_secur_tc_derive_key(zb_secur_ecdhe_common_ctx_t *key_neg_ctx_ptr);
 
    @param param - packet buffer with request
  */
-void zb_zdo_secur_get_authentication_token_req_handle(zb_uint8_t param);
+void zb_zdo_secur_get_authentication_token_req_handle(zb_bufid_t param);
 
 /**
    Send Security Get Authentication Token Response
 
    @param param - packet buffer for response
  */
-void zb_zdo_sec_get_auth_tok_rsp_snd(zb_uint8_t param);
+void zb_zdo_sec_get_auth_tok_rsp_snd(zb_cb_param_t param);
 #define zb_zdo_secur_get_authentication_token_rsp_send zb_zdo_sec_get_auth_tok_rsp_snd
 
 /**
@@ -1679,7 +1752,7 @@ void zb_zdo_sec_get_auth_tok_rsp_snd(zb_uint8_t param);
 
    @param param - packet buffer for request
  */
-void zb_zdo_sec_st_key_upd_req_snd(zb_uint8_t param);
+void zb_zdo_sec_st_key_upd_req_snd(zb_cb_param_t param);
 #define zb_zdo_secur_start_key_update_req_send zb_zdo_sec_st_key_upd_req_snd
 
 /**
@@ -1687,7 +1760,7 @@ void zb_zdo_sec_st_key_upd_req_snd(zb_uint8_t param);
 
    @param ref - address ref
  */
-void zb_zdo_get_auth_token_rsp_timeout(zb_uint8_t ref);
+void zb_zdo_get_auth_token_rsp_timeout(zb_cb_param_t ref);
 
 #endif /* ZB_COORDINATOR_ROLE || ZB_ROUTER_ROLE */
 
@@ -1696,49 +1769,55 @@ void zb_zdo_get_auth_token_rsp_timeout(zb_uint8_t ref);
 
    @param param - packet buffer filled be and APS command
  */
-void zb_aps_in_relay(zb_uint8_t param, zb_uint16_t relay_src, zb_uint8_t cmd_id);
+void zb_aps_in_relay(zb_bufid_t param, zb_uint16_t relay_src, zb_uint8_t cmd_id);
 
 /**
 
  */
-void zb_secur_rejoin_after_security_failure(zb_uint8_t param);
+void zb_secur_rejoin_after_security_failure(zb_cb_param_t param);
 
 /* Include unconditionally. Needed declarations will be placed according to ZB_HW_... macro definitions */
 #include "hw_crypto_api.h"
 
-#ifdef ZB_COORDINATOR_ROLE
-void zb_aps_in_verify_key(zb_uint8_t param);
-#endif
+void zb_aps_in_verify_key(zb_bufid_t param);
 
-void zb_aps_in_confirm_key(zb_uint8_t param);
+void zb_aps_in_confirm_key(zb_bufid_t param);
 
-void zb_apsme_verify_key_req(zb_uint8_t param);
+void zb_apsme_verify_key_req(zb_cb_param_t param);
 
-void zb_zdo_update_tclk(zb_uint8_t param);
+void zb_zdo_update_tclk(zb_cb_param_t param);
 
 void zb_zdo_verify_tclk_conf(zb_ret_t status);
 
-void zb_zdo_verify_tclk(zb_uint8_t param);
+void zb_zdo_verify_tclk(zb_cb_param_t param);
 
-#ifdef ZB_COORDINATOR_ROLE
-void zb_apsme_verify_key_indication(zb_uint8_t param);
+void zb_apsme_verify_key_indication(zb_cb_param_t param);
+void zb_apsme_confirm_key_request(zb_cb_param_t param);
 
-void zb_apsme_confirm_key_request(zb_uint8_t param);
-#endif
+void zb_apsme_confirm_key_indication(zb_bufid_t param);
 
-void zb_apsme_confirm_key_indication(zb_uint8_t param);
+void zb_secur_send_get_auth_token_req(zb_cb_param_t param);
+void zb_secur_auth_token_failed(zb_cb_param_t param);
 
-void zb_secur_send_get_auth_token_req(zb_uint8_t param);
+#ifdef ZB_JOIN_CLIENT
+/* Determines whether joiner needs to
+    request authentication_token from ZC or not.*/
+zb_bool_t zb_secur_is_need_auth_tok_req(void);
+#endif /* ZB_JOIN_CLIENT */
 
 void zdo_secur_init(void);
 
-void bdb_initiate_key_exchange(zb_uint8_t param);
+void bdb_update_key_upd_method_after_cbke(void);
+void bdb_initiate_key_exchange(zb_cb_param_t param);
 
-void bdb_initiate_key_verify(zb_uint8_t param);
+zb_bool_t bdb_is_key_exchange_needed(void);
+zb_bool_t bdb_is_cbke_needed(void);
+
+void bdb_initiate_key_verify(zb_cb_param_t param);
 zb_bool_t bdb_verify_tclk_in_progress(void);
 
 #if defined ZB_FORMATION && !defined ZB_LITE_NO_TRUST_CENTER_REQUIRE_KEY_EXCHANGE
-void bdb_link_key_transport_with_alarm(zb_uint8_t param2, zb_uint16_t param);
+void bdb_link_key_transport_with_alarm(zb_cb_param_t cb_param);
 #endif
 
 #if defined ZB_COORDINATOR_ROLE && !defined ZB_LITE_NO_TRUST_CENTER_REQUIRE_KEY_EXCHANGE
@@ -1755,32 +1834,44 @@ void bdb_link_key_transport_with_alarm(zb_uint8_t param2, zb_uint16_t param);
  */
 zb_bufid_t bdb_cancel_link_key_refresh_alarm(zb_callback_t func, zb_address_ieee_ref_t param, zb_bool_t free_buf);
 
-void bdb_link_key_refresh_alarm(zb_uint8_t param);
+void bdb_reschedule_link_key_alarm(zb_address_ieee_ref_t ref);
+
+void bdb_link_key_refresh_alarm(zb_cb_param_t param);
 #endif
 
-void zdo_authentication_failed(zb_uint8_t param);
+void zdo_authentication_failed(zb_cb_param_t param);
+
+void bdb_auth_token_init_alarm(void);
+
+void bdb_auth_token_stop_alarm(void);
+
+void bdb_auth_token_alarm(zb_cb_param_t param);
+
+void bdb_cancel_key_exchange_alarms(void);
+
+void bdb_node_desc_req_alarm(zb_cb_param_t param);
 
 /* CR : 04/19/2016 [VP]: Start: put it here to call this functions from apsme_secur.c */
-void bdb_request_tclk_alarm(zb_uint8_t param);
+void bdb_request_tclk_alarm(zb_cb_param_t param);
 
-void bdb_verify_tclk_alarm(zb_uint8_t param);
+void bdb_verify_tclk_alarm(zb_cb_param_t param);
 
-void bdb_update_tclk_failed(zb_uint8_t param);
+void bdb_update_tclk_failed(zb_cb_param_t param);
 /* CR : 04/19/2016 [VP]: Stop */
 
 void bdb_update_tclk_stop(void);
 
 void zb_secur_delete_link_keys_by_addr_ref(zb_address_ieee_ref_t addr_ref);
 
-void zb_secur_delete_link_keys_by_long_addr(zb_ieee_addr_t ieee_address);
+void zb_secur_delete_link_keys_by_long_addr(const zb_ieee_addr_t ieee_address);
 
-void zb_secur_delete_link_key_by_idx(zb_uint16_t idx);
+void zb_secur_delete_link_key_by_idx(zb_aps_key_pair_ref_t entry_ref);
 
 zb_ret_t zb_secur_changing_tc_policy_check(void);
 
 zb_aps_device_key_pair_set_t *zb_secur_get_link_key_pair_set(zb_ieee_addr_t address, zb_bool_t valid_only);
 
-zb_aps_device_key_pair_set_t *zb_secur_get_verified_or_provisional_link_key(zb_ieee_addr_t address);
+zb_aps_device_key_pair_set_t *zb_secur_get_verified_or_provisional_link_key(const zb_ieee_addr_t address);
 
 zb_aps_device_key_pair_set_t *zb_secur_create_best_suitable_link_key_pair_set(zb_ieee_addr_t address);
 
@@ -1798,21 +1889,23 @@ zb_ret_t zb_secur_ic_check_crc(zb_uint8_t ic_type, zb_uint8_t const *ic);
 
 zb_ret_t zb_secur_ic_from_string(char *ic_str, zb_uint8_t *ic_type, zb_uint8_t *ic);
 
-zb_bool_t zb_secur_aps_cmd_is_encrypted_by_good_key(zb_uint8_t cmd_id, zb_uint16_t src_addr, zb_uint16_t keypair_i);
+zb_bool_t zb_secur_aps_cmd_is_encrypted_by_good_key(
+  zb_uint8_t cmd_id,
+  zb_uint16_t src_addr,
+  zb_aps_key_pair_ref_t keypair_i);
 
-void zdo_secur_update_tclk_done(zb_uint8_t param);
+void zdo_secur_update_tclk_done(zb_bufid_t param);
 
 void secur_generate_key(zb_uint8_t *key, zb_uint8_t key_size);
 
 zb_bool_t zb_secur_has_verified_key_by_short(zb_uint16_t addr_short);
 
-void zb_secur_trace_all_key_pairs(zb_uint8_t param);
-
-#ifdef DEBUG
+#if defined(ZB_SECUR_TRACE_ALL_KEY_PAIRS_ENABLED)
+void zb_secur_trace_all_key_pairs(zb_cb_param_t param);
 #define ZB_SECUR_TRACE_ALL_KEY_PAIRS() zb_secur_trace_all_key_pairs(0)
 #else
 #define ZB_SECUR_TRACE_ALL_KEY_PAIRS()
-#endif
+#endif /* ZB_SECUR_TRACE_ALL_KEY_PAIRS_ENABLED */
 
 #ifdef ZB_SE_KE_WHITELIST
 void zb_secur_ke_whitelist_add(zb_ieee_addr_t addr);
@@ -1832,14 +1925,12 @@ zb_bool_t zb_sec_b6_hash_iter_start(void *dev, zb_uint32_t input_addr, zb_uint32
 void zb_sec_b6_hash_iter_done(void *dev, zb_uint32_t input_len, zb_uint8_t *calc_hash);
 #endif
 
-void zdo_initiate_tclk_gen_over_aps(zb_uint8_t param);
-
 zb_uint8_t zb_secur_gen_upd_dev_status(zb_ushort_t rejoin_network, zb_ushort_t secure_rejoin);
 
 #ifdef ZB_FORMATION
-void secur_nwk_generate_key(zb_uint8_t i, zb_uint_t key_seq);
+void secur_nwk_generate_key(zb_uint8_t i, zb_uint8_t key_seq);
 
-void secur_authenticate_child_directly(zb_uint8_t param);
+void secur_authenticate_child_directly(zb_cb_param_t param);
 #endif
 
 zb_secur_key_id_t zb_secur_aps_send_policy(zb_uint_t command, zb_uint16_t dest_addr, zb_uint8_t key_type);
@@ -1862,27 +1953,40 @@ zb_secur_ecdhe_common_ctx_t *zb_zdo_ecdhe_common_ctx_alloc_by_ref(zb_address_iee
 
 zb_ret_t zb_zdo_ecdhe_common_ctx_delete_by_ref(zb_address_ieee_ref_t ref);
 
-void zb_zdo_set_configuration_res(zb_uint8_t param);
+#ifdef ZB_JOIN_CLIENT
 
-void zb_zdo_get_configuration_res(zb_uint8_t param);
+void zb_zdo_joiner_key_negotiation_ctx_init(zb_address_ieee_ref_t ref);
 
-void zb_zdo_decommission_res(zb_uint8_t param);
+void zb_zdo_joiner_key_negotiation_ctx_reset(void);
+
+#endif /* ZB_JOIN_CLIENT */
+
+void zb_zdo_set_configuration_res(zb_bufid_t param);
+
+void zb_zdo_get_configuration_res(zb_bufid_t param);
+
+void zb_zdo_decommission_res(zb_bufid_t param);
 
 void zb_zdo_decommission_by_ieee(zb_ieee_addr_t ieee_addr);
 
 zb_bool_t zdo_need_aps_enc(zb_uint16_t cmd_id, zb_uint16_t dst_addr);
 
 #ifdef ZB_COORDINATOR_ROLE
-zb_ret_t zb_zdo_ecdhe_common_ctx_find_confirm_key_param(zb_uint8_t param, zb_secur_ecdhe_common_ctx_t **dlk_ctx);
-zb_ret_t zb_zdo_ecdhe_common_ctx_find_start_key_neg_rsp_param(zb_uint8_t param, zb_secur_ecdhe_common_ctx_t **dlk_ctx);
-
-void zdo_secur_confirm_key_legacy_confirm(zb_ieee_addr_t ieee_addr);
-void zdo_secur_confirm_key_dlk_confirm(zb_secur_ecdhe_common_ctx_t *dlk_ctx);
-void zb_confirm_key_ack_received(zb_secur_ecdhe_common_ctx_t *dlk_ctx_p, zb_address_ieee_ref_t addr_ref);
+zb_ret_t zb_zdo_ecdhe_common_ctx_find_confirm_key_param(zb_bufid_t param, zb_secur_ecdhe_common_ctx_t **dlk_ctx);
+zb_ret_t zb_zdo_ecdhe_common_ctx_find_start_key_neg_rsp_param(zb_bufid_t param, zb_secur_ecdhe_common_ctx_t **dlk_ctx);
 #endif
+void zb_confirm_key_partner_lk_verified(zb_ieee_addr_t partner_ieee_addr);
 
 #ifndef ZB_COORDINATOR_ONLY
-zb_uint8_t zb_zdo_sec_get_auth_lvl_rq_snd(zb_uint8_t param, zb_callback_t cb);
+zb_uint8_t zb_zdo_sec_get_auth_lvl_rq_snd(zb_bufid_t param, zb_callback_t cb);
+
+/**
+ * @brief Stores application link key received from TC by partner's ieee address.
+ *        Also selects source of the key: CBKE or key request.
+ *
+ * @param param buffer that contains zb_apsme_transport_key_indication_t in its tail.
+ */
+void zb_update_app_link_key_using_key_ind(zb_bufid_t param);
 #endif /* ZB_COORDINATOR_ONLY */
 
 #if defined ZB_COORDINATOR_ROLE || defined ZB_ROUTER_ROLE
@@ -1962,9 +2066,15 @@ zb_ret_t zb_secur_generate_auth_key(zb_tlv_psk_secrets_t psk_type, const zb_ieee
 #endif /* ZB_DIRECT_ENABLED */
 
 #ifndef ZB_COORDINATOR_ONLY
-void zb_zdo_parse_get_auth_level_resp(zb_uint8_t param);
-#endif
+void zb_zdo_parse_get_auth_level_resp(zb_bufid_t param);
+#endif /* ZB_COORDINATOR_ONLY */
 
-void zb_zdo_parse_get_configuration_resp(zb_uint8_t param);
+void zb_zdo_parse_get_configuration_resp(zb_bufid_t param);
+
+#if defined ZB_COORDINATOR_ROLE
+zb_bool_t zb_bdb_is_autoswitch_to_high_security_mode_en(void);
+void zb_bdb_tc_set_high_security_mode(void);
+void zb_test_debug_disable_high_security_mode(void);
+#endif /* ZB_COORDINATOR_ROLE */
 
 #endif /* ZB_SECUR_H */

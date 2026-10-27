@@ -108,7 +108,7 @@
  *  @brief Starts router device in ZLL Commissioning call chain.
  *  @param param [IN] - reference to a @ref zb_buf_t "buffer" to put request to.
  */
-void zll_start_router(zb_uint8_t param);
+void zll_start_router(zb_cb_param_t param);
 #endif /* ZB_ENABLE_ZLL */
 #endif /* defined ZB_ROUTER_ROLE */
 
@@ -134,7 +134,7 @@ void zll_start_router(zb_uint8_t param);
  *  @brief ZLL processing for NLME-LEAVE.confirm.
  *  @param param [IN] - reference to the @ref zb_buf_t "buffer" containing NLME-LEAVE.confirm data.
  */
-void zll_leave_nwk_confirm(zb_uint8_t param);
+void zll_leave_nwk_confirm(zb_cb_param_t param);
 #endif /* ZB_ENABLE_ZLL */
 
 /**
@@ -142,7 +142,7 @@ void zll_leave_nwk_confirm(zb_uint8_t param);
  */
 
 #if defined ZB_ENABLE_ZLL
-void zll_send_mgmt_nwk_update_change_channel_cb(zb_uint8_t param);
+void zll_send_mgmt_nwk_update_change_channel_cb(zb_cb_param_t param);
 zb_bool_t zll_check_channel_for_mgmt_nwk_update_change_channel(zb_uint8_t channel);
 #endif /* ZB_ENABLE_ZLL */
 

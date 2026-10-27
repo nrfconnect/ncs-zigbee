@@ -618,10 +618,10 @@ ZB_PACKED_STRUCT
 zb_zcl_tunneling_transfer_data_payload_t;
 
 /** @cond internals_doc */
-zb_ret_t zb_zcl_tunneling_client_send_transfer_data(zb_uint8_t param, zb_uint8_t ep, zb_uint16_t prfl_id,
+zb_ret_t zb_zcl_tunneling_client_send_transfer_data(zb_bufid_t param, zb_uint8_t ep, zb_uint16_t prfl_id,
                                              zb_uint8_t def_resp, zb_callback_t cb, zb_uint16_t tunnel_id,
                                              zb_uint16_t data_size, zb_uint8_t *image_data);
-zb_ret_t zb_zcl_tunneling_server_send_transfer_data(zb_uint8_t param, zb_uint8_t ep, zb_uint16_t prfl_id,
+zb_ret_t zb_zcl_tunneling_server_send_transfer_data(zb_bufid_t param, zb_uint8_t ep, zb_uint16_t prfl_id,
                                               zb_uint8_t def_resp, zb_callback_t cb, zb_uint16_t tunnel_id,
                                               zb_uint16_t data_size, zb_uint8_t *image_data);
 

@@ -63,6 +63,6 @@ typedef struct zb_signals_globals_s
  * 
  * @param param - reference to the buffer which contains signal. See @ref zb_get_app_signal.
  */
-void zb_signal_dispatch(zb_uint8_t param);
+void zb_signal_dispatch(zb_cb_param_t param);
 
 #endif /* ZB_SIGNALS_H */

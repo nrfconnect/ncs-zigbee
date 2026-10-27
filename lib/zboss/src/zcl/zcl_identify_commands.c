@@ -75,18 +75,18 @@ zb_discover_cmd_list_t gs_identify_client_cmd_list =
   sizeof(gs_identify_server_received_commands), gs_identify_server_received_commands
 };
 
-void zb_zcl_identify_time_handler(zb_uint8_t param);
+void zb_zcl_identify_time_handler(zb_cb_param_t param);
 
 #define GET_IDENTIFY_HANDLER(endpoint)                    \
   (zb_af_get_endpoint_desc((endpoint))->identify_handler)
 
 zb_ret_t check_value_identify_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
-zb_bool_t zb_zcl_process_identify_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_identify_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_identify_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_identify_specific_commands_cli(zb_cb_param_t param);
 
 void zb_zcl_identify_write_attr_hook_server(zb_uint8_t endpoint, zb_uint16_t attr_id, zb_uint8_t *new_value, zb_uint16_t manuf_code);
 
-static void zb_zcl_call_identify_time_attr_device_cb(zb_uint8_t param, zb_uint16_t endpoint);
+static void zb_zcl_call_identify_time_attr_device_cb(zb_cb_param_t cb_param);
 
 void zb_zcl_identify_init_server()
 {
@@ -123,7 +123,7 @@ zb_ret_t check_value_identify_server(zb_uint16_t attr_id, zb_uint8_t endpoint, z
  * if invoke result RET_OK then schedule invoke User App with attribute Identify
  * else send response command with error
  */
-void zb_zcl_identify_effect_invoke_user_app(zb_uint8_t param)
+void zb_zcl_identify_effect_invoke_user_app(zb_cb_param_t param)
 {
   zb_zcl_identify_effect_user_app_schedule_t* invoke_data = ZB_BUF_GET_PARAM(param, zb_zcl_identify_effect_user_app_schedule_t);
   zb_zcl_parsed_hdr_t cmd_info;
@@ -156,7 +156,7 @@ void zb_zcl_identify_effect_invoke_user_app(zb_uint8_t param)
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_on_off_effect_invoke_user_app param", (FMT__0));
 }
 
-zb_bool_t zb_zcl_process_identify_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_identify_specific_commands(zb_bufid_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_bool_t processed = ZB_TRUE;
@@ -171,7 +171,7 @@ zb_bool_t zb_zcl_process_identify_specific_commands(zb_uint8_t param)
   TRACE_MSG(
       TRACE_ZCL1,
       "> zb_zcl_process_identify_specific_commands: param %d, cmd %d",
-      (FMT__H_H, param, cmd_info.cmd_id));
+      (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_IDENTIFY == cmd_info.cluster_id);
 
@@ -261,7 +261,7 @@ zb_bool_t zb_zcl_process_identify_specific_commands(zb_uint8_t param)
   return processed;
 }
 
-zb_bool_t zb_zcl_process_identify_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_identify_specific_commands_srv(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -270,7 +270,7 @@ zb_bool_t zb_zcl_process_identify_specific_commands_srv(zb_uint8_t param)
   }
   return zb_zcl_process_identify_specific_commands(param);
 }
-zb_bool_t zb_zcl_process_identify_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_identify_specific_commands_cli(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -280,10 +280,11 @@ zb_bool_t zb_zcl_process_identify_specific_commands_cli(zb_uint8_t param)
   return zb_zcl_process_identify_specific_commands(param);
 }
 
-static void zb_zcl_call_identify_time_attr_device_cb(zb_uint8_t param, zb_uint16_t endpoint)
+static void zb_zcl_call_identify_time_attr_device_cb(zb_cb_param_t cb_param)
 {
   zb_uint16_t identify_time_val;
-  zb_uint8_t dst_ep = (zb_uint8_t)endpoint;
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_uint8_t dst_ep = (zb_uint8_t)ZB_UNPACK_USER_PARAM(cb_param);
   zb_zcl_attr_t *attr_desc;
   zb_zcl_device_callback_param_t *user_app_invoke_data =
     ZB_BUF_GET_PARAM(param, zb_zcl_device_callback_param_t);
@@ -300,8 +301,8 @@ static void zb_zcl_call_identify_time_attr_device_cb(zb_uint8_t param, zb_uint16
 
   identify_time_val = *((zb_uint16_t*)attr_desc->data_p);
 
-  TRACE_MSG(TRACE_ZCL3, "param %hd, dst_ep %hd, identify_time_val %d",
-            (FMT__H_H_D, param, dst_ep, identify_time_val));
+  TRACE_MSG(TRACE_ZCL3, "param %d, dst_ep %d, identify_time_val %d",
+            (FMT__D_D_D, param, dst_ep, identify_time_val));
 
   user_app_invoke_data->device_cb_id = ZB_ZCL_SET_ATTR_VALUE_CB_ID;
   user_app_invoke_data->endpoint = dst_ep;
@@ -319,12 +320,12 @@ static void zb_zcl_call_identify_time_attr_device_cb(zb_uint8_t param, zb_uint16
 }
 
 /* Assumes param contains an endpoint number */
-void zb_zcl_identify_time_handler(zb_uint8_t param)
+void zb_zcl_identify_time_handler(zb_cb_param_t param)
 {
   zb_zcl_attr_t *attr_desc;
   zb_callback_t identify_handler;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_identify_time_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_identify_time_handler %d", (FMT__D, param));
   attr_desc = zb_zcl_get_attr_desc_a(
         param,
         ZB_ZCL_CLUSTER_ID_IDENTIFY,

@@ -72,8 +72,8 @@ static zb_discover_cmd_list_t gs_alarms_server_cmd_list =
   sizeof(gs_alarms_client_received_commands), gs_alarms_client_received_commands
 };
 
-zb_bool_t zb_zcl_process_alarms_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_alarms_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_alarms_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_alarms_specific_commands_cli(zb_cb_param_t param);
 
 void zb_zcl_alarms_init_server()
 {
@@ -93,13 +93,13 @@ void zb_zcl_alarms_init_client()
                               zb_zcl_process_alarms_specific_commands_cli);
 }
 
-static zb_ret_t zb_zcl_alarms_reset_alarm_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_alarms_reset_alarm_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_alarms_reset_alarm_req_t pl_in;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_alarms_reset_alarm_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_alarms_reset_alarm_handler %d", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
 
@@ -129,11 +129,11 @@ static zb_ret_t zb_zcl_alarms_reset_alarm_handler(zb_uint8_t param, const zb_zcl
   return ret;
 }
 
-static zb_ret_t zb_zcl_alarms_reset_all_alarms_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_alarms_reset_all_alarms_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_alarms_reset_all_alarms_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_alarms_reset_all_alarms_handler %d", (FMT__D, param));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
     ZB_ZCL_ALARMS_RESET_ALL_ALARMS_CB_ID, RET_OK, cmd_info, NULL, NULL);
@@ -150,13 +150,13 @@ static zb_ret_t zb_zcl_alarms_reset_all_alarms_handler(zb_uint8_t param, const z
   return ret;
 }
 
-static zb_ret_t zb_zcl_alarms_alarm_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_alarms_alarm_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_alarms_alarm_res_t pl_in;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_alarms_alarm_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_alarms_alarm_handler %d", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
 
@@ -186,7 +186,7 @@ static zb_ret_t zb_zcl_alarms_alarm_handler(zb_uint8_t param, const zb_zcl_parse
   return ret;
 }
 
-zb_bool_t zb_zcl_process_alarms_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_alarms_specific_commands_srv(zb_cb_param_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_bool_t processed = ZB_TRUE;
@@ -201,8 +201,8 @@ zb_bool_t zb_zcl_process_alarms_specific_commands_srv(zb_uint8_t param)
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG( TRACE_ZCL1,
-             "> zb_zcl_process_alarms_specific_commands_srv: param %hd, cmd %hd",
-             (FMT__H_H, param, cmd_info.cmd_id));
+             "> zb_zcl_process_alarms_specific_commands_srv: param %d, cmd %hd",
+             (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_ALARMS == cmd_info.cluster_id);
   ZB_ASSERT(ZB_ZCL_FRAME_DIRECTION_TO_SRV == cmd_info.cmd_direction);
@@ -237,7 +237,7 @@ zb_bool_t zb_zcl_process_alarms_specific_commands_srv(zb_uint8_t param)
   return processed;
 }
 
-zb_bool_t zb_zcl_process_alarms_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_alarms_specific_commands_cli(zb_cb_param_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_bool_t processed = ZB_TRUE;
@@ -252,8 +252,8 @@ zb_bool_t zb_zcl_process_alarms_specific_commands_cli(zb_uint8_t param)
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG( TRACE_ZCL1,
-             "> zb_zcl_process_alarms_specific_commands_cli: param %hd, cmd %hd",
-             (FMT__H_H, param, cmd_info.cmd_id));
+             "> zb_zcl_process_alarms_specific_commands_cli: param %d, cmd %hd",
+             (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_ALARMS == cmd_info.cluster_id);
   ZB_ASSERT(ZB_ZCL_FRAME_DIRECTION_TO_CLI == cmd_info.cmd_direction);

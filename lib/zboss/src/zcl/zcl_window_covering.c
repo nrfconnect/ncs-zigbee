@@ -72,8 +72,8 @@ zb_discover_cmd_list_t gs_window_covering_server_cmd_list =
 };
 
 static zb_ret_t check_value_window_covering_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
-static zb_bool_t zb_zcl_process_window_covering_specific_commands_srv(zb_uint8_t param);
-static zb_bool_t zb_zcl_process_window_covering_specific_commands_cli(zb_uint8_t param);
+static zb_bool_t zb_zcl_process_window_covering_specific_commands_srv(zb_cb_param_t param);
+static zb_bool_t zb_zcl_process_window_covering_specific_commands_cli(zb_cb_param_t param);
 
 void zb_zcl_window_covering_init_server()
 {
@@ -141,7 +141,7 @@ static zb_ret_t check_value_window_covering_server(zb_uint16_t attr_id, zb_uint8
   return ret;
 }
 
-static zb_ret_t zb_zcl_window_covering_invoke_user_app(zb_uint8_t param,
+static zb_ret_t zb_zcl_window_covering_invoke_user_app(zb_bufid_t param,
                                                        const zb_zcl_parsed_hdr_t *cmd_info,
                                                        zb_zcl_device_callback_id_t user_cb_id,
                                                        void *payload)
@@ -164,7 +164,7 @@ static zb_ret_t zb_zcl_window_covering_invoke_user_app(zb_uint8_t param,
   return ret;
 }
 
-static zb_ret_t zb_zcl_process_window_covering_up_open_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_process_window_covering_up_open_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
 
@@ -178,7 +178,7 @@ static zb_ret_t zb_zcl_process_window_covering_up_open_handler(zb_uint8_t param,
   return ret;
 }
 
-static zb_ret_t zb_zcl_process_window_covering_down_close_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_process_window_covering_down_close_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
 
@@ -192,7 +192,7 @@ static zb_ret_t zb_zcl_process_window_covering_down_close_handler(zb_uint8_t par
   return ret;
 }
 
-static zb_ret_t zb_zcl_process_window_covering_stop_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_process_window_covering_stop_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
 
@@ -206,7 +206,7 @@ static zb_ret_t zb_zcl_process_window_covering_stop_handler(zb_uint8_t param, co
   return ret;
 }
 
-static zb_ret_t zb_zcl_process_window_covering_go_to_lift_percentage_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_process_window_covering_go_to_lift_percentage_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_parse_status_t status;
@@ -248,7 +248,7 @@ static zb_ret_t zb_zcl_process_window_covering_go_to_lift_percentage_handler(zb_
   return ret;
 }
 
-static zb_ret_t zb_zcl_process_window_covering_go_to_tilt_percentage_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_process_window_covering_go_to_tilt_percentage_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_parse_status_t status;
@@ -290,15 +290,15 @@ static zb_ret_t zb_zcl_process_window_covering_go_to_tilt_percentage_handler(zb_
   return ret;
 }
 
-static zb_bool_t zb_zcl_process_window_covering_specific_commands(zb_uint8_t param)
+static zb_bool_t zb_zcl_process_window_covering_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_ret_t  ret       = RET_OK;
   zb_zcl_parsed_hdr_t cmd_info;
 
   TRACE_MSG(TRACE_ZCL1,
-            "> zb_zcl_process_window_covering_specific_commands: param %hd",
-            (FMT__H, param));
+            "> zb_zcl_process_window_covering_specific_commands: param %d",
+            (FMT__D, param));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -340,7 +340,7 @@ static zb_bool_t zb_zcl_process_window_covering_specific_commands(zb_uint8_t par
   return processed;
 }
 
-static zb_bool_t zb_zcl_process_window_covering_specific_commands_srv(zb_uint8_t param)
+static zb_bool_t zb_zcl_process_window_covering_specific_commands_srv(zb_cb_param_t param)
 {
   if (ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param)
   {
@@ -350,7 +350,7 @@ static zb_bool_t zb_zcl_process_window_covering_specific_commands_srv(zb_uint8_t
   return zb_zcl_process_window_covering_specific_commands(param);
 }
 
-static zb_bool_t zb_zcl_process_window_covering_specific_commands_cli(zb_uint8_t param)
+static zb_bool_t zb_zcl_process_window_covering_specific_commands_cli(zb_cb_param_t param)
 {
   if (ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param)
   {

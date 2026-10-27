@@ -67,6 +67,8 @@ typedef ZB_PACKED_PRE struct zdo_diagnostics_ctx_s
 {
   zdo_diagnostics_info_t diagnostics_info;
   zb_callback_t get_stats_cb;
+  zb_bool_t enable;
+  zb_callback_t set_enable_cb;
 } ZB_PACKED_STRUCT zdo_diagnostics_ctx_t;
 
 typedef ZB_PACKED_PRE struct zdo_diagnostics_full_stats_s
@@ -172,7 +174,7 @@ void zdo_diagnostics_inc(zdo_diagnostics_counter_id_t counter_id);
     @param param - buffer Id, verifies that it contains the NWK Command
                    and the NWK Command == ZB_NWK_CMD_ROUTE_REQUEST
 */
-void zdo_diagnostics_route_req_inc(zb_uint8_t param);
+void zdo_diagnostics_route_req_inc(zb_bufid_t param);
 
 /**
  * @brief Get full statistics from ZDO and MAC. @see zdo_diagnostics_full_stats_t
@@ -191,6 +193,18 @@ zb_ret_t zdo_diagnostics_get_stats(zb_callback_t cb, zb_uint8_t pib_attr);
  */
 void zdo_diagnostics_init(void);
 
+/**
+ * @brief Enable collect statistics from ZDO and MAC. @see zdo_diagnostics_full_stats_t
+ *        This function is set flag on ZDO level and pass flag to MAC over PIB set.
+ *
+ * @note Don't call this function directly!
+ *       Use @ZDO_DIAGNOSTICS_ENABLE
+ *
+ * @param enable - flag: allow or firbidden collect data
+ * @param cb - callback for return status in bufid.status parameter
+ */
+void zdo_diagnostics_enable(zb_bool_t enable, zb_callback_t cb);
+
 #ifdef  ZDO_DIAGNOSTICS_DEBUG_TRACE
 #define ZDO_DIAGNOSTICS_INC(counter_id) zdo_diagnostics_inc(counter_id, ZB_TRACE_FILE_ID, __LINE__)
 #else
@@ -207,6 +221,9 @@ void zdo_diagnostics_init(void);
 #define ZDO_DIAGNOSTICS_GET_AND_CLEANUP_STATS(cb)                       \
   zdo_diagnostics_get_stats((cb), ZB_PIB_ATTRIBUTE_GET_AND_CLEANUP_DIAG_INFO)
 
+#define ZDO_DIAGNOSTICS_ENABLE(enable, cb)                                   \
+  zdo_diagnostics_enable((enable), (cb))
+
 /*! @}
  *  @endcond */ /* internals_doc */
 
@@ -222,6 +239,8 @@ void zdo_diagnostics_init(void);
 
 #define ZDO_DIAGNOSTICS_GET_STATS(cb)
 #define ZDO_DIAGNOSTICS_GET_AND_CLEANUP_STATS(cb)
+
+#define ZDO_DIAGNOSTICS_ENABLE(enable, cb)
 
 #endif /* defined(ZDO_DIAGNOSTICS) || defined(DOXYGEN) */
 

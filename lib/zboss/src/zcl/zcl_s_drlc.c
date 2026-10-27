@@ -72,7 +72,7 @@ zb_discover_cmd_list_t gs_drlc_server_cmd_list =
   sizeof(gs_drlc_server_generated_commands), gs_drlc_server_generated_commands
 };
 
-zb_bool_t zb_zcl_process_s_drlc_specific_commands(zb_uint8_t param);
+zb_bool_t zb_zcl_process_s_drlc_specific_commands(zb_cb_param_t param);
 
 void zb_zcl_drlc_init_server()
 {
@@ -93,7 +93,7 @@ void zb_zcl_drlc_init_server()
  *
  */
 
-void zb_drlc_server_send_load_control_event(zb_uint8_t param,
+void zb_drlc_server_send_load_control_event(zb_bufid_t param,
   zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
   zb_uint8_t src_ep, zb_zcl_drlc_lce_payload_t *payload, zb_callback_t cb)
 {
@@ -132,7 +132,7 @@ void zb_drlc_server_send_load_control_event(zb_uint8_t param,
   TRACE_MSG(TRACE_ZCL1, "<< zb_drlc_server_send_load_control_event", (FMT__0));
 }
 
-void zb_drlc_server_send_cancel_load_control_event(zb_uint8_t param,
+void zb_drlc_server_send_cancel_load_control_event(zb_bufid_t param,
   zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
   zb_uint8_t src_ep, zb_zcl_drlc_cancel_lce_payload_t *payload, zb_callback_t cb)
 {
@@ -163,7 +163,7 @@ void zb_drlc_server_send_cancel_load_control_event(zb_uint8_t param,
   TRACE_MSG(TRACE_ZCL1, "<< zb_drlc_server_send_cancel_load_control_event", (FMT__0));
 }
 
-void zb_drlc_server_send_cancel_all_load_control_events(zb_uint8_t param,
+void zb_drlc_server_send_cancel_all_load_control_events(zb_bufid_t param,
   zb_addr_u *dst_addr, zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
   zb_uint8_t src_ep, zb_uint8_t *payload, zb_callback_t cb)
 {
@@ -184,7 +184,7 @@ void zb_drlc_server_send_cancel_all_load_control_events(zb_uint8_t param,
   TRACE_MSG(TRACE_ZCL1, "<< zb_drlc_server_send_cancel_all_load_control_events", (FMT__0));
 }
 
-zb_ret_t zb_drlc_server_handle_report_event_status(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+zb_ret_t zb_drlc_server_handle_report_event_status(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_drlc_report_event_status_payload_t pl = ZB_ZCL_DRLC_REPORT_EVENT_STATUS_PAYLOAD_INIT;
   zb_uint8_t                               *data = zb_buf_begin(param);
@@ -226,7 +226,7 @@ zb_ret_t zb_drlc_server_handle_report_event_status(zb_uint8_t param, const zb_zc
   return RET_OK;
 }
 
-zb_ret_t zb_drlc_server_handle_get_scheduled_events(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+zb_ret_t zb_drlc_server_handle_get_scheduled_events(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_drlc_lce_payload_t                  pl_out = ZB_ZCL_DRLC_LCE_PAYLOAD_INIT;
   zb_zcl_drlc_get_scheduled_events_payload_t pl_in = ZB_ZCL_DRLC_CMD_GET_SCHEDULED_EVENTS_PAYLOAD_INIT;
@@ -297,7 +297,7 @@ zb_ret_t zb_drlc_server_handle_get_scheduled_events(zb_uint8_t param, const zb_z
 }
 
 
-static zb_bool_t zb_zcl_process_drlc_server_commands(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_bool_t zb_zcl_process_drlc_server_commands(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_uint8_t processed = ZB_FALSE;
   zb_ret_t   result = RET_ERROR;
@@ -357,7 +357,7 @@ static zb_bool_t zb_zcl_process_drlc_server_commands(zb_uint8_t param, const zb_
  */
 
 
-zb_bool_t zb_zcl_process_s_drlc_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_s_drlc_specific_commands(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
 

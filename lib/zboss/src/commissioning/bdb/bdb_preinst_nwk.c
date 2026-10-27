@@ -134,7 +134,7 @@ static void zb_bdb_preinst_nwk_setup_tclk(void)
   }
 }
 
-static void zb_preinst_nwk_req_tc_long_address_cb(zb_uint8_t param)
+static void zb_preinst_nwk_req_tc_long_address_cb(zb_cb_param_t param)
 {
   zb_zdo_ieee_addr_resp_t *resp = zb_buf_begin(param);
 
@@ -142,7 +142,7 @@ static void zb_preinst_nwk_req_tc_long_address_cb(zb_uint8_t param)
   zb_bdb_preinst_nwk_setup_tclk();
 }
 
-static void zb_preinst_nwk_req_tc_long_address(zb_uint8_t param)
+static void zb_preinst_nwk_req_tc_long_address(zb_cb_param_t param)
 {
   zb_zdo_ieee_addr_req_param_t *req;
 
@@ -226,14 +226,14 @@ static void zb_preinst_nwk_apply_parameters(void)
   else
   {
     /* No TCLK, assume Legacy <R21 here */
-    ZB_AIB().coordinator_version = 20U;
+    ZB_AIB().coordinator_version = ZB_SECUR_TC_VERSION_LEGACY_PRE_21;
   }
 
   ZB_SET_JOINED_STATUS(ZB_TRUE);
   ZG->aps.authenticated = ZB_TRUE;
 }
 
-zb_ret_t zb_bdb_preinst_nwk_on_factory_new(zb_uint8_t param)
+zb_ret_t zb_bdb_preinst_nwk_on_factory_new(zb_bufid_t param)
 {
   zb_ret_t ret = RET_IGNORE;
 

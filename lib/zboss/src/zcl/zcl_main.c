@@ -78,7 +78,7 @@ static zb_uint_t zb_zcl_get_header_size(zb_bufid_t buf)
 }
 
 #if defined HA_CERTIFICATION
-zb_bool_t zb_zcl_rejected_command(zb_uint8_t param);
+zb_bool_t zb_zcl_rejected_command(zb_bufid_t param);
 #endif /* HA_CERTIFICATION */
 
 void zb_zcl_init()
@@ -113,14 +113,14 @@ void zb_zcl_init()
   TRACE_MSG(TRACE_ZCL1, "<<zcl_init", (FMT__0));
 }
 
-zb_uint8_t zb_zcl_handle(zb_uint8_t param)     /* VS Fixed */
+zb_uint8_t zb_zcl_handle(zb_bufid_t param)     /* VS Fixed */
 {
   zb_zcl_parsed_hdr_t *cmd_info_ptr =
     (zb_zcl_parsed_hdr_t *)ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
   zb_uint8_t status; /* zcl_status */
   zb_bool_t processed = ZB_FALSE;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_handle param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_handle param %d", (FMT__D, param));
 
   TRACE_MSG(
       TRACE_ZCL2,
@@ -198,7 +198,7 @@ void zb_zcl_deinit()
  * 1) copies values APSDE data indication - it will be used during ZCL command handling
  * 2) check if command processing allowed by WWAH cluster */
 
-zb_zcl_status_t zb_zcl_parse_header(zb_uint8_t param, zb_zcl_parsed_hdr_t *cmd_info)
+zb_zcl_status_t zb_zcl_parse_header(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_apsde_data_indication_t *ind = ZB_BUF_GET_PARAM(param, zb_apsde_data_indication_t);
   zb_uint8_t *zcl_header;
@@ -207,8 +207,8 @@ zb_zcl_status_t zb_zcl_parse_header(zb_uint8_t param, zb_zcl_parsed_hdr_t *cmd_i
 
   TRACE_MSG(
       TRACE_ZCL1,
-      ">> zb_zcl_parse_header: param %hd h 0x%hx sz %hd, dst endp %hd",
-      (FMT__H_H_H_H, param, zb_buf_get_handle(param), zb_buf_len(param), ind->dst_endpoint));
+      ">> zb_zcl_parse_header: param %d h 0x%hx sz %hd, dst endp %hd",
+      (FMT__D_H_H_H, param, zb_buf_get_handle(param), zb_buf_len(param), ind->dst_endpoint));
 
   /* buffer should have enough data for parsing command! */
   if (zb_buf_len(param) < zb_zcl_get_header_size(param))
@@ -567,12 +567,12 @@ zb_zcl_cluster_write_attr_hook_t zb_zcl_internal_get_cluster_write_attr_hook(zb_
 }
 
 
-zb_bool_t zb_zcl_handle_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_handle_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed;
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_handle_specific_commands param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_handle_specific_commands param %d", (FMT__D, param));
 
   {
     zb_zcl_cluster_handler_t cluster_handler;
@@ -595,21 +595,21 @@ zb_bool_t zb_zcl_handle_specific_commands(zb_uint8_t param)
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_handle_specific_commands processed %hd", (FMT__H, processed));
   return processed;
-}/* zb_uint8_t zb_zcl_handle_specific_commands(zb_uint8_t param) */
+}/* zb_uint8_t zb_zcl_handle_specific_commands(zb_bufid_t param) */
 
 #if defined HA_CERTIFICATION
 /* During HA certification came out that for some commands which
  * should not be handled (command with direction "to server" is sent
  * to client for example) we need to send a response anyway, but with
  * "empty" body */
-zb_bool_t zb_zcl_rejected_command(zb_uint8_t param)
+zb_bool_t zb_zcl_rejected_command(zb_bufid_t param)
 {
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
   zb_zcl_cluster_desc_t *cluster_desc;
   zb_af_endpoint_desc_t *endpoint_desc;
   zb_bool_t ret = ZB_FALSE;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_rejected_command %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_rejected_command %d", (FMT__D, param));
 
   endpoint_desc = zb_af_get_endpoint_desc(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint);
   cluster_desc = get_cluster_desc(ep_desc, cmd_info->cluster_id,
@@ -681,7 +681,7 @@ zb_bool_t zb_zcl_rejected_command(zb_uint8_t param)
 
 
 void zb_zcl_send_cmd_tsn(
-  zb_uint8_t param,
+  zb_bufid_t param,
   const zb_addr_u *dst_addr,
   zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep,
@@ -706,7 +706,7 @@ void zb_zcl_send_cmd_tsn(
 #endif
   zb_uint8_t *cmd_ptr;
 
-  TRACE_MSG(TRACE_ZCL2, "zb_zcl_send_cmd: param %hd (cluster_id 0x%x cmd_id %d)", (FMT__H_D_D, param, cluster_id, cmd_id));
+  TRACE_MSG(TRACE_ZCL2, "zb_zcl_send_cmd: param %d (cluster_id 0x%x cmd_id %d)", (FMT__D_D_D, param, cluster_id, cmd_id));
   TRACE_MSG(TRACE_ZCL2, "payload size %hd", (FMT__H, payload_size));
   cmd_ptr = ZB_ZCL_START_PACKET(param);
   ZB_ZCL_CONSTRUCT_SET_FRAME_CONTROL(*cmd_ptr,
@@ -768,7 +768,7 @@ void zb_zcl_send_cmd_tsn(
 }
 
 void zb_zcl_send_cmd(
-  zb_uint8_t param,
+  zb_bufid_t param,
   const zb_addr_u *dst_addr,
   zb_aps_addr_mode_t dst_addr_mode,
   zb_uint8_t dst_ep,
@@ -789,12 +789,12 @@ void zb_zcl_send_cmd(
 
 
 /* Helper for sending default responses */
-zb_bool_t zb_zcl_send_default_handler(zb_uint8_t param,
+zb_bool_t zb_zcl_send_default_handler(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info, zb_zcl_status_t status)
 {
   zb_bool_t ret;
 
-  TRACE_MSG(TRACE_ZCL3, ">zb_zcl_send_default_handler param %hd, status: %hd", (FMT__H_H, param, status));
+  TRACE_MSG(TRACE_ZCL3, ">zb_zcl_send_default_handler param %d, status: %hd", (FMT__D_H, param, status));
 
   do
   {
@@ -822,18 +822,21 @@ zb_bool_t zb_zcl_send_default_handler(zb_uint8_t param,
 
 void zb_zcl_process_command_finish(zb_bufid_t buffer, const zb_zcl_parsed_hdr_t *pcmd_info, zb_uint8_t status)
 {
+  zb_zcl_parsed_hdr_t pcmd_info_cpy;
+  ZB_MEMCPY(&pcmd_info_cpy, pcmd_info, sizeof(zb_zcl_parsed_hdr_t));
+
   if (ZB_ZCL_CHECK_IF_SEND_DEFAULT_RESP(*(pcmd_info), status))
   {
     ZB_ZCL_SEND_DEFAULT_RESP(
       (buffer),
-      ZB_ZCL_PARSED_HDR_SHORT_DATA((pcmd_info)).source.u.short_addr,
+      ZB_ZCL_PARSED_HDR_SHORT_DATA((&pcmd_info_cpy)).source.u.short_addr,
       ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA((pcmd_info)).src_endpoint,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA((pcmd_info)).dst_endpoint,
-      (pcmd_info)->profile_id,
-      (pcmd_info)->cluster_id,
-      (pcmd_info)->seq_number,
-      (pcmd_info)->cmd_id,
+      ZB_ZCL_PARSED_HDR_SHORT_DATA((&pcmd_info_cpy)).src_endpoint,
+      ZB_ZCL_PARSED_HDR_SHORT_DATA((&pcmd_info_cpy)).dst_endpoint,
+      (&pcmd_info_cpy)->profile_id,
+      (&pcmd_info_cpy)->cluster_id,
+      (&pcmd_info_cpy)->seq_number,
+      (&pcmd_info_cpy)->cmd_id,
       (status));
   }
   else
@@ -867,7 +870,7 @@ void zb_zcl_process_command_finish_new(zb_bufid_t buffer, zb_zcl_parsed_hdr_t *p
   }
 }
 
-void zb_zcl_send_default_resp_ext(zb_uint8_t param,
+void zb_zcl_send_default_resp_ext(zb_bufid_t param,
                                   const zb_zcl_parsed_hdr_t *cmd_info, zb_zcl_status_t status)
 {
   zb_bool_t aps_encrypted;

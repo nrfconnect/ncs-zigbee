@@ -2141,7 +2141,7 @@ typedef ZB_PACKED_PRE struct zb_zcl_metering_publish_snapshot_payload_s
  * @param payload - Packet payload (ref to @ref zb_zcl_metering_get_snapshot_payload_t).
  * @param cb - Callback which should be called when the ZCL stack receives APS ack.
  */
-void zb_zcl_metering_send_cmd_get_snapshot(zb_uint8_t param, zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_get_snapshot(zb_bufid_t param, zb_addr_u *dst_addr,
                                                 zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                 zb_uint8_t src_ep,
                                                 zb_zcl_metering_get_snapshot_payload_t *payload,
@@ -2159,7 +2159,7 @@ void zb_zcl_metering_send_cmd_get_snapshot(zb_uint8_t param, zb_addr_u *dst_addr
  * @param payload - Packet payload (ref to @ref zb_zcl_metering_get_sampled_data_payload_t).
  * @param cb - Callback which should be called when the ZCL stack receives APS ack.
  */
-void zb_zcl_metering_send_cmd_get_sampled_data(zb_uint8_t param, zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_get_sampled_data(zb_bufid_t param, zb_addr_u *dst_addr,
                                                     zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                     zb_uint8_t src_ep,
                                                     zb_zcl_metering_get_sampled_data_payload_t *payload,
@@ -2177,7 +2177,7 @@ void zb_zcl_metering_send_cmd_get_sampled_data(zb_uint8_t param, zb_addr_u *dst_
  * @param payload - Packet payload (ref to @ref zb_zcl_metering_request_fast_poll_mode_payload_t).
  * @param cb - Callback which should be called when the ZCL stack receives APS ack.
  */
-void zb_zcl_metering_send_cmd_request_fast_poll_mode(zb_uint8_t param, zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_request_fast_poll_mode(zb_bufid_t param, zb_addr_u *dst_addr,
                                                           zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                           zb_uint8_t src_ep,
                                                           zb_zcl_metering_request_fast_poll_mode_payload_t *payload,
@@ -2195,7 +2195,7 @@ void zb_zcl_metering_send_cmd_request_fast_poll_mode(zb_uint8_t param, zb_addr_u
  * @param payload - Packet payload (ref to @ref zb_zcl_metering_get_profile_payload_t).
  * @param cb - Callback which should be called when the ZCL stack receives APS ack.
  */
-void zb_zcl_metering_send_cmd_get_profile(zb_uint8_t param, zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_get_profile(zb_bufid_t param, zb_addr_u *dst_addr,
                                                zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                zb_uint8_t src_ep, zb_zcl_metering_get_profile_payload_t *payload,
                                                zb_callback_t cb);
@@ -2212,7 +2212,7 @@ void zb_zcl_metering_send_cmd_get_profile(zb_uint8_t param, zb_addr_u *dst_addr,
  * @param pl - Packet payload (ref to @ref zb_zcl_metering_publish_snapshot_payload_t).
  * @param cb - Callback which should be called when the ZCL stack receives APS ack.
  */
-void zb_zcl_metering_send_cmd_publish_snapshot(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_publish_snapshot(zb_bufid_t param, const zb_addr_u *dst_addr,
                                                     zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                     zb_uint8_t src_ep,
                                                     const zb_zcl_metering_publish_snapshot_payload_t *pl,
@@ -2233,7 +2233,7 @@ void zb_zcl_metering_send_cmd_publish_snapshot(zb_uint8_t param, const zb_addr_u
  * @param tsn - transaction sequence number of response
  * @param cb - Callback which should be called when the ZCL stack receives APS ack.
  */
-void zb_zcl_metering_send_cmd_request_fast_poll_mode_response(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_request_fast_poll_mode_response(zb_bufid_t param, const zb_addr_u *dst_addr,
                                                                    zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                                    zb_uint8_t src_ep,
                                                                    const zb_zcl_metering_request_fast_poll_mode_response_payload_t *pl,
@@ -2254,7 +2254,7 @@ void zb_zcl_metering_send_cmd_request_fast_poll_mode_response(zb_uint8_t param, 
  * @param tsn - transaction sequence number of response
  * @param cb - Callback which should be called when the ZCL stack receives APS ack.
  */
-void zb_zcl_metering_send_cmd_get_profile_response(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_get_profile_response(zb_bufid_t param, const zb_addr_u *dst_addr,
                                                         zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                         zb_uint8_t src_ep, const zb_zcl_metering_get_profile_response_payload_t *pl,
                                                         zb_uint8_t pl_size, zb_uint8_t tsn, zb_callback_t cb);
@@ -2274,7 +2274,7 @@ void zb_zcl_metering_send_cmd_get_profile_response(zb_uint8_t param, const zb_ad
  * @param tsn - transaction sequence number of response
  * @param cb - Callback which should be called when the ZCL stack receives APS ack.
  */
-void zb_zcl_metering_send_cmd_get_sampled_data_response(zb_uint8_t param, const zb_addr_u *dst_addr,
+void zb_zcl_metering_send_cmd_get_sampled_data_response(zb_bufid_t param, const zb_addr_u *dst_addr,
                                                              zb_aps_addr_mode_t dst_addr_mode, zb_uint8_t dst_ep,
                                                              zb_uint8_t src_ep,
                                                              const zb_zcl_metering_get_sampled_data_response_payload_t *pl,

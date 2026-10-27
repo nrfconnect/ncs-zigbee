@@ -77,8 +77,8 @@ zb_discover_cmd_list_t gs_ias_wd_server_cmd_list =
 
 zb_ret_t check_value_ias_wd_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 
-zb_bool_t zb_zcl_process_ias_wd_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_ias_wd_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_ias_wd_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_ias_wd_specific_commands_cli(zb_cb_param_t param);
 
 void zb_zcl_ias_wd_init_server()
 {
@@ -118,14 +118,14 @@ zb_ret_t check_value_ias_wd_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_
 }
 /* Invoke User App for "Start Warning" command
  */
-void zb_zcl_ias_wd_start_warning_invoke_user_app(zb_uint8_t param)
+void zb_zcl_ias_wd_start_warning_invoke_user_app(zb_cb_param_t param)
 {
   zb_zcl_ias_wd_start_warning_user_app_schedule_t* invoke_data =
       ZB_BUF_GET_PARAM(param, zb_zcl_ias_wd_start_warning_user_app_schedule_t);
   zb_zcl_parsed_hdr_t cmd_info;
   zb_ret_t result;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_wd_start_warning_invoke_user_app param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_wd_start_warning_invoke_user_app param %d", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, &(invoke_data->cmd_info), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -154,14 +154,14 @@ void zb_zcl_ias_wd_start_warning_invoke_user_app(zb_uint8_t param)
 }
 
 /** @brief Start Warning command */
-static zb_ret_t start_warning_handler(zb_uint8_t param)
+static zb_ret_t start_warning_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_wd_start_warning_t payload;
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, "> start_warning_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> start_warning_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -200,14 +200,14 @@ static zb_ret_t start_warning_handler(zb_uint8_t param)
 
 /* Invoke User App for "Squawk" command
  */
-void zb_zcl_ias_wd_squawk_invoke_user_app(zb_uint8_t param)
+void zb_zcl_ias_wd_squawk_invoke_user_app(zb_cb_param_t param)
 {
   zb_zcl_ias_wd_squawk_user_app_schedule_t* invoke_data =
       ZB_BUF_GET_PARAM(param, zb_zcl_ias_wd_squawk_user_app_schedule_t);
   zb_zcl_parsed_hdr_t cmd_info;
   zb_ret_t result;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_wd_squawk_invoke_user_app param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_wd_squawk_invoke_user_app param %d", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, &(invoke_data->cmd_info), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -234,14 +234,14 @@ void zb_zcl_ias_wd_squawk_invoke_user_app(zb_uint8_t param)
 }
 
 /** @brief Squawk command */
-static zb_ret_t squawk_handler(zb_uint8_t param)
+static zb_ret_t squawk_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_wd_squawk_t payload;
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, "> squawk_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> squawk_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -266,7 +266,7 @@ static zb_ret_t squawk_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_bool_t zb_zcl_process_ias_wd_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_ias_wd_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -276,7 +276,7 @@ zb_bool_t zb_zcl_process_ias_wd_specific_commands(zb_uint8_t param)
 
   TRACE_MSG( TRACE_ZCL1,
              "> zb_zcl_process_ias_wd_specific_commands: param %d, cmd %d",
-             (FMT__H_H, param, cmd_info.cmd_id));
+             (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_IAS_WD == cmd_info.cluster_id);
   ZB_ASSERT(ZB_ZCL_FRAME_DIRECTION_TO_SRV == cmd_info.cmd_direction);
@@ -317,7 +317,7 @@ zb_bool_t zb_zcl_process_ias_wd_specific_commands(zb_uint8_t param)
   return processed;
 }
 
-zb_bool_t zb_zcl_process_ias_wd_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_ias_wd_specific_commands_srv(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -326,7 +326,7 @@ zb_bool_t zb_zcl_process_ias_wd_specific_commands_srv(zb_uint8_t param)
   }
   return zb_zcl_process_ias_wd_specific_commands(param);
 }
-zb_bool_t zb_zcl_process_ias_wd_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_ias_wd_specific_commands_cli(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {

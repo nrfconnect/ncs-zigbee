@@ -82,7 +82,7 @@ static zb_uint8_t *zb_zcl_messaging_msg_confirmation_put_payload(
   return data;
 }
 
-void zb_zcl_messaging_send_get_last_msg(zb_uint8_t param,
+void zb_zcl_messaging_send_get_last_msg(zb_bufid_t param,
                                              const zb_addr_u *dst_addr,
                                              zb_aps_addr_mode_t dst_addr_mode,
                                              zb_uint8_t dst_ep,
@@ -106,7 +106,7 @@ void zb_zcl_messaging_send_get_last_msg(zb_uint8_t param,
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_messaging_send_get_last_msg", (FMT__0));
 }
 
-void zb_zcl_messaging_send_msg_confirmation(zb_uint8_t param,
+void zb_zcl_messaging_send_msg_confirmation(zb_bufid_t param,
                                             const zb_addr_u *dst_addr,
                                             zb_aps_addr_mode_t dst_addr_mode,
                                             zb_uint8_t dst_ep,
@@ -131,7 +131,7 @@ void zb_zcl_messaging_send_msg_confirmation(zb_uint8_t param,
 }
 
 
-static void zb_zcl_messaging_client_handle_cancel_message(zb_uint8_t param,
+static void zb_zcl_messaging_client_handle_cancel_message(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_messaging_cancel_message_payload_t  pl = ZB_ZCL_MESSAGING_CANCEL_MSG_PAYLOAD_INIT;
@@ -164,7 +164,7 @@ static void zb_zcl_messaging_client_handle_cancel_message(zb_uint8_t param,
 }
 
 
-static void zb_zcl_messaging_client_handle_display_message(zb_uint8_t param,
+static void zb_zcl_messaging_client_handle_display_message(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_messaging_display_message_payload_t pl = ZB_ZCL_MESSAGING_DISPLAY_MSG_PAYLOAD_INIT;
@@ -226,7 +226,7 @@ static void zb_zcl_messaging_client_handle_display_message(zb_uint8_t param,
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_messaging_client_handle_display_message", (FMT__0));
 }
 
-static zb_bool_t zb_zcl_messaging_client_side_process_commands(zb_uint8_t param,
+static zb_bool_t zb_zcl_messaging_client_side_process_commands(zb_bufid_t param,
                 const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_bool_t processed = ZB_FALSE;
@@ -249,12 +249,12 @@ static zb_bool_t zb_zcl_messaging_client_side_process_commands(zb_uint8_t param,
 }
 
 
-zb_bool_t zb_zcl_process_c_messaging_specific_command(zb_uint8_t param)
+zb_bool_t zb_zcl_process_c_messaging_specific_command(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_bool_t          res = ZB_FALSE;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_c_messaging_specific_command param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_c_messaging_specific_command param %d", (FMT__D, param));
 
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {

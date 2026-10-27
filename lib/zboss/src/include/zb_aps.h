@@ -149,7 +149,7 @@ typedef ZB_PACKED_PRE struct zb_apsde_data_req_s
 
 #ifdef APS_FRAGMENTATION
   zb_uint8_t extended_fc;  /* Extended Frame Control - internal use only */
-  zb_uint8_t block_num;    /* Fragmentation: for the first segment - total payload len */
+  zb_uint8_t block_num;    /* Fragmentation: for the first segment, the total number of fragments */
 #endif
   zb_address_ieee_ref_t dst_addr_ref; /* Dst addr ref will be set in zb_apsde_data_request function
                                            by stack if address is present
@@ -217,7 +217,7 @@ typedef ZB_PACKED_PRE struct zb_apsde_data_confirm_s
    This function can be called via scheduler, returns immediately.
    Later zb_nlde_data_confirm will be called to pass NLDE-DATA.request result up.
 
-   @param param - packet to send (\ref zb_buf_t) and parameters at buffer tail
+   @param cb_param - packet to send (\ref zb_buf_t) and parameters at buffer tail
           \ref zb_nlde_data_req_t
 
    @b Example:
@@ -248,7 +248,7 @@ typedef ZB_PACKED_PRE struct zb_apsde_data_confirm_s
 @endcode
 
  */
-void zb_apsde_data_request(zb_uint8_t param);
+void zb_apsde_data_request(zb_cb_param_t cb_param);
 
 /** @brief APSDE-DATA.confirm primitive.
   *
@@ -263,7 +263,7 @@ void zb_apsde_data_request(zb_uint8_t param);
   * status values returned from security suite or the MCPS-DATA.confirm primitive.
   * @li handle - The handle associated with the NSDU being confirmed.
   */
-void zb_apsde_data_confirm(zb_uint8_t param);
+void zb_apsde_data_confirm(zb_cb_param_t param);
 
 /** @brief NLDE-DATA.indication primitive.
   *
@@ -275,7 +275,7 @@ void zb_apsde_data_confirm(zb_uint8_t param);
   *
   * Other fields got from MAC nsdu by macros.
   */
-void zb_apsde_data_indication(zb_uint8_t param);
+void zb_apsde_data_indication(zb_cb_param_t param);
 
 /** @} */ /* APS data service structures and API. */
 
@@ -321,14 +321,14 @@ void data_indication(zb_uint8_t param)
 /** @brief Structure for Get Group Membership Command.
   * @see ZCL8 spec, subclause 3.6.2.3.4.
   */
-typedef ZB_PACKED_PRE struct zb_apsme_get_group_membership_req_s
+typedef struct zb_apsme_get_group_membership_req_s
 {
   zb_callback_t  confirm_cb;    /*!< The callback to be called when the operation is completed. */
   zb_ushort_t    n_groups;      /*!< Group addresses amount. */
   zb_uint8_t     endpoint;      /*!< The endpoint which the groups are assigned to. */
   zb_uint8_t     align[1];
   zb_uint16_t    groups[1];     /*!< First element if list with group addresses. */
-} ZB_PACKED_STRUCT zb_apsme_get_group_membership_req_t;
+} zb_apsme_get_group_membership_req_t;
 
 /*
  * 'groups' array member is passed as a function parameter (e.g. zb_aps_group_table_get_membership()), it should be
@@ -348,7 +348,97 @@ typedef struct zb_apsme_get_group_membership_conf_s
 
 /** @endcond */ /* internals_doc */
 
-/*! @} */
+/** @addtogroup aps_management_service APS management service
+  * @{
+  */
+
+/**
+ * @brief APSME binding structure.
+ *
+ * This data structure passed to @ref zb_apsme_bind_request()
+ * and to @ref zb_apsme_unbind_request().
+ */
+typedef struct zb_apsme_binding_req_s
+{
+  zb_ieee_addr_t  src_addr;       /*!< The source IEEE address for the binding entry. */
+  zb_uint8_t      src_endpoint;   /*!< The source endpoint for the binding entry. */
+  zb_uint16_t     clusterid;      /*!< The identifier of the cluster on the source
+                                        device that is to be bound to the destination device.*/
+  zb_uint8_t      addr_mode;      /*!< The type of destination address supplied by
+                                       the DstAddr parameter - see @ref aps_addr_mode  */
+  zb_addr_u       dst_addr;       /*!< The destination address for the binding entry. */
+  zb_uint8_t      dst_endpoint;   /*!< This parameter will be present only if
+                                       the DstAddrMode parameter has a value of
+                                       0x03 and, if present, will be the
+                                       destination endpoint for the binding entry.*/
+#ifdef SNCP_MODE
+  zb_uint8_t       remote_bind;   /*!< Indication if the bind req is local or remote */
+  zb_uint8_t       id;             /*!< unique identifier of the entry for NCP, updated only in
+                                    zb_apsme_bind_request and zb_apsme_unbind_request and used to
+                                    notify NCP */
+  /* confirm_cb is not sent in payload by NCP, keep it in the end of this structure */
+#endif
+  zb_callback_t   confirm_cb;     /*!< The callback to be called when the operation is completed. */
+} zb_apsme_binding_req_t;
+
+/**
+ * @brief APSME-BIND.request primitive.
+ * @param param - index of buffer containing request data (see @ref
+ * zb_apsme_binding_req_t).
+ */
+void zb_apsme_bind_request(zb_cb_param_t param);
+
+/**
+ * @brief APSME-UNBIND.request primitive.
+ * @param param - index of buffer containing request data (see @ref
+ * zb_apsme_binding_req_t).
+ */
+void zb_apsme_unbind_request(zb_cb_param_t param);
+
+/**
+ *@brief Perform unbind all entries. This custom function and it is not described
+ * in Zigbee specification.
+ * @param param - not used.
+ */
+void zb_apsme_unbind_all(zb_cb_param_t param);
+
+/**
+ * @brief Checks if the binding with specified parameters exists
+ */
+void zb_aps_check_binding_request(zb_cb_param_t param);
+
+/**
+ * @brief APSME-ADD-GROUP.request primitive.
+ *
+ * @param param - index of buffer with parameter. See @ref zb_apsme_add_group_req_t.
+ */
+void zb_apsme_add_group_request(zb_cb_param_t param);
+
+/**
+ * @brief APSME-REMOVE-GROUP.request primitive.
+ *
+ * @internal
+ * Use macro @ref ZDO_REGISTER_CALLBACK to register APSME-REMOVE-GROUP.confirm callback.
+ * @endinternal
+ * @param param - index of buffer with parameter. See @ref zb_apsme_remove_group_req_t.
+ *
+ */
+void zb_apsme_remove_group_request(zb_cb_param_t param);
+
+/**
+ * @brief APSME-REMOVE-ALL-GROUPS.request primitive.
+ *
+ * @internal
+ * Use macro @ref ZDO_REGISTER_CALLBACK to register APSME-REMOVE-ALL-GROUPS.confirm callback.
+ * @endinternal
+ * @param param - index of buffer with parameter. See @ref zb_apsme_remove_all_groups_req_t.
+ *
+ */
+void zb_apsme_remove_all_groups_request(zb_cb_param_t param);
+
+/** @} */ /* APS management service data structures and API. */
+
+/*! @} */ /* aps_api */
 
 
 /*! @cond internals_doc */
@@ -358,7 +448,7 @@ typedef struct zb_apsme_get_group_membership_conf_s
 /** @brief Signals user that data is sent and acknowledged.
   * @param param - reference to the buffer containing ASDU sent.
   */
-void zb_apsde_data_acknowledged(zb_uint8_t param);
+void zb_apsde_data_acknowledged(zb_cb_param_t param);
 
 /** @brief Initialize APS subsystem. */
 void zb_aps_init(void);
@@ -398,7 +488,7 @@ zb_uint8_t aps_find_src_ref(zb_uint8_t src_end, zb_uint16_t cluster_id);
 /** @brief APSME-UPDATE-DEVICE.indication primitive.
   * @param param - reference to the buffer containing indication data.
   */
-void zb_apsme_update_device_indication(zb_uint8_t param);
+void zb_apsme_update_device_indication(zb_cb_param_t param);
 #endif /* ZB_COORDINATOR_ROLE */
 
 /** @internal @brief Send APS command.
@@ -410,16 +500,16 @@ void zb_apsme_update_device_indication(zb_uint8_t param);
   * @param command - command id.
   * @param secure  - if true, secure transfer at NWK level.
   */
-void zb_aps_send_command(zb_uint8_t param, zb_uint16_t dest_addr, zb_uint8_t command, zb_bool_t secure_nwk
+void zb_aps_send_command_func(zb_bufid_t param, zb_uint16_t dest_addr, zb_uint8_t command, zb_bool_t secure_nwk
     /** @param secure_aps - if true, secure APS level.*/
     , zb_secur_key_id_t secure_aps_i, zb_bool_t need_ack);
+#define zb_aps_send_command(param, dest_addr, command, secure_nwk, secure_aps_i, need_ack) \
+  zb_aps_send_command_func(ZB_UNPACK_BUF_REF(param), (dest_addr), (command), (secure_nwk), (secure_aps_i), (need_ack))
 
-void zb_apsde_data_request_relay(zb_uint8_t param, zb_uint16_t relay_via, zb_ieee_addr_t joiner_ieee, zb_bool_t nwk_secure, zb_bool_t aps_secure);
+void zb_aps_send_command_with_relay(zb_bufid_t param, zb_uint16_t dest_addr, zb_uint8_t command, zb_secur_key_id_t secure_aps_i,
+                                    zb_bool_t need_ack, zb_uint16_t relay_via, const zb_ieee_addr_t joiner_ieee);
 
-void zb_aps_send_command_with_relay(zb_uint8_t param, zb_uint16_t dest_addr, zb_uint8_t command, zb_secur_key_id_t secure_aps_i,
-                                    zb_bool_t need_ack, zb_uint16_t relay_via, zb_ieee_addr_t joiner_ieee);
-
-zb_ret_t zb_aps_command_confirm(zb_uint8_t param);
+zb_ret_t zb_aps_command_confirm(zb_bufid_t param);
 
 /** \par Macros for APS FC parse-compose */
 
@@ -495,7 +585,7 @@ zb_uint8_t zb_aps_hdr_size(zb_uint8_t fc);
   * @param pkt - packet for calculate size.
   * @return packet APS full head size.
   */
-zb_ushort_t zb_aps_full_hdr_size(const zb_uint8_t *pkt);
+zb_uint16_t zb_aps_full_hdr_size(const zb_uint8_t *pkt);
 
 
 /* #define APS_CONFIRM_STATUS(buf, s, func)                \ */
@@ -512,7 +602,7 @@ zb_ushort_t zb_aps_full_hdr_size(const zb_uint8_t *pkt);
   * @param param - buffer with parameter. See @ref zb_apsme_get_group_membership_req_s.
   * @see ZCL spec, subclause 3.6.2.2.5.
   */
-void zb_apsme_get_group_membership_request(zb_uint8_t param);
+void zb_apsme_get_group_membership_request(zb_bufid_t param);
 
 #define ZDO_MGMT_APS_LEAVE_RESP_CLID    0x8034U /* it is from zdo for leave callback*/
 
@@ -547,21 +637,48 @@ zb_aps_group_table_ent_t* zb_aps_get_group_table_entry(zb_uint16_t group_addr);
   * @param addr - destination address.
   * @param secure - Is ASP secure.
   */
-void fill_nldereq(zb_uint8_t param, zb_uint16_t addr, zb_uint8_t secure);
+void fill_nldereq(zb_bufid_t param, zb_uint16_t addr, zb_uint8_t secure);
 
 /** @brief Set predefined TC key. */
 void zb_aps_set_preconfigure_security_key(const zb_uint8_t *key);
 
-zb_ret_t zb_aps_get_ieee_source_from_cmd_frame(zb_uint8_t cmd_id, zb_uint8_t cmd_buf_param, zb_ieee_addr_t ieee_addr);
+zb_ret_t zb_aps_get_ieee_source_from_cmd_frame(zb_uint8_t cmd_id, zb_bufid_t cmd_buf_param, zb_ieee_addr_t ieee_addr);
 
 void zb_aps_clear_after_leave(zb_uint16_t address);
 
-zb_ret_t zb_check_bind_trans(zb_uint8_t param);
-void zb_aps_stop_retransmission(zb_ushort_t retrans_table_index);
+zb_ret_t zb_check_bind_trans(zb_bufid_t param);
+void zb_aps_stop_retransmission(zb_uindex_t retrans_table_index);
+
+/**
+ * @brief Finds APS retransmission table entry by address reference or buffer
+ *
+ * @param addr_ref address reference
+ * @param buf_id buffer id
+ * @param[out] out_ent_iter found entry
+ */
+void aps_retrans_ent_find_by_addr_or_buf(
+  zb_address_ieee_ref_t addr_ref,
+  zb_bufid_t buf_id,
+  zb_aps_retrans_ent_iter_t *out_ent_iter);
+
+/**
+ * @brief Removes APS retransmission entry and moves iterator to the next entry
+ *
+ * @param[in,out] ent_iter retransmission entry iterator
+ *  The function moves the iterator to the new position.
+ */
+void aps_retrans_ent_free(zb_aps_retrans_ent_iter_t *ent_iter);
 
 void zb_apsme_remove_all_groups_internal(void);
 void apsme_forget_device(void);
-void aps_send_fail_confirm(zb_uint8_t param, zb_ret_t status);
+void aps_send_fail_confirm(zb_bufid_t param, zb_ret_t status);
+
+void zb_aps_reset_transmission_table(void);
+
+#ifdef ZB_DEBUG_APS_RETRANS
+void zb_aps_verify_empty_retrans_table(void);
+void zb_aps_verify_no_stale_addr_refs(zb_address_ieee_ref_t addr_ref);
+#endif /* ZB_DEBUG_APS_RETRANS */
 
 /*! @} */
 /*! @endcond */
@@ -584,7 +701,7 @@ void zb_aps_group_table_remove_all(zb_aps_group_table_t *table);
 zb_bool_t zb_aps_group_table_is_endpoint_in_group(zb_aps_group_table_t *table,
                                                    zb_uint16_t group_id,
                                                    zb_uint8_t endpoint);
-void zb_apsme_internal_get_group_membership_request(zb_aps_group_table_t *table, zb_uint8_t param);
+void zb_apsme_internal_get_group_membership_request(zb_aps_group_table_t *table, zb_bufid_t param);
 
 
 /* Internal function for binding APS-groups to ZCL endpoints,
@@ -651,7 +768,7 @@ void zb_reinit_aps_binding_dst_table_entry_by_index(zb_uint8_t idx);
   * @snippet start_ze.c zb_apsme_get_request
   * @par
   */
-void zb_apsme_get_request(zb_uint8_t param);
+void zb_apsme_get_request(zb_cb_param_t param);
 
 /** @brief APSME SET request primitive.
   * @param param reference to the buffer containing request data.
@@ -661,7 +778,7 @@ void zb_apsme_get_request(zb_uint8_t param);
   * @par
   *
   */
-void zb_apsme_set_request(zb_uint8_t param);
+void zb_apsme_set_request(zb_cb_param_t param);
 
 /**
  * @brief Increases specified APS outgoing frame counter
@@ -669,13 +786,13 @@ void zb_apsme_set_request(zb_uint8_t param);
  *
  * @return counter value before increment
  */
-zb_uint32_t zb_increase_aps_outgoing_frame_counter(zb_uint8_t aps_key_idx);
+zb_uint32_t zb_increase_aps_outgoing_frame_counter(zb_aps_key_pair_ref_t aps_key_idx);
 
-void aps_force_retx(zb_uint8_t addr_ref);
+void aps_force_retx(zb_cb_param_t addr_ref);
 
-zb_bool_t aps_is_frame_relayed(zb_uint8_t *apsdu);
+zb_bool_t aps_is_frame_relayed(const zb_uint8_t *apsdu);
 
-void aps_cut_relay_hdr(zb_uint8_t param);
+void aps_cut_relay_hdr(zb_bufid_t param);
 
 zb_uint8_t * aps_parse_relay_for_secur(zb_uint8_t *apsdu, zb_uint8_t tlv_len, zb_uint8_t *dest_addr);
 
@@ -690,5 +807,38 @@ void aps_upd_secured_relayed_frm(zb_uint8_t *apsdu, zb_uint8_t tlv_len);
  * @param ieee_addr - IEEE addr
  */
 zb_ret_t zb_aps_add_binding_whitelist_entry(zb_uint8_t ep_id, zb_uint16_t cluster_id, zb_uint8_t cluster_role, zb_ieee_addr_t ieee_addr);
+
+#ifdef APS_FRAGMENTATION
+
+void zb_aps_add_max_trans_size(zb_uint16_t short_addr, zb_uint16_t max_trans_size, zb_uint8_t max_buffer_size);
+zb_uint16_t zb_aps_get_max_trans_size(zb_uint16_t short_addr);
+void zb_aps_remove_max_trans_size(zb_address_ieee_ref_t addr_ref);
+
+#endif /* APS_FRAGMENTATION */
+
+#ifdef ZB_COORDINATOR_ROLE
+/**
+   Reaction on incoming UPDATE-DEVICE
+
+   Issue UPDATE-DEVICE.indication
+
+   @param param - buffer index with update device data
+   @return nothing
+ */
+void zb_aps_in_update_device(zb_bufid_t param);
+#endif /* ZB_COORDINATOR_ROLE */
+
+/**
+ * @brief Function which uses `zb_apsde_data_confirm_t` status
+ *        to determine whether buffer has APS hdr included
+ *        at the moment `zb_apsde_data_confirm` called or not.
+ *        Returns valid result until APS header cut during confirm handling.
+ *
+ * @param param     Buffer to check status in.
+ * @return zb_ret_t RET_OK - APS header present.
+ *                  RET_NOT_FOUND - APS header not found.
+ *                  Any other value if can't determine APS hdr presence.
+ */
+zb_ret_t zb_check_aps_has_hdr_by_confirm_status(zb_bufid_t param);
 
 #endif /* ZB_APS_H */

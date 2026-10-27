@@ -349,7 +349,7 @@ struct zb_zcl_cluster_desc_s;   /* Forward declaration */
  * @param param - index of buffer with ZCL command
  * @return status (see @ref zb_bool_t)
  */
-typedef zb_uint8_t (*zb_device_handler_t)(zb_uint8_t param);
+typedef zb_uint8_t (*zb_device_handler_t)(zb_cb_param_t param);
 /** @} */ /* af_management_service */
 /**
  * @addtogroup af_data_service AF data service
@@ -386,7 +386,7 @@ typedef ZB_PACKED_PRE struct zb_af_endpoint_desc_s
   zb_uint8_t rep_info_count;           /*!< Number of reporting info slots */
   /* Reporting info structure should be better stored in ZCL main,
    * moved here to allow compile-time memory allocating for
-   * reporting_info array, see ZB_AF_DECLARE_DEVICE_CTX() */
+   * reporting_info array, see ZBOSS_DECLARE_DEVICE_CTX() */
   struct zb_zcl_reporting_info_s *reporting_info; /*!< Attributes reporting information */
 
   zb_uint8_t cvc_alarm_count;          /*!< Number of continuous value change alarm slots */
@@ -603,31 +603,6 @@ zb_af_endpoint_desc_t ep_name =          \
    (((cluster_role_mask) == ZB_ZCL_CLUSTER_CLIENT_ROLE) ? cluster_id##_CLIENT_ROLE_INIT : NULL)) \
 }
 
-/** WARNING: This API is deprecated, use ZBOSS_DECLARE_DEVICE_CTX instead. */
-#define ZB_AF_DECLARE_DEVICE_CTX(device_ctx_name, ep_list_name, ep_count, reporting_attr_count) \
-  zb_zcl_reporting_info_t reporting_info## device_ctx_name[reporting_attr_count]; \
-  zb_af_device_ctx_t device_ctx_name =                                  \
-  {                                                                     \
-    ep_count,                                                           \
-    ep_list_name,                                                       \
-    reporting_attr_count,                                               \
-    reporting_info## device_ctx_name,                                   \
-    0,                                                                  \
-    NULL                                                                \
-  }
-
-/** WARNING: This API is deprecated, use ZBOSS_DECLARE_DEVICE_CTX instead. */
-#define ZB_AF_DECLARE_DEVICE_CTX_NO_REP(device_ctx_name, ep_list_name, ep_count) \
-  zb_af_device_ctx_t device_ctx_name =                                  \
-  {                                                                     \
-    ep_count,                                                           \
-    ep_list_name,                                                       \
-    0,                                                                  \
-    NULL,                                                               \
-    0,                                                                  \
-    NULL                                                                \
-  }
-
 /**
   Declare device reporting context
   @param rep_ctx - reporting context variable name
@@ -776,14 +751,14 @@ void zb_af_register_device_ctx(zb_af_device_ctx_t *device_ctx);
 /**
   Callback for notifying user about status of ZCL/ZDO command transmission
  */
-typedef void (*zb_af_transmission_res_cb_t) (zb_uint8_t status);
+typedef void (*zb_af_transmission_res_cb_t) (zb_cb_param_t status);
 
 /**
    Continue inconimg packet proicessing after ZG->zdo.af_data_cb returned TRUE
 
    @param param - incoming packet. Be sure it was initially passed to ZG->zdo.af_data_cb.
  */
-void zb_apsde_data_indication_cont(zb_uint8_t param);
+void zb_apsde_data_indication_cont(zb_cb_param_t param);
 /** @} */ /* af_management_service */
 /*! @} */
 

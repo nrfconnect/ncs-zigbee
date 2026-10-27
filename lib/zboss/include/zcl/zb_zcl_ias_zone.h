@@ -759,7 +759,7 @@ typedef ZB_PACKED_PRE struct zb_zcl_ias_zone_enroll_res_s
 
 /* Set or clear Zone Status bits
  */
-void zb_zcl_ias_zone_change_status(zb_uint8_t param);
+void zb_zcl_ias_zone_change_status(zb_cb_param_t param);
 
 /** @brief Declare Set/Clear Zone Status bits
 */
@@ -837,7 +837,7 @@ zb_bool_t zb_zcl_ias_zone_set_status(
   zb_uint8_t ep,
   zb_uint16_t new_val,
   zb_uint16_t delay,
-  zb_uint8_t buf_param);
+  zb_bufid_t buf_param);
 
 enum zb_zcl_general_cb_params_e
 {
@@ -901,12 +901,12 @@ void zb_zcl_ias_zone_register_cb(
    @return ZB_TRUE if command is sent
 */
 zb_bool_t zb_zcl_ias_zone_check_attr_notify(
-  zb_uint8_t buf_param);
+  zb_cb_param_t buf_param);
 
 /**
    @brief fills in notification command and sends it
 */
-void zb_zcl_ias_zone_send_status_change_not(zb_uint8_t param);
+void zb_zcl_ias_zone_send_status_change_not(zb_cb_param_t param);
 
 /**
    @brief checks cie address on zcl initialization
@@ -932,6 +932,6 @@ void zb_zcl_ias_zone_init_client(void);
 #define ZB_ZCL_CLUSTER_ID_IAS_ZONE_SERVER_ROLE_INIT zb_zcl_ias_zone_init_server
 #define ZB_ZCL_CLUSTER_ID_IAS_ZONE_CLIENT_ROLE_INIT zb_zcl_ias_zone_init_client
 
-zb_bool_t zb_zcl_process_ias_zone_specific_commands(zb_uint8_t param);
+zb_bool_t zb_zcl_process_ias_zone_specific_commands(zb_bufid_t param);
 
 #endif /* ZB_ZCL_IAS_ZONE_H */

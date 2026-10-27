@@ -66,7 +66,7 @@
 #define ZB_BUF_IS_OOM_STATE() (ZB_BUF_IS_OOM_STATE_IN() || ZB_BUF_IS_OOM_STATE_OUT())
 
 #if !defined ZB_MACSPLIT_DEVICE && !defined ZB_MINIMAL_CONTEXT && !defined ZB_ZGPD_ROLE
-#define ZB_NWK_UNLOCK_IN(bufid) zb_nwk_unlock_in((bufid))
+#define ZB_NWK_UNLOCK_IN(bufid) zb_nwk_unlock_in(ZB_UNPACK_BUF_REF(bufid))
 #else
 #define ZB_NWK_UNLOCK_IN(bufid)
 #endif
@@ -163,7 +163,7 @@ zb_bool_t zb_bufpool_storage_is_buf_corrupted(zb_buf_ent_t *buf);
    @param offset - new offset
  */
 void zb_buf_set_len_and_offset_func(TRACE_PROTO zb_bufid_t buf, zb_uint16_t len, zb_uint16_t offset);
-#define zb_buf_set_len_and_offset(a,b,c) zb_buf_set_len_and_offset_func(TRACE_CALL (a), (b), (c))
+#define zb_buf_set_len_and_offset(a,b,c) zb_buf_set_len_and_offset_func(TRACE_CALL ZB_UNPACK_BUF_REF(a), (b), (c))
 
 /**
    Return pointer to the first element of buffer array.
@@ -173,7 +173,7 @@ void zb_buf_set_len_and_offset_func(TRACE_PROTO zb_bufid_t buf, zb_uint16_t len,
    @return pointer to the buffer array
  */
 zb_uint8_t *zb_buf_data0_func(TRACE_PROTO zb_bufid_t buf);
-#define zb_buf_data0(a) zb_buf_data0_func(TRACE_CALL (a))
+#define zb_buf_data0(a) zb_buf_data0_func(TRACE_CALL ZB_UNPACK_BUF_REF(a))
 
 /**
    Convert buffer pointer into bufid.
@@ -219,7 +219,7 @@ zb_bool_t zb_buf_safecopy_func(TRACE_PROTO zb_uint8_t *ptr, const zb_uint8_t *pa
    @return serialized data size
  */
 zb_uint_t zb_buf_serialize_func(TRACE_PROTO zb_bufid_t buf, zb_uint8_t *ptr, zb_uint16_t len);
-#define zb_buf_serialize(a, b, c) zb_buf_serialize_func(TRACE_CALL (a), (b), (c))
+#define zb_buf_serialize(a, b, c) zb_buf_serialize_func(TRACE_CALL ZB_UNPACK_BUF_REF(a), (b), (c))
 
 /**
    Deserialize data buffer into ZBOSS buffer.
@@ -229,7 +229,7 @@ zb_uint_t zb_buf_serialize_func(TRACE_PROTO zb_bufid_t buf, zb_uint8_t *ptr, zb_
    @param payload_size - array size
  */
 void zb_buf_deserialize_func(TRACE_PROTO zb_bufid_t buf, zb_uint8_t *ptr, zb_uint8_t payload_size);
-#define zb_buf_deserialize(a, b, c) zb_buf_deserialize_func(TRACE_CALL (a),(b),(c))
+#define zb_buf_deserialize(a, b, c) zb_buf_deserialize_func(TRACE_CALL ZB_UNPACK_BUF_REF(a),(b),(c))
 
 /**
    Deserialize ZBOSS buffer parameters from the buffer ignoring data section.
@@ -263,7 +263,7 @@ zb_uint8_t *zb_buf_partial_deserialize_func(TRACE_PROTO zb_uint8_t *ptr, zb_uint
    @param len - new length
  */
 void zb_buf_set_len_func(TRACE_PROTO zb_bufid_t buf, zb_uint16_t len);
-#define zb_buf_set_len(a,b) zb_buf_set_len_func(TRACE_CALL (a),(b))
+#define zb_buf_set_len(a,b) zb_buf_set_len_func(TRACE_CALL ZB_UNPACK_BUF_REF(a),(b))
 #endif
 /**
    Return pointer to the data by offset off from data section start.
@@ -274,7 +274,7 @@ void zb_buf_set_len_func(TRACE_PROTO zb_bufid_t buf, zb_uint16_t len);
    @return pointer to the data
  */
 void *zb_buf_data_func(TRACE_PROTO zb_bufid_t buf, zb_uint_t off);
-#define zb_buf_data(a, b) zb_buf_data_func(TRACE_CALL (a),(b))
+#define zb_buf_data(a, b) zb_buf_data_func(TRACE_CALL ZB_UNPACK_BUF_REF(a),(b))
 
 #ifdef ZB_TH_ENABLED
 /**
@@ -284,7 +284,7 @@ void *zb_buf_data_func(TRACE_PROTO zb_bufid_t buf, zb_uint_t off);
    @return data_offset field value
  */
 zb_uint16_t zb_buf_get_offset_func(TRACE_PROTO zb_bufid_t buf);
-#define zb_buf_get_offset(a) zb_buf_get_offset_func(TRACE_CALL (a))
+#define zb_buf_get_offset(a) zb_buf_get_offset_func(TRACE_CALL ZB_UNPACK_BUF_REF(a))
 #endif /* ZB_TH_ENABLED */
 
 
@@ -298,7 +298,7 @@ zb_uint16_t zb_buf_get_offset_func(TRACE_PROTO zb_bufid_t buf);
  * @return RET_OK or error code.
  */
 zb_ret_t zb_buf_requalify_in_to_out_func(TRACE_PROTO zb_bufid_t buf);
-#define zb_buf_requalify_in_to_out(buf) zb_buf_requalify_in_to_out_func(TRACE_CALL (buf))
+#define zb_buf_requalify_in_to_out(buf) zb_buf_requalify_in_to_out_func(TRACE_CALL ZB_UNPACK_BUF_REF(buf))
 
 /**
    Initialize packet buffers pool.

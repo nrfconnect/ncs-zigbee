@@ -78,8 +78,8 @@ zb_discover_cmd_list_t gs_ias_ace_server_cmd_list =
   sizeof(gs_ias_ace_client_received_commands), gs_ias_ace_client_received_commands
 };
 
-zb_bool_t zb_zcl_process_ias_ace_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_ias_ace_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_ias_ace_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_ias_ace_specific_commands_cli(zb_cb_param_t param);
 
 void zb_zcl_ias_ace_init_server()
 {
@@ -122,14 +122,14 @@ static zb_zcl_ias_ace_zone_table_t* zb_zcl_ias_ace_get_zone_table(zb_uint8_t end
 }
 
 /** @brief Arm command */
-static zb_ret_t zb_zcl_ias_ace_arm_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_arm_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_arm_t pl_in;
   zb_zcl_ias_ace_arm_resp_t pl_out;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_arm_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_arm_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
   ZB_BZERO(&pl_out, sizeof(pl_out));
@@ -185,14 +185,14 @@ static zb_ret_t zb_zcl_ias_ace_arm_handler(zb_uint8_t param, const zb_zcl_parsed
 }
 
 /** @brief Bypass command */
-static zb_ret_t zb_zcl_ias_ace_bypass_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_bypass_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_bypass_t pl_in;
   zb_zcl_ias_ace_bypass_resp_t pl_out;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_bypass_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_bypass_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
   ZB_BZERO(&pl_out, sizeof(pl_out));
@@ -249,11 +249,11 @@ static zb_ret_t zb_zcl_ias_ace_bypass_handler(zb_uint8_t param, const zb_zcl_par
 }
 
 /** @brief Emergency command */
-static zb_ret_t zb_zcl_ias_ace_emergency_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_emergency_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_emergency_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_emergency_handler %x", (FMT__D, param));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
     ZB_ZCL_IAS_ACE_EMERGENCY_CB_ID, RET_OK, cmd_info, NULL, NULL);
@@ -271,11 +271,11 @@ static zb_ret_t zb_zcl_ias_ace_emergency_handler(zb_uint8_t param, const zb_zcl_
 }
 
 /** @brief Fire command */
-static zb_ret_t zb_zcl_ias_ace_fire_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_fire_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_fire_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_fire_handler %x", (FMT__D, param));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
     ZB_ZCL_IAS_ACE_FIRE_CB_ID, RET_OK, cmd_info, NULL, NULL);
@@ -293,11 +293,11 @@ static zb_ret_t zb_zcl_ias_ace_fire_handler(zb_uint8_t param, const zb_zcl_parse
 }
 
 /** @brief Panic command */
-static zb_ret_t zb_zcl_ias_ace_panic_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_panic_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_panic_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_panic_handler %x", (FMT__D, param));
 
   ZB_ZCL_DEVICE_CMD_PARAM_INIT_WITH(param,
     ZB_ZCL_IAS_ACE_PANIC_CB_ID, RET_OK, cmd_info, NULL, NULL);
@@ -315,14 +315,14 @@ static zb_ret_t zb_zcl_ias_ace_panic_handler(zb_uint8_t param, const zb_zcl_pars
 }
 
 /** @brief Get Zone ID Map command */
-static zb_ret_t zb_zcl_ias_ace_get_zone_id_map_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_get_zone_id_map_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_ias_ace_get_zone_id_map_resp_t zone_id_map_resp;
   zb_zcl_ias_ace_zone_table_t *table;
   zb_uint16_t length;
   zb_uint16_t i;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_id_map_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_id_map_handler %x", (FMT__D, param));
 
   ZB_BZERO(&zone_id_map_resp, sizeof(zone_id_map_resp));
   length = zb_zcl_ias_ace_get_zone_table_length(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint);
@@ -351,13 +351,13 @@ static zb_ret_t zb_zcl_ias_ace_get_zone_id_map_handler(zb_uint8_t param, const z
 }
 
 /** @brief Get Zone Information command */
-static zb_ret_t zb_zcl_ias_ace_get_zone_info_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_get_zone_info_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_get_zone_info_t payload;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_info_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_info_handler %x", (FMT__D, param));
 
   ZB_BZERO(&payload, sizeof(payload));
 
@@ -418,12 +418,12 @@ static zb_ret_t zb_zcl_ias_ace_get_zone_info_handler(zb_uint8_t param, const zb_
 }
 
 /** @brief Get Panel Status command */
-static zb_ret_t zb_zcl_ias_ace_get_panel_status_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_get_panel_status_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_get_panel_status_resp_t pl_out;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_panel_status_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_panel_status_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_out, sizeof(pl_out));
 
@@ -459,14 +459,14 @@ static zb_ret_t zb_zcl_ias_ace_get_panel_status_handler(zb_uint8_t param, const 
 }
 
 /** @brief Get Bypassed Zone List command */
-static zb_ret_t zb_zcl_ias_ace_get_bypassed_zone_list_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_get_bypassed_zone_list_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_uint8_t *ptr;
   zb_uint16_t i;
   zb_zcl_ias_ace_set_bypassed_zone_list_t pl_out;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_bypassed_zone_list_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_bypassed_zone_list_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_out, sizeof(pl_out));
 
@@ -508,14 +508,14 @@ static zb_ret_t zb_zcl_ias_ace_get_bypassed_zone_list_handler(zb_uint8_t param, 
 }
 
 /** @brief Get Zone Status command */
-static zb_ret_t zb_zcl_ias_ace_get_zone_status_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_get_zone_status_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_get_zone_status_t pl_in;
   zb_zcl_ias_ace_get_zone_status_resp_t pl_out;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_status_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_status_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
   ZB_BZERO(&pl_out, sizeof(pl_out));
@@ -580,13 +580,13 @@ static zb_ret_t zb_zcl_ias_ace_get_zone_status_handler(zb_uint8_t param, const z
 }
 
 /** @brief Arm Response command */
-static zb_ret_t zb_zcl_ias_ace_arm_resp_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_arm_resp_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_arm_resp_t pl_in;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_arm_resp_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_arm_resp_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
 
@@ -617,13 +617,13 @@ static zb_ret_t zb_zcl_ias_ace_arm_resp_handler(zb_uint8_t param, const zb_zcl_p
 }
 
 /** @brief Get Zone ID Map Response command */
-static zb_ret_t zb_zcl_ias_ace_get_zone_id_map_resp_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_get_zone_id_map_resp_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_get_zone_id_map_resp_t pl_in;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_id_map_resp_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_id_map_resp_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
 
@@ -654,13 +654,13 @@ static zb_ret_t zb_zcl_ias_ace_get_zone_id_map_resp_handler(zb_uint8_t param, co
 }
 
 /** @brief Get Zone Info Response command */
-static zb_ret_t zb_zcl_ias_ace_get_zone_info_resp_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_get_zone_info_resp_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_get_zone_info_resp_t pl_in;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_info_resp_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_info_resp_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
 
@@ -691,13 +691,13 @@ static zb_ret_t zb_zcl_ias_ace_get_zone_info_resp_handler(zb_uint8_t param, cons
 }
 
 /** @brief Zone Status Changed command */
-static zb_ret_t zb_zcl_ias_ace_zone_status_changed_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_zone_status_changed_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_zone_status_changed_t pl_in;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_zone_status_changed_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_zone_status_changed_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
 
@@ -728,13 +728,13 @@ static zb_ret_t zb_zcl_ias_ace_zone_status_changed_handler(zb_uint8_t param, con
 }
 
 /** @brief Panel Status Changed command */
-static zb_ret_t zb_zcl_ias_ace_panel_status_changed_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_panel_status_changed_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_panel_status_changed_t pl_in;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_panel_status_changed_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_panel_status_changed_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
 
@@ -765,13 +765,13 @@ static zb_ret_t zb_zcl_ias_ace_panel_status_changed_handler(zb_uint8_t param, co
 }
 
 /** @brief Get Panel Status Response command */
-static zb_ret_t zb_zcl_ias_ace_get_panel_status_resp_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_get_panel_status_resp_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_get_panel_status_resp_t pl_in;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_panel_status_resp_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_panel_status_resp_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
 
@@ -802,13 +802,13 @@ static zb_ret_t zb_zcl_ias_ace_get_panel_status_resp_handler(zb_uint8_t param, c
 }
 
 /** @brief Set Bypassed Zone List command */
-static zb_ret_t zb_zcl_ias_ace_set_bypassed_zone_list_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_set_bypassed_zone_list_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_set_bypassed_zone_list_t pl_in;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_set_bypassed_zone_list_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_set_bypassed_zone_list_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
 
@@ -840,13 +840,13 @@ static zb_ret_t zb_zcl_ias_ace_set_bypassed_zone_list_handler(zb_uint8_t param, 
 }
 
 /** @brief Bypass Response command */
-static zb_ret_t zb_zcl_ias_ace_bypass_resp_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_bypass_resp_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_bypass_resp_t pl_in;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_bypass_resp_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_bypass_resp_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
 
@@ -877,13 +877,13 @@ static zb_ret_t zb_zcl_ias_ace_bypass_resp_handler(zb_uint8_t param, const zb_zc
 }
 
 /** @brief Get Zone Status Response command */
-static zb_ret_t zb_zcl_ias_ace_get_zone_status_resp_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_ias_ace_get_zone_status_resp_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ias_ace_get_zone_status_resp_t pl_in;
   zb_zcl_parse_status_t status;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_status_resp_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ias_ace_get_zone_status_resp_handler %x", (FMT__D, param));
 
   ZB_BZERO(&pl_in, sizeof(pl_in));
 
@@ -913,7 +913,7 @@ static zb_ret_t zb_zcl_ias_ace_get_zone_status_resp_handler(zb_uint8_t param, co
   return ret;
 }
 
-zb_bool_t zb_zcl_process_ias_ace_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_ias_ace_specific_commands_srv(zb_cb_param_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_bool_t processed = ZB_TRUE;
@@ -984,7 +984,7 @@ zb_bool_t zb_zcl_process_ias_ace_specific_commands_srv(zb_uint8_t param)
   return processed;
 }
 
-zb_bool_t zb_zcl_process_ias_ace_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_ias_ace_specific_commands_cli(zb_cb_param_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_bool_t processed = ZB_TRUE;

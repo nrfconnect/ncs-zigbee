@@ -54,7 +54,7 @@
   /** @brief Context Thermostat cluster  */
   static zb_zcl_thermostat_context_t g_thermostat_context;
 
-  void zb_zcl_thermostat_shedule_process(zb_uint8_t param);
+  void zb_zcl_thermostat_shedule_process(zb_cb_param_t param);
 
   zb_uint8_t gs_thermostat_client_received_commands[] =
 {
@@ -143,8 +143,8 @@ void zb_zcl_thermostat_init()
 }
 
 zb_ret_t check_value_thermostat_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
-zb_bool_t zb_zcl_process_thermostat_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_thermostat_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_thermostat_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_thermostat_specific_commands_cli(zb_cb_param_t param);
 
 void zb_zcl_thermostat_init_server()
 {
@@ -706,12 +706,14 @@ zb_ret_t check_value_thermostat_server(zb_uint16_t attr_id, zb_uint8_t endpoint,
 /*
  * Invoke User App with Thermostat command.
  */
-void zb_zcl_thermostat_invoke_user_app(zb_uint8_t param, zb_uint16_t endpoint16)
+void zb_zcl_thermostat_invoke_user_app(zb_cb_param_t cb_param)
 {
   zb_ret_t result;
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_uint16_t endpoint16 = ZB_UNPACK_USER_PARAM(cb_param);
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_invoke_user_app %hx endpoint %d",
-      (FMT__H_D, param, endpoint16));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_invoke_user_app %x endpoint %d",
+      (FMT__D_D, param, endpoint16));
 
   if (ZCL_CTX().device_cb != NULL && g_thermostat_context.setpoint_mode != ZB_ZCL_THERMOSTAT_PROCESS_NONE)
   {
@@ -912,14 +914,14 @@ void zb_zcl_thermostat_convert_weekly_alarm_to_attributies(zb_uint8_t index)
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_thermostat_convert_weekly_alarm_to_attributies", (FMT__0));
 }
 
-void zb_zcl_thermostat_shedule_process(zb_uint8_t param)
+void zb_zcl_thermostat_shedule_process(zb_cb_param_t param)
 {
   zb_uint32_t curr_week_time;
-  zb_uint8_t index = param;
+  zb_bufid_t index = param;
   zb_uint32_t min_time;
   zb_uindex_t i;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_shedule_process index %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_shedule_process index %d", (FMT__D, param));
 
   curr_week_time = zb_get_utc_time() % ZB_SECOND_PER_WEEK;
 
@@ -1005,7 +1007,7 @@ void zb_zcl_thermostat_remove_record_by_day(zb_uint8_t day)
 
 /*********************** Cluster command process *************************/
 
-zb_ret_t zb_zcl_thermostat_setpoint_raise_lower_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_thermostat_setpoint_raise_lower_handler(zb_bufid_t param)
 {
   zb_zcl_thermostat_setpoint_raise_lower_req_t setpoint_raise_lower_req = {0, 0};
   zb_zcl_parse_status_t status;
@@ -1016,7 +1018,7 @@ zb_ret_t zb_zcl_thermostat_setpoint_raise_lower_handler(zb_uint8_t param)
   zb_zcl_parsed_hdr_t cmd_info;
   zb_bool_t is_new_event = (g_thermostat_context.setpoint_mode == ZB_ZCL_THERMOSTAT_PROCESS_NONE) ? ZB_TRUE : ZB_FALSE;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_setpoint_raise_lower_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_setpoint_raise_lower_handler %d", (FMT__D, param));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -1111,7 +1113,7 @@ zb_ret_t zb_zcl_thermostat_setpoint_raise_lower_handler(zb_uint8_t param)
  * 3. Add new Weekly Schedule
  * 4. Restart Schedule Process
  */
-zb_ret_t zb_zcl_thermostat_set_weekly_schedule_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_thermostat_set_weekly_schedule_handler(zb_bufid_t param)
 {
   zb_zcl_thermostat_set_weekly_schedule_req_t req;
   zb_zcl_thermostat_weekly_schedule_point_pair_t pair;
@@ -1120,7 +1122,7 @@ zb_ret_t zb_zcl_thermostat_set_weekly_schedule_handler(zb_uint8_t param)
   zb_uindex_t i = 0;
   zb_uindex_t index;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_set_weekly_schedule_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_set_weekly_schedule_handler %d", (FMT__D, param));
 
   ZB_ZCL_THERMOSTAT_GET_SET_WEEKLY_SCHEDULE_REQ(param, req, status);
   if (status != ZB_ZCL_PARSE_STATUS_SUCCESS)
@@ -1181,14 +1183,14 @@ zb_ret_t zb_zcl_thermostat_set_weekly_schedule_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_thermostat_get_weekly_schedule_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_thermostat_get_weekly_schedule_handler(zb_bufid_t param)
 {
   zb_zcl_thermostat_get_weekly_schedule_req_t req;
   zb_zcl_parse_status_t status;
   zb_ret_t ret = RET_OK;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_get_weekly_schedule_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_get_weekly_schedule_handler %d", (FMT__D, param));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -1245,12 +1247,12 @@ zb_ret_t zb_zcl_thermostat_get_weekly_schedule_handler(zb_uint8_t param)
   return ret;
 }
 
-zb_ret_t zb_zcl_thermostat_clear_weekly_schedule_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_thermostat_clear_weekly_schedule_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   ZVUNUSED(param);
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_clear_weekly_schedule_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_thermostat_clear_weekly_schedule_handler %d", (FMT__D, param));
 
   zb_zcl_thermostat_remove_record_by_day(ZB_ZCL_THERMOSTAT_WEEKLY_ALL);
 
@@ -1265,7 +1267,7 @@ zb_ret_t zb_zcl_thermostat_clear_weekly_schedule_handler(zb_uint8_t param)
  * relay_status, humidity_in_percentage, set_point,
  * unread_entries. Currently Relay log storing is not defined in the Spec
  */
-zb_ret_t zb_zcl_thermostat_get_relay_status_log_handler(zb_uint8_t param)
+zb_ret_t zb_zcl_thermostat_get_relay_status_log_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -1278,7 +1280,7 @@ zb_ret_t zb_zcl_thermostat_get_relay_status_log_handler(zb_uint8_t param)
   zb_uint16_t unread_entries = 0;
   zb_zcl_attr_t *attr_desc;
 
-  TRACE_MSG(TRACE_ZCL3, "> zb_zcl_thermostat_get_relay_status_log_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL3, "> zb_zcl_thermostat_get_relay_status_log_handler %d", (FMT__D, param));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -1316,15 +1318,15 @@ zb_ret_t zb_zcl_thermostat_get_relay_status_log_handler(zb_uint8_t param)
 
 #endif /* defined ZB_ENABLE_HA */
 
-zb_bool_t zb_zcl_process_thermostat_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_thermostat_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
   zb_ret_t ret = RET_OK;
 
   TRACE_MSG( TRACE_ZCL1,
-             "> zb_zcl_process_thermostat_specific_commands: buf %p",
-             (FMT__P, param));
+             "> zb_zcl_process_thermostat_specific_commands: buf %d",
+             (FMT__D, param));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -1421,7 +1423,7 @@ zb_bool_t zb_zcl_process_thermostat_specific_commands(zb_uint8_t param)
 }
 
 
-zb_bool_t zb_zcl_process_thermostat_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_thermostat_specific_commands_srv(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -1432,7 +1434,7 @@ zb_bool_t zb_zcl_process_thermostat_specific_commands_srv(zb_uint8_t param)
 }
 
 
-zb_bool_t zb_zcl_process_thermostat_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_thermostat_specific_commands_cli(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {

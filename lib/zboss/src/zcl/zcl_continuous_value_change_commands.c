@@ -81,7 +81,7 @@ void zb_zcl_cvc_correct_value(zb_zcl_cvc_input_variables_t* input_var);
 
 static zb_uint8_t zb_zcl_cvc_calc(
   zb_zcl_cvc_input_variables_t* input_variables,
-  zb_uint8_t buf_id,
+  zb_bufid_t buf_id,
   zb_bool_t is_recalc)
 {
   zb_bufid_t buf = 0;
@@ -377,7 +377,7 @@ static zb_zcl_cvc_alarm_variables_t *zb_zcl_cvc_get_alarm_variables(zb_uint8_t a
   return NULL;
 }
 
-static void zb_zcl_cvc_next_step_alarm(zb_uint8_t alarm_id)
+static void zb_zcl_cvc_next_step_alarm(zb_cb_param_t alarm_id)
 {
   zb_zcl_cvc_variables_t* change_var;
   zb_zcl_cvc_alarm_variables_t* alarm_var;
@@ -675,7 +675,7 @@ zb_uint8_t zb_zcl_cvc_stop_transition(zb_uint8_t alarm_id)
 zb_uint8_t zb_zcl_cvc_start_alarm(zb_uint8_t endpoint_id,
                                   zb_uint16_t cluster_id,
                                   zb_uint16_t attribute_id,
-                                  zb_uint8_t alarm_buf_id)
+                                  zb_bufid_t alarm_buf_id)
 {
   zb_uint8_t alarm_id;
   zb_zcl_cvc_alarm_variables_t* alarm_info;

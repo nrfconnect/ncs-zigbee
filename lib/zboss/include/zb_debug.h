@@ -242,7 +242,7 @@ while (0)
  */
 void dump_traf(const zb_uint8_t *buf, zb_ushort_t len);
 void dump_usb_traf(zb_uint8_t *buf, zb_ushort_t len);
-void zb_debug_trace_buffer(zb_uint8_t buf_id, zb_uint16_t label);
+void zb_debug_trace_buffer(zb_bufid_t buf_id, zb_uint16_t label);
 void zb_debug_trace_nwk_header(const zb_uint8_t *payload_ptr, zb_uint16_t label);
 #else
 #define dump_traf(buf, len) {ZVUNUSED(buf); ZVUNUSED(len);}
@@ -257,17 +257,12 @@ void zb_debug_trace_nwk_header(const zb_uint8_t *payload_ptr, zb_uint16_t label)
 #define DUMP_TRAF(comment, buf, len, total)
 #endif /* ZB_MAC_TESTING_MODE && ZB_TRACE_TRAFFIC */
 
-#ifdef DEBUG
+#if defined(DEBUG_DUMP_HEX_DATA) && defined(ZB_TRACE_LEVEL)
 void dump_hex_data(zb_uint_t trace_mask, zb_uint8_t trace_level, const zb_uint8_t *buf, zb_ushort_t len);
-
-void trace_hex_data_func(const zb_uint8_t *ptr, zb_short_t size, zb_bool_t format);
-#define trace_8hex_per_line(ptr, size) trace_hex_data_func((ptr), (size), ZB_FALSE)
-#define trace_16hex_per_line(ptr, size) trace_hex_data_func((ptr), (size), ZB_TRUE)
 #else
 #define dump_hex_data(trace_mask, trace_level, buf, len)
+#endif  /* DEBUG_DUMP_HEX_DATA && ZB_TRACE_LEVEL */
 
-#define trace_8hex_per_line(ptr, size)
-#define trace_16hex_per_line(ptr, size)
-#endif  /* DEBUG */
+void zb_dump_flush(void);
 
 #endif /* ZB_DEBUG_H */

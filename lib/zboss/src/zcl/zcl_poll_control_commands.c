@@ -77,7 +77,7 @@ zb_discover_cmd_list_t gs_poll_control_server_cmd_list =
 zb_ret_t check_value_poll_control_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 static void zb_zcl_poll_control_write_attr_hook_server(zb_uint8_t endpoint, zb_uint16_t attr_id, zb_uint8_t *new_value, zb_uint16_t manuf_code);
 
-zb_bool_t zb_zcl_process_poll_control_specific_commands_srv(zb_uint8_t param);
+zb_bool_t zb_zcl_process_poll_control_specific_commands_srv(zb_cb_param_t param);
 
 void zb_zcl_poll_control_init_server()
 {
@@ -223,7 +223,7 @@ zb_ret_t check_value_poll_control_server(zb_uint16_t attr_id, zb_uint8_t endpoin
 #endif
 
 
-void zb_zcl_poll_control_check_in_non_response(zb_uint8_t endpoint);
+void zb_zcl_poll_control_check_in_non_response(zb_cb_param_t endpoint);
 
 static void poll_control_check_binding(zb_bufid_t param,
                                        zb_uint8_t src_endpoint,
@@ -240,10 +240,10 @@ void zb_zcl_poll_controll_register_cb(zb_callback_t cb)
 /** @brief Restart check-in cycle with passed interval
  * @param param - buffer to be used, if 0, buffer will be acquired when needed
  * @param new_checkin_interval_qsec - new checkin interval (in quarterseconds) to be applied */
-static void zb_zcl_poll_control_start_internal(zb_uint8_t param, zb_uint32_t new_checkin_interval_qsec)
+static void zb_zcl_poll_control_start_internal(zb_bufid_t param, zb_uint32_t new_checkin_interval_qsec)
 {
-  TRACE_MSG(TRACE_ZCL3, "> zb_zcl_poll_control_start_internal param %hx new_interval %li",
-      (FMT__H_L, param, new_checkin_interval_qsec));
+  TRACE_MSG(TRACE_ZCL3, "> zb_zcl_poll_control_start_internal param %x new_interval %li",
+      (FMT__D_L, param, new_checkin_interval_qsec));
 #ifdef ZB_USE_CHECKIN_WATCHDOG
   {
     zb_uint32_t checkin_wd_interval = ZB_QUARTERECONDS_TO_BEACON_INTERVAL(new_checkin_interval_qsec)*3;
@@ -269,10 +269,10 @@ static void zb_zcl_poll_control_start_internal(zb_uint8_t param, zb_uint32_t new
 /** @brief Start check-ins cycle with interval taken from Poll Control Cluster
  * @param param - buffer to be used for check-in command
  * @param endpoint - endpoint on which check-ins should be started */
-void zb_zcl_poll_control_start(zb_uint8_t param, zb_uint8_t endpoint)
+void zb_zcl_poll_control_start(zb_bufid_t param, zb_uint8_t endpoint)
 {
   zb_zcl_attr_t *attr_desc;
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_poll_control_start param %hx endpoint %hx", (FMT__H_H, param, endpoint));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_poll_control_start param %x endpoint %hx", (FMT__D_H, param, endpoint));
 
   attr_desc = zb_zcl_get_attr_desc_a(endpoint, ZB_ZCL_CLUSTER_ID_POLL_CONTROL,
                                      ZB_ZCL_CLUSTER_SERVER_ROLE,
@@ -285,9 +285,9 @@ void zb_zcl_poll_control_start(zb_uint8_t param, zb_uint8_t endpoint)
 
 
 /** @brief Stop check-ins */
-zb_uint8_t zb_zcl_poll_control_stop(void)
+zb_bufid_t zb_zcl_poll_control_stop(void)
 {
-  zb_uint8_t canceled_param = 0;
+  zb_cb_param_t canceled_param = 0;
   TRACE_MSG(TRACE_ZCL1, "> zb_zcl_poll_control_stop", (FMT__0));
   ZB_SCHEDULE_ALARM_CANCEL_AND_GET_BUF(
       zb_zcl_poll_control_start_check_in, ZB_ALARM_ANY_PARAM, &canceled_param);
@@ -297,7 +297,7 @@ zb_uint8_t zb_zcl_poll_control_stop(void)
 #endif
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_poll_control_stop", (FMT__0));
-  return canceled_param;
+  return ZB_UNPACK_BUF_REF(canceled_param);
 }
 
 /** @brief Hook on Write Check-in Interval attribute
@@ -306,7 +306,7 @@ void write_attr_check_in_interval_hook(zb_uint8_t endpoint, zb_uint8_t *new_valu
 {
   zb_time_t new_interval;
   zb_uint32_t new_val;
-  zb_uint8_t canceled_param = 0;
+  zb_bufid_t canceled_param = 0;
 
   ZVUNUSED(endpoint);
 
@@ -334,7 +334,7 @@ void write_attr_check_in_interval_hook(zb_uint8_t endpoint, zb_uint8_t *new_valu
       TRACE_MSG(TRACE_APP2, "skip rescheduling check-in", (FMT__0));
       if (canceled_param)
       {
-        TRACE_MSG(TRACE_APP2, "free canceled buffer %hd", (FMT__H, canceled_param));
+        TRACE_MSG(TRACE_APP2, "free canceled buffer %d", (FMT__D, canceled_param));
         zb_buf_free(canceled_param);
       }
     }
@@ -398,7 +398,7 @@ static void check_in_res_handler_unpack_params(zb_bufid_t param,
 }
 
 
-static void check_in_res_handler_check_binding_response_cb(zb_bufid_t param)
+static void check_in_res_handler_check_binding_response_cb(zb_cb_param_t param)
 {
   zb_zcl_poll_control_check_in_res_t payload;
   zb_zcl_parsed_hdr_t cmd_info = { 0 };
@@ -410,6 +410,8 @@ static void check_in_res_handler_check_binding_response_cb(zb_bufid_t param)
             (FMT__D, param));
 
   check_binding_resp = ZB_BUF_GET_PARAM(param, zb_aps_check_binding_resp_t);
+
+  check_in_res_handler_unpack_params(param, &payload, &cmd_info);
 
   /*
     ZCL8: If the Poll Control Server receives a Check-In Response from a client
@@ -424,7 +426,6 @@ static void check_in_res_handler_check_binding_response_cb(zb_bufid_t param)
 
   if (status == ZB_ZCL_STATUS_SUCCESS)
   {
-    check_in_res_handler_unpack_params(param, &payload, &cmd_info);
     endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint;
   }
 
@@ -477,9 +478,11 @@ static void check_in_res_handler_check_binding_response_cb(zb_bufid_t param)
     }
 #endif /* ZB_ED_FUNC */
 
-#ifdef ZB_ZCL_ENABLE_WWAH_SERVER
-    zb_zcl_wwah_bad_parent_recovery_signal(ZB_ZCL_WWAH_BAD_PARENT_RECOVERY_POLL_CONTROL_CHECK_IN_OK);
-#endif
+    /* Notify BDB/WWAH about failed checkin */
+    if (ZCL_SELECTOR().poll_control_checkin_notifier != NULL)
+    {
+      ZCL_SELECTOR().poll_control_checkin_notifier(status);
+    }
   }
 
   poll_control_send_default_response(param, &cmd_info, status);
@@ -489,7 +492,7 @@ static void check_in_res_handler_check_binding_response_cb(zb_bufid_t param)
 
 
 /** @brief Check-in response command */
-static zb_ret_t check_in_res_handler(zb_uint8_t param)
+static zb_ret_t check_in_res_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_poll_control_check_in_res_t payload;
@@ -498,7 +501,7 @@ static zb_ret_t check_in_res_handler(zb_uint8_t param)
   zb_uint8_t endpoint;
   /* zb_zcl_poll_control_server_status_t *server_data; */
 
-  TRACE_MSG(TRACE_ZCL1, "> check_in_res_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> check_in_res_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -533,7 +536,7 @@ static zb_ret_t check_in_res_handler(zb_uint8_t param)
 }
 
 #ifdef ZB_ED_FUNC
-static void fast_poll_stop_handler_send_default_response(zb_uint8_t param)
+static void fast_poll_stop_handler_send_default_response(zb_cb_param_t param)
 {
   /* ZCL8: Table 2-12. Enumerated Command Status Values:
    * ACTION_DENIED is DEPRECATED: use FAILURE
@@ -554,7 +557,7 @@ static void fast_poll_stop_handler_send_default_response(zb_uint8_t param)
 #endif /* ZB_ED_FUNC */
 
 
-static void fast_poll_stop_handler_check_binding_response_cb(zb_bufid_t param)
+static void fast_poll_stop_handler_check_binding_response_cb(zb_cb_param_t param)
 {
   zb_aps_check_binding_resp_t *check_binding_resp = NULL;
 
@@ -598,12 +601,12 @@ static void fast_poll_stop_handler_check_binding_response_cb(zb_bufid_t param)
 
 
 /** @brief fast_poll_stop command */
-static zb_ret_t fast_poll_stop_handler(zb_uint8_t param)
+static zb_ret_t fast_poll_stop_handler(zb_bufid_t param)
 {
   zb_zcl_parsed_hdr_t *cmd_info = NULL;
   zb_uint8_t endpoint;
 
-  TRACE_MSG(TRACE_ZCL1, "> fast_poll_stop_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> fast_poll_stop_handler %x", (FMT__D, param));
 
   /* copy cmd_info so we can use it to send a response later */
   cmd_info = zb_buf_initial_alloc(param, sizeof(zb_zcl_parsed_hdr_t));
@@ -622,7 +625,7 @@ static zb_ret_t fast_poll_stop_handler(zb_uint8_t param)
 }
 
 /** @brief Set Long Poll Interval command */
-static zb_ret_t set_long_poll_interval_handler(zb_uint8_t param)
+static zb_ret_t set_long_poll_interval_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_poll_control_set_long_poll_interval_t payload;
@@ -630,7 +633,7 @@ static zb_ret_t set_long_poll_interval_handler(zb_uint8_t param)
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uint8_t endpoint;
 
-  TRACE_MSG(TRACE_ZCL1, "> set_long_poll_interval_handler param %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> set_long_poll_interval_handler param %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
   endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint;
@@ -643,14 +646,11 @@ static zb_ret_t set_long_poll_interval_handler(zb_uint8_t param)
         (FMT__0));
     ret = RET_INVALID_PARAMETER_1;
   }
-  else if( /*!*/zb_zcl_check_attr_value(ZB_ZCL_CLUSTER_ID_POLL_CONTROL, ZB_ZCL_CLUSTER_SERVER_ROLE, endpoint,
-      ZB_ZCL_ATTR_POLL_CONTROL_LONG_POLL_INTERVAL_ID, (zb_uint8_t*)(&payload.interval)) == RET_ERROR)
+  else if(zb_zcl_check_attr_value(ZB_ZCL_CLUSTER_ID_POLL_CONTROL, ZB_ZCL_CLUSTER_SERVER_ROLE, endpoint,
+            ZB_ZCL_ATTR_POLL_CONTROL_LONG_POLL_INTERVAL_ID, (zb_uint8_t*)(&payload.interval)) == RET_ERROR)
   {
-    /* TODO: DO NOT send Default response here - do it in the
-     * zb_zcl_process_poll_control_specific_commands() */
-    ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, ZB_ZCL_STATUS_INVALID_VALUE);
-    ret = RET_BUSY;   // not need send answer yet
-    TRACE_MSG(TRACE_ZCL1, "set RET_BUSY", (FMT__0));
+    TRACE_MSG(TRACE_ZCL1, "Error value", (FMT__0));
+    ret = RET_INVALID_PARAMETER;
   }
   else
   {
@@ -671,7 +671,7 @@ static zb_ret_t set_long_poll_interval_handler(zb_uint8_t param)
 }
 
 /** @brief Set Short Poll Interval command */
-static zb_ret_t set_short_poll_interval_handler(zb_uint8_t param)
+static zb_ret_t set_short_poll_interval_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_poll_control_set_short_poll_interval_t payload;
@@ -679,7 +679,7 @@ static zb_ret_t set_short_poll_interval_handler(zb_uint8_t param)
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uint8_t endpoint;
 
-  TRACE_MSG(TRACE_ZCL1, "> set_short_poll_interval_handler param %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> set_short_poll_interval_handler param %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
   endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint;
@@ -692,11 +692,11 @@ static zb_ret_t set_short_poll_interval_handler(zb_uint8_t param)
         (FMT__0));
     ret = RET_INVALID_PARAMETER_1;
   }
-  else if( /*!*/zb_zcl_check_attr_value(ZB_ZCL_CLUSTER_ID_POLL_CONTROL, ZB_ZCL_CLUSTER_SERVER_ROLE, endpoint,
-      ZB_ZCL_ATTR_POLL_CONTROL_SHORT_POLL_INTERVAL_ID, (zb_uint8_t*)(&payload.interval)) == RET_ERROR)
+  else if(zb_zcl_check_attr_value(ZB_ZCL_CLUSTER_ID_POLL_CONTROL, ZB_ZCL_CLUSTER_SERVER_ROLE, endpoint,
+            ZB_ZCL_ATTR_POLL_CONTROL_SHORT_POLL_INTERVAL_ID, (zb_uint8_t*)(&payload.interval)) == RET_ERROR)
   {
-    ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, ZB_ZCL_STATUS_INVALID_VALUE);
-    ret = RET_BUSY;   // not need send answer yet
+    TRACE_MSG(TRACE_ZCL1, "Error value", (FMT__0));
+    ret = RET_INVALID_PARAMETER;
   }
   else
   {
@@ -717,7 +717,7 @@ static zb_ret_t set_short_poll_interval_handler(zb_uint8_t param)
 }
 
 /* specific commands handling - server side */
-zb_bool_t zb_zcl_process_poll_control_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_poll_control_specific_commands_srv(zb_cb_param_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -733,8 +733,8 @@ zb_bool_t zb_zcl_process_poll_control_specific_commands_srv(zb_uint8_t param)
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG( TRACE_ZCL1,
-             "> zb_zcl_process_poll_control_specific_commands_srv: param %hd, cmd %hd",
-             (FMT__H_H, param, cmd_info.cmd_id));
+             "> zb_zcl_process_poll_control_specific_commands_srv: param %d, cmd %hd",
+             (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_POLL_CONTROL == cmd_info.cluster_id);
   ZB_ASSERT(ZB_ZCL_FRAME_DIRECTION_TO_SRV == cmd_info.cmd_direction);
@@ -782,6 +782,10 @@ zb_bool_t zb_zcl_process_poll_control_specific_commands_srv(zb_uint8_t param)
         resp_code = ZB_ZCL_STATUS_TIMEOUT;
         break;
 
+      case RET_INVALID_PARAMETER:
+        resp_code = ZB_ZCL_STATUS_INVALID_VALUE;
+        break;
+
       default:
         resp_code = ZB_ZCL_STATUS_INVALID_FIELD;
         break;
@@ -799,23 +803,28 @@ zb_bool_t zb_zcl_process_poll_control_specific_commands_srv(zb_uint8_t param)
 
 /** @brief Run Check-in command if Check in Response not receive
  * */
-void zb_zcl_poll_control_check_in_non_response(zb_uint8_t endpoint)
+void zb_zcl_poll_control_check_in_non_response(zb_cb_param_t endpoint)
 {
   ZVUNUSED(endpoint);
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_poll_control_check_in_non_response endpoint %hd", (FMT__H, endpoint));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_poll_control_check_in_non_response endpoint %d", (FMT__D, endpoint));
 
   /* MA: return to Long Poll */
   zb_zdo_pim_stop_fast_poll(0);
 
 #ifdef ZB_ZCL_ENABLE_WWAH_SERVER
-  zb_zcl_wwah_bad_parent_recovery_signal(ZB_ZCL_WWAH_BAD_PARENT_RECOVERY_POLL_CONTROL_CHECK_IN_FAILED);
 #endif
+
+  /* Notify BDB/WWAH about failed checkin */
+  if (ZCL_SELECTOR().poll_control_checkin_notifier != NULL)
+  {
+    ZCL_SELECTOR().poll_control_checkin_notifier(ZB_ZCL_STATUS_TIMEOUT);
+  }
 
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_poll_control_check_in_non_response", (FMT__0));
 }
 
 
-void zcl_poll_control_check_in_send_cb(zb_uint8_t param)
+void zcl_poll_control_check_in_send_cb(zb_cb_param_t param)
 {
   zb_uint8_t endpoint;
   zb_zcl_attr_t *attr_desc;
@@ -869,7 +878,7 @@ void zcl_poll_control_check_in_send_cb(zb_uint8_t param)
 }
 
 
-static void check_in_handle_check_binding_confirm(zb_bufid_t param)
+static void check_in_handle_check_binding_confirm(zb_cb_param_t param)
 {
   zb_aps_check_binding_resp_t *check_binding_resp = NULL;
   zb_uint8_t endpoint;
@@ -994,7 +1003,7 @@ static void poll_control_check_binding(zb_bufid_t param,
  * Send Check-in command
  * Schedule default next Check-in (7.68 sec)
  * */
-void zb_zcl_poll_control_start_check_in(zb_uint8_t param)
+void zb_zcl_poll_control_start_check_in(zb_cb_param_t param)
 {
   zb_zcl_attr_t *attr_desc;
   zb_uint8_t endpoint;
@@ -1005,7 +1014,7 @@ void zb_zcl_poll_control_start_check_in(zb_uint8_t param)
 #endif
   zb_bool_t skip_check_in = ZB_FALSE;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_poll_control_start_check_in, param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_poll_control_start_check_in, param %d", (FMT__D, param));
 
   /* FIXME: potential problem in the case of multi EP device */
   endpoint = get_endpoint_by_cluster(ZB_ZCL_CLUSTER_ID_POLL_CONTROL, ZB_ZCL_CLUSTER_SERVER_ROLE);
@@ -1111,7 +1120,7 @@ void zb_zcl_poll_control_start_check_in(zb_uint8_t param)
 /** @brief Save NVRAM by write attribute
  */
 #ifdef ZB_USE_NVRAM
-void zb_zcl_poll_control_save_nvram(zb_uint8_t param)
+void zb_zcl_poll_control_save_nvram(zb_cb_param_t param)
 {
   ZVUNUSED(param);
   TRACE_MSG(TRACE_ZCL1, "> zb_zcl_poll_control_save_nvram", (FMT__0));

@@ -48,12 +48,6 @@
 
 /** @cond DOXYGEN_ZCL_SECTION */
 
-#ifdef DEBUG
-/* If defined, samples included to zcl source files will be compiled - need for development only */
-#define ZB_COMPILE_ZCL_SAMPLE
-#endif
-
-
 /** @addtogroup ZB_ZCL_COMMON
  *  @{
  */
@@ -122,7 +116,7 @@ typedef void (*zb_zcl_cluster_init_t)(void);
     @return ZB_TRUE if command was handled (no additional actions are needed),
             ZB_FALSE otherwise
 */
-typedef zb_bool_t (*zb_zcl_cluster_handler_t)(zb_uint8_t param);
+typedef zb_bool_t (*zb_zcl_cluster_handler_t)(zb_cb_param_t param);
 /** @brief ZCL Cluster Check Value Handler. This handler is called before attribute change (for
     corresponding cluster) and checks if new value is in correct range and can be applied.
     @param attr_id - ZCL Attribute ID
@@ -880,19 +874,19 @@ zb_zcl_attr_t;
 /*! Mark attribute ID to distinguish if it is common/manufacturer
     specific/internal attribute:
     - set bit 15 (the highest) for internal attributes
-    - set bit 14 for manufacturer specific attributes
+    - set bit 14 for custom attributes
 */
-/*! @internal @brief Mark attribute Id as custom/manufacture specific attribute */
+/*! @internal @brief Mark attribute Id as internal attribute */
 #define ZB_ZCL_ATTR_INTERNAL_ID(_attr_id) ((_attr_id) | (1U << 15))
 
-/*! @internal @brief Check if attribute Id is custom/manufacture specific */
+/*! @internal @brief Check if attribute Id is internal */
 #define ZB_ZCL_ATTR_CHECK_INTERNAL_ID(_attr_id) ((_attr_id) & (1U << 15))
 
 
-/*! @internal @brief Mark attribute Id as custom/manufacture specific attribute */
+/*! @internal @brief Mark attribute Id as custom attribute */
 #define ZB_ZCL_ATTR_CUSTOM_ID(_attr_id) ((_attr_id) | (1U << 14))
 
-/*! @internal @brief Check if attribute Id is custom/manufacture specific */
+/*! @internal @brief Check if attribute Id is custom */
 #define ZB_ZCL_ATTR_CHECK_CUSTOM_ID(_attr_id) ((_attr_id) & (1U << 14))
 
 
@@ -1669,6 +1663,44 @@ do                                         \
    (PUT_DATA48(ptr, val))
 
 /**
+ *  @brief Put 40-bit value to packet.
+ *  @param ptr - pointer to the place to put value to
+ *  @param val - value to put into packet
+ *  @hideinitializer
+ */
+#define ZB_ZCL_PACKET_PUT_DATA40_VAL(ptr, val) \
+    (PUT_DATA40_VAL(ptr, val))
+
+/**
+ *  @brief Put 40-bit value to packet.
+ *  @param ptr - pointer to the place to put value to
+ *  @param val - pointer to the value to put into packet
+ *  @hideinitializer
+ */
+#define ZB_ZCL_PACKET_PUT_DATA40(ptr, val)       \
+    (PUT_DATA40(ptr, val))
+
+
+/**
+ *  @brief Put 56-bit value to packet.
+ *  @param ptr - pointer to the place to put value to
+ *  @param val - value to put into packet
+ *  @hideinitializer
+ */
+#define ZB_ZCL_PACKET_PUT_DATA56_VAL(ptr, val) \
+    (PUT_DATA56_VAL(ptr, val))
+
+/**
+ *  @brief Put 56-bit value to packet.
+ *  @param ptr - pointer to the place to put value to
+ *  @param val - pointer to the value to put into packet
+ *  @hideinitializer
+ */
+#define ZB_ZCL_PACKET_PUT_DATA56(ptr, val)       \
+    (PUT_DATA56(ptr, val))
+
+
+/**
  *  @brief Put 24-bit value to packet.
  *  @param ptr - pointer to the place to put value to
  *  @param val - value to put into packet
@@ -1998,7 +2030,7 @@ void zb_zcl_fix_endian(zb_uint8_t *data_ptr, zb_uint8_t data_type);
 typedef struct zcl_cb_hash_ent_s
 {
   zb_callback_t func; /*!< callback pointer */
-  zb_uint8_t    buf;  /*!< buffer index */
+  zb_cb_param_t buf;  /*!< buffer index */
 }
 zcl_cb_hash_ent_t;
 
@@ -2140,9 +2172,6 @@ zb_bool_t zb_zcl_is_analog_data_type(zb_uint8_t attr_type);
 
 /**
  * @brief Check if attribute value is valid or not
- *
- * @deprecated This function will be removed in the next Major release after February 2023
- *             Use @ref zb_zcl_check_attr_value_manuf instead
  *
  * @param cluster_id - cluster ID
  * @param cluster_role - cluster role (@ref zcl_cluster_role)
@@ -2339,7 +2368,7 @@ zb_zcl_status_t zb_zcl_set_attr_val(zb_uint8_t ep, zb_uint16_t cluster_id, zb_ui
  * @param param - pointer to buffer with ZCL command
  * @param cb - pointer to callback function
  */
-zb_ret_t zb_zcl_register_cb(zb_uint8_t param, zb_callback_t cb);
+zb_ret_t zb_zcl_register_cb(zb_cb_param_t param, zb_callback_t cb);
 
 /**
  * @brief Call callback on receiving APS acknowledge for ZCL command
@@ -2349,7 +2378,7 @@ zb_ret_t zb_zcl_register_cb(zb_uint8_t param, zb_callback_t cb);
  * @return RET_OK if callback was found and called
  *         RET_NOT_FOUND if no callback was registered
  */
-zb_ret_t zb_zcl_ack_callback(zb_uint8_t param);
+zb_ret_t zb_zcl_ack_callback(zb_cb_param_t param);
 
 /**
  * Check whether ZCL command should be handled by stack
@@ -2361,13 +2390,14 @@ zb_ret_t zb_zcl_ack_callback(zb_uint8_t param);
  *         ZB_ZCL_STATUS_UNSUP_CLUST_CMD if general command is not supported
  *         ZB_ZCL_STATUS_UNSUP_CLUST if cluster with role specified in ZCL header is not supported
  */
-zb_uint8_t zb_zcl_check_accept_command(zb_uint8_t param);
+zb_uint8_t zb_zcl_check_accept_command(zb_bufid_t param);
 
 /** @cond DOXYGEN_INTERNAL_DOC */
 /*! Get endpoint ID that is under initialization at the moment
     @return endpoint ID
  */
 zb_uint8_t zb_get_current_endpoint_id(void);
+/** @endcond DOXYGEN_INTERNAL_DOC */
 
 /** @brief Common continue command
 
@@ -2551,7 +2581,7 @@ void zb_zcl_schedule_status_abort(zb_bufid_t  buffer, zb_addr_u *addr,
                                   zb_uint8_t dst_addr_mode, zb_uint8_t dst_ep,
                                   zb_uint8_t ep, zb_callback_t cb);
 
-zb_bool_t zb_zcl_handle_specific_commands(zb_uint8_t param);
+zb_bool_t zb_zcl_handle_specific_commands(zb_bufid_t param);
 zb_bool_t cluster_needs_aps_encryption(zb_uint8_t endpoint_id, zb_uint16_t cluster_id);
 
 zb_zcl_status_t zb_zcl_set_attr_val_manuf_internal(zb_uint8_t ep,

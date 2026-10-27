@@ -88,8 +88,8 @@ zb_discover_cmd_list_t gs_direct_configuration_client_cmd_list =
 
 zb_ret_t check_value_direct_configuration_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 void zb_zcl_direct_configuration_write_attr_hook_server(zb_uint8_t endpoint, zb_uint16_t attr_id, zb_uint8_t *new_value, zb_uint16_t manuf_code);
-zb_bool_t zb_zcl_process_direct_configuration_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_direct_configuration_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_direct_configuration_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_direct_configuration_specific_commands_cli(zb_cb_param_t param);
 
 
 void zb_zcl_direct_configuration_init_server()
@@ -142,7 +142,7 @@ zb_ret_t check_value_direct_configuration_server(zb_uint16_t attr_id, zb_uint8_t
 }
 
 
-static zb_ret_t zbd_configure_interface_req_handler(zb_uint8_t param, zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zbd_configure_interface_req_handler(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_direct_configuration_configure_interface_req_t zbd_req;
@@ -276,7 +276,7 @@ static zb_ret_t zbd_configure_interface_req_handler(zb_uint8_t param, zb_zcl_par
 }
 
 
-static zb_ret_t zbd_configure_interface_resp_handler(zb_uint8_t param, zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zbd_configure_interface_resp_handler(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_direct_configuration_configure_interface_resp_t zbd_resp;
@@ -303,7 +303,7 @@ static zb_ret_t zbd_configure_interface_resp_handler(zb_uint8_t param, zb_zcl_pa
   return ret;
 }
 
-static zb_ret_t zbd_configure_anonymous_join_timeout_req_handler(zb_uint8_t param, zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zbd_configure_anonymous_join_timeout_req_handler(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_direct_configuration_configure_anonymous_join_timeout_req_t zbd_req;
@@ -407,7 +407,7 @@ static zb_ret_t zbd_configure_anonymous_join_timeout_req_handler(zb_uint8_t para
   return ret;
 }
 
-zb_bool_t zb_zcl_process_direct_configuration_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_direct_configuration_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -416,7 +416,7 @@ zb_bool_t zb_zcl_process_direct_configuration_specific_commands(zb_uint8_t param
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_direct_configuration_specific_commands: param %d, cmd %d",
-    (FMT__H_H, param, cmd_info.cmd_id));
+    (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(cmd_info.cluster_id == ZB_ZCL_CLUSTER_ID_DIRECT_CONFIGURATION);
 
@@ -499,7 +499,7 @@ zb_bool_t zb_zcl_process_direct_configuration_specific_commands(zb_uint8_t param
 }
 
 
-zb_bool_t zb_zcl_process_direct_configuration_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_direct_configuration_specific_commands_srv(zb_cb_param_t param)
 {
   if (ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param)
   {
@@ -511,7 +511,7 @@ zb_bool_t zb_zcl_process_direct_configuration_specific_commands_srv(zb_uint8_t p
   return zb_zcl_process_direct_configuration_specific_commands(param);
 }
 
-zb_bool_t zb_zcl_process_direct_configuration_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_direct_configuration_specific_commands_cli(zb_cb_param_t param)
 {
   if (ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param)
   {
@@ -555,7 +555,7 @@ void zb_zcl_direct_configuration_write_attr_hook_server(zb_uint8_t endpoint, zb_
  *
  * @param param unused
  */
-static void zb_zcl_direct_configuration_anonymous_join_disable(zb_uint8_t param)
+static void zb_zcl_direct_configuration_anonymous_join_disable(zb_cb_param_t param)
 {
   ZVUNUSED(param);
   TRACE_MSG(TRACE_ZBDIRECT1, "zb_zcl_direct_configuration_anonymous_join_disable()", (FMT__0));

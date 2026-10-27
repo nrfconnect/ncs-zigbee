@@ -52,10 +52,12 @@
 
 #if defined (ZB_ENABLE_ZCL) || defined (ZB_ENABLE_ZGPD_ATTR_REPORTING)
 
-static void broadcast_endpoint_delivery_step(zb_uint8_t param, zb_uint16_t bc_buf_ref);
+static void broadcast_endpoint_delivery_step(zb_cb_param_t cb_param);
 
-static void zb_zcl_init_periodic_activities(zb_uint8_t param)
+static void zb_zcl_init_periodic_activities(zb_cb_param_t param)
 {
+  TRACE_MSG(TRACE_ERROR, "zb_zcl_init_periodic_activities param [%d]", (FMT__D, param));
+  TRACE_MSG(TRACE_ERROR, "zb_zcl_init_periodic_activities param [%d]", (FMT__D, param));
   if (param == 0U)
   {
     zb_ret_t ret = zb_buf_get_out_delayed(zb_zcl_init_periodic_activities);
@@ -205,7 +207,7 @@ zb_bool_t zb_zcl_check_cluster_list(void)
         for (cl_2 = 0U; cl_2 < ZCL_CTX().device_ctx->ep_desc_list[ep_2]->cluster_count; cl_2++)
         {
           TRACE_MSG(TRACE_ZCL3, "ep_1=%02d, cl_1=%02d, ep_2=%02d, cl_2=%02d", (FMT__D_D_D_D, ep_1, cl_1, ep_2, cl_2));
-          
+
           p_cluster1 = ZCL_CTX().device_ctx->ep_desc_list[ep_1]->cluster_desc_list + cl_1;
           p_cluster2 = ZCL_CTX().device_ctx->ep_desc_list[ep_2]->cluster_desc_list + cl_2;
 
@@ -238,7 +240,7 @@ zb_bool_t zb_zcl_check_cluster_list(void)
       }
     }
   }
-  
+
 #ifdef ZB_STACK_REGRESSION_TESTING_API
   if (ZB_REGRESSION_TESTS_API().check_cluster_list_always_success)
   {
@@ -421,6 +423,9 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
     case ZB_ZCL_ATTR_TYPE_S16:
     case ZB_ZCL_ATTR_TYPE_16BITMAP:
     case ZB_ZCL_ATTR_TYPE_16BIT_ENUM:
+    case ZB_ZCL_ATTR_TYPE_SEMI:
+    case ZB_ZCL_ATTR_TYPE_CLUSTER_ID:
+    case ZB_ZCL_ATTR_TYPE_ATTRIBUTE_ID:
        ZB_ZCL_PACKET_PUT_DATA16(cmd_ptr, attr_value);
       break;
 
@@ -429,13 +434,17 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
     case ZB_ZCL_ATTR_TYPE_S32:
     case ZB_ZCL_ATTR_TYPE_32BITMAP:
     case ZB_ZCL_ATTR_TYPE_UTC_TIME:
+    case ZB_ZCL_ATTR_TYPE_TIME_OF_DAY:
+    case ZB_ZCL_ATTR_TYPE_DATE:
+    case ZB_ZCL_ATTR_TYPE_BACNET_OID:
     case ZB_ZCL_ATTR_TYPE_SINGLE:
       ZB_ZCL_PACKET_PUT_DATA32(cmd_ptr, attr_value);
       break;
 
     case ZB_ZCL_ATTR_TYPE_U48:
     case ZB_ZCL_ATTR_TYPE_S48:
-//TODO: fix it, put data taking into account bytes order
+    case ZB_ZCL_ATTR_TYPE_48BIT:
+    case ZB_ZCL_ATTR_TYPE_48BITMAP:
       ZB_ZCL_PACKET_PUT_DATA48(cmd_ptr, attr_value);
       break;
 
@@ -443,8 +452,22 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
     case ZB_ZCL_ATTR_TYPE_U24:
     case ZB_ZCL_ATTR_TYPE_24BIT:
     case ZB_ZCL_ATTR_TYPE_24BITMAP:
-//TODO: fix it, put data taking into account bytes order
       ZB_ZCL_PACKET_PUT_DATA24(cmd_ptr, attr_value);
+      break;
+
+    case ZB_ZCL_ATTR_TYPE_U40:
+    case ZB_ZCL_ATTR_TYPE_S40:
+    case ZB_ZCL_ATTR_TYPE_40BIT:
+    case ZB_ZCL_ATTR_TYPE_40BITMAP:
+      ZB_ZCL_PACKET_PUT_DATA40(cmd_ptr, attr_value);
+      break;
+
+    case ZB_ZCL_ATTR_TYPE_U56:
+    case ZB_ZCL_ATTR_TYPE_S56:
+    case ZB_ZCL_ATTR_TYPE_56BIT:
+    case ZB_ZCL_ATTR_TYPE_56BITMAP:
+      ZB_ZCL_PACKET_PUT_DATA56(cmd_ptr, attr_value);
+      ZB_ZCL_PACKET_PUT_DATA_N(cmd_ptr, attr_value, 7);
       break;
 
     case ZB_ZCL_ATTR_TYPE_OCTET_STRING:
@@ -509,6 +532,7 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
     case ZB_ZCL_ATTR_TYPE_64BITMAP:
     case ZB_ZCL_ATTR_TYPE_U64:
     case ZB_ZCL_ATTR_TYPE_S64:
+    case ZB_ZCL_ATTR_TYPE_DOUBLE:
     case ZB_ZCL_ATTR_TYPE_IEEE_ADDR:
       ZB_ZCL_PACKET_PUT_DATA64(cmd_ptr, attr_value);
       break;
@@ -519,6 +543,7 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
 
     default:
       TRACE_MSG(TRACE_ZCL1, "Error, unsupported type!", (FMT__0));
+      //ZB_ASSERT(0);
       break;
   }
 
@@ -538,6 +563,7 @@ zb_uint8_t zb_zcl_get_analog_attribute_size(zb_uint8_t attr_type)
   switch (attr_type)
   {
     case ZB_ZCL_ATTR_TYPE_U8:
+    case ZB_ZCL_ATTR_TYPE_S8:
       ret = sizeof(zb_uint8_t);
       break;
 
@@ -553,6 +579,7 @@ zb_uint8_t zb_zcl_get_analog_attribute_size(zb_uint8_t attr_type)
 
     case ZB_ZCL_ATTR_TYPE_U32:
     case ZB_ZCL_ATTR_TYPE_S32:
+    case ZB_ZCL_ATTR_TYPE_UTC_TIME:
       ret = sizeof(zb_uint32_t);
       break;
 
@@ -697,14 +724,14 @@ zb_uint8_t zb_zcl_get_tsn_from_packet(zb_bufid_t buffer)
    @param param - index to buffer with ZCL command
    @param cb - pointer to callback function
 */
-zb_ret_t zb_zcl_register_cb(zb_uint8_t param, zb_callback_t cb)
+zb_ret_t zb_zcl_register_cb(zb_cb_param_t param, zb_callback_t cb)
 {
   zb_ret_t           ret;
   zb_uint32_t        hash;
   zb_uint32_t        i;
   zcl_cb_hash_ent_t *ent;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_register_cb param %hd, cb %p", (FMT__H_P, param, cb));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_register_cb param %d, cb %p", (FMT__D_P, param, cb));
 
   ZB_ASSERT(param);
 
@@ -743,14 +770,14 @@ zb_ret_t zb_zcl_register_cb(zb_uint8_t param, zb_callback_t cb)
 /**
    Call callback on receiving APS acknowledge for ZCL command
  */
-zb_ret_t zb_zcl_ack_callback(zb_uint8_t param)
+zb_ret_t zb_zcl_ack_callback(zb_cb_param_t param)
 {
   zb_uint32_t        hash;
   zb_uint32_t        i;
   zcl_cb_hash_ent_t *ent;
   zb_ret_t           ret = RET_NOT_FOUND;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_ack_callback %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_ack_callback %d", (FMT__D, param));
 
   hash = ZB_ZCL_TRAN_TABLE_HASH_PARAM(param);
   i = hash;
@@ -900,7 +927,6 @@ zb_uint8_t zb_zcl_check_attribute_writable(
     }
     /* NOTE: Need to check for authorized write access, but no description for it in spec */
     if (ZB_ZCL_STATUS_SUCCESS == status)
-        //&& zb_zcl_check_attr_value(cluster_id, cluster_role, endpoint, attr_desc->id, new_value) == RET_ERROR /-- ZB_FALSE) --/
     {
       zb_ret_t ret = zb_zcl_check_attr_value_manuf(cluster_id, cluster_role, endpoint, attr_desc->id, attr_desc->manuf_code, new_value);
       if (ret == RET_ERROR)
@@ -943,6 +969,7 @@ zb_uint8_t zb_zcl_check_attribute_writable(
 */
 static void zb_zcl_conform_singleton(zb_uint8_t ep_first, zb_uint16_t cluster_id, zb_uint8_t cluster_role, zb_uint16_t attr_id, zb_uint8_t *value, zb_uint16_t manuf_code)
 {
+  zb_af_endpoint_desc_t *endp_desc;
   zb_uindex_t i;
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_conform_singleton ep %hd, cluster %d, attr 0x%x, manuf_code 0x%x",
             (FMT__H_D_D_D, ep_first, cluster_id, attr_id, manuf_code));
@@ -955,12 +982,13 @@ static void zb_zcl_conform_singleton(zb_uint8_t ep_first, zb_uint16_t cluster_id
   ZCL_DEVICE_CONTEXT_ITERATOR(i);
   while (device_ctx != NULL && i < device_ctx->ep_count)
   {
-    TRACE_MSG(TRACE_ZCL3, "ep_id %hd", (FMT__H, device_ctx->ep_desc_list[i]->ep_id));
-    if (device_ctx->ep_desc_list[i]->ep_id != ep_first)
+    endp_desc = device_ctx->ep_desc_list[i++];
+    TRACE_MSG(TRACE_ZCL3, "ep_id %hd", (FMT__H, endp_desc->ep_id));
+    if (endp_desc->ep_id != ep_first)
     {
       zb_zcl_attr_t *attr_desc;
       zb_zcl_cluster_desc_t *cluster_desc = get_cluster_desc(
-        device_ctx->ep_desc_list[i], cluster_id, cluster_role);
+        endp_desc, cluster_id, cluster_role);
 
       if (cluster_desc == NULL)
       {
@@ -973,7 +1001,7 @@ static void zb_zcl_conform_singleton(zb_uint8_t ep_first, zb_uint16_t cluster_id
         continue;
       }
 
-      zb_zcl_write_attr_hook(device_ctx->ep_desc_list[i]->ep_id,
+      zb_zcl_write_attr_hook(endp_desc->ep_id,
                              cluster_id, cluster_role, attr_id, value, manuf_code);
 
       ZB_MEMCPY(attr_desc->data_p, value,
@@ -983,12 +1011,11 @@ static void zb_zcl_conform_singleton(zb_uint8_t ep_first, zb_uint16_t cluster_id
       /* check, if reporting is needed for an attribute */
       if (ZB_ZCL_IS_ATTR_REPORTABLE(attr_desc))
       {
-        zb_zcl_mark_attr_for_reporting_manuf(device_ctx->ep_desc_list[i]->ep_id,
+        zb_zcl_mark_attr_for_reporting_manuf(endp_desc->ep_id,
                                              cluster_id, cluster_role, attr_id, manuf_code);
       }
 #endif
     }
-    i++;
   }
   ZCL_DEVICE_CONTEXT_ITERATOR_END;
 
@@ -1343,28 +1370,37 @@ zb_bool_t cluster_needs_aps_encryption(zb_uint8_t endpoint_id, zb_uint16_t clust
   }
   else
 #endif
-      if (profile_id == ZB_AF_HA_PROFILE_ID
-          && (cluster_id == ZB_ZCL_CLUSTER_ID_WWAH || (
-#ifdef ZB_STACK_REGRESSION_TESTING_API
-          !ZB_REGRESSION_TESTS_API().disable_auto_security_for_zbd_conf_cluster &&
-#endif
-            cluster_id == ZB_ZCL_CLUSTER_ID_DIRECT_CONFIGURATION) ))
+  if (profile_id == ZB_AF_HA_PROFILE_ID)
   {
-    if (cluster_id == ZB_ZCL_CLUSTER_ID_WWAH)
+    switch (cluster_id)
     {
-      /* WWAH cluster is always encrypted */
-      res = ZB_TRUE;
-    }
-    else
-    {
-      ZB_ASSERT(cluster_id == ZB_ZCL_CLUSTER_ID_DIRECT_CONFIGURATION);
+      case ZB_ZCL_CLUSTER_ID_WWAH:
+      /* According to ZCL8 spec (3.18.4),
+        read attributes command for keep-alive cluster shall be encrypted. */
+      case ZB_ZCL_CLUSTER_ID_KEEP_ALIVE:
+        res = ZB_TRUE;
+        break;
+
+      /* Needed for BDB3.1: poll control should be encrypted if sent to TC. */
+      case ZB_ZCL_CLUSTER_ID_POLL_CONTROL:
+        res = !ZB_R22_GU_BEHAVIOR_ENABLED();
+        break;
 
       /* Zigbee Direct specification (12.3.5.1.): In a centralized security network,
        * all interactions with the Zigbee Direct Configuration cluster,
        * including read and discovery commands, SHALL require APS encryption with the Trust Center
        * link-key. In a distributed security network, any device on the network is authorized to interact
        * with this cluster without APS security. */
-      res = !zb_is_network_distributed();
+      case ZB_ZCL_CLUSTER_ID_DIRECT_CONFIGURATION:
+#ifdef ZB_STACK_REGRESSION_TESTING_API
+        if (!ZB_REGRESSION_TESTS_API().disable_auto_security_for_zbd_conf_cluster)
+#endif /* ZB_STACK_REGRESSION_TESTING_API */
+        {
+          res = !zb_is_network_distributed();
+        }
+
+      default:
+        break;
     }
   }
 #ifdef ZB_APS_ENCRYPTION_PER_CLUSTER
@@ -1385,15 +1421,16 @@ zb_bool_t cluster_needs_aps_encryption(zb_uint8_t endpoint_id, zb_uint16_t clust
   return res;
 }
 
-static void ep_process_zcl_cmd(zb_uint8_t param)
+static void ep_process_zcl_cmd(zb_cb_param_t cb_param)
 {
   zb_zcl_parsed_hdr_t* cmd_info_buf_ptr;
   zb_zcl_parsed_hdr_t cmd_info;
   zb_uint8_t ep;
   zb_af_endpoint_desc_t *ep_desc;
   zb_uint8_t status = ZB_ZCL_STATUS_FAIL;
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
 
-  TRACE_MSG(TRACE_ZCL2, "> ep_process_zcl_cmd, param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL2, "> ep_process_zcl_cmd, param %d", (FMT__D, param));
 
   cmd_info_buf_ptr = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
 
@@ -1541,10 +1578,8 @@ suspension. The incoming request packet will be ignored.
   }
 #else
   if (ep_desc->device_handler != NULL
-#if defined ZB_SE_COMMISSIONING || (defined ZB_ZCL_SUPPORT_CLUSTER_WWAH && defined ZB_ZCL_ENABLE_WWAH_SERVER)
       && (ZCL_SELECTOR().block_zcl_cmd == NULL
           || !ZCL_SELECTOR().block_zcl_cmd(&cmd_info))
-#endif /* ZB_SE_COMMISSIONING || (ZB_ZCL_SUPPORT_CLUSTER_WWAH && ZB_ZCL_ENABLE_WWAH_SERVER) */
     )
   {
     status = (*ep_desc->device_handler)(param) != 0U ? ZB_ZCL_STATUS_SUCCESS : ZB_ZCL_STATUS_FAIL;
@@ -1570,7 +1605,7 @@ send_default_response:
 }
 
 
-static void broadcast_endpoint_call_next_delivery_step(zb_uint8_t param)
+static void broadcast_endpoint_call_next_delivery_step(zb_cb_param_t param)
 {
   zb_ret_t ret = zb_buf_get_out_delayed_ext(broadcast_endpoint_delivery_step, param, 0);
   if (ret != RET_OK)
@@ -1581,20 +1616,21 @@ static void broadcast_endpoint_call_next_delivery_step(zb_uint8_t param)
 }
 
 
-static void broadcast_endpoint_delivery_step(zb_uint8_t param, zb_uint16_t bc_buf_ref)
+static void broadcast_endpoint_delivery_step(zb_cb_param_t cb_param)
 {
   zb_zcl_parsed_hdr_t *cmd_info_ptr;
   zb_uint8_t ep;
   zb_uint32_t process_command_jitter;
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_bufid_t bc_buf_ref = (zb_bufid_t)ZB_UNPACK_USER_PARAM(cb_param);
 
-  ZB_ASSERT(bc_buf_ref <= ZB_UINT8_MAX);
-  cmd_info_ptr = ZB_BUF_GET_PARAM((zb_uint8_t)bc_buf_ref, zb_zcl_parsed_hdr_t);
-  zb_buf_copy(param, (zb_uint8_t)bc_buf_ref);
+  cmd_info_ptr = ZB_BUF_GET_PARAM(bc_buf_ref, zb_zcl_parsed_hdr_t);
+  zb_buf_copy(param, bc_buf_ref);
 
   ep = ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info_ptr).dst_endpoint;
 
-  TRACE_MSG(TRACE_ZCL2, "> broadcast_endpoint_delivery_step, param %hd, bc_buf_ref %hd",
-            (FMT__H_H, param, bc_buf_ref));
+  TRACE_MSG(TRACE_ZCL2, "> broadcast_endpoint_delivery_step, param %d, bc_buf_ref %d",
+            (FMT__D_D, param, bc_buf_ref));
   TRACE_MSG(TRACE_ZCL3, "deliver to ep %hd", (FMT__H, ep));
 
   /*
@@ -1621,8 +1657,7 @@ static void broadcast_endpoint_delivery_step(zb_uint8_t param, zb_uint16_t bc_bu
   /* Cmd is delivered to all matching endpoints: free initial buffer */
   if (ep == 0U)
   {
-    ZB_ASSERT(bc_buf_ref <= ZB_UINT8_MAX);
-    zb_buf_free((zb_uint8_t)bc_buf_ref);
+    zb_buf_free(bc_buf_ref);
   }
   /* Proceed to next endpoint */
   else
@@ -1630,18 +1665,17 @@ static void broadcast_endpoint_delivery_step(zb_uint8_t param, zb_uint16_t bc_bu
     TRACE_MSG(TRACE_ZCL3, "wait new buf to handle ep %hd, jitter %d", (FMT__H_D, ep, process_command_jitter));
 
     ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info_ptr).dst_endpoint = ep;
-    ZB_ASSERT(bc_buf_ref <= ZB_UINT8_MAX);
-    ZB_SCHEDULE_ALARM(broadcast_endpoint_call_next_delivery_step, (zb_uint8_t)bc_buf_ref, process_command_jitter);
+    ZB_SCHEDULE_ALARM(broadcast_endpoint_call_next_delivery_step, bc_buf_ref, process_command_jitter);
   }
   TRACE_MSG(TRACE_ZCL2, "< broadcast_endpoint_delivery_step", (FMT__0));
 }
 
 
-void zb_zcl_process_parsed_zcl_cmd(zb_uint8_t param)
+void zb_zcl_process_parsed_zcl_cmd(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t *cmd_info_ptr = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_parsed_zcl_cmd %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_parsed_zcl_cmd %d", (FMT__D, param));
 
   if (ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info_ptr).dst_endpoint == ZB_ZCL_BROADCAST_ENDPOINT)
   {
@@ -1700,7 +1734,7 @@ void zb_zcl_process_parsed_zcl_cmd(zb_uint8_t param)
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_process_parsed_zcl_cmd", (FMT__0));
 }
 
-void zb_zcl_process_device_command(zb_uint8_t param)
+void zb_zcl_process_device_command(zb_cb_param_t param)
 {
   /* ZCL command information surely present */
   zb_zcl_parsed_hdr_t cmd_info;
@@ -1709,9 +1743,9 @@ void zb_zcl_process_device_command(zb_uint8_t param)
 
 #ifdef ZB_STACK_REGRESSION_TESTING_API
   /* rtp_zdo_01 */
-  TRACE_MSG(TRACE_TEST1, "> zb_zcl_process_device_command %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_TEST1, "> zb_zcl_process_device_command %d", (FMT__D, param));
 #else
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_device_command %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_process_device_command %d", (FMT__D, param));
 #endif
 
   ZB_BZERO(&cmd_info, sizeof(cmd_info));
@@ -2018,14 +2052,14 @@ zb_bool_t zb_zcl_is_msc_allows_frag(zb_uint16_t cluster_id)
 
 /* Check if command should be handled - check command direction and
  * cluster role */
-zb_uint8_t zb_zcl_check_accept_command(zb_uint8_t param)
+zb_uint8_t zb_zcl_check_accept_command(zb_bufid_t param)
 {
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
   zb_zcl_cluster_desc_t *cluster_desc;
   zb_af_endpoint_desc_t *endpoint_desc;
   zb_uint8_t status;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_check_accept_command %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_check_accept_command %d", (FMT__D, param));
 
   endpoint_desc = zb_af_get_endpoint_desc(ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint);
   cluster_desc = get_cluster_desc(endpoint_desc, cmd_info->cluster_id,
@@ -2493,7 +2527,16 @@ zb_ret_t zb_zcl_finish_and_send_packet_common(zb_bufid_t buffer,
   }
 
 #ifdef APS_FRAGMENTATION
-  if (frag)
+  /* Do not set fragmentation flag for any broadcasts/group sending
+      as fragmentation not allowed for broadcasts.
+     See r23.2 spec 2.2.4.1.1.3. */
+  if (frag
+      && dst_addr_mode != ZB_APS_ADDR_MODE_16_GROUP_ENDP_NOT_PRESENT
+      /* Add check for broadcast address here, just in case.
+         It seems that there is no strong limitations
+          to have only unicasts here. */
+      && !(apsde_req->addr_mode == ZB_APS_ADDR_MODE_16_ENDP_PRESENT
+          && (ZB_NWK_IS_ADDRESS_BROADCAST(dst_addr->addr_short))))
   {
     apsde_req->tx_options |= ZB_APSDE_TX_OPT_FRAG_PERMITTED;
   }

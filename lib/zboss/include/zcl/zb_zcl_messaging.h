@@ -529,7 +529,7 @@ typedef struct zb_zcl_messaging_get_last_message_response_s {
  * @par Usage
  * @n Example of sending ZB_ZCL_MESSAGING_CLI_CMD_GET_LAST_MESSAGE "GetLastMessage" command
  */
-void zb_zcl_messaging_send_get_last_msg(zb_uint8_t param,
+void zb_zcl_messaging_send_get_last_msg(zb_bufid_t param,
                                              const zb_addr_u *dst_addr,
                                              zb_aps_addr_mode_t dst_addr_mode,
                                              zb_uint8_t dst_ep,
@@ -551,7 +551,7 @@ void zb_zcl_messaging_send_get_last_msg(zb_uint8_t param,
  * @par Usage
  * @n Handle @ref ZB_ZCL_MESSAGING_CLI_CMD_GET_LAST_MESSAGE "GetLastMessage" command
  */
-void zb_zcl_messaging_send_display_msg(zb_uint8_t param,
+void zb_zcl_messaging_send_display_msg(zb_bufid_t param,
                                             const zb_addr_u *dst_addr,
                                             zb_aps_addr_mode_t dst_addr_mode,
                                             zb_uint8_t dst_ep,
@@ -570,7 +570,7 @@ void zb_zcl_messaging_send_display_msg(zb_uint8_t param,
  * @param payload - Packet payload (@ref zb_zcl_messaging_message_confirm_payload_t).
  * @param cb - Callback which should be called when the ZCL stack receives APS ack.
  */
-void zb_zcl_messaging_send_msg_confirmation(zb_uint8_t param,
+void zb_zcl_messaging_send_msg_confirmation(zb_bufid_t param,
                                             const zb_addr_u *dst_addr,
                                             zb_aps_addr_mode_t dst_addr_mode,
                                             zb_uint8_t dst_ep,
@@ -589,7 +589,7 @@ void zb_zcl_messaging_send_msg_confirmation(zb_uint8_t param,
  * @param payload - Packet payload (@ref zb_zcl_messaging_cancel_message_payload_t).
  * @param cb - Callback which should be called when the ZCL stack receives APS ack.
  */
-void zb_zcl_messaging_send_cancel_msg(zb_uint8_t param,
+void zb_zcl_messaging_send_cancel_msg(zb_bufid_t param,
                                            const zb_addr_u *dst_addr,
                                            zb_aps_addr_mode_t dst_addr_mode,
                                            zb_uint8_t dst_ep,

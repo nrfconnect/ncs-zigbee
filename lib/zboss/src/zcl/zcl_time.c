@@ -62,7 +62,7 @@ static zb_uint8_t                              zb_zcl_src_search_endpoint   = 0;
 
 zb_bool_t check_value_time(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 
-static void zb_zcl_time_sync_stop(zb_uint8_t unused)
+static void zb_zcl_time_sync_stop(zb_cb_param_t unused)
 {
   ZVUNUSED(unused);
   if (zb_zcl_time_server_found_cb != NULL)
@@ -95,7 +95,7 @@ static zb_uint8_t zb_zcl_time_sync_get_auth_level(zb_uint8_t time_status, zb_uin
   }
 }
 
-zb_bool_t zb_zcl_time_server_read_attr_handle(zb_uint8_t param)
+zb_bool_t zb_zcl_time_server_read_attr_handle(zb_bufid_t param)
 {
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
   zb_zcl_read_attr_res_t *resp = NULL;
@@ -103,7 +103,7 @@ zb_bool_t zb_zcl_time_server_read_attr_handle(zb_uint8_t param)
   zb_uint32_t nw_time = ZB_ZCL_TIME_TIME_DEFAULT_VALUE;
   zb_uint8_t fails = 0;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_time_server_read_attr_handle %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_time_server_read_attr_handle %d", (FMT__D, param));
 
   if (cmd_info->cluster_id != ZB_ZCL_CLUSTER_ID_TIME || !zb_zcl_search_in_process)
   {
@@ -179,7 +179,7 @@ zb_bool_t zb_zcl_time_server_read_attr_handle(zb_uint8_t param)
 }
 
 
-static void zb_zcl_time_server_start_search_cb(zb_uint8_t param)
+static void zb_zcl_time_server_start_search_cb(zb_cb_param_t param)
 {
   zb_zdo_match_desc_resp_t *resp = (zb_zdo_match_desc_resp_t *)zb_buf_begin(param);
   zb_uint8_t dst_endpoint;
@@ -188,7 +188,7 @@ static void zb_zcl_time_server_start_search_cb(zb_uint8_t param)
   zb_apsde_data_indication_t *ind = ZB_BUF_GET_PARAM(param, zb_apsde_data_indication_t);
   zb_uint8_t *cmd_ptr;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_time_server_start_search_cb %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_time_server_start_search_cb %d", (FMT__D, param));
 
   TRACE_MSG(TRACE_ZCL2, "resp match_len %hd", (FMT__H, resp->match_len));
 
@@ -224,7 +224,7 @@ static void zb_zcl_time_server_start_search_cb(zb_uint8_t param)
 }
 
 
-static void zb_zcl_time_server_start_search(zb_uint8_t param)
+static void zb_zcl_time_server_start_search(zb_cb_param_t param)
 {
   zb_zdo_match_desc_param_t *req;
 

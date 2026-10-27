@@ -408,6 +408,12 @@ typedef bool zb_bitbool_t;
 #define ZB_UINT32_MIN      0UL
 #define ZB_UINT32_MAX      4294967295UL
 
+#define ZB_INT64_MIN       (-9223372036854775807L - 1)
+#define ZB_INT64_MAX       9223372036854775807L
+#define ZB_UINT64_MIN      0UL
+#define ZB_UINT64_MAX      18446744073709551615UL
+
+
 #define ZB_UINT_MIN      0UL
 
 /*
@@ -640,7 +646,9 @@ zb_addr_u;
 #define ZB_16BIT_SIZE 2U
 #define ZB_24BIT_SIZE 3U
 #define ZB_32BIT_SIZE 4U
+#define ZB_40BIT_SIZE 5U
 #define ZB_48BIT_SIZE 6U
+#define ZB_56BIT_SIZE 7U
 #define ZB_64BIT_SIZE 8U
 
 #ifdef ZB_LITTLE_ENDIAN
@@ -811,7 +819,9 @@ void* zb_put_next_ieee(zb_uint8_t *dst, zb_ieee_addr_t src);
 */
 #define ZB_LETOH16 ZB_HTOLE16
 #define ZB_LETOH24 ZB_HTOLE24
+#define ZB_LETOH40 ZB_HTOLE40
 #define ZB_LETOH48 ZB_HTOLE48
+#define ZB_LETOH56 ZB_HTOLE56
 #define ZB_LETOH32 ZB_HTOLE32
 #define ZB_BETOH16 ZB_HTOBE16
 #define ZB_BETOH32 ZB_HTOBE32
@@ -1146,14 +1156,18 @@ typedef ZB_PACKED_PRE struct zb_int48_s
 #if defined ZB_LITTLE_ENDIAN
 
 #define ZB_HTOLE24(ptr, val)   ZB_MEMCPY((ptr), (val), ZB_24BIT_SIZE)
+#define ZB_HTOLE40(ptr, val)   ZB_MEMCPY((ptr), (val), ZB_40BIT_SIZE)
 #define ZB_HTOLE48(ptr, val)   ZB_MEMCPY((ptr), (val), ZB_48BIT_SIZE)
+#define ZB_HTOLE56(ptr, val)   ZB_MEMCPY((ptr), (val), ZB_56BIT_SIZE)
 
 #else /* ZB_BIG_ENDIAN */
 
 void zb_reverse_bytes(zb_uint8_t *ptr, zb_uint8_t *val, zb_uint8_t size);
 
 #define ZB_HTOLE24(ptr, val)   zb_reverse_bytes((zb_uint8_t*)(ptr), (val), ZB_24BIT_SIZE)
+#define ZB_HTOLE40(ptr, val)   zb_reverse_bytes((zb_uint8_t*)(ptr), (val), ZB_40BIT_SIZE)
 #define ZB_HTOLE48(ptr, val)   zb_reverse_bytes((zb_uint8_t*)(ptr), (val), ZB_48BIT_SIZE)
+#define ZB_HTOLE56(ptr, val)   zb_reverse_bytes((zb_uint8_t*)(ptr), (val), ZB_56BIT_SIZE)
 
 #endif /* ZB_BIG_ENDIAN */
 
@@ -1590,12 +1604,28 @@ typedef zb_uint32_t           zb_uint24_t;
   (ptr) += ZB_24BIT_SIZE;                \
 }
 
+#define PUT_DATA40(ptr, val) (ZB_HTOLE40(ptr, val), (ptr) += ZB_40BIT_SIZE)
+#define PUT_DATA40_VAL(ptr, val)              \
+{                                             \
+  zb_uint40_t tmp_val = (val);                \
+  ZB_HTOLE40((ptr), &tmp_val);                \
+  (ptr) += ZB_40BIT_SIZE;               \
+}
+
 #define PUT_DATA48(ptr, val) (ZB_HTOLE48(ptr, val), (ptr) += ZB_48BIT_SIZE)
 #define PUT_DATA48_VAL(ptr, val)              \
 {                                             \
   zb_uint48_t tmp_val = (val);                \
   ZB_HTOLE48((ptr), &tmp_val);                \
   (ptr) += ZB_48BIT_SIZE;               \
+}
+
+#define PUT_DATA56(ptr, val) (ZB_HTOLE56(ptr, val), (ptr) += ZB_56BIT_SIZE)
+#define PUT_DATA56_VAL(ptr, val)              \
+{                                             \
+  zb_uint56_t tmp_val = (val);                \
+  ZB_HTOLE56((ptr), &tmp_val);                \
+  (ptr) += ZB_56BIT_SIZE;               \
 }
 
 /* take MSB nibble from uint8_t */

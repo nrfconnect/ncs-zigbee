@@ -54,11 +54,6 @@
     @{
 */
 
-#ifdef DEBUG
-/* If defined, samples included to zll source files will be compiled - need for development only */
-#define ZB_COMPILE_ZLL_SAMPLE
-#endif
-
 /************************** Common functions ****************************/
 
 /**
@@ -88,7 +83,7 @@ zb_ret_t zb_zll_dev_start(void);
  *  @brief Finishes startup sequence.
  *  @param param [IN] - reference to the @ref zb_buf_t "buffer" to put task status notification to.
  */
-void zll_continue_start(zb_uint8_t param);
+void zll_continue_start(zb_cb_param_t param);
 
 /* TODO: [Multi-MAC] allow to set interface id */
 /**
@@ -110,7 +105,7 @@ void zll_continue_start(zb_uint8_t param);
  *  @param param [IN] - reference to the @ref zb_buf_t "buffer" containing parameters of
  *  commissioning command @ref zb_zcl_parsed_hdr_s
  */
-void zll_process_device_command(zb_uint8_t param);
+void zll_process_device_command(zb_cb_param_t param);
 
 /************************** Start new network ****************************/
 
@@ -125,7 +120,7 @@ typedef ZB_PACKED_PRE struct zb_zll_start_new_nwk_param_s
 
 #if defined ZB_ZLL_ENABLE_COMMISSIONING_CLIENT
 
-zb_ret_t zb_zll_start_new_network(zb_uint8_t param);
+zb_ret_t zb_zll_start_new_network(zb_bufid_t param);
 
 /**
  *  @brief Requests a target to start a new network.
@@ -164,7 +159,7 @@ zb_ret_t zb_zll_start_new_network(zb_uint8_t param);
  *  @param param [IN] - reference to the @ref zb_buf_t "buffer" containing operation status
  *  information.
  */
-void zll_direct_join_confirm(zb_uint8_t param);
+void zll_direct_join_confirm(zb_cb_param_t param);
 
 /*************************** ZLL transaction/task ***************************/
 
@@ -245,7 +240,7 @@ typedef ZB_PACKED_PRE struct zb_zll_device_discovery_req_s
   * @note It is not recommended to call the function directly. Use @ref
   * ZB_ZLL_START_DEVICE_DISCOVERY() macro instead.
   */
-void zb_zll_start_device_discovery(zb_uint8_t param);
+void zb_zll_start_device_discovery(zb_cb_param_t param);
 
 /************************** Join router ****************************/
 
@@ -261,7 +256,7 @@ zb_zll_join_router_param_t;
   * @note It is not recommended to call the function directly. Use @ref
   * ZB_ZLL_JOIN_ROUTER() macro instead.
   */
-void zb_zll_join_router(zb_uint8_t param);
+void zb_zll_join_router(zb_cb_param_t param);
 
 /** @brief Fills in parameters for Join router and schedules it for execution.
   * @param buffer - buffer to put transaction packets to.
@@ -295,7 +290,7 @@ zb_zll_join_end_device_param_t;
   * @note It is not recommended to call the function directly. Use @ref
   * ZB_ZLL_JOIN_ED() macro instead.
   */
-void zb_zll_join_ed(zb_uint8_t param);
+void zb_zll_join_ed(zb_cb_param_t param);
 
 /** @brief Fills in parameters for Join end device and schedules it for execution.
   * @param buffer - buffer to put transaction packets to.
@@ -321,14 +316,14 @@ void zb_zll_join_ed(zb_uint8_t param);
   * @param param - reference to the buffer without parameters.
   * @return command status
   */
-zb_ret_t zb_zll_start_commissioning(zb_uint8_t param);
+zb_ret_t zb_zll_start_commissioning(zb_bufid_t param);
 
  /** @brief Perform Add device to network.
   * @param param - reference to the buffer without parameters.
   * @note It recommended to call the function after finish call
   * Device discovery.
   */
-void zll_add_device_to_network(zb_uint8_t param);
+void zll_add_device_to_network(zb_cb_param_t param);
 
 /** @brief Find device index with max rssi from device_infos table
   * @param route_only - find from all device or router only
@@ -357,7 +352,7 @@ zb_uint8_t zll_find_device_ep_by_short_addr(zb_uint16_t addr);
  */
 zb_int_t zll_get_ep_info(zb_int_t i, zb_uint16_t *addr, zb_uint8_t *ep);
 
-void zll_network_start_continue(zb_uint8_t param);
+void zll_network_start_continue(zb_cb_param_t param);
 
 void zll_save_nwk_prefs(zb_ext_pan_id_t ext_pan_id, zb_uint16_t pan_id,
                              zb_uint16_t short_addr, zb_uint8_t channel);

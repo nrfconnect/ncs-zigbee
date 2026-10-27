@@ -67,8 +67,8 @@ static zb_discover_cmd_list_t gs_basic_client_cmd_list =
 };
 
 zb_ret_t check_value_basic_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
-zb_bool_t zb_zcl_process_basic_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_basic_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_basic_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_basic_specific_commands_cli(zb_cb_param_t param);
 
 void zb_zcl_basic_init_server()
 {
@@ -101,12 +101,12 @@ zb_ret_t check_value_basic_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_u
 }
 /* Invoke User App for "Reset to Factory Defaults" command
  */
-static void zb_zcl_basic_reset_invoke_user_app(zb_uint8_t param)
+static void zb_zcl_basic_reset_invoke_user_app(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_ret_t result = RET_ERROR;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_basic_reset_invoke_user_app param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_basic_reset_invoke_user_app param %d", (FMT__D, param));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -157,7 +157,7 @@ zb_bool_t zb_zcl_check_is_device_enabled(zb_uint8_t ep_id, zb_uint8_t cmd_id, zb
   return ret;
 }
 
-zb_bool_t zb_zcl_process_basic_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_basic_specific_commands_cli(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -167,7 +167,7 @@ zb_bool_t zb_zcl_process_basic_specific_commands_cli(zb_uint8_t param)
   return ZB_FALSE;
 }
 
-zb_bool_t zb_zcl_process_basic_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_basic_specific_commands_srv(zb_cb_param_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -182,8 +182,8 @@ zb_bool_t zb_zcl_process_basic_specific_commands_srv(zb_uint8_t param)
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG( TRACE_ZCL1,
-             "> zb_zcl_process_basic_specific_commands_srv: param %hd, cmd %hd",
-             (FMT__H_H, param, cmd_info.cmd_id));
+             "> zb_zcl_process_basic_specific_commands_srv: param %d, cmd %hd",
+             (FMT__D_H, param, cmd_info.cmd_id));
 
   switch (cmd_info.cmd_id)
   {

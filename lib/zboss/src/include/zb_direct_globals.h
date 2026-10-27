@@ -69,8 +69,8 @@ the context with proper pointers letting the stack know that Zigbee Direct is av
 
 */
 typedef zb_bool_t (*zbd_is_network_zbd_aware_func_t)(void);
-typedef zb_bool_t (*zbd_process_tunneled_frame_if_needed_func_t)(zb_address_ieee_ref_t ref, zb_uint8_t param);
-typedef zb_bool_t (*zbd_is_frame_from_zvd_allowed_func_t)(zb_uint8_t);
+typedef zb_bool_t (*zbd_process_tunneled_frame_if_needed_func_t)(zb_address_ieee_ref_t ref, zb_bufid_t param);
+typedef zb_bool_t (*zbd_is_frame_from_zvd_allowed_func_t)(zb_bufid_t);
 typedef zb_bool_t (*zbd_is_neighbor_zvd_func_t)(const zb_neighbor_tbl_ent_t*);
 typedef zb_bool_t (*zbd_is_zbd_provisioned_func_t)(void);
 
@@ -103,7 +103,7 @@ typedef struct zb_direct_context_s
   /**
    * @brief Handles Network Commissioning Response from ZDD to ZVD TC (on ZDD side)
    */
-  zb_callback2_t trusted_link_process_sent_commissioning_resp;
+  zb_callback_t trusted_link_process_sent_commissioning_resp;
 
   /**
    * @brief Calculates NWK address and MAC interface of destination hop

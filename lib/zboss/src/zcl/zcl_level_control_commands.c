@@ -76,16 +76,16 @@ zb_discover_cmd_list_t gs_level_server_cmd_list =
   0, NULL
 };
 
-static void move_to_level_continue(zb_uint8_t param);
+static void move_to_level_continue(zb_cb_param_t param);
 static void level_control_stop_internal(zb_uint8_t endpoint);
 
 static zb_ret_t check_value_level_control_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 static zb_ret_t check_value_level_control_client(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
 
-static void level_control_default_resp(zb_uint8_t param, zb_bool_t status);
+static void level_control_default_resp(zb_bufid_t param, zb_bool_t status);
 
-zb_bool_t zb_zcl_process_level_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_level_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_level_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_level_specific_commands_cli(zb_cb_param_t param);
 
 void zb_zcl_level_control_init_server()
 {
@@ -212,7 +212,7 @@ zb_ret_t level_control_value_set_func(zb_uint8_t endpoint, zb_uint16_t* value, z
   return ret;
 }
 
-static zb_bool_t level_control_check_req_options(zb_uint8_t param, zb_uint8_t endpoint)
+static zb_bool_t level_control_check_req_options(zb_bufid_t param, zb_uint8_t endpoint)
 {
   zb_zcl_level_control_req_options_t req_options;
   zb_bool_t res = ZB_TRUE;
@@ -295,10 +295,10 @@ static zb_bool_t level_control_check_req_options(zb_uint8_t param, zb_uint8_t en
   return res;
 }
 
-static void level_control_default_resp(zb_uint8_t param, zb_bool_t status)
+static void level_control_default_resp(zb_bufid_t param, zb_bool_t status)
 {
   zb_zcl_parsed_hdr_t cmd_info;
-  TRACE_MSG(TRACE_ZCL1, "level_control_default_resp param %hd, status %hd", (FMT__H_H, param, status));
+  TRACE_MSG(TRACE_ZCL1, "level_control_default_resp param %d, status %hd", (FMT__D_H, param, status));
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
   ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, (status ? ZB_ZCL_STATUS_SUCCESS : ZB_ZCL_STATUS_FAIL));
 }
@@ -306,7 +306,7 @@ static void level_control_default_resp(zb_uint8_t param, zb_bool_t status)
 zb_bool_t level_control_calculate_and_start_cvc(zb_zcl_cvc_input_variables_t *input_var, zb_bool_t is_onoff, zb_uint8_t endpoint)
 {
   zb_bool_t status = ZB_TRUE;
-  zb_uint8_t alarm_buf_id;
+  zb_bufid_t alarm_buf_id;
   zb_zcl_level_control_move_variables_t* move_variables;
   zb_bool_t on_value = ZB_TRUE;
   zb_uint8_t alarm_id;
@@ -368,7 +368,7 @@ zb_bool_t level_control_calculate_and_start_cvc(zb_zcl_cvc_input_variables_t *in
 }
 
 static void move_to_level_handler(
-  zb_uint8_t param, zb_bool_t is_onoff, zb_uint8_t endpoint)
+  zb_bufid_t param, zb_bool_t is_onoff, zb_uint8_t endpoint)
 {
   zb_zcl_level_control_move_variables_t* move_variables;
   zb_zcl_level_control_move_to_level_req_t move_to_level_req;
@@ -450,12 +450,12 @@ static void move_to_level_handler(
 }
 
 
-static void move_to_level_continue(zb_uint8_t endpoint)
+static void move_to_level_continue(zb_cb_param_t endpoint)
 {
   zb_zcl_level_control_move_variables_t* move_variables;
   zb_uint8_t off_value = 0;
 
-  TRACE_MSG(TRACE_ZCL1, "move_to_level_continue ep %hd", (FMT__H, endpoint));
+  TRACE_MSG(TRACE_ZCL1, "move_to_level_continue ep %d", (FMT__D, endpoint));
   move_variables = level_control_get_move_variables(endpoint);
   ZB_ASSERT(move_variables);
 
@@ -473,7 +473,7 @@ static void move_to_level_continue(zb_uint8_t endpoint)
 }
 
 
-static void move_handler(zb_uint8_t param, zb_bool_t is_onoff, zb_uint8_t endpoint)
+static void move_handler(zb_bufid_t param, zb_bool_t is_onoff, zb_uint8_t endpoint)
 {
   zb_zcl_level_control_move_req_t move_req;
   zb_int16_t tmp;
@@ -594,7 +594,7 @@ static void move_handler(zb_uint8_t param, zb_bool_t is_onoff, zb_uint8_t endpoi
 }
 
 static void step_handler(
-  zb_uint8_t param, zb_bool_t is_onoff, zb_uint8_t endpoint)
+  zb_bufid_t param, zb_bool_t is_onoff, zb_uint8_t endpoint)
 {
   zb_zcl_level_control_step_req_t step_req;
   zb_int16_t tmp;
@@ -749,13 +749,13 @@ static void level_control_stop_internal(zb_uint8_t endpoint)
   }
 }
 
-static void stop_handler(zb_uint8_t param, zb_uint8_t endpoint)
+static void stop_handler(zb_bufid_t param, zb_uint8_t endpoint)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_zcl_level_control_move_variables_t* move_variables;
   zb_bool_t status = ZB_TRUE;
 
-  TRACE_MSG(TRACE_ZCL1, "> stop_handler param %i", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> stop_handler param %d", (FMT__D, param));
 
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
@@ -785,7 +785,7 @@ static void stop_handler(zb_uint8_t param, zb_uint8_t endpoint)
   TRACE_MSG(TRACE_ZCL1, "< stop_handler", (FMT__0));
 }
 
-zb_bool_t zb_zcl_process_level_control_specific_commands(zb_uint8_t param)
+zb_bool_t zb_zcl_process_level_control_specific_commands(zb_bufid_t param)
 {
   zb_zcl_attr_t* curr_level_desc;
   zb_zcl_attr_t* move_status_desc;
@@ -799,7 +799,7 @@ zb_bool_t zb_zcl_process_level_control_specific_commands(zb_uint8_t param)
 
   TRACE_MSG( TRACE_ZCL1,
              "> zb_zcl_process_level_control_specific_commands: param %d, cmd %d",
-      (FMT__H_H, param, cmd_info.cmd_id));
+      (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_LEVEL_CONTROL == cmd_info.cluster_id);
   ZB_ASSERT(ZB_ZCL_FRAME_DIRECTION_TO_SRV == cmd_info.cmd_direction);
@@ -888,7 +888,7 @@ zb_bool_t zb_zcl_process_level_control_specific_commands(zb_uint8_t param)
   return processed;
 }
 
-zb_bool_t zb_zcl_process_level_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_level_specific_commands_srv(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -898,7 +898,7 @@ zb_bool_t zb_zcl_process_level_specific_commands_srv(zb_uint8_t param)
   return zb_zcl_process_level_control_specific_commands(param);
 }
 
-zb_bool_t zb_zcl_process_level_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_level_specific_commands_cli(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {

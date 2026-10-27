@@ -43,7 +43,8 @@
 #ifndef ZB_ZCL_H
 #define ZB_ZCL_H 1
 
-#include "zboss_api_zcl.h"
+#if !defined(ZB_DO_NOT_CHECK_ZCL_BY_MISRA)
+
 #ifndef ZB_ZCL_DISABLE_REPORTING
 #include "zcl/zb_zcl_reporting.h"
 #endif
@@ -62,14 +63,14 @@
 /** @brief ZCL command handler
   * @param param - reference to the buffer with packet.
   */
-void zb_zcl_process_device_command(zb_uint8_t param);
+void zb_zcl_process_device_command(zb_cb_param_t param);
 
 
 /** @brief Parsed ZCL command handler
   * @param param - reference to the buffer with parsed ZCL header
   *                of type @ref zb_zcl_parsed_hdr_t stored as buffer parameter.
   */
-void zb_zcl_process_parsed_zcl_cmd(zb_uint8_t param);
+void zb_zcl_process_parsed_zcl_cmd(zb_cb_param_t param);
 /********************** ZCL main functions declaration ******************************/
 /** @brief Initialize Zigbee cluster library.  */
 void zb_zcl_init(void);
@@ -85,7 +86,7 @@ void zcl_main_loop(void);
   * @param cmd_info - pointer to the resulting parsed header representation (in the buffer).
   * @return - header not contain error
   */
-zb_zcl_status_t zb_zcl_parse_header(zb_uint8_t param, zb_zcl_parsed_hdr_t *cmd_info);
+zb_zcl_status_t zb_zcl_parse_header(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info);
 
 #ifndef ZB_ZCL_DISABLE_REPORTING
 void zb_zcl_put_default_reporting_info_for_cluster(zb_uint8_t endpoint, zb_uint16_t profile_id, struct zb_zcl_cluster_desc_s *cluster_desc);
@@ -95,9 +96,9 @@ void zb_zcl_mark_report_not_sent(zb_zcl_reporting_info_t *rep_info);
 void zb_zcl_update_reporting_info(zb_zcl_reporting_info_t *rep_info);
 
 void zb_zcl_adjust_reporting_timer(zb_uint8_t param);
-#endif  /* ZB_ZCL_DISABLE_REPORTING */
+#endif  /* !ZB_ZCL_DISABLE_REPORTING */
 
-/** Internal functions for gettings ZCL cluster handlers */
+/** Internal functions for getting ZCL cluster handlers */
 zb_zcl_cluster_handler_t zb_zcl_get_cluster_handler_internal(zb_uint8_t endpoint, zb_uint16_t cluster_id, zb_uint8_t cluster_role);
 zb_zcl_cluster_check_value_t zb_zcl_internal_get_cluster_check_value(zb_uint8_t endpoint, zb_uint16_t cluster_id, zb_uint8_t cluster_role);
 zb_zcl_cluster_write_attr_hook_t zb_zcl_internal_get_cluster_write_attr_hook(zb_uint8_t endpoint, zb_uint16_t cluster_id, zb_uint8_t cluster_role);
@@ -105,5 +106,7 @@ zb_zcl_cluster_write_attr_hook_t zb_zcl_internal_get_cluster_write_attr_hook(zb_
 /** @endcond */ /* internals_doc */
 
 /*! @} */ /* zcl_api */
+
+#endif /* !ZB_DO_NOT_CHECK_ZCL_BY_MISRA */
 
 #endif /* ZB_ZCL_H */

@@ -50,15 +50,27 @@
 
 /* to be able to limit addr_ref size to 1 byte, limit address translation table
  * size to 255  */
-#ifndef ZB_CONFIGURABLE_MEM
+#if !defined(ZB_CONFIGURABLE_MEM) && defined(ZB_NO_BIG_NET)
 ZB_ASSERT_COMPILE_DECL(ZB_IEEE_ADDR_TABLE_SIZE < ZB_UINT8_MAX);
 #endif
 ZB_ASSERT_COMPILE_DECL(ZB_NWK_ROUTER_AGE_LIMIT < 4); /* Check if fits in 2 bits */
 
-#ifdef ZB_ROUTER_ROLE
-#define ZB_MAX_CHILDREN ZB_NEIGHBOR_TABLE_SIZE
-#define ZB_MAX_ED_CAPACITY_DEFAULT ((ZB_NEIGHBOR_TABLE_SIZE)/2u)
-#endif
+#ifdef ZB_DEBUG_NWK
+#define TRACE_NWK_PROTO_VOID    zb_uint16_t from_file, zb_uint16_t from_line
+#define TRACE_NWK_CALL_VOID     ZB_TRACE_FILE_ID, __LINE__
+#define TRACE_NWK_FORWARD_VOID  from_file, from_line
+#define TRACE_NWK_PROTO         TRACE_NWK_PROTO_VOID ,
+#define TRACE_NWK_CALL          TRACE_NWK_CALL_VOID ,
+#define TRACE_NWK_FORWARD       TRACE_NWK_FORWARD_VOID ,
+#else
+#define TRACE_NWK_PROTO_VOID
+#define TRACE_NWK_CALL_VOID
+#define TRACE_NWK_FORWARD_VOID
+#define TRACE_NWK_PROTO
+#define TRACE_NWK_CALL
+#define TRACE_NWK_FORWARD
+#endif  /* ZB_DEBUG_NWK */
+
 
 /* zb_neighbor_tbl_ent_t moved to zboss_api_internal.h for configurable memory feature. */
 
@@ -79,12 +91,9 @@ typedef struct zb_neighbor_tbl_s
   /*! base (run-time) neighbor table */
 #ifndef ZB_CONFIGURABLE_MEM
   zb_neighbor_tbl_ent_t     neighbor[ZB_NEIGHBOR_TABLE_SIZE];
-  /*! array for addressing neighbor table by network address ref */
-  zb_uint8_t                addr_to_neighbor[ZB_IEEE_ADDR_TABLE_SIZE];
   zb_nwk_disc_tbl_ent_t     disc_table[ZB_NWK_DISC_TABLE_SIZE];
 #else
   zb_neighbor_tbl_ent_t     *neighbor;
-  zb_uint8_t                *addr_to_neighbor;
   zb_nwk_disc_tbl_ent_t     *disc_table;
 #endif
   zb_nbr_iterator_data_t    iterator_data;
@@ -159,7 +168,14 @@ zb_bool_t zb_nwk_neighbor_exists(zb_address_ieee_ref_t addr_ref);
    @return RET_OK if entry is found or was successfully created; RET_NOT_FOUND if entry doesn't exist; error code
    if error
  */
-zb_ret_t zb_nwk_neighbor_get(zb_address_ieee_ref_t addr_ref, zb_bool_t create_if_absent, zb_neighbor_tbl_ent_t **nbt);
+#define zb_nwk_neighbor_get(addr_ref, create_if_absent, nbt) \
+  zb_nwk_neighbor_get_func(TRACE_NWK_CALL (addr_ref), (create_if_absent), (nbt))
+
+
+zb_ret_t zb_nwk_neighbor_get_func(
+  TRACE_NWK_PROTO zb_address_ieee_ref_t addr_ref,
+  zb_bool_t create_if_absent,
+  zb_neighbor_tbl_ent_t **nbt);
 
 
 /**
@@ -192,7 +208,10 @@ zb_ret_t zb_nwk_neighbor_get_by_ieee(const zb_ieee_addr_t long_addr, zb_neighbor
 
    @return RET_OK if success, error code if error
  */
-zb_ret_t zb_nwk_neighbor_delete(zb_address_ieee_ref_t ieee_ref);
+#define zb_nwk_neighbor_delete(ieee_ref) \
+  zb_nwk_neighbor_delete_func(TRACE_NWK_CALL (ieee_ref))
+
+zb_ret_t zb_nwk_neighbor_delete_func(TRACE_NWK_PROTO zb_address_ieee_ref_t ieee_ref);
 
 /**
    Remove all entities
@@ -273,7 +292,7 @@ zb_uint8_t zb_nwk_neighbor_get_ed_short_list(zb_uint8_t start_index, zb_uint8_t 
 zb_uint8_t zb_nwk_neighbor_get_zc_zr_cnt(void);
 zb_ret_t zb_nwk_neighbor_get_by_idx(zb_uint8_t idx, zb_neighbor_tbl_ent_t **nbt);
 
-zb_ret_t zb_nwk_get_sorted_neighbor(zb_uint8_t *index, zb_neighbor_tbl_ent_t **p_nbt);
+zb_ret_t zb_nwk_get_sorted_neighbor(zb_sorted_address_idx_t *index, zb_neighbor_tbl_ent_t **p_nbt);
 
 void zb_nwk_neighbor_complete_deletion(zb_address_ieee_ref_t ieee_ref, zb_uint8_t neighbor_index);
 
@@ -292,7 +311,7 @@ void zb_nwk_neighbor_update_lqa_rssi(zb_neighbor_tbl_ent_t *nbt, zb_uint8_t lqi,
 
 #if !defined ZB_ED_ROLE && defined ZB_MAC_DUTY_CYCLE_MONITORING
 zb_uint8_t zb_nwk_neighbor_get_subghz_count(void);
-zb_address_ieee_ref_t zb_nwk_neighbor_get_top_ith_device(zb_uint8_t i);
+zb_address_ieee_ref_t zb_nwk_neighbor_get_top_ith_device(zb_uindex_t i);
 /** @fn zb_uint8_t zb_nwk_neighbor_get_subghz_list(zb_uint8_t *ref_list, zb_uint8_t max_records)
  *  @brief Builds list of Sub-GHz devices
  *  @details Returns list of references to Sub-GHz devices entries in neighbor table sorted by

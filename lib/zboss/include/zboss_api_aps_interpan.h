@@ -148,7 +148,7 @@ typedef struct zb_mchan_intrp_data_confirm_s
  * @param current_channel - channel at which packet was received
  * @return status (see @ref zb_bool_t)
  */
-typedef zb_uint8_t (*zb_af_inter_pan_handler_t)(zb_uint8_t param, zb_uint8_t current_page, zb_uint8_t current_channel);
+typedef zb_uint8_t (*zb_af_inter_pan_handler_t)(zb_bufid_t param, zb_uint8_t current_page, zb_uint8_t current_channel);
 
 /** @brief Enable interpan procedure. This allows to send interpan frames at multiple channels
   *        and register handler to receive interpan frames.
@@ -195,10 +195,10 @@ void zb_af_interpan_set_data_indication(zb_af_inter_pan_handler_t cb);
   *
   * Assumes buffer contains data in its main part, and INTRP-DATA.request parameters in buffer's
   * parameter (represented as @ref zb_intrp_data_req_s structure).
-  * @param param - reference (index) of the packet buffer.
+  * @param cb_param - reference (index) of the packet buffer.
   * @see SE spec, subclause B.5.1.
   */
-void zb_intrp_data_request(zb_uint8_t param);
+void zb_intrp_data_request(zb_cb_param_t cb_param);
 #endif /* defined ZB_ENABLE_INTER_PAN_EXCHANGE || defined DOXYGEN */
 
 /** @} */

@@ -103,7 +103,7 @@ typedef ZB_PACKED_PRE struct zb_aps_binding_table_s
   zb_uint8_t              align[1];
 #endif
 #ifndef ZB_CONFIGURABLE_MEM
-  zb_uint8_t              trans_table[ZB_APS_BIND_TRANS_TABLE_SIZE];    /*!< Buffers for simultaneous sendings */
+  zb_bufid_t              trans_table[ZB_APS_BIND_TRANS_TABLE_SIZE];    /*!< Buffers for simultaneous sendings */
   zb_aps_bind_src_table_t src_table[ZB_APS_SRC_BINDING_TABLE_SIZE];     /*!< Source table */
   /* sizeof(zb_aps_bind_src_table_t) is now 3. Can't use sizeof() in ifdefs, so hard-code 3  */
 #if (ZB_APS_SRC_BINDING_TABLE_SIZE * 3) % 4 != 0
@@ -111,7 +111,7 @@ typedef ZB_PACKED_PRE struct zb_aps_binding_table_s
 #endif
   zb_aps_bind_dst_table_t dst_table[ZB_APS_DST_BINDING_TABLE_SIZE];     /*!< Destination table */
 #else
-  zb_uint8_t              *trans_table;
+  zb_bufid_t              *trans_table;
   zb_aps_bind_src_table_t *src_table;
   zb_aps_bind_dst_table_t *dst_table;
 #endif
@@ -134,7 +134,7 @@ typedef ZB_PACKED_PRE struct zb_aps_group_table_ent_s
 } ZB_PACKED_STRUCT zb_aps_group_table_ent_t;
 
 
-ZB_RING_BUFFER_DECLARE(zb_aps_grp_up_q, zb_uint8_t, ZB_APS_GROUP_UP_Q_SIZE);
+ZB_RING_BUFFER_DECLARE(zb_aps_grp_up_q, zb_bufid_t, ZB_APS_GROUP_UP_Q_SIZE);
 
 /**
    Group addressing data structure
@@ -159,15 +159,10 @@ typedef struct zb_tc_policy_s
   zb_bitbool_t allow_joins:1;
   zb_bitbool_t use_white_list:1;
 #ifdef ZB_SECURITY_INSTALLCODES
-  zb_bitbool_t require_installcodes:1;                      /*!< bdbJoinUsesInstallCodeKey
-                                                             * is equal to TRUE, the Trust
-                                                             * Center only permits a node
-                                                             * to join its network if
-                                                             * a corresponding install
-                                                             * code derived preconfigured
-                                                             * link key  associated
-                                                             * with the node has been
-                                                             * preinstalled   */
+  zb_bitfield_t require_installcodes:2;                      /*!< RequireInstallCodesOrPresetPassphrase
+                                                                  0b00 - not required
+                                                                  0b01 - not required for legacy devices
+                                                                  0b10 - required for joining devices */
 #endif
 #ifndef ZB_LITE_NO_TRUST_CENTER_REQUIRE_KEY_EXCHANGE
   zb_bitbool_t update_trust_center_link_keys_required:1;
@@ -191,7 +186,6 @@ typedef struct zb_tc_policy_s
                                                 * the node was able to decrypt
                                                 * the network key. @see bdb_node_join_link_key_type  */
 
-  zb_time_t     trust_center_node_join_timeout;
   zb_bitfield_t tclk_exchange_attempts:4; /*!< the number of key establishment attempts that have been made to establish a new link key after joining.  */
   zb_bitfield_t tclk_exchange_attempts_max:4; /*!< the maximum number of key establishment attempts that will be made before giving up on the key establishment.  */
 
@@ -201,6 +195,8 @@ typedef struct zb_tc_policy_s
   zb_bitbool_t waiting_for_tclk_exchange:1;       /*!< Set to 1 when node start Link Key exchange
                                                    * procedure. Reset to zero when TC LK exchange
                                                    * successfully completes or failed */
+  zb_bitbool_t waiting_for_token_exchange:1;       /*!< Set to 1 when node start auth token exchange
+                                                   * procedure. */
   zb_bitbool_t is_distributed:1;
 
 #ifdef ZB_CONTROL4_NETWORK_SUPPORT
@@ -217,6 +213,8 @@ typedef struct zb_tc_policy_s
                                                                * ignore permit_join value */
   zb_bitbool_t allow_unsecure_tc_rejoins:1;   /*<! allow joiner devices perform TC rejoin, when there is
                                                    no unique TCLK */
+  zb_bitbool_t allow_rejoins_with_well_known_key:1; /*<! allow joiner devices use Global (Well Known) key to join */
+
   zb_bitfield_t is_device_interview_enabled:1;                /*!< Shows whether Device Interview stage is enabled */
 
   zb_bitfield_t disable_zvd_support:1; /*!< Disables ZVD support on TC side */
@@ -225,6 +223,11 @@ typedef struct zb_tc_policy_s
   zb_bitfield_t allow_secured_rejoin_without_tclk:1;   /* if the BDB operation (steering or formation) is cancelled */
 #endif /* ZB_DIRECT_ENABLED */
   zb_bitfield_t disable_link_key_tlv:1;
+  zb_bitfield_t require_cbke:1;
+  zb_bitfield_t disable_min_fast_poll_duration_after_join:1;
+#if !defined ZB_COORDINATOR_ONLY
+  zb_bitfield_t max_join_retry_attempts:4; /*< Number of retries to join. Same as bdbcRecSameNetworkRetryAttempts */
+#endif
 #ifdef ZB_ALLOW_PROVISIONAL_KEY_AS_TCLK
   zb_bitbool_t allow_provisional_key_as_tclk:1; /*!< if 1, allow joining to trust centers that claim revision r21 or higher
                                                  *   but sends provisional key as a trust center link key */
@@ -237,17 +240,18 @@ typedef struct zb_tc_policy_s
                                                     * Device will avoid TLVs in ZDO frames until it is sure that the dest device has r23+ revision.
                                                     * Because some buggy legacy devices drop the frames with TLVs. WARNING it may violate the spec! */
 #endif /* !ZB_COORDINATOR_ONLY */
+  zb_bitfield_t disable_partner_lk_autohandling:1; /*!< if 0, the stack will automatically accept and verify partner link key (see BDB 3.1, 7.4)
+                                                        if 1, the stack will send extra signals ZB_BDB_SIGNAL_PARTNER_INFO_FOR_APP_LK_RECEIVED,
+                                                        ZB_BDB_SIGNAL_APP_LK_VERIFICATION_FAILED to the app during partner link key procedure */
+#ifdef ZB_COORDINATOR_ROLE
+  zb_bitfield_t autoswitch_to_high_sec_mode:1; /*!< if 1, then TC will switch to high security mode,
+                                                * when the commissioning window is closed (see BDB 3.1, 5.6.1) */
+  zb_bitfield_t forbid_dlk_with_wkk:1; /*!< Forbid well-known secret for DLK. It's required for BDB 3.1 */
+#endif /* ZB_COORDINATOR_ROLE */
 }
 zb_tc_policy_t;
 
-#ifndef ZB_SECURITY_INSTALLCODES
-#define ZB_JOIN_USES_INSTALL_CODE_KEY(is_client) ZB_FALSE
-#elif defined ZB_SECURITY_INSTALLCODES_ONLY
-#define ZB_JOIN_USES_INSTALL_CODE_KEY(is_client) ZB_TRUE
-#else
-zb_bool_t zdo_secur_must_use_installcode(zb_bool_t is_client);
-#define ZB_JOIN_USES_INSTALL_CODE_KEY(is_client) zdo_secur_must_use_installcode(is_client)
-#endif
+#define ZB_JOIN_USES_INSTALL_CODE_KEY(is_client) zdo_secur_get_install_code_policy(is_client)
 
 #define ZB_APS_CHALLENGE_VAL_SIZE 8
 typedef struct zb_aps_cnt_challenge_ctx_s
@@ -297,13 +301,6 @@ typedef struct zb_apsib_s
                                                                    * @see zb_tlv_key_negotiation_methods_t */
   zb_uint8_t trust_center_supported_preshared_secrets; /*!< Trust Center Supported Pre-shared Secrets Bitmask */
 
-#ifndef ZB_NO_NWK_MULTICAST
-  zb_uint8_t      aps_nonmember_radius;     /*!< Non-member radius for NWK multicast, a value of 0x07 is treated as infinity see 3.3.1.8.2 sub-clause */
-
-  /* TODO: What value is required for mcf.max_nonmember_radius, where it should be set? */
-  zb_uint8_t      aps_max_nonmember_radius; /*!< Maximum non-member radius value for multicast transmission */
-#endif                                      /* ZB_NO_NWK_MULTICAST */
-
   zb_uint8_t tc_standard_key[ZB_CCM_KEY_SIZE];      /*!< Trust Center Standard Key */
 #ifdef ZB_DISTRIBUTED_SECURITY_ON
   zb_uint8_t tc_standard_distributed_key[ZB_CCM_KEY_SIZE];      /*!< Distributed Standard Key */
@@ -332,7 +329,7 @@ typedef struct zb_apsib_s
   zb_uint8_t aps_max_window_size;
 #endif
   zb_tc_policy_t tcpolicy;
-  zb_uint8_t    bdb_remove_device_param; /*!< Used to store buffer param with Remove zb. */
+  zb_bufid_t    bdb_remove_device_param; /*!< Used to store buffer param with Remove zb. */
   zb_aps_cnt_challenge_ctx_t aps_challenge_ctx;
   zb_uint16_t aps_security_time_out_period;
 #ifdef ZB_CONFIGURABLE_RETRIES
@@ -372,6 +369,18 @@ typedef struct zb_apsib_s
 
 /* Moved zb_aps_retrans_ent_t to zboss_api_internal.h */
 
+#define ZB_APS_RETRANS_ENT_TIMER_SLOT_NO_TIMEOUT (ZB_APS_RETRANS_ENT_TIMER_SLOTS)
+#define ZB_APS_RETRANS_ENT_TIMER_SLOT_FREE (ZB_APS_RETRANS_ENT_TIMER_SLOTS + 1U)
+#define ZB_APS_RETRANS_ENT_TIMER_SLOT_NONE (ZB_APS_RETRANS_ENT_TIMER_SLOTS + 2U)
+
+typedef struct zb_aps_retrans_ent_iter_s
+{
+  zb_uint8_t slot_idx;
+  zb_aps_retrans_ent_ref_t prev_ent_idx;
+  zb_aps_retrans_ent_ref_t ent_idx;
+} zb_aps_retrans_ent_iter_t;
+
+
 typedef struct zb_aps_retrans_s
 {
 #ifndef ZB_CONFIGURABLE_MEM
@@ -379,8 +388,126 @@ typedef struct zb_aps_retrans_s
 #else
   zb_aps_retrans_ent_t *hash;
 #endif
+
   zb_uint8_t           n_packets;
+
+  /*
+   * The following fields are needed to optimize memory and scheduler alarms usage.
+   *
+   * APS retransmission table uses only one timer (alarm) with fixed-size interval equals to ZB_APS_RETRANS_TIMER_PRECISION.
+   * Each retransmission entry is placed in a slot according to remaining timeout intervals count.
+   * (i.e., if there are 0.8 seconds before APS Ack timeout,
+   *  the record is located in the slot 2 as 0.8 / ZB_APS_RETRANS_TIMER_PRECISION = 2).
+   *
+   * Slots are stored in memory as linked lists (with link to next element).
+   * Free entries and entries without active timer are stored in their own linked list.
+   *
+   * Every time when the fixed interval expires, all packets from the first slot are retransmitted
+   * and records from all other slots are moved to the previous slot.
+   *
+   * Technically, retrans_timer_first_slot_idx field stores index of the current first slot. Retransmission timer (alarm)
+   * just increments this index.
+   *
+   * Therefore, operations with retransmission table have the following complexity:
+   *  - Add new entry - O(1)
+   *  - Retransmit all entries with expired timeout - O(N) among all entries with expired timer. The other entries are
+   *    not iterated.
+   *  - Remove entry when APS Ack is received - O(N) among all entries.
+   */
+  zb_aps_retrans_ent_ref_t timer_slots[ZB_APS_RETRANS_ENT_TIMER_SLOTS + 2U];
+
+  zb_uint8_t retrans_timer_first_slot_idx;
 } zb_aps_retrans_t;
+
+
+/**
+ * @brief Returns head element for the retransmission timer slot
+ */
+#define ZB_APS_RETRANS_ENT_LIST_HEAD(slot_idx) \
+  ZG->aps.retrans.timer_slots[(slot_idx)]
+
+/**
+ * @brief Initializes the iterator for the first active retransmission entry
+ */
+#define ZB_APS_RETRANS_TABLE_ITER_BEGIN(it_ptr)                                 \
+  do {                                                                          \
+    (it_ptr)->slot_idx = 0U;                                                    \
+    (it_ptr)->prev_ent_idx = ZB_APS_RETRANS_ENT_REF_NONE;                       \
+    (it_ptr)->ent_idx = ZB_APS_RETRANS_ENT_LIST_HEAD((it_ptr)->slot_idx);       \
+                                                                                \
+    while ((it_ptr)->slot_idx < (ZB_APS_RETRANS_ENT_TIMER_SLOT_FREE) &&         \
+      (it_ptr)->ent_idx == ZB_APS_RETRANS_ENT_REF_NONE)                         \
+    {                                                                           \
+      (it_ptr)->slot_idx++;                                                     \
+      (it_ptr)->ent_idx = ZB_APS_RETRANS_ENT_LIST_HEAD((it_ptr)->slot_idx);     \
+    }                                                                           \
+  } while(ZB_FALSE)
+
+
+/**
+ * @brief Checks if the retransmission entry iterator is end iterator
+ */
+#define ZB_APS_RETRANS_TABLE_ITER_END(it_ptr)                       \
+  ((it_ptr)->slot_idx == ZB_APS_RETRANS_ENT_TIMER_SLOT_FREE)
+
+/**
+ * @brief Moves retransmission entry iterator to the next active entry
+ */
+#define ZB_APS_RETRANS_TABLE_ITER_NEXT(it_ptr)                                            \
+  do                                                                                      \
+  {                                                                                       \
+    if (ZG->aps.retrans.hash[(it_ptr)->ent_idx].list_next != ZB_APS_RETRANS_ENT_REF_NONE) \
+    {                                                                                     \
+      (it_ptr)->prev_ent_idx = (it_ptr)->ent_idx;                                         \
+      (it_ptr)->ent_idx = ZG->aps.retrans.hash[(it_ptr)->ent_idx].list_next;              \
+    }                                                                                     \
+    else                                                                                  \
+    {                                                                                     \
+      do                                                                                  \
+      {                                                                                   \
+        (it_ptr)->slot_idx++;                                                             \
+        (it_ptr)->prev_ent_idx = ZB_APS_RETRANS_ENT_REF_NONE;                             \
+        (it_ptr)->ent_idx = ZB_APS_RETRANS_ENT_LIST_HEAD((it_ptr)->slot_idx);             \
+      } while ((it_ptr)->slot_idx < ZB_APS_RETRANS_ENT_TIMER_SLOT_FREE &&                 \
+        ZB_APS_RETRANS_ENT_LIST_HEAD((it_ptr)->slot_idx) == ZB_APS_RETRANS_ENT_REF_NONE); \
+    }                                                                                     \
+  } while (ZB_FALSE)
+
+
+/**
+ * @brief Initializes the iterator for the first active retransmission entry
+ * in the specified slot
+ */
+#define ZB_APS_RETRANS_TABLE_SLOT_ITER_BEGIN(it_ptr, it_slot_idx)               \
+  do {                                                                          \
+    (it_ptr)->slot_idx = (it_slot_idx);                                         \
+    (it_ptr)->prev_ent_idx = ZB_APS_RETRANS_ENT_REF_NONE;                       \
+    (it_ptr)->ent_idx = ZB_APS_RETRANS_ENT_LIST_HEAD((it_ptr)->slot_idx);       \
+  } while(ZB_FALSE)
+
+
+/**
+ * @brief Checks if the retransmission entry iterator is end iterator in the slot
+ * specified in \ref ZB_APS_RETRANS_TABLE_SLOT_ITER_BEGIN
+ */
+#define ZB_APS_RETRANS_TABLE_SLOT_ITER_END(it_ptr)          \
+  ((it_ptr)->ent_idx == ZB_APS_RETRANS_ENT_REF_NONE)
+
+
+/**
+ * @brief Moves retransmission entry iterator to the next active entry in the slot
+ * specified in \ref ZB_APS_RETRANS_TABLE_SLOT_ITER_BEGIN
+ */
+#define ZB_APS_RETRANS_TABLE_SLOT_ITER_NEXT(it_ptr)                                     \
+  do                                                                                    \
+  {                                                                                     \
+    (it_ptr)->prev_ent_idx = (it_ptr)->ent_idx;                                         \
+    (it_ptr)->ent_idx = ZG->aps.retrans.hash[(it_ptr)->ent_idx].list_next;              \
+  } while (ZB_FALSE)
+
+
+#define ZB_APS_RETRANS_TABLE_ITER_ENTRY(it_ptr) \
+  (ZG->aps.retrans.hash[(it_ptr)->ent_idx])
 
 
 typedef struct zb_aps_tmp_s
@@ -429,7 +556,7 @@ typedef ZB_PACKED_PRE struct zb_aps_in_fragmented_frame_s
   zb_uint8_t aps_counter;
   zb_uint8_t total_blocks_num;
   zb_uint8_t current_window;
-  zb_bufid_t window_buffers[ZB_APS_MAX_FRAGMENT_NUM_IN_WINDOW];
+  zb_bufid_t window_buffer;
   zb_bufid_t buffer;
   ZB_PACKED_PRE struct
   {
@@ -466,7 +593,7 @@ typedef struct zb_aps_out_fragmented_frame_s
   zb_uint8_t blocks_sent_mask[ZB_APS_BLOCK_MASK_SIZE];
   zb_uint8_t blocks_retry_mask[ZB_APS_BLOCK_MASK_SIZE];
   zb_uint8_t current_window;
-  zb_uint8_t block_ref[ZB_APS_BLOCK_REF_SIZE];
+  zb_bufid_t block_ref[ZB_APS_BLOCK_REF_SIZE];
 
   zb_uint8_t retry_count;
   /* ZB_APS_RETRANS_ENT_SENT_MAC_NOT_CONFIRMED_ALRM_RUNNING case: block_num and block_ack of
@@ -477,7 +604,7 @@ typedef struct zb_aps_out_fragmented_frame_s
   /* 2019-03-06 CR:MAJOR What is the reason of this field? It is not used anywhere in
    * the code. */
   zb_uint8_t dst_max_in;
-  zb_uint8_t data_param;
+  zb_bufid_t data_param;
   zb_bool_t transmission_is_scheduled;
   zb_uint8_t addr_mode;
 } zb_aps_out_fragment_frame_t;
@@ -494,7 +621,7 @@ typedef struct zb_aps_out_fragmented_frame_s
 
 typedef struct zb_aps_max_trans_size_s
 {
-  zb_uint8_t addr_ref;
+  zb_address_ieee_ref_t addr_ref;
   zb_uint16_t max_in_trans_size;
   zb_uint8_t max_buffer_size;
   zb_uint8_t clock;
@@ -560,7 +687,7 @@ ZB_ASSERT_COMPILE_DECL(ZB_APS_MAX_IN_FRAGMENT_TRANSMISSIONS < ZB_INVALID_FRAG_ID
 #endif
 
 #ifdef ZB_APS_USER_PAYLOAD
-zb_bool_t zb_aps_call_user_payload_cb(zb_uint8_t param);
+zb_bool_t zb_aps_call_user_payload_cb(zb_bufid_t param);
 
 #define ZB_APS_CALL_USER_PAYLOAD_CB(param) zb_aps_call_user_payload_cb(param)
 #else

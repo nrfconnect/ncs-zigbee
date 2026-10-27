@@ -56,39 +56,39 @@
 #include "zb_bdb_internal.h"
 
 
-#if defined ZB_FORMATION
+#if defined ZB_BDB_MODE && defined ZB_FORMATION
 
 #ifndef NCP_MODE_HOST
-static void nwk_cancel_network_formation_response(zb_bufid_t buf);
+static void nwk_cancel_network_formation_response(zb_cb_param_t buf);
 #endif /* NCP_MODE_HOST */
 
-static void bdb_formation(zb_uint8_t param)
+static void bdb_formation(zb_cb_param_t param)
 {
-  TRACE_MSG(TRACE_ZDO3, "bdb_formation param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZDO3, "bdb_formation param %d", (FMT__D, param));
 
   /* See Figure 5 - Network formation procedure */
 
   if (ZB_BDB().v_do_primary_scan == ZB_BDB_JOIN_MACHINE_PRIMARY_SCAN
-      && ZB_BDB().bdb_primary_channel_set != 0)
+        && !zb_channel_page_list_is_empty(ZB_BDB().bdb_primary_channel_list))
   {
     ZB_BDB().v_do_primary_scan = ZB_BDB_JOIN_MACHINE_SECONDARY_SCAN_START;
     ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_IN_PROGRESS;
-    ZB_BDB().v_scan_channels = ZB_BDB().bdb_primary_channel_set;
-    TRACE_MSG(TRACE_ZDO1, "Doing formation channel mask 0x%lx", (FMT__L, ZB_BDB().v_scan_channels));
+    zb_channel_page_list_copy(ZB_BDB().v_scan_channels_list, ZB_BDB().bdb_primary_channel_list);
+    TRACE_MSG(TRACE_ZDO1, "Doing formation", (FMT__0));
     /* call directly to simplify cancellation logic */
     zdo_start_formation(param);
   }
   else if ((ZB_BDB().v_do_primary_scan == ZB_BDB_JOIN_MACHINE_SECONDARY_SCAN_START
-            && ZB_BDB().bdb_secondary_channel_set != 0)
-           ||
-           (ZB_BDB().v_do_primary_scan == ZB_BDB_JOIN_MACHINE_PRIMARY_SCAN
-            && ZB_BDB().bdb_secondary_channel_set != 0
-            && ZB_BDB().bdb_primary_channel_set == 0))
+            && !zb_channel_page_list_is_empty(ZB_BDB().bdb_secondary_channel_list))
+          ||
+          (ZB_BDB().v_do_primary_scan == ZB_BDB_JOIN_MACHINE_PRIMARY_SCAN
+            && zb_channel_page_list_is_empty(ZB_BDB().bdb_primary_channel_list)
+            && !zb_channel_page_list_is_empty(ZB_BDB().bdb_secondary_channel_list)))
   {
     ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_IN_PROGRESS;
     ZB_BDB().v_do_primary_scan = ZB_BDB_JOIN_MACHINE_SECONDARY_SCAN_DONE;
-    ZB_BDB().v_scan_channels = ZB_BDB().bdb_secondary_channel_set;
-    TRACE_MSG(TRACE_ZDO1, "Doing formation channel mask 0x%lx", (FMT__L, ZB_BDB().v_scan_channels));
+    zb_channel_page_list_copy(ZB_BDB().v_scan_channels_list, ZB_BDB().bdb_secondary_channel_list);
+    TRACE_MSG(TRACE_ZDO1, "Doing formation", (FMT__0));
     /* call directly to simplify cancellation logic */
     zdo_start_formation(param);
   }
@@ -97,7 +97,7 @@ static void bdb_formation(zb_uint8_t param)
     ZB_BDB().bdb_commissioning_status = ZB_BDB_STATUS_FORMATION_FAILURE;
     TRACE_MSG(TRACE_ZDO1, "BDB: Formation failed run next bdb machine step", (FMT__0));
     ZB_BDB().v_do_primary_scan = ZB_BDB_JOIN_MACHINE_PRIMARY_SCAN;
-    ZB_BDB().bdb_commissioning_step <<= 1;
+    ZB_BDB().bdb_commissioning_step = ZB_BDB_STEP_COMMISSIONING_STOP;
     ZB_SCHEDULE_CALLBACK(bdb_commissioning_machine, param);
   }
 }
@@ -105,23 +105,7 @@ static void bdb_formation(zb_uint8_t param)
 
 static void bdb_commissioning_formation_channels_mask(zb_channel_list_t list)
 {
-  zb_uint32_t mask;
-
-#if defined ZB_SUB_GHZ_ZB30_SUPPORT
-  zb_uint8_t used_page;
-#endif /* ZB_SUB_GHZ_ZB30_SUPPORT */
-
-  mask = ZB_BDB().v_scan_channels;
-
-  zb_channel_list_init(list);
-
-#if defined ZB_SUB_GHZ_ZB30_SUPPORT
-  used_page = zb_aib_channel_page_list_get_first_filled_page();
-  zb_channel_page_list_set_mask(list, used_page, mask);
-#else
-  zb_channel_page_list_set_mask(list, ZB_CHANNEL_LIST_PAGE0_IDX, mask);
-#endif /* !ZB_SUB_GHZ_ZB30_SUPPORT */
-
+  zb_channel_page_list_copy(list, ZB_BDB().v_scan_channels_list);
 }
 
 
@@ -142,15 +126,20 @@ static void bdb_formation_force_link(void)
 
 void zb_set_network_coordinator_role(zb_uint32_t channel_mask)
 {
-  bdb_force_link();
-  bdb_formation_force_link();
-  zb_set_network_coordinator_role_with_mode(channel_mask, ZB_COMMISSIONING_BDB);
+  zb_channel_list_t channel_list;
+  zb_channel_list_init(channel_list);
+  zb_channel_page_list_set_2_4GHz_mask(channel_list, channel_mask);
+
+  zb_set_network_coordinator_role_ext(channel_list);
 }
 
 void zb_set_network_coordinator_role_ext(zb_channel_list_t channel_list)
 {
   bdb_force_link();
   bdb_formation_force_link();
+
+  zb_set_bdb_primary_channel_list(channel_list);
+
   zb_set_nwk_role_mode_common_ext(ZB_NWK_DEVICE_TYPE_COORDINATOR,
                                   channel_list,
                                   ZB_COMMISSIONING_BDB);
@@ -171,27 +160,10 @@ static void bdb_enable_distributed(void)
   bdb_formation_force_link();
 }
 
-void zb_enable_distributed(void)
-{
-  bdb_enable_distributed();
-}
-
 void zb_bdb_enable_distributed_network_formation(void)
 {
   bdb_enable_distributed();
   zb_zdo_setup_network_as_distributed();
-}
-
-void zb_bdb_enable_distributed_formation(zb_bool_t enable)
-{
-  if (enable)
-  {
-    zb_bdb_enable_distributed_network_formation();
-  }
-  else
-  {
-    zb_bdb_disable_distributed_network_formation();
-  }
 }
 
 #endif /* ZB_DISTRIBUTED_SECURITY_ON */
@@ -213,41 +185,33 @@ static void bdb_send_formation_cancelled_signal(zb_bufid_t buf, zb_ret_t status)
 void bdb_cancel_formation(zb_bufid_t buf)
 {
   /* The states this function can be called:
-     1. No formation (initiated by bdb_start_top_level_commissioning) is in progress
-        Conditions: ZB_BDB().bdb_commissioning_mode != ZB_BDB_NETWORK_FORMATION
-        Actions: return RET_INVALID_STATE
-     2. Formation is in progress, network formation is not sent yet
-        Conditions: ZB_BDB().bdb_commissioning_step <= ZB_BDB_NETWORK_FORMATION
+     1. Formation is in progress, network formation is not sent yet
+        Conditions: ZB_BDB().bdb_commissioning_step <= ZB_BDB_STEP_NETWORK_FORMATION
         Actions: set ZB_BDB().bdb_op_cancelled flag
                  return RET_OK
-     3. Formation is in progress, network formation is scheduled
-        Conditions: ZB_BDB().bdb_commissioning_step == ZB_BDB_NETWORK_FORMATION
+     2. Formation is in progress, network formation is scheduled
+        Conditions: ZB_BDB().bdb_commissioning_step == ZB_BDB_STEP_NETWORK_FORMATION
         Actions: call zb_nwk_cancel_network_formation()
                  zb_nwk_cancel_network_formation will return RET_OK
                  return RET_OK
-     4. Formation is in progress, NWK layer formation is in progress
-        Conditions: ZB_BDB().bdb_commissioning_step == ZB_BDB_NETWORK_FORMATION
+     3. Formation is in progress, NWK layer formation is in progress
+        Conditions: ZB_BDB().bdb_commissioning_step == ZB_BDB_STEP_NETWORK_FORMATION
         Actions: call zb_nwk_cancel_network_formation()
                  zb_nwk_cancel_network_formation will return RET_OK (if it possible to cancel)
                  or RET_INVALID_STATE (if it is too late to cancel a formation)
                  return RET_OK or RET_PENDING
-     5. Formation is in progress, formation confirm is scheduled
-        Conditions: ZB_BDB().bdb_commissioning_step == ZB_BDB_NETWORK_FORMATION
+     4. Formation is in progress, formation confirm is scheduled
+        Conditions: ZB_BDB().bdb_commissioning_step == ZB_BDB_STEP_NETWORK_FORMATION
         Actions: call zb_nwk_cancel_network_formation()
                  zb_nwk_cancel_network_formation will return RET_INVALID_STATE
                  return RET_PENDING
-     6. Formation is in progress, formation confirm is scheduled
-        Conditions: ZB_BDB().bdb_commissioning_step == ZB_BDB_NETWORK_FORMATION
-        Actions: call zb_nwk_cancel_network_formation()
-                 zb_nwk_cancel_network_formation will return RET_INVALID_STATE
-                 return RET_PENDING
-     7. Formation is in progress, NWK layer formation is already cancelled
-        Conditions: ZB_BDB().bdb_commissioning_step == ZB_BDB_NETWORK_FORMATION
+     5. Formation is in progress, NWK layer formation is already cancelled
+        Conditions: ZB_BDB().bdb_commissioning_step == ZB_BDB_STEP_NETWORK_FORMATION
         Actions: call zb_nwk_cancel_network_formation()
                  zb_nwk_cancel_network_formation() will return RET_IGNORE
                  return RET_IGNORE
-     8. Formation is in progress, but already cancelled
-        Conditions: ZB_BDB().bdb_commissioning_step == ZB_BDB_NETWORK_FORMATION
+     6. Formation is in progress, but already cancelled
+        Conditions: ZB_BDB().bdb_commissioning_step == ZB_BDB_STEP_NETWORK_FORMATION
                     ZB_BDB().bdb_op_cancelled == ZB_TRUE
         Actions: return RET_IGNORE
   */
@@ -270,13 +234,7 @@ void bdb_cancel_formation(zb_bufid_t buf)
       break;
     }
 
-    if (ZB_BDB().bdb_commissioning_mode != ZB_BDB_NETWORK_FORMATION)
-    {
-      ret = RET_INVALID_STATE;
-      break;
-    }
-
-    if (ZB_BDB().bdb_commissioning_step > ZB_BDB_NETWORK_FORMATION)
+    if (ZB_BDB().bdb_commissioning_step > ZB_BDB_STEP_NETWORK_FORMATION)
     {
       ret = RET_PENDING;
       break;
@@ -284,7 +242,7 @@ void bdb_cancel_formation(zb_bufid_t buf)
 
     ZB_BDB().bdb_op_cancelled = ZB_TRUE;
 
-    if (ZB_BDB().bdb_commissioning_step < ZB_BDB_NETWORK_FORMATION)
+    if (ZB_BDB().bdb_commissioning_step < ZB_BDB_STEP_NETWORK_FORMATION)
     {
       ret = RET_OK;
       break;
@@ -304,7 +262,7 @@ void bdb_cancel_formation(zb_bufid_t buf)
 }
 
 
-static void nwk_cancel_network_formation_response(zb_bufid_t buf)
+static void nwk_cancel_network_formation_response(zb_cb_param_t buf)
 {
   zb_ret_t status;
 

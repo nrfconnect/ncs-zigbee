@@ -91,8 +91,8 @@ static zb_discover_cmd_list_t gs_ota_upgrade_client_cmd_list =
   sizeof(gs_ota_upgrade_client_generated_commands), gs_ota_upgrade_client_generated_commands
 };
 
-static zb_bool_t zb_zcl_process_ota_upgrade_specific_commands_cli(zb_uint8_t param);
-static zb_bool_t zb_zcl_process_ota_cli_upgrade_specific_commands(zb_uint8_t param);
+static zb_bool_t zb_zcl_process_ota_upgrade_specific_commands_cli(zb_cb_param_t param);
+static zb_bool_t zb_zcl_process_ota_cli_upgrade_specific_commands(zb_bufid_t param);
 
 void zb_zcl_ota_upgrade_init_cli(void)
 {
@@ -120,9 +120,9 @@ void zb_zcl_ota_set_file_size(zb_uint8_t endpoint, zb_uint32_t size)
   get_upgrade_client_variables(endpoint)->download_file_size = size;
 }
 
-static void resend_buffer(zb_uint8_t param);
+static void resend_buffer(zb_cb_param_t param);
 
-static void zb_zcl_ota_upgrade_block_req_cb(zb_uint8_t param)
+static void zb_zcl_ota_upgrade_block_req_cb(zb_cb_param_t param)
 {
   zb_zcl_command_send_status_t *cmd_send_status = ZB_BUF_GET_PARAM(param, zb_zcl_command_send_status_t);
   zb_zcl_ota_upgrade_client_variable_t *client_data = get_upgrade_client_variables(cmd_send_status->src_endpoint);
@@ -155,7 +155,7 @@ static void zb_zcl_ota_upgrade_block_req_cb(zb_uint8_t param)
     ZB_N_APS_ACK_WAIT_DURATION_FROM_NON_SLEEPY * (ZB_N_APS_MAX_FRAME_RETRIES - 1) / ZB_APS_DUPS_TABLE_SIZE )
 #define OTA_BLOCK_REQ_DELAY(_delay) (((_delay > OTA_MIN_BLOCK_REQ_DELAY)) ? (_delay) : OTA_MIN_BLOCK_REQ_DELAY)
 
-static void zb_zcl_ota_upgrade_send_block_request(zb_uint8_t param, zb_time_t current_delay)
+static void zb_zcl_ota_upgrade_send_block_request(zb_bufid_t param, zb_time_t current_delay)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_ieee_addr_t our_long_address;
@@ -165,7 +165,7 @@ static void zb_zcl_ota_upgrade_send_block_request(zb_uint8_t param, zb_time_t cu
   zb_uint32_t current_offset;
   zb_zcl_ota_upgrade_client_variable_t *client_data;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_send_block_request param %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_send_block_request param %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
   endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint;
@@ -215,20 +215,19 @@ static void zb_zcl_ota_upgrade_send_block_request(zb_uint8_t param, zb_time_t cu
 
 /****************** public function and its helper ****************/
 
-static void zb_zcl_ota_upgrade_request_server_send(zb_uint8_t param, zb_uint16_t endpoint16)
+static void zb_zcl_ota_upgrade_request_server_send(zb_cb_param_t cb_param)
 {
-  zb_uint8_t endpoint;
   zb_uint16_t manufacturer;
   zb_uint16_t image_type;
   zb_uint32_t file_version;
   zb_zcl_attr_t *attr_desc;
   zb_uint16_t addr;
   zb_uint8_t dst_endpoint;
+  zb_bufid_t param = ZB_UNPACK_BUF_REF(cb_param);
+  zb_uint8_t endpoint = (zb_uint8_t)ZB_UNPACK_USER_PARAM(cb_param);
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_request_server_send param %hx ep %d", (FMT__H_D,
-      param, endpoint16));
-
-  endpoint = (zb_uint8_t)endpoint16;
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_request_server_send param %d ep %hd", (FMT__D_H,
+      param, endpoint));
 
   /* zb_zcl_ota_upgrade_request_server_send is called by delayed buffer alloc,
    * so check for scheduling more than 1 zb_zcl_ota_upgrade_request_server_send
@@ -264,11 +263,11 @@ static void zb_zcl_ota_upgrade_request_server_send(zb_uint8_t param, zb_uint16_t
 }
 
 
-static void zb_zcl_ota_upgrade_request_server(zb_uint8_t endpoint)
+static void zb_zcl_ota_upgrade_request_server(zb_cb_param_t endpoint)
 {
   zb_zcl_ota_upgrade_client_variable_t *client_data;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_request_server endpoint %d", (FMT__H, endpoint));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_request_server endpoint %d", (FMT__D, endpoint));
 
   client_data = get_upgrade_client_variables(endpoint);
 
@@ -301,7 +300,7 @@ static void zb_zcl_ota_upgrade_request_server(zb_uint8_t endpoint)
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_ota_upgrade_request_server", (FMT__0));
 }
 
-static void zb_zcl_ota_server_discovery_callback(zb_uint8_t param)
+static void zb_zcl_ota_server_discovery_callback(zb_cb_param_t param)
 {
   zb_uint8_t *zdp_cmd = zb_buf_begin(param);
 
@@ -333,11 +332,11 @@ static void zb_zcl_ota_server_discovery_callback(zb_uint8_t param)
 }
 
 /* public API */
-void zb_zcl_ota_upgrade_init_client(zb_uint8_t param)
+void zb_zcl_ota_upgrade_init_client(zb_cb_param_t param)
 {
   zb_zdo_match_desc_param_t *req;
   zb_uint16_t tc_addr;
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_init_client %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_init_client %d", (FMT__D, param));
 
   // start_ota_server_discovery
   req = zb_buf_initial_alloc(param, sizeof(zb_zdo_match_desc_param_t) + sizeof(zb_uint16_t));
@@ -506,7 +505,7 @@ void zb_zcl_ota_upgrade_file_upgraded(zb_uint8_t endpoint)
  /*************************** Client handlers *************************/
 
 /** @brief Image Notify command */
-static zb_ret_t image_notify_handler(zb_uint8_t param)
+static zb_ret_t image_notify_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   /* Compilers may complain here about maybe-uninitialized without {0} when optimization is enabled */
@@ -514,7 +513,7 @@ static zb_ret_t image_notify_handler(zb_uint8_t param)
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, "> image_notify_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> image_notify_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -560,7 +559,7 @@ static zb_ret_t image_notify_handler(zb_uint8_t param)
       }
       if(is_agree_file)
       {
-        zb_uint8_t my_jitter_rnd = ZB_RANDOM_JTR(ZB_ZCL_OTA_UPGRADE_QUERY_JITTER_MAX_VALUE) + 1;
+        zb_uint8_t my_jitter_rnd = ZB_RANDOM_JTR(ZB_ZCL_OTA_UPGRADE_QUERY_JITTER_MAX_VALUE);
 #ifdef ZB_STACK_REGRESSION_TESTING_API
         if (ZB_REGRESSION_TESTS_API().zcl_ota_custom_query_jitter)
         {
@@ -653,14 +652,14 @@ static zb_ret_t image_notify_handler(zb_uint8_t param)
 }
 
 /** @brief Query Next Image Request command */
-static zb_ret_t query_next_image_resp_handler(zb_uint8_t param)
+static zb_ret_t query_next_image_resp_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ota_upgrade_query_next_image_res_t payload = {0};
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, "> query_next_image_resp_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> query_next_image_resp_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -761,6 +760,8 @@ static zb_ret_t query_next_image_resp_handler(zb_uint8_t param)
 }
 
 
+static void resend_buffer(zb_cb_param_t param);
+
 static void cancel_resend_buffer()
 {
   TRACE_MSG(TRACE_ZCL2, "cancel_resend_buffer", (FMT__0));
@@ -785,7 +786,7 @@ static void schedule_resend_buffer(zb_uint8_t endpoint)
 
 
 /* public API */
-void zcl_ota_abort(zb_uint8_t endpoint, zb_uint8_t param)
+void zcl_ota_abort(zb_uint8_t endpoint, zb_bufid_t param)
 {
   zb_uint8_t status = ZB_ZCL_OTA_UPGRADE_IMAGE_STATUS_NORMAL;
   zb_zcl_attr_t *attr_desc;
@@ -854,7 +855,7 @@ void zcl_ota_abort(zb_uint8_t endpoint, zb_uint8_t param)
 
 /* FIXME: link problem. */
 #ifdef ZB_ZCL_SUPPORT_CLUSTER_WWAH
-void schedule_init_client(zb_uint8_t param)
+void schedule_init_client(zb_cb_param_t param)
 {
   TRACE_MSG(TRACE_APP1, "> schedule_init_client", (FMT__0));
   ZB_SCHEDULE_ALARM(zb_zcl_ota_upgrade_init_client, param, 2*ZB_TIME_ONE_SECOND);
@@ -898,14 +899,14 @@ static void zcl_ota_abort_and_set_tc_cli()
 #endif  /* ZB_COORDINATOR_ONLY */
 #endif
 
-static void zb_zcl_ota_upgrade_end_res_timeout(zb_uint8_t endpoint)
+static void zb_zcl_ota_upgrade_end_res_timeout(zb_cb_param_t endpoint)
 {
   TRACE_MSG(TRACE_OTA1, "Error: receive upgrade end response timed out for endpoint %d. Aborting OTA", (FMT__D, endpoint));
   zcl_ota_abort(endpoint, ZB_UNDEFINED_BUFFER);
 }
 
 /* Helper routine to finish OTA Upgrade */
-static void zb_zcl_ota_upgrade_end(zb_uint8_t param,
+static void zb_zcl_ota_upgrade_end(zb_bufid_t param,
                                    zb_uint8_t status,
                                    zb_zcl_parsed_hdr_t                  *cmd_info,
                                    zb_zcl_ota_upgrade_image_block_res_t *payload)
@@ -937,7 +938,7 @@ static void zb_zcl_ota_upgrade_end(zb_uint8_t param,
 
 /* Note: resend_buffer is used by r20 ZBOSS apps. Seems now no need to call it from outside, so tet make it static. */
 // try resend req
-static void resend_buffer(zb_uint8_t param)
+static void resend_buffer(zb_cb_param_t param)
 {
   zb_ieee_addr_t our_long_address = {0};
   zb_bufid_t send_buf = 0;
@@ -1028,7 +1029,7 @@ static void resend_buffer(zb_uint8_t param)
 }
 
 /* Helper routine to get next image block */
-static void zb_zcl_ota_upgrade_get_next_image_block(zb_uint8_t param,
+static void zb_zcl_ota_upgrade_get_next_image_block(zb_bufid_t param,
                                                     zb_zcl_parsed_hdr_t                  *cmd_info,
                                                     zb_zcl_ota_upgrade_image_block_res_t *payload)
 {
@@ -1045,7 +1046,7 @@ static void zb_zcl_ota_upgrade_get_next_image_block(zb_uint8_t param,
 }
 
 /* Helper routine to process downloaded image */
-static void zb_zcl_ota_upgrade_process_downloaded_image(zb_uint8_t param,
+static void zb_zcl_ota_upgrade_process_downloaded_image(zb_bufid_t param,
                                                         zb_zcl_parsed_hdr_t                  *cmd_info,
                                                         zb_zcl_ota_upgrade_image_block_res_t *payload)
 {
@@ -1092,7 +1093,7 @@ static void zb_zcl_ota_upgrade_process_downloaded_image(zb_uint8_t param,
 
 /* public API. Never called */
 /* Resume OTA Upgrade signal from application */
-void zb_zcl_ota_upgrade_resume_client(zb_uint8_t param, zb_uint8_t upgrade_status)
+void zb_zcl_ota_upgrade_resume_client(zb_bufid_t param, zb_uint8_t upgrade_status)
 {
   zb_uint8_t endpoint;
   zb_uint8_t ota_status;
@@ -1100,7 +1101,7 @@ void zb_zcl_ota_upgrade_resume_client(zb_uint8_t param, zb_uint8_t upgrade_statu
   zb_zcl_parsed_hdr_t                  cmd_info;
   zb_zcl_parse_status_t                status = ZB_ZCL_PARSE_STATUS_FAILURE;
 
-  TRACE_MSG(TRACE_OTA2, "zb_zcl_ota_upgrade_resume_client param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_OTA2, "zb_zcl_ota_upgrade_resume_client param %d", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -1201,12 +1202,12 @@ void zb_zcl_ota_restart_after_rejoin(zb_uint8_t endpoint)
 }
 
 
-static void zb_zcl_ota_upgrade_finish_upgrade(zb_uint8_t param)
+static void zb_zcl_ota_upgrade_finish_upgrade(zb_cb_param_t param)
 {
   zb_uint8_t user_ret;
   zb_uint8_t endpoint = *ZB_BUF_GET_PARAM(param, zb_uint8_t);
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_finish_upgrade param %hd ep %hd", (FMT__H_H,
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_finish_upgrade param %d ep %hd", (FMT__D_H,
       param, endpoint));
 
   ZB_ZCL_OTA_UPGRADE_FINISH_USER_APP(param, user_ret);
@@ -1216,19 +1217,19 @@ static void zb_zcl_ota_upgrade_finish_upgrade(zb_uint8_t param)
 
   zb_zcl_ota_upgrade_set_ota_status(endpoint, ZB_ZCL_OTA_UPGRADE_IMAGE_STATUS_NORMAL);
 
-  TRACE_MSG(TRACE_ZCL1, "< zb_zcl_ota_upgrade_finish_upgrade param %hd ep %hd", (FMT__H_H,
+  TRACE_MSG(TRACE_ZCL1, "< zb_zcl_ota_upgrade_finish_upgrade param %d ep %hd", (FMT__D_H,
       param, endpoint));
 }
 
 /** @brief Image Block Response command */
-static zb_ret_t image_block_resp_handler(zb_uint8_t param)
+static zb_ret_t image_block_resp_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ota_upgrade_image_block_res_t payload;
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, "> image_block_resp_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> image_block_resp_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -1416,7 +1417,7 @@ static zb_ret_t image_block_resp_handler(zb_uint8_t param)
           TRACE_MSG(TRACE_ZCL2, "set delay attr %d",
                     (FMT__D, payload.response.wait_for_data.delay));
 
-          /* TODO: implement attribute value check in zb_zcl_check_attr_value (0 - 0x258)
+          /* TODO: implement attribute value check in zb_zcl_check_attr_value_manuf (0 - 0x258)
              NOTE: it seems error in the spec, too low upper limit;
              possibly it should be 6000? */
 
@@ -1478,7 +1479,7 @@ static zb_ret_t image_block_resp_handler(zb_uint8_t param)
 
 
 /* public API */
-void zb_zcl_ota_upgrade_send_upgrade_end_req(zb_uint8_t param, zb_uint8_t upgrade_status)
+void zb_zcl_ota_upgrade_send_upgrade_end_req(zb_bufid_t param, zb_uint8_t upgrade_status)
 {
   zb_zcl_ota_upgrade_image_block_res_t payload;
   zb_zcl_parse_status_t status;
@@ -1486,8 +1487,8 @@ void zb_zcl_ota_upgrade_send_upgrade_end_req(zb_uint8_t param, zb_uint8_t upgrad
 
   ZB_BZERO(&payload, sizeof(payload));
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_send_upgrade_end_req param %hd, status %hd",
-            (FMT__H_H, param, upgrade_status));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_ota_upgrade_send_upgrade_end_req param %d, status %hd",
+            (FMT__D_H, param, upgrade_status));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -1511,7 +1512,7 @@ void zb_zcl_ota_upgrade_send_upgrade_end_req(zb_uint8_t param, zb_uint8_t upgrad
 }
 
 /** @brief Upgrade End Response command */
-static zb_ret_t upgrade_end_resp_handler(zb_uint8_t param)
+static zb_ret_t upgrade_end_resp_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ota_upgrade_upgrade_end_res_t payload;
@@ -1621,14 +1622,14 @@ static zb_ret_t upgrade_end_resp_handler(zb_uint8_t param)
 }
 
 /** @brief Query Specific File Response command */
-static zb_ret_t query_specific_file_resp_handler(zb_uint8_t param)
+static zb_ret_t query_specific_file_resp_handler(zb_bufid_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_ota_upgrade_query_specific_file_res_t payload;
   zb_zcl_parse_status_t status;
   zb_zcl_parsed_hdr_t cmd_info;
 
-  TRACE_MSG(TRACE_ZCL1, "> query_specific_file_resp_handler %hx", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> query_specific_file_resp_handler %x", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -1687,7 +1688,7 @@ static zb_ret_t query_specific_file_resp_handler(zb_uint8_t param)
 }
 
 
-static zb_bool_t zb_zcl_process_ota_cli_upgrade_specific_commands(zb_uint8_t param)
+static zb_bool_t zb_zcl_process_ota_cli_upgrade_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -1697,7 +1698,7 @@ static zb_bool_t zb_zcl_process_ota_cli_upgrade_specific_commands(zb_uint8_t par
 
   TRACE_MSG( TRACE_ZCL1,
              "> zb_zcl_process_ota_upgrade_specific_commands: param %d, cmd %d",
-             (FMT__H_H, param, cmd_info.cmd_id));
+             (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_OTA_UPGRADE == cmd_info.cluster_id);
 
@@ -1819,7 +1820,7 @@ static zb_bool_t zb_zcl_process_ota_cli_upgrade_specific_commands(zb_uint8_t par
   return processed;
 }
 
-static zb_bool_t zb_zcl_process_ota_upgrade_specific_commands_cli(zb_uint8_t param)
+static zb_bool_t zb_zcl_process_ota_upgrade_specific_commands_cli(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {

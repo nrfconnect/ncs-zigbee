@@ -52,16 +52,6 @@
   *  @{
   */
 
-/** Performs custom initialization steps after the stack is initialized and started.
- *
- * Background: The library provides the complete MAIN() routine for initializing and running the stack
- * in NCP mode. This callout functon is for customizing it.
- *
- * The library contains a weak, empty implementation, so the application can replace it with another
- * one if necessary.
- */
-void zb_ncp_app_fw_custom_post_start(void);
-
 /** Return code which is raised if @ref zb_ncp_custom_response will be called later*/
 #define NCP_RET_LATER (255U)
 
@@ -76,7 +66,7 @@ void zb_ncp_app_fw_custom_post_start(void);
  *
  * @note If returned length is equal to 0, the response is generated and sent automatically.
  */
-typedef zb_uint16_t (*zb_ncp_custom_request_cb_t)(zb_uint8_t param);
+typedef zb_uint16_t (*zb_ncp_custom_request_cb_t)(zb_bufid_t param);
 
 /** Registers a callback, that is called once the zb_ncp_custom_request is called on the host side
  *  and the corresponding NCP command is received.
@@ -89,7 +79,7 @@ void zb_ncp_custom_register_request_cb(zb_ncp_custom_request_cb_t cb);
  *
  * @param param - the ZBOSS buffer with payload. It's freed by the stack.
  */
-void zb_ncp_custom_indication(zb_uint8_t param);
+void zb_ncp_custom_indication(zb_cb_param_t param);
 
 /** Sends a custom response.
  *
@@ -100,7 +90,7 @@ void zb_ncp_custom_indication(zb_uint8_t param);
  *
  * @note Should be called within @ref zb_ncp_custom_request_cb_t unless @ref NCP_RET_LATER is not returned from callback.
  */
-zb_uint16_t zb_ncp_custom_response(zb_uint8_t param);
+zb_uint16_t zb_ncp_custom_response(zb_cb_param_t param);
 
 /** @} */ /* ncp_dev_api */
 

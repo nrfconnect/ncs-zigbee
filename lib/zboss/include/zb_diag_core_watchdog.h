@@ -56,6 +56,6 @@ void zb_diag_core_watchdog_init(void);
  *
  * You can redefine the message period in your vendor configuration file, @see ZB_DIAG_CORE_WATCHDOG_TMO_MS
  */
-void zb_diag_core_watchdog(zb_uint8_t param);
+void zb_diag_core_watchdog(zb_cb_param_t param);
 
 #endif /* ZB_DIAG_CORE_WATCHDOG_H */

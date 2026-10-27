@@ -56,6 +56,22 @@
 
 /*! @cond internals_doc */
 
+#ifdef ZB_DEBUG_CALLBACKS
+#define TRACE_SCHEDULER_PROTO_VOID    zb_uint16_t from_file, zb_uint16_t from_line
+#define TRACE_SCHEDULER_CALL_VOID     ZB_TRACE_FILE_ID, __LINE__
+#define TRACE_SCHEDULER_FORWARD_VOID  from_file, from_line
+#define TRACE_SCHEDULER_PROTO         TRACE_ADDR_PROTO_VOID ,
+#define TRACE_SCHEDULER_CALL          TRACE_ADDR_CALL_VOID ,
+#define TRACE_SCHEDULER_FORWARD       TRACE_ADDR_FORWARD_VOID ,
+#else
+#define TRACE_SCHEDULER_PROTO_VOID
+#define TRACE_SCHEDULER_CALL_VOID
+#define TRACE_SCHEDULER_FORWARD_VOID
+#define TRACE_SCHEDULER_PROTO
+#define TRACE_SCHEDULER_CALL
+#define TRACE_SCHEDULER_FORWARD
+#endif  /* ZB_DEBUG_CALLBACKS */
+
 #ifdef ZB_INTERRUPT_SAFE_ALARMS
 #define ZB_ALARM_INT_DISABLE() ZB_OSIF_GLOBAL_LOCK()
 #define ZB_ALARM_INT_ENABLE() ZB_OSIF_GLOBAL_UNLOCK()
@@ -73,12 +89,12 @@
 #endif /* ZB_INTERRUPT_SAFE_CALLBACKS */
 
 /* When running in multithreaded environment, is it possible
-when a callback is scheduled from another thread. 
-The scheduler itself if thread-safe, so, this is possible. 
-However, if scheduler is sleeping in a main ZBOSS thread now, 
+when a callback is scheduled from another thread.
+The scheduler itself if thread-safe, so, this is possible.
+However, if scheduler is sleeping in a main ZBOSS thread now,
 it should be signalled somehow.
 In this case there is a zb_scheduler_wakeup() routine shall be defined.
-Since it is a platform-specific item, it shall be defined in OSIF */ 
+Since it is a platform-specific item, it shall be defined in OSIF */
 #if defined(ZB_THREADS) && !defined(ZB_SCHEDULER_NO_AUTOWAKEUP)
 #define ZB_SCHEDULER_WAKEUP() zb_scheduler_wakeup()
 #else
@@ -97,7 +113,7 @@ Since it is a platform-specific item, it shall be defined in OSIF */
 
    @return is equal.
  */
-typedef zb_bool_t (ZB_CODE * zb_callback_compare_t)(zb_uint8_t param, void* param2);
+typedef zb_bool_t (ZB_CODE * zb_callback_compare_t)(zb_bufid_t param, void* param2);
 
 #endif
 
@@ -119,14 +135,10 @@ typedef zb_uint16_t (ZB_CODE * zb_addr_assignment_cb_t)(zb_ieee_addr_t ieee_addr
 
 /* zb_cb_q_ent_t moved to zboss_api_internal.h */
 
-#define ZB_SCHEDULER_SET_2PARAM_CB(i) (ZG->sched.cb_flag_bm[(i)/32U] |= (1UL << ((i)%32U)))
-#define ZB_SCHEDULER_RESET_2PARAM_CB(i) (ZG->sched.cb_flag_bm[(i)/32U] &= ~(1UL << ((i)%32U)))
-#define ZB_SCHEDULER_IS_2PARAM_CB(i) (ZG->sched.cb_flag_bm[(i)/32U] & (1UL << ((i)%32U)))
-
 typedef ZB_PACKED_PRE struct zb_mac_cb_ent_s
 {
  zb_callback_t func;   /* currently, it is the same as common queue, */
- zb_uint8_t param;     /* but, possibly, it is better to remove param from it */
+ zb_cb_param_t param; /* but, possibly, it is better to remove param from it */
 }
 ZB_PACKED_STRUCT
 zb_mac_cb_ent_t;
@@ -161,11 +173,9 @@ typedef struct zb_sched_globals_s
 #ifndef ZB_CONFIGURABLE_MEM
   zb_cb_q_t cb_q;           /*!< immediate callbacks queue  */
 #define ZB_CB_Q (&ZG->sched.cb_q)
-  zb_uint32_t cb_flag_bm[(ZB_SCHEDULER_Q_SIZE + 31U)/32U];
 #else
   zb_cb_q_t *cb_q;
 #define ZB_CB_Q (ZG->sched.cb_q)
-  zb_uint32_t *cb_flag_bm;
 #endif
 #ifndef ZB_ALIEN_SCHEDULER
   zb_mac_tx_q_t mac_tx_q;	/* queue of callback's waiting for tx */
@@ -179,8 +189,8 @@ typedef struct zb_sched_globals_s
   zb_tm_q_ent_t *tm_buffer;
 #endif
   /*  Use list macros for indexed lists and use byte instead pointer here. */
-  ZB_POOLED_LIST8_DEFINE(tm_queue);    /*!< delayed callbacks queue  */
-  ZB_POOLED_LIST8_DEFINE(tm_freelist); /*!< freelist of the timer queue entries  */
+  ZB_POOLED_LIST16_DEFINE(tm_queue);    /*!< delayed callbacks queue  */
+  ZB_POOLED_LIST16_DEFINE(tm_freelist); /*!< freelist of the timer queue entries  */
   zb_delayed_cb_q_t delayed_queue[2]; /*!< queue to store delayed callbacks for getting in and out buffers (@ref buffer_types)*/
   zb_uint8_t tm_buffer_usage;   /*!< Usage of timer queue  */
   zb_bool_t stop;
@@ -222,8 +232,8 @@ void zb_sched_loop_iteration(void);
 #ifndef ZB_ALIEN_SCHEDULER
 /* Schedules a callback, that requires NORMAL_FIFO for transfer or security operations,
 it will be called after current tx finished or just during next scheduler loop */
-#define ZB_SCHEDULE_TX_CB(func, param) zb_schedule_tx_cb(func, param, 0)
-#define ZB_SCHEDULE_TX_CB_WITH_HIGH_PRIORITY(func, param) zb_schedule_tx_cb(func, param, 1)
+#define ZB_SCHEDULE_TX_CB(func, param) zb_schedule_tx_cb(func, ZB_UNPACK_BUF_REF(param), 0U)
+#define ZB_SCHEDULE_TX_CB_WITH_HIGH_PRIORITY(func, param) zb_schedule_tx_cb(func, ZB_UNPACK_BUF_REF(param), 1U)
 #else
 
 #define ZB_SCHEDULE_TX_CB ZB_SCHEDULE_CALLBACK
@@ -249,7 +259,7 @@ void zb_scheduler_trace_file_line(zb_uint32_t file_id, zb_uint32_t line_number, 
    @param param - default parameter for comparer
    @return param of scheduled function or 0 if not found.
  */
-zb_uint8_t zb_schedule_alarm_cancel_compare(zb_callback_t func, zb_callback_compare_t comp, void* param);
+zb_cb_param_t zb_schedule_alarm_cancel_compare(zb_callback_t func, zb_callback_compare_t comp, void* param);
 #endif /* !ZB_MINIMAL_CONTEXT */
 
 #endif
@@ -315,7 +325,7 @@ while(0)
  *  @param param - parameter for callback.
  *  @returns schedule status.
  */
-zb_ret_t zb_schedule_tx_cb(zb_callback_t func, zb_uint8_t param, zb_uint8_t prior);
+zb_ret_t zb_schedule_tx_cb(zb_callback_t func, zb_bufid_t param, zb_uint8_t prior);
 #endif /* !ZB_MINIMAL_CONTEXT */
 
 
@@ -347,7 +357,7 @@ void zb_sched_register_ethernet_cb(zb_callback_t usbc_rx_cb);
  *  @param func - callback function.
  *  @param param - parameter for callback.
  */
-void zb_schedule_callback_from_alien(zb_callback_t func, zb_uint8_t param);
+void zb_schedule_callback_from_alien(zb_callback_t func, zb_cb_param_t param);
 
 #ifdef ZB_DEBUG_BUFFERS_EXT
   void zb_schedule_trace_queue();
@@ -356,7 +366,8 @@ void zb_schedule_callback_from_alien(zb_callback_t func, zb_uint8_t param);
 #define ZB_SCHEDULE_TRACE_QUEUE()
 #endif
 
-zb_ret_t zb_schedule_callback(zb_callback_t func, zb_uint8_t param);
+zb_ret_t zb_schedule_callback_func(TRACE_SCHEDULER_PROTO zb_callback_t func, zb_cb_param_t param);
+#define zb_schedule_callback(func, param) zb_schedule_callback_func(TRACE_SCHEDULER_CALL (func), (param))
 
 /**
    Schedule single-param callback execution.
@@ -371,28 +382,9 @@ zb_ret_t zb_schedule_callback(zb_callback_t func, zb_uint8_t param);
 
    See sched sample
  */
-#define ZB_SCHEDULE_CALLBACK(func, param) (void)zb_schedule_callback(func, param)
+#define ZB_SCHEDULE_CALLBACK(func, param) (void)zb_schedule_callback((func), (param))
 
-zb_ret_t zb_schedule_callback2(zb_callback2_t func, zb_uint8_t param, zb_uint16_t user_param);
-
-/**
-   Schedule two-param callback execution.
-   Schedule execution of function `func' in the main scheduler loop.
-
-   The return was intentionally suppressed to avoid MISRA 17.7 violation.
-   If its return is needed the API should be called directly
-
-   @param func - function to execute
-   @param param - zb_uint8_t callback parameter - usually, but not always ref to
-   packet buffer
-   @param user_param - zb_uint16_t user parameter - usually, but not
-   always short address
-
-   See sched sample
- */
-#define ZB_SCHEDULE_CALLBACK2(func, param, user_param) (void)zb_schedule_callback2(func, param, user_param)
-
-zb_ret_t zb_schedule_callback_prior(zb_callback_t func, zb_uint8_t param);
+zb_ret_t zb_schedule_callback_prior(zb_callback_t func, zb_cb_param_t param);
 
 /**
    Schedule single-param high priority callback execution.
@@ -409,7 +401,8 @@ zb_ret_t zb_schedule_callback_prior(zb_callback_t func, zb_uint8_t param);
  */
 #define ZB_SCHEDULE_CALLBACK_PRIOR(func, param) (void)zb_schedule_callback_prior(func, param)
 
-zb_ret_t zb_schedule_alarm(zb_callback_t func, zb_uint8_t param, zb_time_t timeout_bi);
+zb_ret_t zb_schedule_alarm_func(TRACE_SCHEDULER_PROTO zb_callback_t func, zb_cb_param_t param, zb_time_t timeout_bi);
+#define zb_schedule_alarm(func, param, timeout_bi) zb_schedule_alarm_func(TRACE_SCHEDULER_CALL (func), (param), (timeout_bi))
 
 /**
    Schedule alarm - callback to be executed after timeout.
@@ -423,12 +416,11 @@ zb_ret_t zb_schedule_alarm(zb_callback_t func, zb_uint8_t param, zb_time_t timeo
    If its return is needed the API should be called directly
 
    @param func - function to call via scheduler
-   @param param - parameter to pass to the function
-   @param timeout_bi - timeout, in beacon intervals
+   @param param - packed parameters buf_ref and timeout_bi to pass to the function
 
    See any sample
  */
-#define ZB_SCHEDULE_ALARM(func, param, timeout_bi) (void)zb_schedule_alarm(func, param, timeout_bi)
+#define ZB_SCHEDULE_ALARM(func, param, timeout_bi) (void)zb_schedule_alarm((func), (param), (timeout_bi))
 
 /**
    Cancel scheduled alarm.

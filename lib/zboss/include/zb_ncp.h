@@ -74,30 +74,30 @@
 typedef zb_uint8_t ncp_signal_t;
 
 #if defined NCP_MODE && !defined NCP_MODE_HOST
-void ncp_signal(ncp_signal_t signal, zb_uint8_t param);
-void ncp_signal_exec(ncp_signal_t signal, zb_uint8_t param);
+void ncp_signal(ncp_signal_t signal, zb_bufid_t param);
+void ncp_signal_exec(ncp_signal_t signal, zb_bufid_t param);
 #define NCP_CALL_COMPLETED(sig, param) ncp_signal(sig, param)
 
-zb_bool_t ncp_catch_zcl_packet(zb_uint8_t param, zb_zcl_parsed_hdr_t *cmd_info, zb_uint8_t zcl_parse_status);
+zb_bool_t ncp_catch_zcl_packet(zb_bufid_t param, zb_zcl_parsed_hdr_t *cmd_info, zb_uint8_t zcl_parse_status);
 #define NCP_CATCH_ZCL_PACKET(param, cmd_info, status) ncp_catch_zcl_packet(param, cmd_info, status)
 
-zb_bool_t ncp_catch_aps_data_conf(zb_uint8_t param);
+zb_bool_t ncp_catch_aps_data_conf(zb_bufid_t param);
 #define NCP_CATCH_APS_DATA_CONF(param) ncp_catch_aps_data_conf(param)
 
-zb_bool_t ncp_catch_nwk_disc_conf(zb_uint8_t param);
+zb_bool_t ncp_catch_nwk_disc_conf(zb_bufid_t param);
 #define NCP_CATCH_NWK_DISC_CFM(param) ncp_catch_nwk_disc_conf(param)
 
 #ifdef ZB_ENABLE_SE_MIN_CONFIG
-void ncp_se_signal(zse_commissioning_signal_t signal, zb_uint8_t param);
-void ncp_se_signal_exec(zse_commissioning_signal_t signal, zb_uint8_t param);
+void ncp_se_signal(zse_commissioning_signal_t signal, zb_bufid_t param);
+void ncp_se_signal_exec(zse_commissioning_signal_t signal, zb_bufid_t param);
 
-zb_bool_t ncp_partner_lk_failed(zb_uint8_t param);
+zb_bool_t ncp_partner_lk_failed(zb_bufid_t param);
 #define NCP_CATCH_PARTNER_LK_FAILED(param) ncp_partner_lk_failed(param)
 
 #endif /* ZB_ENABLE_SE_MIN_CONFIG */
 
 void ncp_address_update_ind(zb_uint16_t short_address);
-void ncp_apsme_remote_bind_unbind_ind(zb_uint8_t param, zb_bool_t bind);
+void ncp_apsme_remote_bind_unbind_ind(zb_bufid_t param, zb_bool_t bind);
 
 #ifdef ZB_APSDE_REQ_ROUTING_FEATURES
 void ncp_nwk_route_req_send_ind(zb_nwk_cmd_rreq_t *rreq);

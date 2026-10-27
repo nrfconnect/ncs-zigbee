@@ -50,7 +50,7 @@ typedef zb_uint8_t zb_commissioning_signal_t;
 
 typedef void (*zb_commissioning_signal_func_t)(zb_commissioning_signal_t, zb_bufid_t);
 typedef zb_uint8_t (*zb_commissioning_get_permit_join_duration_func_t)(void);
-typedef zb_bool_t (*zb_commissioning_must_use_installcode_func_t)(zb_bool_t is_client);
+typedef zb_uint8_t (*zb_commissioning_get_install_code_policy_func_t)(zb_bool_t is_client);
 typedef void (*zb_commissioning_formation_channels_mask_t)(zb_channel_list_t list);
 typedef zb_uint8_t (*zb_commissioning_get_scan_duration_func_t)(void);
 typedef void (*zb_commissioning_get_scan_channel_mask_func_t)(zb_channel_list_t channel_mask);
@@ -77,7 +77,9 @@ typedef zb_bool_t (*zb_commissioning_is_in_tc_rejoin_func_t)(void);
 #define ZB_COMM_SIGNAL_TCLK_VERIFIED_REMOTE 19u
 #define ZB_COMM_SIGNAL_DEVICE_LEFT 20u
 #define ZB_COMM_SIGNAL_INIT 21u
-#define ZB_COMM_SIGNAL_LEAVE_LOCAL_IND 22u
+#define ZB_COMM_SIGNAL_JOIN_DONE 22u
+#define ZB_COMM_SIGNAL_TC_CONNECTIVITY_METHOD_DISCOVERED 23u
+#define ZB_COMM_SIGNAL_LEAVE_LOCAL_IND 24u
 
 
 typedef struct zb_formation_func_selector_s
@@ -97,7 +99,7 @@ typedef struct zb_commissioning_func_selector_s
 #endif /* ZB_ROUTER_ROLE */
 
 #ifndef NCP_MODE_HOST
-  zb_commissioning_must_use_installcode_func_t must_use_install_code;
+  zb_commissioning_get_install_code_policy_func_t get_install_code_policy;
 #endif /* !NCP_MODE_HOST */
 
 #ifdef ZB_JOIN_CLIENT
@@ -113,7 +115,7 @@ typedef struct zb_commissioning_ctx_s
   zb_commissioning_type_t commissioning_type;
   struct zb_discovery_ctx_s
   {
-    zb_uint8_t scanlist_ref;                  /* Buffer with scanlist */
+    zb_bufid_t scanlist_ref;                  /* Buffer with scanlist */
     zb_ushort_t scanlist_idx;                 /* nwk descriptor index in scanlist */
     zb_uint8_t scanlist_join_attempt_n;       /* Indicates the current joining
                                                * attempt number */
@@ -129,10 +131,11 @@ typedef struct zb_commissioning_ctx_s
                                    * Zigbee coordinator or router to
                                    * associate with (see sub-clause
                                    * 2.5.5.5). This attribute has
-                                   * default value of 5 and valid values 
+                                   * default value of 5 and valid values
                                    * between 1 and 255.*/
 
     zb_callback_t active_scan_complete_cb;
+    zb_bitfield_t primary_scan:1; /* Uses to switch primary and secondary scans */
   } discovery_ctx;
 
 #ifdef ZB_FORMATION
@@ -154,52 +157,58 @@ typedef struct zb_commissioning_ctx_s
 #define COMM_SELECTOR() COMM_CTX().commissioning_selector
 
 void zdo_commissioning_init(void);
-void zdo_commissioning_start(zb_uint8_t param);
-#if !defined NCP_MODE_HOST && defined ZB_SECURITY_INSTALLCODES && !defined ZB_SECURITY_INSTALLCODES_ONLY
-zb_bool_t zdo_secur_must_use_installcode(zb_bool_t is_client);
-#endif /* !NCP_MODE_HOST && ZB_SECURITY_INSTALLCODES && !ZB_SECURITY_INSTALLCODES_ONLY */
-void zdo_comm_set_permit_join_after_router_start(zb_uint8_t param);
-void zdo_handle_nlme_network_discovery_confirm(zb_uint8_t param);
-void zdo_join_to_nwk_descr(zb_uint8_t param);
-void zdo_authenticated_send_device_annce(zb_uint8_t param);
+void zdo_commissioning_start(zb_cb_param_t param);
+#if !defined NCP_MODE_HOST
+zb_uint8_t zdo_secur_get_install_code_policy(zb_bool_t is_client);
+#endif /* !NCP_MODE_HOST */
+void zdo_comm_set_permit_join_after_router_start(zb_cb_param_t param);
+void zdo_handle_nlme_network_discovery_confirm(zb_bufid_t param);
+void zdo_join_to_nwk_descr(zb_cb_param_t param);
+void zdo_authenticated_send_device_annce(zb_cb_param_t param);
 void zdo_reset_scanlist(zb_bool_t do_free);
-void zdo_call_nlme_reset(zb_uint8_t param, zb_bool_t warm_start, zb_callback_t cb);
-void zdo_next_nwk_discovery_req(zb_uint8_t param);
+void zdo_call_nlme_reset(zb_bufid_t param, zb_bool_t warm_start, zb_callback_t cb);
+void zdo_next_nwk_discovery_req(zb_cb_param_t param);
 #if !defined NCP_MODE_HOST && defined ZB_COORDINATOR_ROLE
-void zdo_commissioning_secure_rejoin_setup_lk_alarm(zb_uint8_t param);
+void zdo_commissioning_secure_rejoin_setup_lk_alarm(zb_cb_param_t param);
 void zdo_commissioning_tclk_verified_remote(zb_address_ieee_ref_t param);
 void zdo_commissioning_device_left(zb_address_ieee_ref_t param);
 #endif /* !NCP_MODE_HOST && ZB_COORDINATOR_ROLE */
 #ifdef ZB_FORMATION
-void zdo_commissioning_send_nwk_key_to_joined_dev(zb_uint8_t param, zb_uint16_t user_param);
+void zdo_commissioning_send_nwk_key_to_joined_dev(zb_cb_param_t param);
 void zdo_commissioning_authenticate_remote(zb_bufid_t param);
 #endif /* ZB_FORMATION */
-void zdo_commissioning_leave_with_rejoin(zb_uint8_t param);
+void zdo_commissioning_leave_with_rejoin(zb_cb_param_t param);
 
 #ifdef ZB_ROUTER_ROLE
-void zdo_commissioning_start_router_confirm(zb_uint8_t param);
+void zdo_commissioning_start_router_confirm(zb_cb_param_t param);
 #endif
 
 #ifdef ZB_JOIN_CLIENT
 zb_bool_t zb_joining_to_distributed_network_enabled(void);
-void zdo_commissioning_join_via_scanlist(zb_uint8_t param);
-void zdo_commissioning_nwk_discovery_failed(zb_uint8_t param);
-void zdo_commissioning_join_failed(zb_uint8_t param);
-void zdo_commissioning_authentication_failed(zb_uint8_t param);
-void zdo_commissioning_handle_dev_annce_sent_event(zb_uint8_t param);
-void zdo_commissioning_initiate_rejoin(zb_uint8_t param);
+void zdo_commissioning_join_via_scanlist(zb_cb_param_t param);
+void zdo_commissioning_nwk_discovery_failed(zb_cb_param_t param);
+void zdo_commissioning_join_failed(zb_cb_param_t param);
+void zdo_commissioning_authentication_failed(zb_cb_param_t param);
+void zdo_commissioning_handle_dev_annce_sent_event(zb_cb_param_t param);
+void zdo_commissioning_initiate_rejoin(zb_cb_param_t param);
 zb_bool_t zdo_secur_waiting_for_tclk_update(void);
-void zdo_retry_joining(zb_uint8_t param);
-void zdo_commissioning_tclk_upd_complete(zb_uint8_t param);
-void zdo_commissioning_tclk_upd_failed(zb_uint8_t param);
-void zdo_commissioning_authenticated(zb_uint8_t param);
-void zdo_commissioning_dev_annce_sent(zb_uint8_t param);
-void zdo_commissioning_secur_failed(zb_uint8_t param);
-void zdo_commissioning_leave_local_ind(zb_uint8_t param);
-void zdo_commissioning_leave_done(zb_uint8_t param);
+void zdo_retry_joining(zb_cb_param_t param);
+void zdo_commissioning_tclk_upd_complete(zb_cb_param_t param);
+void zdo_commissioning_tclk_upd_failed(zb_cb_param_t param);
+void zdo_commissioning_authenticated(zb_bufid_t param);
+void zdo_commissioning_dev_annce_sent(zb_cb_param_t param);
+/* This handler will be called on joiner (ZR/ZED) after
+    authentication_token_response reception in case of
+    initial join using DLK. */
+void zdo_commissioning_handle_auth_token_ok(zb_cb_param_t param);
+void zdo_commissioning_secur_failed(zb_bufid_t param);
+void zdo_commissioning_leave_local_ind(zb_bufid_t param);
+void zdo_commissioning_leave_done(zb_cb_param_t param);
 void zdo_inform_app_leave(zb_uint8_t leave_type);
+void zdo_commissioning_seek_cbke(zb_cb_param_t cb_param);
 #endif
-
-
+#if defined ZB_COORDINATOR_ROLE
+void zdo_commissioning_srv_cbke_done(zb_cb_param_t param);
+#endif
 
 #endif /* ZB_COMMISSIONING_H */

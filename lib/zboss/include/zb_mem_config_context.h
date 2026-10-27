@@ -104,6 +104,23 @@
 #error ZB_CONFIG_IOBUF_POOL_SIZE must be < ("zb_bufid_t max_value"  - ZB_NWK_MAC_IFACE_TBL_SIZE)
 #endif
 
+/* TODO: Consider adding checks for big_net.
+ * Like when types are redefined that shrink value range. */
+
+#ifdef ZB_NO_BIG_NET
+
+#if ZB_CONFIG_N_APS_KEY_PAIR_ARR_MAX_SIZE > ZB_UINT8_MAX
+#error no big net mode: ZB_CONFIG_N_APS_KEY_PAIR_ARR_MAX_SIZE is larger than ZB_UINT8_MAX
+#endif
+
+#if ZB_CONFIG_IEEE_ADDR_TABLE_SIZE > ZB_UINT8_MAX
+#error no big net mode: ZB_CONFIG_IEEE_ADDR_TABLE_SIZE is larger than ZB_UINT8_MAX
+#endif
+
+#endif
+
+/* TODO: Add compiletime check on FULL Datasets fitting NVRAM page size */
+
 /**@brief Maximum buffer index.
  *        This macro is just an abbreviation for a corresponding macro in ZBOSS sources and its value must not be changed.
  */
@@ -132,7 +149,6 @@
 #define ZB_CONFIG_USE_DEFAULTS 0U
 
 #endif
-
 
 /**
    If user did not overwrite default memory configuration, that variable value is 1, else 0.
@@ -181,12 +197,12 @@ ZB_CONFIG_PRE zb_uint8_t gc_iobuf_buf_in_use[(ZB_CONFIG_IOBUF_POOL_SIZE + 7)/8] 
 #ifdef ZB_MACSPLIT
 
 ZB_CONFIG_PRE zb_uint8_t gc_tx_calls_table[ZB_CONFIG_N_BUF_IDS] ZB_CONFIG_POST = { 0 };
-ZB_RING_BUFFER_DECLARE(zb_macsplit_transport_tx_queue, zb_uint8_t, ZB_CONFIG_IOBUF_POOL_SIZE);
+ZB_RING_BUFFER_DECLARE(zb_macsplit_transport_tx_queue, zb_bufid_t, ZB_CONFIG_IOBUF_POOL_SIZE);
 ZB_CONFIG_PRE zb_macsplit_transport_tx_queue_t gc_macsplit_queue ZB_CONFIG_POST = { 0 };
 
 #if defined ZB_MACSPLIT_DEVICE
 
-ZB_CONFIG_PRE zb_uint8_t gc_msdu_handles[ZB_CONFIG_N_BUF_IDS] ZB_CONFIG_POST = { 0 };
+ZB_CONFIG_PRE zb_bufid_t gc_msdu_handles[ZB_CONFIG_N_BUF_IDS] ZB_CONFIG_POST = { 0 };
 
 #else /* ZB_MACSPLIT_DEVICE */
 
@@ -205,26 +221,16 @@ zb_nwk_globals.h
 
 zb_nwk_handle_t.input_q
 */
-ZB_RING_BUFFER_DECLARE(zb_nwk_in_q_buf, zb_uint8_t, (ZB_CONFIG_IOBUF_POOL_SIZE/2));
+ZB_RING_BUFFER_DECLARE(zb_nwk_in_q_buf, zb_bufid_t, (ZB_CONFIG_IOBUF_POOL_SIZE/2));
 ZB_CONFIG_PRE zb_nwk_in_q_buf_t gc_nwk_in_q ZB_CONFIG_POST = { 0 };
 
 /**
-TSNs pending for address request complete.
+Pending bufs and tsn for address and node desc request.
 
 zb_zdo_globals.h
-nwk_addr_req_pending_tsns
-nwk_addr_req_pending_mask
+zb_parallel_nwk_addr_and_node_req_t
 */
-ZB_CONFIG_PRE zb_uint8_t gc_nwk_addr_req_pending_tsns[ZB_CONFIG_N_BUF_IDS] ZB_CONFIG_POST = { 0 };
-ZB_CONFIG_PRE zb_uint8_t gc_nwk_addr_req_pending_mask[(ZB_CONFIG_N_BUF_IDS + 7) / 8] ZB_CONFIG_POST = { 0 };
-
-/**
-Node Desc feature: mask of pending pkt for every buffer
-
-zb_zdo_globals.h
-node_desc_req_pending_mask
-*/
-ZB_CONFIG_PRE zb_uint8_t gc_node_desc_req_pending_mask[(ZB_CONFIG_N_BUF_IDS + 7) / 8] ZB_CONFIG_POST = { 0 };
+ZB_CONFIG_PRE zb_parallel_nwk_addr_and_node_req_t gc_nwk_node_parallel_req[ZB_N_PARALLEL_NWK_NODE_REQ] ZB_CONFIG_POST = { 0 };
 
 /**
 MAC pending TX queue (FFDs).
@@ -262,7 +268,7 @@ ZB_CONFIG_PRE zb_time_t gc_poll_timestamp_table[ZB_CONFIG_CHILD_HASH_TABLE_SIZE]
 ZB_CONFIG_PRE zb_uint8_t gc_trans_table_size ZB_CONFIG_POST = ZB_CONFIG_APS_BIND_TRANS_TABLE_SIZE;
 ZB_CONFIG_PRE zb_uint8_t gc_single_trans_index_size ZB_CONFIG_POST = ZB_CONFIG_SINGLE_TRANS_INDEX_SIZE;
 ZB_CONFIG_PRE zb_uint8_t gc_trans_index_buf[ZB_CONFIG_APS_DST_BINDING_TABLE_SIZE][ZB_CONFIG_SINGLE_TRANS_INDEX_SIZE] ZB_CONFIG_POST = { 0 };
-ZB_CONFIG_PRE zb_uint8_t gc_trans_table[ZB_CONFIG_APS_BIND_TRANS_TABLE_SIZE] ZB_CONFIG_POST = { 0 };
+ZB_CONFIG_PRE zb_bufid_t gc_trans_table[ZB_CONFIG_APS_BIND_TRANS_TABLE_SIZE] ZB_CONFIG_POST = { 0 };
 
 /**
   APS bind tables
@@ -299,7 +305,6 @@ ZB_CONFIG_PRE zb_uint_t gc_n_aps_retrans_entries ZB_CONFIG_POST = ZB_CONFIG_N_AP
 ZB_RING_BUFFER_DECLARE(zb_cb_q_buf, zb_cb_q_ent_t, ZB_CONFIG_SCHEDULER_Q_SIZE);
 ZB_CONFIG_PRE zb_cb_q_buf_t gc_cb_q ZB_CONFIG_POST = { 0 };
 ZB_CONFIG_PRE zb_tm_q_ent_t gc_tm_buf[ZB_CONFIG_SCHEDULER_Q_SIZE] ZB_CONFIG_POST = { 0 };
-ZB_CONFIG_PRE zb_uint32_t gc_cb_flag_bm[(ZB_CONFIG_SCHEDULER_Q_SIZE + 31)/32] ZB_CONFIG_POST = { 0 };
 ZB_CONFIG_PRE zb_uint_t gc_sched_q_size ZB_CONFIG_POST = ZB_CONFIG_SCHEDULER_Q_SIZE;
 ZB_CONFIG_PRE zb_uint_t gc_sched_stack_unprotected_q_size ZB_CONFIG_POST  = ZB_CONFIG_SCHEDULER_Q_SIZE_PROTECTED_STACK_POOL;
 
@@ -314,8 +319,7 @@ ZB_CONFIG_PRE zb_uint_t gc_n_aps_key_pair ZB_CONFIG_POST = ZB_CONFIG_N_APS_KEY_P
 
 /* ZB_IEEE_ADDR_TABLE_SIZE */
 ZB_CONFIG_PRE zb_address_map_t gc_addr_map[ZB_CONFIG_IEEE_ADDR_TABLE_SIZE] ZB_CONFIG_POST = { 0 };
-ZB_CONFIG_PRE zb_uint8_t gc_short_sorted[ZB_CONFIG_IEEE_ADDR_TABLE_SIZE] ZB_CONFIG_POST = { 0 };
-ZB_CONFIG_PRE zb_uint8_t gc_addr_to_neighbor[ZB_CONFIG_IEEE_ADDR_TABLE_SIZE] ZB_CONFIG_POST = { 0 };
+ZB_CONFIG_PRE zb_address_ieee_ref_t gc_short_sorted[ZB_CONFIG_IEEE_ADDR_TABLE_SIZE] ZB_CONFIG_POST = { 0 };
 ZB_CONFIG_PRE zb_uint_t gc_addr_table_size ZB_CONFIG_POST = ZB_CONFIG_IEEE_ADDR_TABLE_SIZE;
 
 /* ZB_NEIGHBOR_TABLE_SIZE */
@@ -324,7 +328,7 @@ ZB_CONFIG_PRE zb_uint8_t gc_passive_ack[ZB_NWK_BRR_TABLE_SIZE][((ZB_CONFIG_NEIGH
 #endif
 
 ZB_CONFIG_PRE zb_neighbor_tbl_ent_t gc_neighbor[ZB_CONFIG_NEIGHBOR_TABLE_SIZE] ZB_CONFIG_POST = { 0 };
-ZB_CONFIG_PRE zb_uint_t gc_neighbor_table_size ZB_CONFIG_POST = ZB_CONFIG_NEIGHBOR_TABLE_SIZE;
+ZB_CONFIG_PRE zb_uint8_t gc_neighbor_table_size ZB_CONFIG_POST = ZB_CONFIG_NEIGHBOR_TABLE_SIZE;
 
 ZB_CONFIG_PRE zb_nwk_disc_tbl_ent_t gc_ext_neighbor[ZB_CONFIG_NWK_DISC_TABLE_SIZE] ZB_CONFIG_POST = { 0 };
 ZB_CONFIG_PRE zb_uint_t gc_nwk_disc_table_size ZB_CONFIG_POST = ZB_CONFIG_NWK_DISC_TABLE_SIZE;
@@ -339,7 +343,7 @@ ZB_CONFIG_PRE zb_uint8_t gc_nwk_route_disc_table_size ZB_CONFIG_POST = ZB_CONFIG
 #if defined ZB_PRO_STACK && !defined ZB_LITE_NO_SOURCE_ROUTING
 /* 10/21/2019 EE CR:MAJOR ZC only! Not ZB_ROUTER_ROLE but ZB_COORDINATOR_ROLE */
 ZB_CONFIG_PRE zb_nwk_rrec_t gc_src_routing_table[ZB_CONFIG_NWK_MAX_SOURCE_ROUTES] ZB_CONFIG_POST = { 0 };
-ZB_CONFIG_PRE zb_uint8_t gc_nwk_max_source_routes ZB_CONFIG_POST = ZB_CONFIG_NWK_MAX_SOURCE_ROUTES;
+ZB_CONFIG_PRE zb_uint_t gc_nwk_max_source_routes ZB_CONFIG_POST = ZB_CONFIG_NWK_MAX_SOURCE_ROUTES;
 #endif
 #endif
 

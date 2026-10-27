@@ -63,13 +63,13 @@ static void zdo_classic_formation_force_link(void);
 #endif /* ZB_FORMATION */
 
 #ifdef ZB_JOIN_CLIENT
-static void zdo_restart_association(zb_uint8_t param);
+static void zdo_restart_association(zb_cb_param_t param);
 #endif /* ZB_JOIN_CLIENT */
 
 static zb_uint8_t zdo_classic_get_scan_duration(void);
 
 
-void zdo_classic_initiate_commissioning(zb_uint8_t param)
+void zdo_classic_initiate_commissioning(zb_bufid_t param)
 {
   zb_ext_pan_id_t use_ext_pan_id;
 
@@ -150,7 +150,7 @@ void zdo_classic_initiate_commissioning(zb_uint8_t param)
 }
 
 #ifdef ZB_JOIN_CLIENT
-static void zdo_restart_association(zb_uint8_t param)
+static void zdo_restart_association(zb_cb_param_t param)
 {
   zb_nlme_network_discovery_request_t *req = ZB_BUF_GET_PARAM(param, zb_nlme_network_discovery_request_t);
   TRACE_MSG(TRACE_ERROR, "rejoin failed - try association", (FMT__0));
@@ -233,24 +233,12 @@ static void zdo_classic_handle_authentication_failed_signal(zb_bufid_t param)
 #endif
     )
   {
-#ifdef ZB_REJOIN_BACKOFF
-    if (zb_zdo_rejoin_backoff_is_running())
-    {
-      /* Go to new rejoin backoff iteration */
-      zb_zdo_rejoin_backoff_iteration_done();
-      ZB_SCHEDULE_CALLBACK(zb_zdo_rejoin_backoff_continue, 0);
-      zb_buf_free(param);
-    }
-    else
-#endif
-    {
-      zb_ext_pan_id_t ext_pan_id;
-      zb_get_extended_pan_id(ext_pan_id);
-      /* force unsecure (AKA Trust Center) rejoin to current pan */
-      (void)zdo_initiate_rejoin(param, ext_pan_id,
-                                ZB_AIB().aps_channel_mask_list, ZB_FALSE,
-                                zdo_classic_get_scan_duration());
-    }
+    zb_ext_pan_id_t ext_pan_id;
+    zb_get_extended_pan_id(ext_pan_id);
+    /* force unsecure (AKA Trust Center) rejoin to current pan */
+    (void)zdo_initiate_rejoin(param, ext_pan_id,
+                              ZB_AIB().aps_channel_mask_list, ZB_FALSE,
+                              zdo_classic_get_scan_duration());
   }
   else
   {
@@ -261,12 +249,12 @@ static void zdo_classic_handle_authentication_failed_signal(zb_bufid_t param)
 #else
     ZB_SET_JOINED_STATUS(ZB_FALSE);
     zb_buf_free(param);
-    (void)zb_buf_get_out_delayed_ext(zb_zdo_startup_complete_int_delayed, ZB_NWK_STATUS_NO_KEY);
+    (void)zb_buf_get_out_delayed_ext(zb_zdo_startup_complete_int_delayed, ZB_NWK_STATUS_NO_KEY, 0);
 #endif
   }
 }
 
-static void zdo_classic_rejoin(zb_bufid_t param)
+static void zdo_classic_rejoin(zb_cb_param_t param)
 {
   zb_ext_pan_id_t ext_pan_id;
 
@@ -295,9 +283,13 @@ static void zdo_classic_handle_initiate_rejoin_signal(zb_bufid_t param)
 }
 
 
-static void zdo_classic_handle_dev_annce_sent_signal(zb_bufid_t param)
+/* Checks whether TCLK is needed and requests it from ZC.
+   If TCLK not needed, raises signal to application. */
+static void zdo_classic_try_request_tclk(zb_cb_param_t param)
 {
-  zb_uint16_t aps_key_idx = (zb_uint16_t)-1;
+  zb_aps_key_pair_ref_t aps_key_idx = ZB_APS_KEY_PAIR_REF_NONE;
+
+  TRACE_MSG(TRACE_ZDO1, ">> zdo_classic_try_request_tclk param %d", (FMT__D, param));
 
   if (!ZB_IEEE_ADDR_IS_ZERO(ZB_AIB().trust_center_address))
   {
@@ -308,33 +300,46 @@ static void zdo_classic_handle_dev_annce_sent_signal(zb_bufid_t param)
   if (!IS_DISTRIBUTED_SECURITY()
       && ZB_TCPOL().update_trust_center_link_keys_required
       && !ZB_TCPOL().waiting_for_tclk_exchange
-      && aps_key_idx == (zb_uint16_t)-1) /* TCLK is not already in progress */
+      && aps_key_idx == ZB_APS_KEY_PAIR_REF_NONE) /* TCLK is not already in progress */
   {
-
     TRACE_MSG(TRACE_SECUR3, "Found key idx %d", (FMT__D, aps_key_idx));
 
-    if (aps_key_idx == (zb_uint16_t)-1)
+    if (aps_key_idx == ZB_APS_KEY_PAIR_REF_NONE)
     {
       TRACE_MSG(TRACE_SECUR3, "BDB & !distributed - get TCLK over APS", (FMT__0));
-      zdo_initiate_tclk_gen_over_aps(0);
+      bdb_initiate_key_exchange(0);
     }
+
+    zb_buf_free(param);
   }
   else
   {
-      (void)zb_app_signal_pack(param, COMM_CTX().application_signal, (zb_int16_t)zb_buf_get_status(param), 0U);
-      ZB_SCHEDULE_CALLBACK(zb_zdo_startup_complete_int, param);
-    }
+    (void)zb_app_signal_pack(param, COMM_CTX().application_signal, (zb_int16_t)zb_buf_get_status(param), 0U);
+    ZB_SCHEDULE_CALLBACK(zb_zdo_startup_complete_int, param);
+  }
+
+  TRACE_MSG(TRACE_ZDO1, "<< zdo_classic_try_request_tclk", (FMT__0));
+}
+
+static void zdo_classic_handle_dev_annce_sent_signal(zb_bufid_t param)
+{
+  TRACE_MSG(TRACE_ZDO1, "zdo_classic_handle_dev_annce_sent_signal param %d", (FMT__D, param));
 
   if (ZB_IS_DEVICE_ZR())
   {
-    (void)zb_buf_get_out_delayed(zb_zdo_start_router);
+    ZB_SCHEDULE_CALLBACK(zb_zdo_start_router, param);
+  }
+  else
+  {
+    ZB_SCHEDULE_CALLBACK(zdo_classic_try_request_tclk, param);
   }
 }
 
 
 static void zdo_classic_handle_router_started_signal(zb_bufid_t param)
 {
-  zb_buf_free(param);
+  TRACE_MSG(TRACE_ZDO1, "zdo_classic_handle_router_started_signal param %d", (FMT__D, param));
+  ZB_SCHEDULE_CALLBACK(zdo_classic_try_request_tclk, param);
 }
 
 
@@ -356,7 +361,7 @@ static void zdo_classic_handle_leave_done_signal(zb_bufid_t param)
     ZB_ZDO_CLEAR_UNAUTH();
     if (param != ZB_BUF_INVALID)
     {
-      ZB_SCHEDULE_CALLBACK2(zb_zdo_startup_complete_int_delayed, param, ZB_NWK_STATUS_NO_KEY);
+      ZB_SCHEDULE_CALLBACK(zb_zdo_startup_complete_int_delayed, ZB_PACK_2_U16_IN_U32(param, ZB_NWK_STATUS_NO_KEY));
     }
     else
     {
@@ -469,7 +474,7 @@ static void zdo_classic_handle_secured_rejoin_signal(zb_bufid_t param)
       && !IS_DISTRIBUTED_SECURITY()
       && (key_pair == NULL))
   {
-    ZB_SCHEDULE_ALARM(bdb_link_key_refresh_alarm, param, ZB_TCPOL().trust_center_node_join_timeout);
+    ZB_SCHEDULE_ALARM(bdb_link_key_refresh_alarm, param, ZB_SECUR_LINK_KEY_UPDATE_TIMEOUT);
   }
   else
   {
@@ -641,11 +646,11 @@ zb_uint8_t zdo_classic_get_scan_duration(void)
 }
 
 
-static zb_bool_t zdo_classic_must_use_installcode(zb_bool_t is_client)
+static zb_uint8_t zdo_classic_get_install_code_policy(zb_bool_t is_client)
 {
   ZVUNUSED(is_client);
 #ifdef ZB_SECURITY_INSTALLCODES
-  return (zb_bool_t)ZB_TCPOL().require_installcodes;
+  return ZB_TCPOL().require_installcodes;
 #else
   return ZB_FALSE;
 #endif /* ZB_SECURITY_INSTALLCODES */
@@ -672,7 +677,7 @@ static void zdo_classic_commissioning_force_link(void)
   COMM_SELECTOR().get_scan_duration = zdo_classic_get_scan_duration;
 #endif /* ZB_JOIN_CLIENT */
 
-  COMM_SELECTOR().must_use_install_code = zdo_classic_must_use_installcode;
+  COMM_SELECTOR().get_install_code_policy = zdo_classic_get_install_code_policy;
 }
 
 

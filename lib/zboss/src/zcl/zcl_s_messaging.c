@@ -95,7 +95,7 @@ static zb_uint8_t *zb_zcl_messaging_cancel_msg_put_payload(
   return data;
 }
 
-void zb_zcl_messaging_send_cancel_msg(zb_uint8_t param,
+void zb_zcl_messaging_send_cancel_msg(zb_bufid_t param,
                                            const zb_addr_u *dst_addr,
                                            zb_aps_addr_mode_t dst_addr_mode,
                                            zb_uint8_t dst_ep,
@@ -126,7 +126,7 @@ Display Message packet (11 bytes for other Display Message fields).
 Devices using fragmentation can send a message larger than this.
 Reserving bytes for source route will reduce this.
 */
-void zb_zcl_messaging_send_display_msg(zb_uint8_t param,
+void zb_zcl_messaging_send_display_msg(zb_bufid_t param,
                                             const zb_addr_u *dst_addr,
                                             zb_aps_addr_mode_t dst_addr_mode,
                                             zb_uint8_t dst_ep,
@@ -151,7 +151,7 @@ void zb_zcl_messaging_send_display_msg(zb_uint8_t param,
 }
 
 
-static void zb_zcl_messaging_server_handle_message_confirmation(zb_uint8_t param,
+static void zb_zcl_messaging_server_handle_message_confirmation(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_uint8_t *data = zb_buf_begin(param);
@@ -207,7 +207,7 @@ static void zb_zcl_messaging_server_handle_message_confirmation(zb_uint8_t param
   TRACE_MSG(TRACE_ZCL1, "<< zb_zcl_messaging_server_handle_message_confirmation", (FMT__0));
 }
 
-static void zb_zcl_messaging_server_handle_get_last_message(zb_uint8_t param,
+static void zb_zcl_messaging_server_handle_get_last_message(zb_bufid_t param,
   const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_zcl_messaging_get_last_message_response_t resp = ZB_ZCL_MESSAGING_GET_LAST_MESSAGE_RESPONSE_INIT;
@@ -258,7 +258,7 @@ static void zb_zcl_messaging_server_handle_get_last_message(zb_uint8_t param,
 }
 
 
-static zb_bool_t zb_zcl_messaging_server_side_process_commands(zb_uint8_t param,
+static zb_bool_t zb_zcl_messaging_server_side_process_commands(zb_bufid_t param,
                 const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_bool_t processed = ZB_FALSE;
@@ -281,12 +281,12 @@ static zb_bool_t zb_zcl_messaging_server_side_process_commands(zb_uint8_t param,
 }
 
 
-zb_bool_t zb_zcl_process_s_messaging_specific_command(zb_uint8_t param)
+zb_bool_t zb_zcl_process_s_messaging_specific_command(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t cmd_info;
   zb_bool_t          res = ZB_FALSE;
 
-  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_s_messaging_specific_command param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_process_s_messaging_specific_command param %d", (FMT__D, param));
 
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {

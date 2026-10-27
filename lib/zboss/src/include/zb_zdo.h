@@ -47,7 +47,6 @@
 #include "zboss_api_zdo.h"
 #include "zdo_wwah_survey_beacons.h"
 #include "zb_tlv.h"
-#include "zboss_api_zcl.h"
 
 
 /*! @cond internals_doc */
@@ -158,8 +157,8 @@ typedef void (*zb_apsme_update_device_ind_cb)(zb_apsme_update_device_ind_t *ind,
 typedef void (*zb_assert_indication_cb_t)(zb_uint16_t file_id, zb_int_t line_number);
 struct zb_zdo_device_annce_s;
 typedef void (ZB_CODE * zb_device_annce_cb_t)(struct zb_zdo_device_annce_s *da);
-typedef zb_ret_t (ZB_CODE * zb_zdo_responce_cb_t)(zb_uint8_t param, zb_uint16_t clusterid);
-typedef void (*zb_zdo_set_channel_confirm_cb_t) (zb_uint8_t status);
+typedef zb_ret_t (ZB_CODE * zb_zdo_responce_cb_t)(zb_bufid_t param, zb_uint16_t clusterid);
+typedef void (*zb_zdo_set_channel_confirm_cb_t) (zb_cb_param_t status);
 typedef void (*zb_zdo_duty_cycle_mode_ind_cb_t) (zb_uint8_t mode);
 
 /**
@@ -283,7 +282,7 @@ zb_ret_t zb_zdo_start_no_autostart(void);
   Use when init device and start device process cut HW test/init procedure
 
  */
-void zb_zdo_dev_start_cont(zb_uint8_t param);
+void zb_zdo_dev_start_cont(zb_cb_param_t param);
 
 #ifdef ZB_USE_INTERNAL_HEADERS
 
@@ -298,17 +297,17 @@ void zb_zdo_dev_start_cont(zb_uint8_t param);
 @snippet tp_pro_bv_20_zc.c zb_af_set_data_indication
 
  */
-void zboss_signal_handler(zb_uint8_t param);
+void zboss_signal_handler(zb_cb_param_t param);
 
 #endif /* ZB_USE_INTERNAL_HEADERS */
 
 /*! @} */
 
 /* internal zdo_startup_complete */
-void zb_zdo_startup_complete_int(zb_uint8_t param);
-void zb_zdo_startup_complete_int_delayed(zb_uint8_t param, zb_uint16_t user_param);
-void zb_zdo_device_first_start_int_delayed(zb_uint8_t param, zb_uint16_t user_param);
-void zb_zdo_device_reboot_int_delayed(zb_uint8_t param, zb_uint16_t user_param);
+void zb_zdo_startup_complete_int(zb_cb_param_t param);
+void zb_zdo_startup_complete_int_delayed(zb_cb_param_t param);
+void zb_zdo_device_first_start_int_delayed(zb_cb_param_t param);
+void zb_zdo_device_reboot_int_delayed(zb_cb_param_t param);
 
 /*! @cond internals_doc */
 /*! \addtogroup ZB_ZDO ZDO Internals */
@@ -317,7 +316,7 @@ void zb_zdo_device_reboot_int_delayed(zb_uint8_t param, zb_uint16_t user_param);
 /**
    Send Device announce command for custom params
  */
-void zdo_send_device_annce_ex(zb_uint8_t             param,
+void zdo_send_device_annce_ex(zb_bufid_t             param,
                               zb_zdo_device_annce_t *dev_annce
 #ifdef ZB_USEALIAS
                              ,zb_bool_t use_alias
@@ -327,7 +326,7 @@ void zdo_send_device_annce_ex(zb_uint8_t             param,
 /**
    Actually send Device announce command
  */
-void zdo_send_device_annce(zb_uint8_t param);
+void zdo_send_device_annce(zb_cb_param_t param);
 
 
 /**
@@ -335,14 +334,14 @@ void zdo_send_device_annce(zb_uint8_t param);
 
    @param param - index of buffer to fill with primitive parameters.
 */
-void zdo_send_desc_resp(zb_uint8_t param);
+void zdo_send_desc_resp(zb_bufid_t param);
 
 /**
    Simple_desc_resp primitive.
 
    @param param - index of buffer to fill with primitive parameters.
 */
-void zdo_send_simple_desc_resp(zb_uint8_t param);
+void zdo_send_simple_desc_resp(zb_bufid_t param);
 
 #ifdef ZB_FIXED_OPTIONAL_DESC_RESPONSES
 /**
@@ -351,7 +350,7 @@ void zdo_send_simple_desc_resp(zb_uint8_t param);
   @param param - index of buffer that has complex descriptor request.
                  Will be reused to send response.
 */
-void zb_zdo_send_complex_desc_resp(zb_uint8_t param);
+void zb_zdo_send_complex_desc_resp(zb_bufid_t param);
 
 /**
   User_Desc_rsp primitive
@@ -359,7 +358,7 @@ void zb_zdo_send_complex_desc_resp(zb_uint8_t param);
   @param param - index of buffer that has user descriptor request.
                  Will be reused to send response.
 */
-void zb_zdo_send_user_desc_resp(zb_uint8_t param);
+void zb_zdo_send_user_desc_resp(zb_bufid_t param);
 
 /**
   User_Desc_conf primitive
@@ -367,7 +366,7 @@ void zb_zdo_send_user_desc_resp(zb_uint8_t param);
   @param param - index of buffer containing User_Desc_set primitive.
                  Will be reused to send confirm.
 */
-void zb_zdo_send_user_desc_conf(zb_uint8_t param);
+void zb_zdo_send_user_desc_conf(zb_bufid_t param);
 #endif
 
 /**
@@ -379,7 +378,7 @@ void zb_zdo_send_user_desc_conf(zb_uint8_t param);
    @param param - index of buffer with zb_zdo_simple_desc_resp_t.
    @return RET_OK or RET_IGNORE for malformed  payload in response.
 */
-zb_ret_t zb_zdo_simple_desc_resp_convert_zboss(zb_uint8_t param);
+zb_ret_t zb_zdo_simple_desc_resp_convert_zboss(zb_bufid_t param);
 
 /**
    Copies node descriptor, taking into account endian
@@ -408,7 +407,7 @@ void zb_copy_simple_desc(zb_af_simple_desc_1_1_t* dst_desc, zb_af_simple_desc_1_
    @param param - index of buffer to fill with primitive parameters.
    @param fc - APS FC of the response
 */
-void zdo_device_nwk_addr_res(zb_uint8_t param, zb_uint8_t fc);
+void zdo_device_nwk_addr_res(zb_bufid_t param, zb_uint8_t fc);
 
 #define ZB_ZDO_SINGLE_DEV_RESPONSE  0x00U
 #define ZB_ZDO_EXTENDED_RESPONSE    0x01U
@@ -419,39 +418,39 @@ void zdo_device_nwk_addr_res(zb_uint8_t param, zb_uint8_t fc);
    @param param - index of buffer to fill with primitive parameters.
    @param fc - APS FC of the response
 */
-void zdo_device_ieee_addr_res(zb_uint8_t param, zb_uint8_t fc);
+void zdo_device_ieee_addr_res(zb_bufid_t param, zb_uint8_t fc);
 
 /**
    Sends update notify command
    @param param - index of buffer
 */
-void zb_zdo_nwk_upd_notify(zb_uint8_t param);
+void zb_zdo_nwk_upd_notify(zb_bufid_t param);
 
 /**
    Active_EP_res primitive.
 
    @param param - index of buffer to fill with primitive parameters.
 */
-void zdo_active_ep_res(zb_uint8_t param);
+void zdo_active_ep_res(zb_bufid_t param);
 
 /**
    Match_Desc_res primitive.
 
    @param param - index of buffer to fill with primitive parameters.
 */
-void zdo_match_desc_res(zb_uint8_t param);
+void zdo_match_desc_res(zb_bufid_t param);
 
 /**
    Performs channel interference reporting and resolution
    @param param - unused
 */
-void zb_zdo_check_fails(zb_uint8_t param);
+void zb_zdo_check_fails(zb_cb_param_t param);
 
 /**
    Timer callback to set limit for channel check action
    @param param - unused
  */
-void zb_zdo_channel_check_timer_cb(zb_uint8_t param);
+void zb_zdo_channel_check_timer_cb(zb_cb_param_t param);
 
 /**
    Callback to finish channel check action, is called on
@@ -492,7 +491,7 @@ zb_ret_t zdo_initiate_rejoin(zb_bufid_t buf, zb_uint8_t *ext_pan_id,
 
    @param param - index of buffer with request
  */
-void zb_zdo_addr_resp_handle(zb_uint8_t param);
+void zb_zdo_addr_resp_handle(zb_bufid_t param);
 
 
 /**
@@ -500,7 +499,7 @@ void zb_zdo_addr_resp_handle(zb_uint8_t param);
 
    @param param - index of buffer with request
  */
-void zb_zdo_mgmt_nwk_update_handler(zb_uint8_t param);
+void zb_zdo_mgmt_nwk_update_handler(zb_bufid_t param);
 
 
 /**
@@ -508,7 +507,7 @@ void zb_zdo_mgmt_nwk_update_handler(zb_uint8_t param);
 
    @param param - index of buffer with request
  */
-void zb_zdo_mgmt_nwk_enhanced_update_handler(zb_uint8_t param);
+void zb_zdo_mgmt_nwk_enhanced_update_handler(zb_bufid_t param);
 
 
 /**
@@ -516,7 +515,7 @@ void zb_zdo_mgmt_nwk_enhanced_update_handler(zb_uint8_t param);
 
    @param param - index of buffer with request
  */
-void zb_zdo_mgmt_unsol_enh_nwk_update_notify_handler(zb_uint8_t param);
+void zb_zdo_mgmt_unsol_enh_nwk_update_notify_handler(zb_bufid_t param);
 
 
 /**
@@ -524,7 +523,7 @@ void zb_zdo_mgmt_unsol_enh_nwk_update_notify_handler(zb_uint8_t param);
 
    @param param - index of buffer with request
  */
-void zb_zdo_mgmt_handle_unsol_nwk_update_notify(zb_uint8_t param);
+void zb_zdo_mgmt_handle_unsol_nwk_update_notify(zb_bufid_t param);
 
 /**
    Bind/Unbind response primitive
@@ -532,15 +531,15 @@ void zb_zdo_mgmt_handle_unsol_nwk_update_notify(zb_uint8_t param);
    @param param - index of buffer with request
    @param bind - true for bind, false for unbind
  */
-void zb_zdo_bind_unbind_res(zb_uint8_t param, zb_bool_t bind);
+void zb_zdo_bind_unbind_res(zb_bufid_t param, zb_bool_t bind);
 
-void zb_zdo_clear_all_bind_res(zb_uint8_t param);
+void zb_zdo_clear_all_bind_res(zb_bufid_t param);
 
 /**
    Sends 2.4.4.3.2 Mgmt_Lqi_rsp
    @param param - index of buffer with Lqi request
  */
-void zdo_lqi_resp(zb_uint8_t param);
+void zdo_lqi_resp(zb_bufid_t param);
 
 #if defined ZB_JOINING_LIST_SUPPORT && defined ZB_ROUTER_ROLE
 
@@ -548,55 +547,47 @@ void zdo_lqi_resp(zb_uint8_t param);
    Sends 2.4.4.4.11 Mgmt_NWK_IEEE_Joining_List_rsp
    @param param - index of buffer with nwk ieee joining list request
  */
-void zdo_nwk_joining_list_resp(zb_uint8_t param);
+void zdo_nwk_joining_list_resp(zb_bufid_t param);
 
 /**
    Helper function that is responsible for actual Mgmt_NWK_IEEE_Joining_List_rsp sending
    To be used as a callback for mlme-get.confirm
 */
-void zdo_nwk_joining_list_resp_send(zb_uint8_t param);
+void zdo_nwk_joining_list_resp_send(zb_cb_param_t param);
 
 /**
    Sends 2.4.3.3.11 Mgmt_NWK_IEEE_Joining_List_req
    @param param - index of buffer with nwk ieee joining list request
  */
-zb_uint8_t zb_zdo_mgmt_nwk_ieee_joining_list_req(zb_uint8_t param, zb_callback_t cb);
+zb_uint8_t zb_zdo_mgmt_nwk_ieee_joining_list_req(zb_bufid_t param, zb_callback_t cb);
 
 #endif /* defined ZB_JOINING_LIST_SUPPORT && defined ZB_ROUTER_ROLE */
-
-/**
-   Allocates buffer and schedules to execute zb_get_peer_short_addr()
-   @param dst_addr_ref - reference to destination IEEE address
-   @param cb - callback to run on get peer address finish
-   @param param - parameter for callback function
- */
-void zb_start_get_peer_short_addr(zb_address_ieee_ref_t dst_addr_ref, zb_callback_t cb, zb_uint8_t param);
 
 /**
    Sends response for System_Server_Discovery_req
    @param param - index of buffer with request
  */
-void zdo_system_server_discovery_res(zb_uint8_t param);
+void zdo_system_server_discovery_res(zb_bufid_t param);
 
 /**
    Sends 2.4.4.2.1 End_Device_Bind_rsp command
    @param param - index of buffer to use for i/o
    @param status - End_Device_Bind_req command status
 */
-void zb_zdo_end_device_bind_resp(zb_uint8_t param, zb_zdp_status_t status);
+void zb_zdo_end_device_bind_resp(zb_bufid_t param, zb_zdp_status_t status);
 
 /**
    Handle end_device_bind_req command
    @param param - index of buffer with request
  */
-void zb_zdo_end_device_bind_handler(zb_uint8_t param);
+void zb_zdo_end_device_bind_handler(zb_bufid_t param);
 
 /**
    Handle incoming mgmt_leave_req
 
    @param param - buffer with request
  */
-void zdo_mgmt_leave_srv(zb_uint8_t param);
+void zdo_mgmt_leave_srv(zb_bufid_t param);
 
 /**
    Try to send mgmt_leave_rsp if somebody waiting for it.
@@ -612,7 +603,7 @@ void zdo_mgmt_leave_srv(zb_uint8_t param);
 
    @return TRUE if resp sent, FALSE otherwise
  */
-zb_bool_t zdo_try_send_mgmt_leave_rsp(zb_uint8_t param, zb_uint8_t status);
+zb_bool_t zdo_try_send_mgmt_leave_rsp(zb_bufid_t param, zb_uint8_t status);
 
 void zb_zdo_register_addr_resp_cb(zb_callback_t addr_resp_cb);
 
@@ -645,7 +636,7 @@ void zb_zdo_register_duty_cycle_mode_indication_cb(zb_zdo_duty_cycle_mode_ind_cb
 
    @return nothing
  */
-void zb_zdo_mgmt_permit_joining_handle(zb_uint8_t param);
+void zb_zdo_mgmt_permit_joining_handle(zb_cb_param_t param);
 
 /**
    changes channel
@@ -654,7 +645,7 @@ void zb_zdo_mgmt_permit_joining_handle(zb_uint8_t param);
 
    @return nothing
  */
-void zb_zdo_set_channel_cb(zb_uint8_t channel);
+void zb_zdo_set_channel_cb(zb_cb_param_t channel);
 
 /**
    changes channel without updating NWKUpdateID field
@@ -663,11 +654,11 @@ void zb_zdo_set_channel_cb(zb_uint8_t channel);
 
    @return nothing
  */
-void zb_zdo_do_set_channel(zb_uint8_t channel);
+void zb_zdo_do_set_channel(zb_cb_param_t channel);
 
 #ifdef ZB_ROUTER_ROLE
 
-void zb_zdo_mgmt_permit_joining_confirm_handle(zb_uint8_t param);
+void zb_zdo_mgmt_permit_joining_confirm_handle(zb_cb_param_t param);
 
 #ifdef ZB_CERTIFICATION_HACKS
 /* ZB_UINT8_MAX used as a special value
@@ -718,7 +709,7 @@ zb_int_t zdo_check_cluster_filtered_out(zb_uint16_t clid);
 #endif
 
 
-void zdo_clear_after_leave(zb_uint8_t param);
+void zdo_clear_after_leave(zb_cb_param_t param);
 
 /** @brief Callback registration function. */
 zb_bool_t register_zdo_cb(
@@ -743,8 +734,8 @@ void zdo_cb_reset(void);
 /* If forget device param is true - then remove all information related to device;
  * otherwise - remove device from neighbors, children and unlock its address entry,
  * save application data (bindings e.t.c) */
-void zdo_device_removed(zb_uint8_t param, zb_uint16_t forget_device);
-void zb_send_leave_signal(zb_uint8_t param, zb_uint16_t user_param);
+void zdo_device_removed(zb_cb_param_t cb_param);
+void zb_send_leave_signal(zb_cb_param_t cb_param);
 
 void zb_zdo_register_device_annce_cb(zb_device_annce_cb_t cb);
 
@@ -767,7 +758,7 @@ void zb_zdo_register_set_channel_confirm_cb(zb_zdo_set_channel_confirm_cb_t cb);
  * @param parent_short - short address of the device parent, 0xffff if unknown
  * @param action - action TC made - @see secur_tc_action
  */
-void zb_send_device_update_signal(zb_uint8_t param,
+void zb_send_device_update_signal(zb_bufid_t param,
                                   zb_ieee_addr_t long_addr,
                                   zb_uint16_t short_addr,
                                   zb_uint8_t status,
@@ -802,7 +793,7 @@ void zb_prepare_and_send_device_update_signal(zb_ieee_addr_t long_addr, zb_uint8
  * @param authorization_type - authorization type (legacy, r21 TCLK)
  * @param authorization_status - authorization status (depends on authorization_type)
  */
-void zb_send_device_authorized_signal(zb_uint8_t param,
+void zb_send_device_authorized_signal(zb_bufid_t param,
                                       zb_ieee_addr_t long_addr,
                                       zb_uint16_t short_addr,
                                       zb_uint8_t authorization_type,
@@ -821,38 +812,28 @@ void zb_prepare_and_send_device_authorized_signal(zb_ieee_addr_t long_addr,
                                                   zb_uint8_t authorization_type,
                                                   zb_uint8_t authorization_status);
 
-#ifdef DEBUG
-/**
- * @brief Send @ZB_DEBUG_SIGNAL_TCLK_READY signal
- *
- * @param param - reference to the buffer
- * @param long_addr - long address of the partner device
- */
-void zb_send_tclk_ready_debug_signal(zb_uint8_t param, zb_ieee_addr_t long_addr);
-
-/**
- * @brief Prepare parameters and send the
- *        @ZB_DEBUG_SIGNAL_TCLK_READY signal with delay
- *
- * @param long_addr - long address of the partner device
- */
-void zb_prepare_and_send_tclk_ready_debug_signal(zb_ieee_addr_t long_addr);
-#endif
-
-/**
- * @brief Alarm to send @ZB_ZDO_SIGNAL_DEVICE_AUTHORIZED signal
- *        for legacy devices ( < r21)
- *
- * @param param - address reference
- */
-void zb_legacy_device_auth_signal_alarm(zb_uint8_t param);
-
 /* @brief Cancel zb_legacy_device_auth_signal_alarm
  *        for legacy devices ( < r21)
  *
  * @param long_addr - IEEE64 address reference
  */
-void zb_legacy_device_auth_signal_cancel(zb_ieee_addr_t long_addr);
+zb_ret_t zb_legacy_device_auth_signal_cancel(zb_ieee_addr_t long_addr);
+
+/* @brief Cancel zb_legacy_device_auth_signal_alarm
+ *        for legacy devices ( < r21)
+ *
+ * @param address_ref - address reference
+ */
+zb_ret_t zb_legacy_device_auth_signal_cancel_by_ref(zb_address_ieee_ref_t address_ref);
+
+/* @brief Schedules zb_legacy_device_auth_signal_alarm
+ *        for legacy devices ( < r21)
+ *        locking address of device pointed by address_ref
+ *
+ * @param address_ref - address reference
+ * @param timeout - timeout before zb_legacy_device_auth_signal_alarm will be called
+ */
+void zb_legacy_device_auth_signal_alarm_schedule(zb_address_ieee_ref_t address_ref, zb_time_t timeout);
 
 
 /* MM: For unicast, counter should be set to 1 and callback can be freed in two
@@ -871,9 +852,9 @@ void zb_legacy_device_auth_signal_cancel(zb_ieee_addr_t long_addr);
  * @param param - a buf ID, @see zb_bufid_t
  * @param param2 - an address reference, @see zb_address_ieee_ref_t
  */
-void zb_zdo_send_device_unavailable_signal(zb_uint8_t param, zb_uint16_t param2);
+void zb_zdo_send_device_unavailable_signal(zb_cb_param_t cb_param);
 
-void zb_send_no_active_links_left_signal(zb_uint8_t param);
+void zb_send_no_active_links_left_signal(zb_cb_param_t param);
 
 #define ZB_ZDO_CB_UNICAST_COUNTER     1U  /* 1 resp for Unicast */
 #define ZB_ZDO_CB_BROADCAST_COUNTER   0xFFU  /* wait for timeout */
@@ -885,7 +866,7 @@ void zb_send_no_active_links_left_signal(zb_uint8_t param);
 #define ZB_ZDO_CB_CLOCK_COUNTER(_rx_on_when_idle) \
   (ZB_ZDO_CB_KILLER_CRITICAL_TIME(_rx_on_when_idle) / ZB_ZDO_CB_KILLER_QUANT + 1U)
 
-void zdo_aps_decryption_failed(zb_uint8_t param);
+void zdo_aps_decryption_failed(zb_cb_param_t param);
 
 #define ZB_ZDO_NEIGHBOR_ERROR_VALUE     0xffU
 
@@ -900,7 +881,7 @@ typedef struct zb_zdo_get_channel_resp_t
   zb_uint8_t channel;
 } zb_zdo_get_channel_resp_t;
 
-void zb_zdo_get_channel(zb_uint8_t param);
+void zb_zdo_get_channel(zb_bufid_t param);
 
 /* Poll control */
 
@@ -964,7 +945,7 @@ zb_zdo_pim_stop_fast_poll_extended_resp_t;
 void zb_zdo_pim_init(void);
 void zb_zdo_pim_init_defaults(void);
 void zb_zdo_pim_start_fast_poll(zb_uint8_t param);
-void zb_zdo_fast_poll_leave(zb_uint8_t param);
+void zb_zdo_fast_poll_leave(zb_cb_param_t param);
 void zb_zdo_pim_stop_fast_poll(zb_uint8_t param);
 void zb_zdo_pim_reset_turbo_poll_min(zb_uint8_t param);
 void zb_zdo_pim_reset_turbo_poll_max(zb_uint8_t param);
@@ -980,9 +961,9 @@ void zb_zdo_pim_set_turbo_poll_max(zb_time_t turbo_poll_max_ms);
 void zb_zdo_pim_set_turbo_poll_min(zb_time_t turbo_poll_min_ms);
 zb_time_t zb_zdo_get_pim_turbo_poll_min_ms(void);
 zb_time_t zb_zdo_get_poll_interval_ms(void);
-void zb_zdo_pim_start_poll(zb_uint8_t param);
+void zb_zdo_pim_start_poll(zb_cb_param_t param);
 void zb_zdo_pim_stop_poll(zb_uint8_t param);
-void zb_zdo_turbo_poll_packets_leave(zb_uint8_t param);
+void zb_zdo_turbo_poll_packets_leave(zb_cb_param_t param);
 void zb_zdo_update_long_poll_int(zb_uint8_t param);
 void zb_zdo_pim_continue_turbo_poll(void);
 zb_time_t zb_zdo_pim_get_long_poll_ms_interval(void);
@@ -993,7 +974,7 @@ void zb_zdo_pim_repeat_poll(void);
 
 #ifdef ZB_USE_INTERNAL_HEADERS
 void zb_zdo_pim_set_long_poll_interval(zb_time_t ms);
-void zb_zdo_pim_start_turbo_poll_packets(zb_uint8_t n_packets);
+void zb_zdo_pim_start_turbo_poll_packets(zb_cb_param_t n_packets);
 #endif
 /**
  * @brief Sends asynchronous request to check whether the device is in fast poll mode
@@ -1002,7 +983,7 @@ void zb_zdo_pim_start_turbo_poll_packets(zb_uint8_t n_packets);
  *
  * @param cb
  */
-void zb_zdo_pim_get_in_fast_poll_flag_req(zb_uint8_t param, zb_callback_t cb);
+void zb_zdo_pim_get_in_fast_poll_flag_req(zb_bufid_t param, zb_callback_t cb);
 
 
 /**
@@ -1012,7 +993,7 @@ void zb_zdo_pim_get_in_fast_poll_flag_req(zb_uint8_t param, zb_callback_t cb);
  *
  * @param cb
  */
-void zb_zdo_pim_stop_fast_poll_extended_req(zb_uint8_t param, zb_callback_t cb);
+void zb_zdo_pim_stop_fast_poll_extended_req(zb_bufid_t param, zb_callback_t cb);
 
 #else
 /* No any polling if not ZED-only or ZR switched to ZED */
@@ -1051,7 +1032,7 @@ void zb_zdo_pim_stop_fast_poll_extended_req(zb_uint8_t param, zb_callback_t cb);
 
 #endif  /* ZB_ED_FUNC */
 
-void zb_zdo_device_is_unreachable(zb_uint8_t addr_ref);
+void zb_zdo_device_is_unreachable(zb_cb_param_t addr_ref);
 
 zb_uint8_t zdo_get_aging_timeout(void);
 
@@ -1065,9 +1046,9 @@ void zdo_set_aging_timeout(zb_uint8_t timeout);
 
 zb_time_t zdo_get_ed_keepalive_timeout(void);
 
-void zb_zdo_start_router(zb_uint8_t param);
+void zb_zdo_start_router(zb_cb_param_t param);
 
-void zdo_mgmt_permit_joining_resp_cli(zb_uint8_t param);
+void zdo_mgmt_permit_joining_resp_cli(zb_cb_param_t param);
 
 void zb_set_zdo_descriptor(void);
 
@@ -1157,7 +1138,7 @@ typedef enum  zb_commissioning_type_e
 /** @} */
 
 #ifdef ZB_COMMISSIONING_CLASSIC_SUPPORT
-void zdo_classic_initiate_commissioning(zb_uint8_t param);
+void zdo_classic_initiate_commissioning(zb_bufid_t param);
 #endif
 
 #if defined ZB_JOINING_LIST_SUPPORT
@@ -1165,7 +1146,7 @@ void zdo_classic_initiate_commissioning(zb_uint8_t param);
 typedef ZB_PACKED_PRE struct zb_jl_q_ent_s
 {
   zb_callback_t func;           /*!< function to call  */
-  zb_uint8_t param;             /*!< parameter to pass to 'func'  */
+  zb_bufid_t param;             /*!< parameter to pass to 'func'  */
 }
 ZB_PACKED_STRUCT
 zb_jl_q_ent_t;
@@ -1451,7 +1432,7 @@ void zdo_set_node_descriptor_manufacturer_code(zb_uint16_t manuf_code);
  * @param param - reference to buffer to construct response in
  * @param param_req - reference to buffer containing device announce being handled
  */
-void zdo_parent_annce_handler(zb_uint8_t param, zb_uint16_t param_req);
+void zdo_parent_annce_handler(zb_cb_param_t cb_param);
 
 #ifdef ZB_ROUTER_ROLE
 /**
@@ -1461,9 +1442,9 @@ void zdo_parent_annce_handler(zb_uint8_t param, zb_uint16_t param_req);
  *
  * @see ZB R21 spec, subclause 2.4.3.1.12.
  */
-void zdo_send_parent_annce(zb_uint8_t param);
+void zdo_send_parent_annce(zb_cb_param_t param);
 
-void zdo_send_parent_annce_at_formation(zb_uint8_t param);
+void zdo_send_parent_annce_at_formation(zb_cb_param_t param);
 #endif
 
 zb_uint8_t zb_commissioning_default_permit_duration(void);
@@ -1471,14 +1452,14 @@ zb_uint8_t zb_commissioning_default_permit_duration(void);
 #ifdef ZB_FORMATION
 void zdo_formation_force_link(void);
 
-void zdo_start_formation(zb_uint8_t param);
+void zdo_start_formation(zb_cb_param_t param);
 
-void zdo_commissioning_formation_done(zb_uint8_t param);
+void zdo_commissioning_formation_done(zb_cb_param_t param);
 
-void zdo_commissioning_formation_failed(zb_uint8_t param);
+void zdo_commissioning_formation_failed(zb_cb_param_t param);
 #endif
 
-void zdo_comm_set_permit_join(zb_uint8_t param, zb_callback_t cb);
+void zdo_comm_set_permit_join(zb_bufid_t param, zb_callback_t cb);
 
 void zdo_commissioning_leave(zb_bufid_t buf, zb_bool_t rejoin, zb_bool_t remove_children);
 
@@ -1497,10 +1478,10 @@ void zb_sync_distributed(void);
 /* [VK]: to avoid a MISRA warning for the Rule-5.1:
  * The external identifier 'xxx' clashes with other identifier(s) in the first 31 characters 1 time(s).
  */
-void zb_zdo_st_key_neg_req_put_tlv(zb_uint8_t param);
+void zb_zdo_st_key_neg_req_put_tlv(zb_bufid_t param);
 #define zb_zdo_start_key_negotiation_req_put_tlv zb_zdo_st_key_neg_req_put_tlv
 
-void zb_zdo_get_auth_tok_req_put_tlv(zb_uint8_t param);
+void zb_zdo_get_auth_tok_req_put_tlv(zb_bufid_t param);
 #define zb_zdo_get_authentication_token_req_put_tlv zb_zdo_get_auth_tok_req_put_tlv
 
 zb_ret_t zb_zdo_start_k_neg_r_proc_tlv(zb_uint8_t *tlv_ptr,
@@ -1519,12 +1500,12 @@ zb_ret_t zb_zdo_get_auth_tkn_rsp_proc_tlv(zb_uint8_t *tlv_ptr,
 
 #if defined ZB_COORDINATOR_ROLE || defined ZB_ROUTER_ROLE
 
-void zb_zdo_st_key_neg_rsp_put_tlv(zb_uint8_t param,
+void zb_zdo_st_key_neg_rsp_put_tlv(zb_bufid_t param,
                                    zb_uint8_t *public_point);
 #define zb_zdo_start_key_negotiation_rsp_put_tlv zb_zdo_st_key_neg_rsp_put_tlv
 
 
-void zb_zdo_get_auth_tok_rsp_put_tlv(zb_uint8_t param, zb_uint8_t *passphrase);
+void zb_zdo_get_auth_tok_rsp_put_tlv(zb_bufid_t param, zb_uint8_t *passphrase);
 #define zb_zdo_get_authentication_token_rsp_put_tlv zb_zdo_get_auth_tok_rsp_put_tlv
 
 /**
@@ -1555,9 +1536,9 @@ zb_ret_t zb_zdo_get_authentication_token_req_process_tlv(zb_uint8_t *tlv_ptr,
 
 #endif /* ZB_COORDINATOR_ROLE || ZB_ROUTER_ROLE */
 
-void zb_zdo_key_neg_methods_put_tlv(zb_uint8_t param);
+void zb_zdo_key_neg_methods_put_tlv(zb_bufid_t param);
 
-void zb_zdo_upd_key_req_put_tlvs(zb_uint8_t param, zb_uint8_t selected_method, zb_uint8_t selected_secret);
+void zb_zdo_upd_key_req_put_tlvs(zb_bufid_t param, zb_uint8_t selected_method, zb_uint8_t selected_secret);
 
 #ifdef ZB_JOIN_CLIENT
 zb_ret_t zb_zdo_upd_key_req_process_tlv(zb_uint8_t *tlv_ptr,
@@ -1586,14 +1567,14 @@ zb_secur_ecdhe_common_ctx_t *zb_zdo_alloc_ecdhe_ctx_with_support_kn_tlv(zb_ieee_
 zb_ret_t zb_zdo_key_neg_methods_and_frag_param_process_tlv(zb_uint8_t *tlv_ptr,
                                                            zb_uint8_t tlv_data_len,
                                                            zb_uint8_t src_short_addr);
-void zb_zdo_encapsulation_put_tlv(zb_uint8_t param,
+void zb_zdo_encapsulation_put_tlv(zb_bufid_t param,
                                   zb_secur_ecdhe_common_ctx_t *ecdhe_ctx);
 
 void zb_zdo_encapsulation_process_tlv(zb_uint8_t *tlv_ptr,
                                       zb_uint8_t tlv_data_len,
                                       zb_secur_ecdhe_common_ctx_t *ecdhe_ctx);
 
-zb_ret_t zb_zdo_clear_all_bind_put_tlv(zb_uint8_t param);
+zb_ret_t zb_zdo_clear_all_bind_put_tlv(zb_bufid_t param);
 zb_ret_t zb_zdo_clear_all_bind_process_tlv(zb_uint8_t *tlv_ptr,
                                            zb_uint8_t tlv_data_len,
                                            zb_tlv_clear_all_bind_req_eui64_t *tlv_param);
@@ -1604,10 +1585,10 @@ zb_ret_t zb_zdo_decommission_process_tlv(zb_uint8_t *tlv_ptr,
                                          zb_uint8_t tlv_data_len,
                                          zb_tlv_decommission_req_eui64_t *tlv_param);
 
-void zb_zdo_get_auth_level_req_put_target_ieee_tlv(zb_uint8_t param, zb_uint8_t *target_ieee);
+void zb_zdo_get_auth_level_req_put_target_ieee_tlv(zb_bufid_t param, zb_uint8_t *target_ieee);
 zb_ret_t zb_zdo_get_auth_level_req_process_target_ieee_tlv(zb_uint8_t *tlv_ptr, zb_uint8_t tlv_data_len, zb_uint8_t *target_ieee);
 
-void zb_zdo_get_auth_level_rsp_put_dev_auth_lvl_tlv(zb_uint8_t param, zb_uint8_t *target_ieee, zb_uint8_t initial_join_auth, zb_uint8_t active_lk_type);
+void zb_zdo_get_auth_level_rsp_put_dev_auth_lvl_tlv(zb_bufid_t param, zb_uint8_t *target_ieee, zb_uint8_t initial_join_auth, zb_uint8_t active_lk_type);
 zb_ret_t zb_zdo_get_auth_level_rsp_process_dev_auth_lvl_tlv(zb_uint8_t *tlv_ptr, zb_uint8_t tlv_data_len,
                                                             zb_uint8_t *target_ieee, zb_uint8_t *initial_join_auth, zb_uint8_t *active_lk_type);
 
@@ -1622,35 +1603,44 @@ void zb_zdo_set_configuration_req_process_tlv(zb_uint8_t *tlv_ptr,
                                               zb_uint8_t tlv_data_len,
                                               zb_zdo_processing_status_tlv_ctx_t *tlv_statuses);
 
-void zb_zdo_put_processing_status_tlv(zb_uint8_t param, zb_zdo_processing_status_tlv_ctx_t *tlv_statuses);
+void zb_zdo_put_processing_status_tlv(zb_bufid_t param, zb_zdo_processing_status_tlv_ctx_t *tlv_statuses);
 
 
-void zb_zdo_construct_relay_tlv(zb_uint8_t param, zb_uint8_t *joiner_ieee);
+void zb_zdo_construct_relay_tlv(zb_bufid_t param, const zb_uint8_t *joiner_ieee);
 
-void zb_zdo_cut_all_except_relay_msg_tlv(zb_uint8_t param);
-void zb_zdo_get_tunneled_frame_from_relay(zb_uint8_t param);
+void zb_zdo_cut_all_except_relay_msg_tlv(zb_bufid_t param);
+void zb_zdo_get_tunneled_frame_from_relay(zb_bufid_t param);
 
 zb_ret_t zb_zdo_link_key_capabilities_process_tlv(zb_uint8_t *tlv_ptr, zb_uint8_t tlv_data_len, zb_uint8_t *capabilities);
-void zb_zdo_link_key_cap_put_tlv(zb_uint8_t param, zb_uint8_t capabilities);
+void zb_zdo_link_key_cap_put_tlv(zb_bufid_t param, zb_uint8_t capabilities);
 
-void zb_zdo_beacon_survey_resp_put_tlv(zb_uint8_t param, zb_zdo_beacon_survey_resp_params_t *resp_params);
+void zb_zdo_beacon_survey_resp_put_tlv(zb_bufid_t param, zb_zdo_beacon_survey_resp_params_t *resp_params);
 
-zb_ret_t zb_zdo_put_tlv_by_id(zb_uint8_t param, zb_uint8_t id);
+zb_ret_t zb_zdo_put_tlv_by_id(zb_bufid_t param, zb_uint8_t id);
 
 void zdo_load_production_config(void);
-void zb_send_no_autostart_signal(zb_uint8_t param);
-void zb_nlme_leave_indication_cont(zb_uint8_t param_buf);
-void zb_nlme_leave_handle_child(zb_uint8_t addr_ref, zb_uint8_t rejoin);
+
+void zb_send_no_autostart_signal(zb_cb_param_t param);
+void zb_nlme_leave_indication_cont(zb_bufid_t param_buf);
+void zb_nlme_leave_handle_child(zb_address_ieee_ref_t addr_ref, zb_uint8_t rejoin);
 
 #if defined(ZB_ROUTER_ROLE) && defined(ZB_LEAVE_RESPONSE_TIMEOUT_ENABLED)
-void zdo_mgmt_leave_without_rejoin_no_resp(zb_uint8_t addr_ref);
-void zdo_mgmt_leave_with_rejoin_no_resp(zb_uint8_t addr_ref);
+void zdo_mgmt_leave_without_rejoin_no_resp(zb_address_ieee_ref_t addr_ref);
+void zdo_mgmt_leave_with_rejoin_no_resp(zb_address_ieee_ref_t addr_ref);
 #endif /* ZB_ROUTER_ROLE && ZB_LEAVE_RESPONSE_TIMEOUT_ENABLED */
 
 /**
  * Returns if the device is authenticated in the network.
  */
 zb_bool_t zb_zdo_authenticated(void);
+
+#if defined ZB_CERTIFICATION_HACKS || defined ZB_STACK_REGRESSION_TESTING_API
+/* Clears "authenticated" flag in order to
+    perform TC rejoin instead of secure rejoin.
+    It's assumed that "zdo_commissioning_initiate_rejoin" func
+     initiates rejoin right after this call. */
+void zb_zdo_clear_authenticated_flag(void);
+#endif /* ZB_CERTIFICATION_HACKS || ZB_STACK_REGRESSION_TESTING_API */
 
 /**
  * Returns if the device has a valid TCLK.
@@ -1673,49 +1663,49 @@ void zb_set_nwk_role_mode_common_ext(zb_nwk_device_type_t device_type,
 
 zb_commissioning_type_t zb_zdo_get_commissioning_type(void);
 
-void zb_zdo_data_indication(zb_uint8_t param);
+void zb_zdo_data_indication(zb_cb_param_t cb_param);
 
 void zb_zdo_init(void);
 
 #ifdef ZB_ENABLE_ZCL
-zb_bool_t zb_af_is_confirm_for_zcl_frame(zb_uint8_t param);
+zb_bool_t zb_af_is_confirm_for_zcl_frame(zb_bufid_t param);
 
-void zb_af_handle_zcl_frame_data_confirm(zb_uint8_t param);
+void zb_af_handle_zcl_frame_data_confirm(zb_bufid_t param);
 
-zb_bool_t zb_af_handle_zcl_frame(zb_uint8_t param);
+zb_bool_t zb_af_handle_zcl_frame(zb_bufid_t param);
 #endif /* ZB_ENABLE_ZCL */
 
-void zb_zdo_send_status_res(zb_uint8_t param, zb_uint8_t status);
+void zb_zdo_send_status_res(zb_bufid_t param, zb_uint8_t status);
 
-void zb_send_leave_indication_signal(zb_uint8_t param);
+void zb_send_leave_indication_signal(zb_bufid_t param);
 
-void zdo_send_signal_no_args(zb_uint8_t param, zb_uint16_t signal);
+void zdo_send_signal_no_args(zb_cb_param_t param);
 
-void zdo_mgmt_beacon_survey_req_handler(zb_uint8_t param);
+void zdo_mgmt_beacon_survey_req_handler(zb_bufid_t param);
 
-void zdo_beacon_survey_hook(zb_uint8_t param);
+void zdo_beacon_survey_hook(zb_bufid_t param);
 
-void zb_zdo_beacon_survey_resp_handler(zb_uint8_t param);
+void zb_zdo_beacon_survey_resp_handler(zb_bufid_t param);
 
-void zdo_secur_get_config_rsp_hook(zb_uint8_t param);
+void zdo_secur_get_config_rsp_hook(zb_bufid_t param);
 
-void zdo_aps_challenge_timeout(zb_uint8_t param);
+void zdo_aps_challenge_timeout(zb_cb_param_t param);
 
-void zb_zdo_secur_get_auth_level_req_handle(zb_uint8_t param);
+void zb_zdo_secur_get_auth_level_req_handle(zb_bufid_t param);
 
 
 /* Challenge req/rsp functions */
 #define ZB_ZDO_CHALLENGE_RSP_MIC_SIZE (8U)
 
-void zb_zdo_secur_send_challenge_req(zb_uint8_t param);
+void zb_zdo_secur_send_challenge_req(zb_cb_param_t param);
 
-void zb_zdo_secur_challenge_req_handle(zb_uint8_t param);
+void zb_zdo_secur_challenge_req_handle(zb_bufid_t param);
 
-void zb_zdo_secur_challenge_resp_handle(zb_uint8_t param);
+void zb_zdo_secur_challenge_resp_handle(zb_bufid_t param);
 
-void zb_zdo_challenge_req_put_tlv (zb_uint8_t param, zb_uint8_t *rand);
+void zb_zdo_challenge_req_put_tlv (zb_bufid_t param, zb_uint8_t *rand);
 
-zb_uint8_t *zb_zdo_challenge_rsp_put_tlv (zb_uint8_t param, zb_uint8_t *rand, zb_uint32_t out_cnt, zb_uint32_t challenge_cnt);
+zb_uint8_t *zb_zdo_challenge_rsp_put_tlv (zb_bufid_t param, zb_uint8_t *rand, zb_uint32_t out_cnt, zb_uint32_t challenge_cnt);
 
 zb_ret_t zb_zdo_challenge_req_process_tlv(zb_uint8_t *tlv_ptr, zb_uint8_t tlv_data_len,
                                               zb_uint8_t *sender_ieee, zb_uint8_t *rand_value);
@@ -1725,7 +1715,7 @@ zb_ret_t zb_zdo_challenge_resp_process_tlv(zb_uint8_t *tlv_ptr, zb_uint8_t tlv_d
 
 
 #if defined NCP_MODE && !defined NCP_MODE_HOST
-void zdo_send_ncp_join_signal(zb_uint8_t param);
+void zdo_send_ncp_join_signal(zb_cb_param_t param);
 #endif /* defined NCP_MODE && !defined NCP_MODE_HOST */
 
 #ifdef ZB_PRODUCTION_CONFIG
@@ -1766,7 +1756,7 @@ zb_ret_t zb_production_cfg_read(zb_uint8_t *buffer, zb_uint16_t len, zb_uint16_t
    This is legacy pre-r23 Network report.
    It is present in r23 Test Specification at GU side - see  Test Case 8.2 (PAN ID Conflict)
  */
-void zb_panid_conflict_send_legacy_network_report(zb_uint8_t param);
+void zb_panid_conflict_send_legacy_network_report(zb_cb_param_t param);
 #endif
 
 void zb_send_device_interview_signal_common(zb_bufid_t param, zb_address_ieee_ref_t addr_ref, zb_uint32_t signal_code, zb_uint16_t status);
@@ -1778,7 +1768,7 @@ void zb_send_device_interview_signal_common(zb_bufid_t param, zb_address_ieee_re
  * @param param - buffer that will be reused for storing the signal parameters
  * @addr_ref - ieee address reference to device which is going to be interviewed
  */
-void zb_send_device_ready_for_interview_signal_delayed(zb_bufid_t param, zb_uint16_t addr_ref);
+void zb_send_device_ready_for_interview_signal_delayed(zb_cb_param_t cb_param);
 
 /**
  * @brief Prepare parameters and send
@@ -1786,7 +1776,7 @@ void zb_send_device_ready_for_interview_signal_delayed(zb_bufid_t param, zb_uint
  *
  * @param param - buffer for signal
  */
-void zb_send_device_interview_failed_signal_delayed(zb_bufid_t param, zb_uint16_t addr_ref);
+void zb_send_device_interview_failed_signal_delayed(zb_cb_param_t param);
 
 /**
  * @brief Prepare parameters and send
@@ -1794,7 +1784,7 @@ void zb_send_device_interview_failed_signal_delayed(zb_bufid_t param, zb_uint16_
  *
  * @param param - buffer for signal
  */
-void zb_send_device_interview_done_signal_delayed(zb_bufid_t param, zb_uint16_t addr_ref);
+void zb_send_device_interview_done_signal_delayed(zb_cb_param_t param);
 
 #ifdef ZB_COORDINATOR_ROLE
 /**
@@ -1833,14 +1823,14 @@ zb_bool_t zb_is_device_interview_started_on_joiner(void);
 #endif /* ZB_JOIN_CLIENT */
 
 #ifdef ZB_COORDINATOR_ROLE
-void send_transport_key_after_dlk(zb_uint8_t param, zb_secur_ecdhe_common_ctx_t *dlk_ctx_p);
+void send_transport_key_after_dlk(zb_bufid_t param, zb_secur_ecdhe_common_ctx_t *dlk_ctx_p);
 #endif /* ZB_COORDINATOR_ROLE */
 
-zb_uint8_t zdo_send_req_by_short(zb_uint16_t command_id, zb_uint8_t param, zb_callback_t cb,
+zb_uint8_t zdo_send_req_by_short(zb_uint16_t command_id, zb_bufid_t param, zb_callback_t cb,
                                  zb_uint16_t addr, zb_uint8_t resp_counter);
-zb_uint8_t zdo_send_req_by_long(zb_uint16_t command_id, zb_uint8_t param, zb_callback_t cb,
+zb_uint8_t zdo_send_req_by_long(zb_uint16_t command_id, zb_bufid_t param, zb_callback_t cb,
                                 zb_ieee_addr_t addr);
-void zdo_send_resp_by_short(zb_uint16_t command_id, zb_uint8_t param, zb_uint16_t addr, zb_bool_t aps_secur);
+void zdo_send_resp_by_short(zb_uint16_t command_id, zb_bufid_t param, zb_uint16_t addr, zb_bool_t aps_secur);
 
 
 /**
@@ -1859,6 +1849,9 @@ void zb_zdo_enable_tx_fail_debug(zb_bool_t enable);
 zb_ret_t zb_check_next_panid(zb_uint16_t panid);
 
 zb_ret_t zb_check_next_channel(zb_channel_page_t channel_page);
+
+
+void zdo_ed_perform_silent_rejoin(zb_cb_param_t param);
 
 void zdo_maybe_discover_ieee(zb_uint16_t short_addr);
 

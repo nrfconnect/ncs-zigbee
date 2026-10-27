@@ -59,9 +59,10 @@
 #ifdef ZB_ENABLE_SE_MIN_CONFIG
 #include "zboss_api_se.h"
 #endif
-#ifdef ZB_ENABLE_ZCL
+#if defined(ZB_ENABLE_ZCL) && !defined(ZB_DO_NOT_CHECK_ZCL_BY_MISRA)
 #include "zboss_api_zcl.h"
-#endif /* ZB_ENABLE_ZCL */
+#endif /* ZB_ENABLE_ZCL && !ZB_DO_NOT_CHECK_ZCL_BY_MISRA */
+#include "zboss_api_bdb.h"
 #ifdef ZB_ENABLE_ZGP
 #include "zboss_api_zgp.h"
 #endif
@@ -96,7 +97,7 @@ void zb_secur_setup_nwk_key(zb_uint8_t *key, zb_uint8_t i);
  *
  *  @param param - work buffer ID or 0 (is zero, function allocates buffer itself)
  */
-void zb_secur_nwk_key_switch_procedure(zb_uint8_t param);
+void zb_secur_nwk_key_switch_procedure(zb_cb_param_t param);
 #endif /* ZB_COORDINATOR_ROLE */
 /** @} */ /* secur_nwk_key */
 
@@ -125,6 +126,15 @@ void zb_secur_set_ignore_tc_rejoin(zb_bool_t enable);
  *
  *  If set to ZB_FALSE, remote requests that attempt to change Trust Center
  *  policy (such as MgmtPermitJoin requests) will be rejected.
+ *
+ *  'allow_remote_policy_change' is TRUE by default,
+ *  see BDB 3.1 specification, document 22-65816-030, Table 9 – Trust Center policy values.
+ *
+ *  BDB 3.0.1 doesn't have such a policy, but its behavior corresponds to the TRUE value.
+ *
+ *  It's NOT RECOMMENDED to change this value to FALSE to avoid compatibility issues with other ZigBee devices!
+ *
+ *  @note According to SE specification, this policy must be set to FALSE and should NOT be changed
  *
  *  @param enable - whether to enable or disable remote policy changes.
  */
@@ -243,6 +253,17 @@ typedef zb_uint8_t zb_tlv_psk_secrets_t;
 /** @} */
 
 /**
+ * @name bitmask for install code policy (RequireInstallCodeOrPresetPassphrase)
+ * @anchor zb_ic_policy_t
+ *
+*/
+/** @{ */
+#define ZB_INSTALL_CODE_NOT_REQUIRED                0x00u
+#define ZB_INSTALL_CODE_NOT_REQUIRED_FOR_LEGACY     0x01u
+#define ZB_INSTALL_CODE_REQUIRED                    0x02u
+/** @} */
+
+/**
  * @brief Type for IC types.
  *
  * Holds one of @ref ic_types. Kept only for backward compatibility as
@@ -293,7 +314,7 @@ zb_ret_t zb_secur_ic_set(zb_uint8_t ic_type, const zb_uint8_t *ic);
 */
 typedef ZB_PACKED_PRE struct zb_secur_ic_get_list_req_s
 {
-  zb_uint8_t start_index;    /*!< Starting Index for the requested elements
+  zb_uint16_t start_index;   /*!< Starting Index for the requested elements
                                * of the IC table */
   zb_callback_t response_cb; /*!< Callback that will be called on response receiving */
 }
@@ -304,9 +325,9 @@ zb_secur_ic_get_list_req_t;
 */
 typedef ZB_PACKED_PRE struct zb_secur_ic_get_list_resp_s
 {
-  zb_uint8_t status;                     /*!< The status of the command.*/
-  zb_uint8_t ic_table_entries;           /*!< Total number of IC table entries within the device */
-  zb_uint8_t start_index;                /*!< Starting index within the IC table */
+  zb_uint16_t ic_table_entries;          /*!< Total number of IC table entries within the device */
+  zb_uint16_t start_index;               /*!< Starting index within the IC table */
+  zb_ret_t status;                       /*!< The status of the command.*/
   zb_uint8_t ic_table_list_count;        /*!< Number of received IC table entries */
 }
 ZB_PACKED_STRUCT
@@ -326,7 +347,7 @@ typedef ZB_PACKED_PRE struct zb_secur_ic_entry_s
   */
 typedef ZB_PACKED_PRE struct zb_secur_ic_get_by_idx_req_s
 {
-  zb_uint8_t ic_index;        /*!< Starting Index for the requested elements
+  zb_uint16_t ic_index;       /*!< Starting Index for the requested elements
                                 * of the IC table */
   zb_callback_t response_cb;  /*!< Callback that will be called on response receiving */
 }
@@ -337,11 +358,11 @@ zb_secur_ic_get_by_idx_req_t;
   */
 typedef ZB_PACKED_PRE struct zb_secur_ic_get_by_idx_resp_s
 {
-  zb_uint8_t status;                           /*!< The status of the command.*/
+  zb_ret_t status;                             /*!< The status of the command.*/
   zb_ieee_addr_t device_address;               /*!< Partner address */
   zb_ic_types_t ic_type;                       /*!< Installcode type.*/
   zb_uint8_t installcode[ZB_CCM_KEY_SIZE+ZB_CCM_KEY_CRC_SIZE];   /*!< 16b installcode +2b crc */
-  zb_uint8_t ic_index;                        /*!< Starting Index for the requested elements */
+  zb_uint16_t ic_index;                        /*!< Starting Index for the requested elements */
 }
 ZB_PACKED_STRUCT
 zb_secur_ic_get_by_idx_resp_t;
@@ -360,7 +381,7 @@ zb_secur_ic_remove_req_t;
   */
 typedef ZB_PACKED_PRE struct zb_secur_ic_remove_resp_s
 {
-  zb_uint8_t status; /*!< The status of the command.*/
+  zb_ret_t status; /*!< The status of the command.*/
 }
 ZB_PACKED_STRUCT
 zb_secur_ic_remove_resp_t;
@@ -378,7 +399,7 @@ zb_secur_ic_remove_all_req_t;
   */
 typedef ZB_PACKED_PRE struct zb_secur_ic_remove_all_resp_s
 {
-  zb_uint8_t status;  /*!< The status of the command.*/
+  zb_ret_t status;  /*!< The status of the command.*/
 }
 ZB_PACKED_STRUCT
 zb_secur_ic_remove_all_resp_t;
@@ -392,7 +413,7 @@ zb_secur_ic_remove_all_resp_t;
  *
  *  @snippet ic_sample/ic_zc.c zb_secur_ic_get_list_req_usage
 */
-void zb_secur_ic_get_list_req(zb_uint8_t param);
+void zb_secur_ic_get_list_req(zb_bufid_t param);
 
 /**
  * @brief Get the install code by index.
@@ -401,7 +422,7 @@ void zb_secur_ic_get_list_req(zb_uint8_t param);
  * @param param buffer with request parameters, will be also used to store response.
  *  @snippet ic_sample/ic_zc.c zb_secur_ic_get_by_idx_req_usage
 */
-void zb_secur_ic_get_by_idx_req(zb_uint8_t param);
+void zb_secur_ic_get_by_idx_req(zb_bufid_t param);
 
 /**
  * @brief Remove the install code for the device with specified long
@@ -411,7 +432,7 @@ void zb_secur_ic_get_by_idx_req(zb_uint8_t param);
  * @param param buffer with request parameters, will be also used to store response.
  * @snippet ic_sample/ic_zc.c zb_secur_ic_remove_req_usage
 */
-void zb_secur_ic_remove_req(zb_uint8_t param);
+void zb_secur_ic_remove_req(zb_bufid_t param);
 
 /**
  * Remove the install code for all devices.
@@ -420,7 +441,7 @@ void zb_secur_ic_remove_req(zb_uint8_t param);
  * @param param buffer with request parameters, will be also used to store response.
  * @snippet ic_sample/ic_zc.c zb_secur_ic_remove_all_req_usage
 */
-void zb_secur_ic_remove_all_req(zb_uint8_t param);
+void zb_secur_ic_remove_all_req(zb_bufid_t param);
 #endif /* ZB_COORDINATOR_ROLE && ZB_SECURITY_INSTALLCODES */
 
 /** @fn zb_ret_t zb_secur_ic_str_set(char *ic_str)
@@ -435,7 +456,7 @@ void zb_secur_ic_remove_all_req(zb_uint8_t param);
  */
 zb_ret_t zb_secur_ic_str_set(char *ic_str);
 
-#ifndef ZB_USE_INTERNAL_HEADERS
+#if (defined(ZB_COORDINATOR_ROLE) && defined(ZB_SECURITY_INSTALLCODES)) || defined(DOXYGEN)
 
 /** @fn void zb_secur_ic_str_add(zb_ieee_addr_t address, char *ic_str, zb_secur_ic_add_cb_t cb)
  *  @brief Add install code for the device from character string
@@ -450,15 +471,8 @@ zb_ret_t zb_secur_ic_str_set(char *ic_str);
  */
 void zb_secur_ic_str_add(zb_ieee_addr_t address, char *ic_str, zb_secur_ic_add_cb_t cb);
 
-#endif /* ZB_USE_INTERNAL_HEADERS */
+#endif /* ZB_COORDINATOR_ROLE && ZB_SECURITY_INSTALLCODES */
 
-/**
-   Set installcode policy flag.
-
-   @param allow_ic_only - use ZB_TRUE value to check installcodes
-   @snippet ic_sample/ic_zc.c zb_set_installcode_policy_usage
-*/
-void zb_set_installcode_policy(zb_bool_t allow_ic_only);
 /** @} */ /* secur_ic_usage */
 
 #ifdef ZB_ROUTER_ROLE
@@ -640,7 +654,7 @@ typedef struct zb_tx_power_params_s
  *
  * @param param - buffer, containing @ref zb_tx_power_params_t.
 */
-void zb_get_tx_power_async(zb_bufid_t param);
+void zb_get_tx_power_async(zb_cb_param_t param);
 
 /**
  * @brief Set transceiver power to a given value on a given page and channel asynchronously.
@@ -651,7 +665,7 @@ void zb_get_tx_power_async(zb_bufid_t param);
  *
  * @param param - buffer, containing @ref zb_tx_power_params_t.
 */
-void zb_set_tx_power_async(zb_bufid_t param);
+void zb_set_tx_power_async(zb_cb_param_t param);
 
 /* Required for the Multi MAC compatibility reasons.
  *
@@ -662,12 +676,12 @@ void zb_set_tx_power_async(zb_bufid_t param);
  *
  * @warning do not use directly, use @ref zb_get_tx_power_async instead
  */
-void zb_get_tx_power_async_macsplit(zb_bufid_t param);
+void zb_get_tx_power_async_macsplit(zb_cb_param_t param);
 /** Moved here for the Multi MAC compatibility reasons
  *
  * @warning do not use directly, use @ref zb_set_tx_power_async instead
  */
-void zb_set_tx_power_async_macsplit(zb_bufid_t param);
+void zb_set_tx_power_async_macsplit(zb_cb_param_t param);
 
 #define zb_set_tx_power_async zb_set_tx_power_async_macsplit
 #define zb_get_tx_power_async zb_get_tx_power_async_macsplit
@@ -726,12 +740,6 @@ zb_ret_t zboss_start(void);
 
 /*! @addtogroup zb_general_get */
 /*! @{ */
-/**
- *  @brief Get ZBOSS version.
- *  @returns Pointer to zero-terminated version string.
- */
-const zb_char_t ZB_IAR_CODE *zb_get_version(void);
-
 /**
  *  @brief Get ZBOSS numeric version.
  *  @returns (MAJOR << 24 | MINOR << 16 | REVISION)
@@ -847,7 +855,7 @@ zb_ret_t zb_get_version_ext_zboss(zb_version_ext_stack_t *ext_ver_zboss);
   */
 typedef struct zb_tc_dev_list_iterator_s
 {
-  zb_uint_t idx;                /*!< Starting index of the APS keypair array */
+  zb_aps_key_pair_ref_t idx; /*!< Starting index of the APS keypair array, see @ref zb_aps_key_pair_ref_t */
 } ZB_PACKED_STRUCT
 zb_tc_dev_list_iterator_t;
 
@@ -1214,34 +1222,25 @@ void zb_set_pta_opt(zb_uint32_t opt);
 /**
    Initiate device as a Zigbee 3.0 (not SE!) coordinator
    @param channel_mask - Zigbee channel mask
-
-   @note BDB channel sets that are set using @ref zb_set_bdb_primary_channel_set() and @ref
-   zb_set_bdb_secondary_channel_set(), are always reset to zero after changing network role of the device.
 */
 void zb_set_network_coordinator_role(zb_uint32_t channel_mask);
 #endif /* ZB_COORDINATOR_ROLE */
 
-#if defined ZB_ROUTER_ROLE && defined ZB_BDB_MODE && !defined BDB_OLD
+#if defined ZB_ROUTER_ROLE && defined ZB_BDB_MODE
 /**
    Initiate device as a Zigbee Zigbee 3.0 (not SE!) router
    @param channel_mask - Zigbee channel mask
-
-   @note BDB channel sets that are set using @ref zb_set_bdb_primary_channel_set() and @ref
-   zb_set_bdb_secondary_channel_set(), are always reset to zero after changing network role of the device.
 */
 void zb_set_network_router_role(zb_uint32_t channel_mask);
-#endif /* ZB_ROUTER_ROLE && ZB_BDB_MODE && !BDB_OLD */
+#endif /* ZB_ROUTER_ROLE && ZB_BDB_MODE */
 
-#if defined ZB_ED_FUNC && defined ZB_BDB_MODE && !defined BDB_OLD
+#if defined ZB_ED_FUNC && defined ZB_BDB_MODE
 /**
    Initiate device as a Zigbee Zigbee 3.0 (not SE!) End Device
    @param channel_mask - Zigbee channel mask
-
-   @note BDB channel sets that are set using @ref zb_set_bdb_primary_channel_set() and @ref
-   zb_set_bdb_secondary_channel_set(), are always reset to zero after changing network role of the device.
 */
 void zb_set_network_ed_role(zb_uint32_t channel_mask);
-#endif /* ZB_ED_FUNC && ZB_BDB_MODE && !BDB_OLD */
+#endif /* ZB_ED_FUNC && ZB_BDB_MODE */
 
 #ifndef ZB_USE_INTERNAL_HEADERS
 
@@ -1281,23 +1280,23 @@ void zb_set_network_ed_role_legacy(zb_uint32_t channel_mask);
 void zb_set_network_coordinator_role_ext(zb_channel_list_t channel_list);
 #endif /* ZB_COORDINATOR_ROLE */
 
-#if defined ZB_ROUTER_ROLE && defined ZB_BDB_MODE && !defined BDB_OLD
+#if defined ZB_ROUTER_ROLE && defined ZB_BDB_MODE
 /**
    Initiate device as a Zigbee 3.0 BDB router with channel list.
    Provides functionality to set mask for Sub-GHz and 2.4GHz page.
    @param channel_list - Zigbee channels list
 */
 void zb_set_network_router_role_ext(zb_channel_list_t channel_list);
-#endif /* ZB_ROUTER_ROLE && ZB_BDB_MODE && !BDB_OLD */
+#endif /* ZB_ROUTER_ROLE && ZB_BDB_MODE */
 
-#if defined ZB_ED_FUNC && defined ZB_BDB_MODE && !defined BDB_OLD
+#if defined ZB_ED_FUNC && defined ZB_BDB_MODE
 /**
    Initiate device as a Zigbee 3.0 BDB End Device with channel list.
    Provides functionality to set mask for 2.4 GHz or Sub-GHz page.
    @param channel_list - Zigbee channels list
 */
 void zb_set_network_ed_role_ext(zb_channel_list_t channel_list);
-#endif /* ZB_ED_FUNC && ZB_BDB_MODE && !BDB_OLD */
+#endif /* ZB_ED_FUNC && ZB_BDB_MODE */
 /** @endcond */ /* DOXYGEN_SUBGHZ_FEATURE */
 
 /** @} */
@@ -1311,13 +1310,6 @@ void zb_set_network_ed_role_ext(zb_channel_list_t channel_list);
  * @return - zb_nwk_device_type_t device_role_id
  */
 zb_nwk_device_type_t zb_get_network_role(void);
-
-/**
- * Returns the maximum number of children allowed
- * @deprecated This function will be removed in the next Major release after March 2025
- *             Use @ref zb_nwk_get_max_ed_capacity() instead
- */
-zb_uint8_t zb_get_max_children(void);
 
 /*! @} */ /* zb_general_get */
 
@@ -1367,15 +1359,6 @@ void zb_channel_list_init(zb_channel_list_t channel_list);
    @return RET_OK if ok, else error code
  */
 zb_ret_t zb_channel_list_add(zb_channel_list_t channel_list, zb_uint8_t page_num, zb_uint32_t channel_mask);
-
-/**
-   Set the maximum number of connected devices. Used for coordinators
-   and routers
-   @deprecated This function will be removed in the next Major release after March 2025
-               Use @ref zb_nwk_set_max_ed_capacity() instead
-   @param max_children - maximum number of connected devices
-*/
-void zb_set_max_children(zb_uint8_t max_children);
 
 /** @} */ /* zb_general_set */
 
@@ -1596,7 +1579,7 @@ void zb_set_keepalive_mode(nwk_keepalive_supported_method_t mode);
 
    @param param - reference to the buffer which contains signal. See @ref zb_get_app_signal.
 */
-void zboss_signal_handler(zb_uint8_t param);
+void zboss_signal_handler(zb_cb_param_t param);
 
 #endif /* ZB_USE_INTERNAL_HEADERS */
 
@@ -1611,7 +1594,7 @@ void zboss_signal_handler(zb_uint8_t param);
  * @return ZB_TRUE if the signal was fully processed and no more actions needed by other handler in the subsription chain.
  *
  */
-typedef zb_bool_t (*zb_signal_handler_t)(zb_uint8_t param);
+typedef zb_bool_t (*zb_signal_handler_t)(zb_cb_param_t param);
 
 /**
  * @brief Add new signal handler to the end of a subscription chain.
@@ -1651,42 +1634,43 @@ zb_bool_t zb_signal_handler_remove(zb_signal_handler_t handler);
  *
  * ZB_NVRAM_DATASET_NUMBER - count of dataset types. Not a real dataset type!
  */
-typedef enum zb_nvram_dataset_types_e
-{
-  /* Do not use 0 as dataset type: it can be used internally */
-  ZB_NVRAM_RESERVED              = 0, /**< Reserved value */
-  ZB_NVRAM_COMMON_DATA           = 1, /**< Dataset, contains common Zigbee data */
-  ZB_NVRAM_HA_DATA               = 2, /**< Dataset, contains HA profile Zigbee data */
-  ZB_NVRAM_ZCL_REPORTING_DATA    = 3, /**< Dataset, contains ZCL reporting data */
-  ZB_NVRAM_APS_SECURE_DATA_GAP   = 4, /**< Reserved value */
-  ZB_NVRAM_APS_BINDING_DATA_GAP  = 5, /**< Reserved value */
-  ZB_NVRAM_HA_POLL_CONTROL_DATA  = 6, /**< Dataset, contains HA POLL CONTROL data */
-  ZB_NVRAM_APS_SECURE_DATA       = 7, /**< Dataset, contains NIB outgoing frame counter */
-  ZB_NVRAM_DATASET_GRPW_DATA     = 8, /**< Green Power dataset */
-  ZB_NVRAM_APP_DATA1             = 9, /**< Application-specific data #1 */
-  ZB_NVRAM_APP_DATA2             = 10, /**< Application-specific data #2 */
-  ZB_NVRAM_ADDR_MAP              = 11, /**< Dataset stores address map info */
-  ZB_NVRAM_NEIGHBOUR_TBL         = 12, /**< Dataset stores Neighbor table info */
-  ZB_NVRAM_INSTALLCODES          = 13, /**< Dataset contains APS installcodes data */
-  ZB_NVRAM_IB_COUNTERS           = 14, /**< Dataset, contains APS secure keys data */
-  ZB_NVRAM_APS_BINDING_DATA      = 15, /**< Dataset, contains APS binding data */
-  ZB_NVRAM_DATASET_GP_PRPOXYT    = 16, /**< Green Power Proxy table */
-  ZB_NVRAM_DATASET_GP_SINKT      = 17, /**< Green Power Sink table */
-  ZB_NVRAM_DATASET_GP_CLUSTER    = 18, /**< Green Power Cluster data */
-  ZB_NVRAM_APS_GROUPS_DATA       = 19, /**< Dataset, contains APS groups data */
-  ZB_NVRAM_DATASET_SE_CERTDB     = 20, /**< Smart Energy Dataset - Certificates DataBase */
-  ZB_NVRAM_ZCL_WWAH_DATA         = 21, /**< Dataset, contains ZCL WWAH data */
-  ZB_NVRAM_DATASET_GP_APP_TBL    = 22, /**< Dataset, contains ZCL WWAH data */
-  /* Note: added new app_data datasets down and created a hole for new system datasets.
-   */
-  ZB_NVRAM_APP_DATA3             = 27, /**< Application-specific data #3 */
-  ZB_NVRAM_APP_DATA4             = 28, /**< Application-specific data #4 */
-  ZB_NVRAM_KE_WHITELIST          = 29,
-  ZB_NVRAM_DATASET_ZB_DIRECT     = 30, /**< Zigbee Direct dataset */
-  ZB_NVRAM_ZDO_DIAGNOSTICS_DATA  = 31, /**< Dataset of the Diagnostics cluster */
-  ZB_NVRAM_DATASET_NUMBER,             /**< Count of Dataset */
-  ZB_NVRAM_DATA_SET_TYPE_PAGE_HDR = 0xFFFFU, /**< Special internal dataset type  */
-} zb_nvram_dataset_types_t;
+typedef zb_uint16_t zb_nvram_dataset_types_t;
+
+/* Do not use 0 as dataset type: it can be used internally */
+#define ZB_NVRAM_RESERVED             0U  /**< Reserved value */
+#define ZB_NVRAM_COMMON_DATA          1U  /**< Dataset, contains common Zigbee data */
+#define ZB_NVRAM_HA_DATA              2U  /**< Dataset, contains HA profile Zigbee data */
+#define ZB_NVRAM_ZCL_REPORTING_DATA   3U  /**< Dataset, contains ZCL reporting data */
+#define ZB_NVRAM_APS_SECURE_DATA_GAP  4U  /**< Reserved value */
+#define ZB_NVRAM_APS_BINDING_DATA_GAP 5U  /**< Reserved value */
+#define ZB_NVRAM_HA_POLL_CONTROL_DATA 6U  /**< Dataset, contains HA POLL CONTROL data */
+#define ZB_NVRAM_APS_SECURE_DATA      7U  /**< Dataset, contains APS secure keys data */
+#define ZB_NVRAM_DATASET_GRPW_DATA    8U  /**< Green Power dataset */
+#define ZB_NVRAM_APP_DATA1            9U  /**< Application-specific data #1 */
+#define ZB_NVRAM_APP_DATA2            10U /**< Application-specific data #2 */
+#define ZB_NVRAM_ADDR_MAP             11U /**< Dataset stores address map info */
+#define ZB_NVRAM_NEIGHBOUR_TBL        12U /**< Dataset stores Neighbor table info */
+#define ZB_NVRAM_INSTALLCODES         13U /**< Dataset contains APS installcodes data */
+#define ZB_NVRAM_IB_COUNTERS          14U /**< Dataset, contains NIB outgoing frame counter */
+#define ZB_NVRAM_APS_BINDING_DATA     15U /**< Dataset, contains APS binding data */
+#define ZB_NVRAM_DATASET_GP_PROXYT    16U /**< Green Power Proxy table */
+#define ZB_NVRAM_DATASET_GP_SINKT     17U /**< Green Power Sink table */
+#define ZB_NVRAM_DATASET_GP_CLUSTER   18U /**< Green Power Cluster data */
+#define ZB_NVRAM_APS_GROUPS_DATA      19U /**< Dataset, contains APS groups data */
+#define ZB_NVRAM_DATASET_SE_CERTDB    20U /**< Smart Energy Dataset - Certificates DataBase */
+#define ZB_NVRAM_ZCL_WWAH_DATA        21U /**< Dataset, contains ZCL WWAH data */
+#define ZB_NVRAM_DATASET_GP_APP_TBL   22U /**< Dataset, contains ZCL WWAH data */
+
+/* Note: added new app_data datasets down and created a hole for new system datasets. */
+#define ZB_NVRAM_APP_DATA3            27U /**< Application-specific data #3 */
+#define ZB_NVRAM_APP_DATA4            28U /**< Application-specific data #4 */
+#define ZB_NVRAM_KE_WHITELIST         29U
+#define ZB_NVRAM_DATASET_ZB_DIRECT    30U /**< Zigbee Direct dataset */
+#define ZB_NVRAM_ZDO_DIAGNOSTICS_DATA 31U /**< Dataset of the Diagnostics cluster */
+#define ZB_NVRAM_ADDR_MAP_ENTRY       32U /**< Dataset stores single address map entry */
+#define ZB_NVRAM_APS_KEY_PAIR_ENTRY   33U /**< Dataset stores single APS key pair entry */
+#define ZB_NVRAM_DATASET_NUMBER       34U /**< Count of Dataset */
+#define ZB_NVRAM_DATA_SET_TYPE_PAGE_HDR 0xFFFFU /**< Special internal dataset type  */
 
 #define ZB_NVRAM_DATA_SET_TYPE_PAGE_HDR_R22 30u
 
@@ -1807,7 +1791,7 @@ void zb_nvram_register_app4_write_cb(
 /**
  * Write specified dataset into NVRAM
  *
- * @param t - dataset index, see @ref zb_nvram_dataset_types_e
+ * @param t - dataset index, see @ref zb_nvram_dataset_types_t
  * @return Status of operation
  *
  * @b Example
@@ -2236,7 +2220,7 @@ void function_add(zb_uint8_t param)
 }
    @endcode
  */
-void zb_ieee_joining_list_add(zb_uint8_t param);
+void zb_ieee_joining_list_add(zb_bufid_t param);
 
 
 /**
@@ -2246,7 +2230,7 @@ void zb_ieee_joining_list_add(zb_uint8_t param);
  *
  * @param param - Reference to buffer containing @ref zb_ieee_joining_list_delete_params_t structure as a parameter.
  */
-void zb_ieee_joining_list_delete(zb_uint8_t param);
+void zb_ieee_joining_list_delete(zb_bufid_t param);
 
 
 /**
@@ -2286,7 +2270,7 @@ void function_clear(zb_uint8_t param)
 }
    @endcode
  */
-void zb_ieee_joining_list_clear(zb_uint8_t param);
+void zb_ieee_joining_list_clear(zb_bufid_t param);
 
 
 /**
@@ -2326,7 +2310,7 @@ void function_policy(zb_uint8_t param)
 }
    @endcode
  */
-void zb_ieee_joining_list_set_policy(zb_uint8_t param);
+void zb_ieee_joining_list_set_policy(zb_bufid_t param);
 
 
 /**
@@ -2336,7 +2320,7 @@ void zb_ieee_joining_list_set_policy(zb_uint8_t param);
  *
  * @param param - Reference to buffer containing @ref zb_ieee_joining_list_announce_t structure as a parameter.
  */
-void zb_ieee_joining_list_announce(zb_uint8_t param);
+void zb_ieee_joining_list_announce(zb_bufid_t param);
 
 
 /**
@@ -2349,19 +2333,39 @@ void zb_ieee_joining_list_announce(zb_uint8_t param);
  *
  * @param param - Reference to buffer containing @ref zb_ieee_joining_list_request_t structure as a parameter.
  */
-void zb_ieee_joining_list_request(zb_uint8_t param);
+void zb_ieee_joining_list_request(zb_bufid_t param);
 /*!@} */ /* zdo_joining_lists */
 
 #endif /* defined ZB_JOINING_LIST_SUPPORT */
 
 #if defined ZB_SECURITY_INSTALLCODES || defined DOXYGEN
 /**
-  Set using of install codes by TC
+  Set install code policy for device.
 
-  @param use_ic - enable/disable install code usage
+  @param ic_policy - @see zb_ic_policy_t :
+   0b00 - ic not required
+   0b01 - ic not required for legacy devices (only for TC)
+   0b10 - ic required
+
+  @return RET_OK - success,
+          RET_INVALID_PARAMETER_1 - if the value of ic_policy is incorrect
+                                    (it includes case when value == 0b01 for non-TC devices)
+
+  @snippet ic_sample/ic_zc.c zb_set_installcode_policy_usage
 */
-void zb_tc_set_use_installcode(zb_uint8_t use_ic);
+zb_ret_t zb_set_installcode_policy(zb_uint8_t ic_policy);
 #endif /* ZB_SECURITY_INSTALLCODES */
+
+#if defined ZB_COORDINATOR_ROLE
+/**
+  Allow/disallow well-known key for DLK procedure.
+
+  @param value - ZB_TRUE if the device can use well-known key during DLK
+
+  @note According BDB 3.1 specification the well-known key should be forbid for DLK.
+*/
+void zb_allow_well_known_key_for_dlk(zb_bool_t value);
+#endif /* ZB_COORDINATOR_ROLE */
 
 #if (defined ZB_ED_FUNC && defined ZB_CONTROL4_NETWORK_SUPPORT) || defined DOXYGEN
 /**
@@ -2382,6 +2386,20 @@ zb_bool_t zb_control4_network_permitted(void);
  * @param ms - value in milliseconds
  */
 void zb_set_mac_transaction_persistence_time(zb_uint16_t ms);
+
+#ifndef ZB_COORDINATOR_ONLY
+
+/**
+ * @brief Set the number of attempts to join the network.
+ * If the device failed to join to the parent device for any reason, it will try again `value` times.
+ * By default this variable equals 3 (bdbcRecSameNetworkRetryAttempts)
+ *
+ * @param value - number between 0 and 10 (bdbcMaxSameNetworkRetryAttempts)
+ */
+zb_ret_t zb_set_max_nwk_join_attempts (zb_uint8_t value);
+
+#endif
+
 
 #ifdef ZB_ALLOW_PROVISIONAL_KEY_AS_TCLK
 /**
@@ -2410,6 +2428,17 @@ void zb_disallow_provisional_key_as_tclk(void);
  */
 void zb_compatibility_workaround_enabled(zb_bool_t val);
 #endif /* !ZB_COORDINATOR_ONLY */
+
+
+#ifdef ZB_COORDINATOR_ROLE
+/**
+ * Device will switch to high security mode automatically after the commission window is closed.
+ * High security mode contains two policies - `require install codes` and `disallow TC rejoins without TCLK`.
+ *
+ * @see BDB 3.1 specification, 5.6.1
+ */
+void zb_autoswitch_to_high_security_mode_enabled(zb_bool_t val);
+#endif /* ZB_COORDINATOR_ROLE */
 
 #ifdef APP_GENERATES_TCLK
 /** @brief Callback for the application to generate TCLK

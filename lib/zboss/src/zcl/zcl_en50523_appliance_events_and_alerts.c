@@ -74,8 +74,8 @@ static zb_discover_cmd_list_t gs_appl_ev_and_alerts_server_cmd_list =
 };
 
 
-zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_cli(zb_cb_param_t param);
 
 void zb_zcl_en50523_appliance_events_and_alerts_init_server()
 {
@@ -95,7 +95,7 @@ void zb_zcl_en50523_appliance_events_and_alerts_init_client()
                               zb_zcl_process_en50523_appliance_events_and_alerts_cli);
 }
 
-static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_get_alerts_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_get_alerts_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t    ret = RET_OK;
   zb_uint8_t *ptr;
@@ -143,7 +143,7 @@ static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_get_alerts_handler(zb
   return ret;
 }
 
-static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_get_alerts_resp_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_get_alerts_resp_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_en50523_appl_ev_and_alerts_get_alerts_resp_t pl_in;
@@ -179,7 +179,7 @@ static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_get_alerts_resp_handl
   return ret;
 }
 
-static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_alerts_notificaton_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_alerts_notificaton_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_en50523_appl_ev_and_alerts_alerts_notif_t pl_in;
@@ -215,7 +215,7 @@ static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_alerts_notificaton_ha
   return ret;
 }
 
-static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_event_notificaton_handler(zb_uint8_t param, const zb_zcl_parsed_hdr_t *cmd_info)
+static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_event_notificaton_handler(zb_bufid_t param, const zb_zcl_parsed_hdr_t *cmd_info)
 {
   zb_ret_t ret = RET_OK;
   zb_zcl_en50523_appl_ev_and_alerts_event_notif_t pl_in;
@@ -251,7 +251,7 @@ static zb_ret_t zb_zcl_en50523_appliance_events_and_alerts_event_notificaton_han
   return ret;
 }
 
-zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_srv(zb_cb_param_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_bool_t processed = ZB_TRUE;
@@ -266,7 +266,7 @@ zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_srv(zb_uint8_t para
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG(TRACE_ZCL1,
-      "> zb_zcl_process_en50523_appliance_events_and_alerts_srv: param %hd", (FMT__H, param));
+      "> zb_zcl_process_en50523_appliance_events_and_alerts_srv: param %d", (FMT__D, param));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_APPLIANCE_EVENTS_AND_ALERTS == cmd_info.cluster_id);
   ZB_ASSERT(ZB_ZCL_FRAME_DIRECTION_TO_SRV == cmd_info.cmd_direction);
@@ -294,7 +294,7 @@ zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_srv(zb_uint8_t para
   return processed;
 }
 
-zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_cli(zb_cb_param_t param)
 {
   zb_ret_t ret = RET_OK;
   zb_bool_t processed = ZB_TRUE;
@@ -309,7 +309,7 @@ zb_bool_t zb_zcl_process_en50523_appliance_events_and_alerts_cli(zb_uint8_t para
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG(TRACE_ZCL1,
-      "> zb_zcl_process_en50523_appliance_events_and_alerts_cli: param %hd", (FMT__H, param));
+      "> zb_zcl_process_en50523_appliance_events_and_alerts_cli: param %d", (FMT__D, param));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_APPLIANCE_EVENTS_AND_ALERTS == cmd_info.cluster_id);
   ZB_ASSERT(ZB_ZCL_FRAME_DIRECTION_TO_CLI == cmd_info.cmd_direction);

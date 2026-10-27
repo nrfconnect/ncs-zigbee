@@ -81,13 +81,13 @@ zb_discover_cmd_list_t gs_on_off_server_cmd_list =
   0, NULL
 };
 
-void zb_zcl_on_off_invoke_user_app(zb_uint8_t param);
-static zb_ret_t zb_zcl_call_on_off_attr_device_cb(zb_uint8_t param, zb_uint8_t dst_ep, zb_uint8_t value);
-static void zb_zcl_on_off_timer_handler(zb_uint8_t param);
+void zb_zcl_on_off_invoke_user_app(zb_cb_param_t param);
+static zb_ret_t zb_zcl_call_on_off_attr_device_cb(zb_bufid_t param, zb_uint8_t dst_ep, zb_uint8_t value);
+static void zb_zcl_on_off_timer_handler(zb_cb_param_t param);
 
 zb_ret_t check_value_on_off_server(zb_uint16_t attr_id, zb_uint8_t endpoint, zb_uint8_t *value);
-zb_bool_t zb_zcl_process_on_off_specific_commands_srv(zb_uint8_t param);
-zb_bool_t zb_zcl_process_on_off_specific_commands_cli(zb_uint8_t param);
+zb_bool_t zb_zcl_process_on_off_specific_commands_srv(zb_cb_param_t param);
+zb_bool_t zb_zcl_process_on_off_specific_commands_cli(zb_cb_param_t param);
 
 static void cancel_on_off_timer_handler_alarm(void);
 
@@ -193,7 +193,7 @@ static zb_bool_t get_reduced_timer_counter()
 static void cancel_on_off_timer_handler_alarm(void)
 {
   zb_ret_t ret;
-  zb_bufid_t bufid;
+  zb_cb_param_t bufid;
 
   TRACE_MSG(TRACE_ZCL1, ">>cancel_on_off_timer_handler_alarm", (FMT__0));
 
@@ -211,13 +211,13 @@ static void cancel_on_off_timer_handler_alarm(void)
   TRACE_MSG(TRACE_ZCL1, "<<cancel_on_off_timer_handler_alarm", (FMT__0));
 }
 
-static zb_ret_t zb_zcl_call_on_off_attr_device_cb(zb_uint8_t param, zb_uint8_t dst_ep, zb_uint8_t value)
+static zb_ret_t zb_zcl_call_on_off_attr_device_cb(zb_bufid_t param, zb_uint8_t dst_ep, zb_uint8_t value)
 {
   zb_zcl_device_callback_param_t *user_app_invoke_data =
     ZB_BUF_GET_PARAM(param, zb_zcl_device_callback_param_t);
 
-  TRACE_MSG(TRACE_ZCL1, ">>zb_zcl_call_on_off_attr_device_cb(), param %hd, dst_ep %hd, value %hd",
-            (FMT__H_H_H, param, dst_ep, value));
+  TRACE_MSG(TRACE_ZCL1, ">>zb_zcl_call_on_off_attr_device_cb(), param %d, dst_ep %hd, value %hd",
+            (FMT__D_H_H, param, dst_ep, value));
 
   user_app_invoke_data->device_cb_id = ZB_ZCL_SET_ATTR_VALUE_CB_ID;
   user_app_invoke_data->endpoint = dst_ep;
@@ -246,7 +246,7 @@ static zb_ret_t zb_zcl_call_on_off_attr_device_cb(zb_uint8_t param, zb_uint8_t d
  *
  * Timer period = 1/10 sec
  * */
-static void zb_zcl_on_off_timer_handler(zb_uint8_t param)
+static void zb_zcl_on_off_timer_handler(zb_cb_param_t param)
 {
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
   zb_uint8_t endpoint;
@@ -256,7 +256,7 @@ static void zb_zcl_on_off_timer_handler(zb_uint8_t param)
   zb_zcl_attr_t * attr_desc_off_wait_time;
   zb_bool_t is_set_off = ZB_FALSE;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_on_off_timer_handler %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_on_off_timer_handler %d", (FMT__D, param));
 
   endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint;
 
@@ -336,8 +336,11 @@ static void zb_zcl_on_off_timer_handler(zb_uint8_t param)
   TRACE_MSG(TRACE_ZCL1, "< zb_zcl_on_off_timer_handler", (FMT__0));
 }
 
-void zb_zcl_on_off_send_default_resp(zb_uint8_t cb_param, zb_uint16_t user_param)
+void zb_zcl_on_off_send_default_resp(zb_cb_param_t param)
 {
+  zb_bufid_t cb_param = ZB_UNPACK_BUF_REF(param);
+  zb_bufid_t user_param = (zb_bufid_t)ZB_UNPACK_USER_PARAM(param);
+
   if (!cb_param)
   {
     zb_buf_get_out_delayed_ext(zb_zcl_on_off_send_default_resp, user_param, 0);
@@ -345,7 +348,7 @@ void zb_zcl_on_off_send_default_resp(zb_uint8_t cb_param, zb_uint16_t user_param
   else
   {
     zb_zcl_parsed_hdr_t *cmd_info;
-    cmd_info = ZB_BUF_GET_PARAM((zb_uint8_t)user_param, zb_zcl_parsed_hdr_t);
+    cmd_info = ZB_BUF_GET_PARAM(user_param, zb_zcl_parsed_hdr_t);
     ZB_ZCL_PROCESS_COMMAND_FINISH(cb_param, cmd_info, ZB_ZCL_STATUS_SUCCESS);
   }
 }
@@ -353,7 +356,7 @@ void zb_zcl_on_off_send_default_resp(zb_uint8_t cb_param, zb_uint16_t user_param
 /* Process On command
  * see Spec 3.8.2.3.2
  * */
-static zb_ret_t zb_zcl_process_on_off_on_handler(zb_uint8_t param)
+static zb_ret_t zb_zcl_process_on_off_on_handler(zb_bufid_t param)
 {
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
   zb_uint8_t endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint;
@@ -407,7 +410,7 @@ static zb_ret_t zb_zcl_process_on_off_on_handler(zb_uint8_t param)
 /* Process Off command
  * see Spec 3.8.2.3.1
  * */
-static zb_ret_t zb_zcl_process_on_off_off_handler(zb_uint8_t param)
+static zb_ret_t zb_zcl_process_on_off_off_handler(zb_bufid_t param)
 {
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
   zb_uint8_t endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint;
@@ -439,7 +442,7 @@ static zb_ret_t zb_zcl_process_on_off_off_handler(zb_uint8_t param)
 /* Process Toggle command
  * see Spec 3.8.2.3.3
  * */
-static zb_ret_t zb_zcl_process_on_off_toggle_handler(zb_uint8_t param)
+static zb_ret_t zb_zcl_process_on_off_toggle_handler(zb_bufid_t param)
 {
   zb_uint8_t new_val; 
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
@@ -504,7 +507,7 @@ static zb_ret_t zb_zcl_process_on_off_toggle_handler(zb_uint8_t param)
  * if invoke result RET_OK then schedule invoke User App with attribute On/Off
  * else send response command with error
  */
-void zb_zcl_on_off_effect_invoke_user_app(zb_uint8_t param)
+void zb_zcl_on_off_effect_invoke_user_app(zb_cb_param_t param)
 {
   zb_zcl_on_off_effect_user_app_schedule_t* invoke_data = ZB_BUF_GET_PARAM(param, zb_zcl_on_off_effect_user_app_schedule_t);
   zb_zcl_parsed_hdr_t cmd_info;
@@ -512,7 +515,7 @@ void zb_zcl_on_off_effect_invoke_user_app(zb_uint8_t param)
   zb_zcl_attr_t *attr_desc_on_time;
   zb_uint8_t val = ZB_ZCL_ON_OFF_IS_OFF;
 
-  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_on_off_effect_invoke_user_app param %hd", (FMT__H, param));
+  TRACE_MSG(TRACE_ZCL1, "> zb_zcl_on_off_effect_invoke_user_app param %d", (FMT__D, param));
 
   ZB_MEMCPY(&cmd_info, &(invoke_data->cmd_info), sizeof(zb_zcl_parsed_hdr_t));
 
@@ -570,7 +573,7 @@ void zb_zcl_on_off_effect_invoke_user_app(zb_uint8_t param)
 /* Process Off with effect command
  * see Spec 3.8.2.3.4
  * */
-static zb_ret_t zb_zcl_process_on_off_off_with_effect_handler(zb_uint8_t param)
+static zb_ret_t zb_zcl_process_on_off_off_with_effect_handler(zb_bufid_t param)
 {
   zb_zcl_on_off_off_with_effect_req_t off_with_effect_payload;
   zb_zcl_parse_status_t status;
@@ -639,7 +642,7 @@ static zb_ret_t zb_zcl_process_on_off_off_with_effect_handler(zb_uint8_t param)
 /* Process Off with effect command
  * see Spec 3.8.2.3.5
  * */
-static zb_ret_t zb_zcl_process_on_off_on_with_recall_global_scene_handler(zb_uint8_t param)
+static zb_ret_t zb_zcl_process_on_off_on_with_recall_global_scene_handler(zb_bufid_t param)
 {
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
   zb_uint8_t endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(cmd_info).dst_endpoint;
@@ -723,7 +726,7 @@ static zb_ret_t zb_zcl_process_on_off_on_with_recall_global_scene_handler(zb_uin
 /* Process On with timed off command
  * see Spec 3.8.2.3.6
  * */
-static zb_ret_t zb_zcl_process_on_off_on_with_timed_off_handler(zb_uint8_t param)
+static zb_ret_t zb_zcl_process_on_off_on_with_timed_off_handler(zb_bufid_t param)
 {
   zb_zcl_parsed_hdr_t *cmd_info = ZB_BUF_GET_PARAM(param, zb_zcl_parsed_hdr_t);
   zb_ret_t ret = RET_ERROR;
@@ -810,11 +813,10 @@ static zb_ret_t zb_zcl_process_on_off_on_with_timed_off_handler(zb_uint8_t param
         else if (is_need_timer)
         {
           //start timer
-          ZB_SCHEDULE_ALARM(zb_zcl_on_off_timer_handler,
-                            param,
+          ZB_SCHEDULE_ALARM(zb_zcl_on_off_timer_handler, param,
                             ZB_ZCL_ON_OFF_TIMER_BEACON_INTERVAL);
           /* Server sends Default Response immediately after receiving the command*/
-          zb_zcl_on_off_send_default_resp(0, param);
+          zb_zcl_on_off_send_default_resp(ZB_PACK_2_U16_IN_U32(0, param));
         }
         ret = RET_BUSY;
       }
@@ -835,7 +837,7 @@ static zb_ret_t zb_zcl_process_on_off_on_with_timed_off_handler(zb_uint8_t param
  * Process specific command ZCL OnOff cluster
  * See Spec 6.6.1
  */
-zb_bool_t  zb_zcl_process_on_off_specific_commands(zb_uint8_t param)
+zb_bool_t  zb_zcl_process_on_off_specific_commands(zb_bufid_t param)
 {
   zb_bool_t processed = ZB_TRUE;
   zb_zcl_parsed_hdr_t cmd_info;
@@ -844,8 +846,8 @@ zb_bool_t  zb_zcl_process_on_off_specific_commands(zb_uint8_t param)
   ZB_ZCL_COPY_PARSED_HEADER(param, &cmd_info);
 
   TRACE_MSG( TRACE_ZCL1,
-             "> zb_zcl_process_on_off_specific_commands: param %hd, cmd_info.cmd_id 0x%hx",
-             (FMT__H_H, param, cmd_info.cmd_id));
+             "> zb_zcl_process_on_off_specific_commands: param %d, cmd_info.cmd_id 0x%hx",
+             (FMT__D_H, param, cmd_info.cmd_id));
 
   ZB_ASSERT(ZB_ZCL_CLUSTER_ID_ON_OFF == cmd_info.cluster_id);
   ZB_ASSERT(ZB_ZCL_FRAME_DIRECTION_TO_SRV == cmd_info.cmd_direction);
@@ -904,7 +906,7 @@ zb_bool_t  zb_zcl_process_on_off_specific_commands(zb_uint8_t param)
 }
 
 
-zb_bool_t zb_zcl_process_on_off_specific_commands_srv(zb_uint8_t param)
+zb_bool_t zb_zcl_process_on_off_specific_commands_srv(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -914,7 +916,7 @@ zb_bool_t zb_zcl_process_on_off_specific_commands_srv(zb_uint8_t param)
   return zb_zcl_process_on_off_specific_commands(param);
 }
 
-zb_bool_t zb_zcl_process_on_off_specific_commands_cli(zb_uint8_t param)
+zb_bool_t zb_zcl_process_on_off_specific_commands_cli(zb_cb_param_t param)
 {
   if ( ZB_ZCL_GENERAL_GET_CMD_LISTS_PARAM == param )
   {
@@ -930,7 +932,7 @@ zb_bool_t zb_zcl_process_on_off_specific_commands_cli(zb_uint8_t param)
  *
  * On_off_timer used "On with timed off" command.
  */
-void zb_zcl_on_off_invoke_user_app(zb_uint8_t param)
+void zb_zcl_on_off_invoke_user_app(zb_cb_param_t param)
 {
   zb_on_off_user_app_schedule_t* invoke_data =
       ZB_BUF_GET_PARAM(param, zb_on_off_user_app_schedule_t);
@@ -971,7 +973,7 @@ void zb_zcl_on_off_invoke_user_app(zb_uint8_t param)
 /*2019-04-10 Now Server sends Default Response immediately after receiving the command*/
     if (result == RET_OK)
     {
-      zb_zcl_on_off_send_default_resp(0, param);
+      zb_zcl_on_off_send_default_resp(ZB_PACK_2_U16_IN_U32(0, param));
     }
   }
   else

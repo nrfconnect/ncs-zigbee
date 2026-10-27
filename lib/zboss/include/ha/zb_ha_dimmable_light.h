@@ -201,7 +201,7 @@
                           ZB_HA_DIMMABLE_LIGHT_REPORT_ATTR_COUNT,               \
                           reporting_info## ep_name,                             \
                           ZB_HA_DIMMABLE_LIGHT_CVC_ATTR_COUNT,                  \
-                          cvc_alarm_info## device_ctx_name)
+                          cvc_alarm_info## ep_name)
 
 /**
   @brief Declare application's device context for Dimmable Light device

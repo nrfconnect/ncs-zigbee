@@ -116,7 +116,9 @@ typedef struct zb_nvram_globals_s
                                  * counter), so device is factory new  */
   zb_bitfield_t inited:1;            /*!< if true, NVRAM is inited (read/write operations are
                                       * allowed) */
-  zb_bitfield_t alignment:5;
+  zb_bitfield_t migration_in_progress:1; /*!< if true, NVRAM migration (when no more space in the page) is in progress  */
+  zb_bitfield_t ver_migration_in_progress:1; /*!< if true, NVRAM version migration is in progress  */
+  zb_bitfield_t alignment:3;
 
 #ifdef ZB_NVRAM_ENABLE_DIRECT_API
   /* positions of datasets; updated on each write operation; used for read operations */
@@ -130,6 +132,8 @@ typedef struct zb_nvram_globals_s
 } zb_nvram_globals_t;
 
 #define ZB_NVRAM() ZG->nvram
+
+#define ZB_NVRAM_MIGRATION_PREV_PAGE() ((zb_get_nvram_page_count() + ZB_NVRAM().current_page - 1U) % zb_get_nvram_page_count())
 
 #endif
 

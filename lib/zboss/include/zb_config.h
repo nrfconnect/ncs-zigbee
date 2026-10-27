@@ -56,11 +56,11 @@ constants etc.
 /* \defgroup buildconfig Build Configurations
    @{ */
 #include "zb_vendor.h"
+
 /**
    Load common ZBOSS definitions
 */
 #include "zb_config_common.h"
-
 
 /*
   some BDB defaults
@@ -71,10 +71,8 @@ constants etc.
 
 #ifdef ZB_BDB_MODE
 #define ZB_BDB_ENABLE_FINDING_BINDING
-#if !defined(NCP_MODE_HOST)
 /* BDB mandates GPPB */
 #define ZB_ENABLE_ZGP
-#endif /* !NCP_MODE_HOST */
 /* Starting from BDB 3.1 rejoin backoff is mandatory. */
 #define ZB_REJOIN_BACKOFF
 /* Distributed is M for BDB, but not for SE */
@@ -101,14 +99,11 @@ constants etc.
 
 /*
  * ZC/ZR - GPPB role library     (default) (implementation of Basic Proxy is mandatory for Zigbee 3.0 ZR)
- * ZC/ZR - GPCB role library               (Options file shall use ZB_ENABLE_ZGP_COMBO define)
- * ZC/ZR - GP Commissioning Tool           (Options file shall use ZGP_COMMISSIONING_TOOL define)
- * ZED   - Target role library   (default) (Options file shall use ZB_ENABLE_ZGP_TARGET define)
- * ZED   - Target+ role library            (Options file shall use ZB_ENABLE_ZGP_TARGET_PLUS define)
- *
- * To enable advanced features (not covered by the current version of GP specification) please
- * define ZB_ENABLE_ZGP_ADVANCED, so in this case the GPPB/GPCB/GPCT basic libs will be re-compiled
- * to GPP/GPC/GPCT advanced libs
+ * ZC/ZR - GPCB role library               (Separated Sink library)
+ * ZC/ZR - GP Commissioning Tool           (Separated Sink+CT library)
+ * ZED   - No ZGP implementation (default)
+ * ZED   - Target role library
+ *  ZED   - Target+ role library
  *
  * GP infrastructure devices:
  *
@@ -135,9 +130,21 @@ constants etc.
  *
  */
 
+#ifdef ZB_ED_ROLE
+#if defined ZB_ENABLE_ZGP && !defined ZB_ENABLE_ZGP_TARGET
+/* for ED role if ZB_ENABLE_ZGP_TARGET is not explicitly declared - disable the whole ZGP functionality */
+#undef ZB_ENABLE_ZGP
+#endif
+#if defined ZB_ENABLE_ZGP_DIRECT && !defined ZB_ENABLE_ZGP_TARGET_PLUS
+/* for ED role if ZB_ENABLE_ZGP_TARGET_PLUS is not explicitly declared - disable ZB_ENABLE_ZGP_DIRECT functionality */
+#undef ZB_ENABLE_ZGP_DIRECT
+#endif
+#endif /* ZB_ED_ROLE */
+
+#if defined ZB_ENABLE_ZGP || defined ZB_DOCUMENT_ZGP
+
 #ifdef ZB_ZGPD_ROLE
 #define ZB_ENABLE_ZGP_DIRECT
-#define ZB_ENABLE_ZGP_SECUR
 #define APP_ONLY_NVRAM
 
 #ifndef ZB_MAC_INTERFACE_SINGLE
@@ -147,64 +154,26 @@ constants etc.
 #ifndef ZB_MAC_MONOLITHIC
 #define ZB_MAC_MONOLITHIC
 #endif
-
-#elif defined ZB_ENABLE_ZGP && !defined ZB_ENABLE_ZGP_TARGET && defined ZB_ED_ROLE
-#undef ZB_ENABLE_ZGP
-#endif
-
-#if defined ZB_ENABLE_ZGP_DIRECT && !defined ZB_ENABLE_ZGP_TARGET && defined ZB_ED_ROLE
-#undef ZB_ENABLE_ZGP_DIRECT
-#endif
-
-
-#if (defined ZB_ENABLE_ZGP && !defined ZB_ZGPD_ROLE) || defined ZB_DOCUMENT_ZGP
-
-/*
-#define ZB_ENABLE_ZGP_ADVANCED
-*/
-
-#define ZB_ENABLE_ZGP_CLUSTER
-#define ZB_ENABLE_ZGP_SECUR
-#define ZB_USEALIAS
+#else /* ZB_ZGPD_ROLE */
 
 #ifndef ZB_ED_ROLE
 /* ZED can only be implemented as GP Target/Target+ */
 #define ZB_ENABLE_ZGP_PROXY
 #endif
 
+#define ZB_ENABLE_ZGP_SINK
+#define ZB_ENABLE_ZGP_INFRA
+#define ZB_USEALIAS
+
 #ifndef ZB_ENABLE_ZGP_TARGET
 #define ZB_ENABLE_ZGP_DIRECT
 #define ZB_ENABLE_ZGP_TX_QUEUE
 #endif
 
-#if (defined ZB_ENABLE_ZGP_COMBO || defined ZB_ENABLE_ZGP_TARGET || defined ZB_ENABLE_ZGP_TARGET_PLUS || defined ZGP_COMMISSIONING_TOOL)
-#define ZB_ENABLE_ZGP_SINK
-
-/* Old implementation of 8 bit vector handling on ZGP Sink Side is deprecated now.
- *   Let's keep it until SC will decide to discontinue it
- *   All the code under this define should be removed once it will be discontinued */
-#ifndef ZB_ZGP_SINK_SUPPORT_LEGACY_8BIT_VECTOR_HANDLING
-#define ZB_ZGP_SINK_SUPPORT_LEGACY_8BIT_VECTOR_HANDLING
-#endif
-
-/**< ZGP Sink Match Info is legacy and is deprecated now.
- *   Let's keep it until SC will decide to discontinue it
- *   All the code under this define should be removed once it will be discontinued */
-#ifndef ZB_ZGP_SINK_SUPPORT_LEGACY_MATCH_INFO
-#define ZB_ZGP_SINK_SUPPORT_LEGACY_MATCH_INFO
-#endif
-
-#ifdef ZB_ZGP_SINK_SUPPORT_LEGACY_MATCH_INFO
-/** Max number of command identifiers in one
- *  functionality matching table entry */
-#define ZB_ZGP_MATCH_TBL_MAX_CMDS_FOR_MATCH 5U
-
-/** Max number of cluster identifiers in one
- *  functionality matching table entry */
-#define ZB_ZGP_TBL_MAX_CLUSTERS 5U
-#endif  /* ZB_ZGP_SINK_SUPPORT_LEGACY_MATCH_INFO */
-
-#endif
+#ifdef NCP_MODE_HOST
+#undef ZB_ENABLE_ZGP_DIRECT
+#undef ZB_ENABLE_ZGP_TX_QUEUE
+#endif /* NCP_MODE_HOST */
 
 /** Sink table size */
 #ifndef ZB_ZGP_SINK_TBL_SIZE
@@ -275,6 +244,7 @@ constants etc.
 #endif  /* ZB_ENABLE_ZGP_PROXY */
 
 #endif  /* !ZB_ZGPD_ROLE */
+#endif /* defined ZB_ENABLE_ZGP || defined ZB_DOCUMENT_ZGP */
 
 /** @cond DOXYGEN_INTERNAL_DOC */
 /**
@@ -288,6 +258,23 @@ constants etc.
 #endif
 
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
+
+/* In bdb 3.1 we can use KEC cluster only for CBKE */
+#if !defined ZB_ENABLE_SE && defined ZB_SE_ENABLE_KEC_CLUSTER
+
+#ifndef ZB_ENABLE_SE_MIN_CONFIG
+#define ZB_ENABLE_SE_MIN_CONFIG
+#endif
+
+#ifndef ZB_NO_SE_COMMISSIONING
+#define ZB_NO_SE_COMMISSIONING
+#endif
+
+#ifndef ZB_SE_DISABLE_TIME_SYNC
+#define ZB_SE_DISABLE_TIME_SYNC
+#endif
+
+#endif /* !defined ZB_ENABLE_SE && defined ZB_SE_ENABLE_KEC_CLUSTER */
 
 #if defined ZB_ENABLE_SE_MIN_CONFIG
 #ifndef ZB_SECURITY_INSTALLCODES
@@ -353,15 +340,6 @@ constants etc.
 #define ZB_ZGP_TX_QUEUE_SIZE 10U
 #endif
 
-#ifdef ZB_ZGP_IMMED_TX
-/** Number of zb_zgp_tx_pinfo_t in zb_zgp_tx_packet_info_q_t. */
-#define ZB_ZGP_TX_PACKET_INFO_COUNT ZB_ZGP_TX_QUEUE_SIZE + (ZB_IOBUF_POOL_SIZE / 4U)
-/** Value with which immed_tx_frame_counter is incremented upon a reboot. */
-#define ZB_GP_IMMED_TX_FRAME_COUNTER_UPDATE_INTERVAL 1000U
-#define ZGP_INCLUDE_DST_LONG_ADDR
-#else
-#define ZB_ZGP_TX_PACKET_INFO_COUNT ZB_ZGP_TX_QUEUE_SIZE
-#endif  /* ZB_ZGP_IMMED_TX */
 /** Maximum payload length in outgoing ZGP frames */
 #ifndef ZB_ZGP_TX_CMD_PLD_MAX_SIZE
 #define ZB_ZGP_TX_CMD_PLD_MAX_SIZE  64U /* Maximum payload size of APP_0000 packet */
@@ -443,7 +421,7 @@ Ideally should rework the whole zb_config.h to suit better for that new concept.
    * There are several available MACs:
    *   - ZB_MAC_MONOLITHIC - monolithic MAC (used by default)
    *   - ZB_MACSPLIT_HOST
-   *   - ZB_MACSPLIT_DEVICE - MAC that is used as SoC part for MAC-split host
+   *   - ZB_MACSPLIT_DEVICE - MAC that is used as SoC part for MAC-Split host
    *   - ZB_EXTMAC - external MAC
    *   - ZB_MAC_SUBGHZ
    *   - ZB_MAC_BLE - BLE MAC that is used as a part of Zigbee Direct feature
@@ -451,7 +429,7 @@ Ideally should rework the whole zb_config.h to suit better for that new concept.
    * Supported MAC types should be defined in vendors, BLE MAC will be registered automatically after Zigbee Direct linking
    * and initialization.
    *
-   * ZB_COMPILE_MAC_MONOLITHIC is used to compile monolithic MAC and use it as a part of MAC-split device.
+   * ZB_COMPILE_MAC_MONOLITHIC is used to compile monolithic MAC and use it as a part of MAC-Split device.
    */
 
   /* Monolithic MAC is a default interface and used when enabled interfaces are not specified in vendors */
@@ -614,11 +592,15 @@ Ideally should rework the whole zb_config.h to suit better for that new concept.
 #define ZB_MAC_RADIO_CANT_WAKEUP_MCU
 #endif
 
+/* The `ZB_CHILD_HASH_TABLE_SIZE` value will be overridden when "configurable memory" feature is used.
+ * Otherwise, the value should be defined */
+#if !defined(ZB_ED_ROLE) && !defined(ZB_CONFIGURABLE_MEM) && defined(ZB_MAC_SOFTWARE_PB_MATCHING) && !defined(ZB_CHILD_HASH_TABLE_SIZE)
+#error ZB_CHILD_HASH_TABLE_SIZE should be defined
+#endif
+
 /***********************************************************************/
 /****************************General stack options**********************/
 /***********************************************************************/
-
-#define ZB_VERSION "0.2.0.1"
 
 /*! \addtogroup ZB_CONFIG */
 /*! @{ */
@@ -722,18 +704,21 @@ Ideally should rework the whole zb_config.h to suit better for that new concept.
 #define ZB_NWK_STOCHASTIC_ADDRESS_ASSIGN
 
 /*! Source routing path length, also called nwkMaxSourceRoute */
-#define ZB_NWK_MAX_PATH_LENGTH  5U
+#define ZB_NWK_MAX_PATH_LENGTH  ZB_CONFIG_CONST_BIG_NET(/* big net */ 11U, /* small net */ 5U)
 /*! Source route table capacity */
-/* 10/21/2019 EE CR:MINOR Isn't it too many? Can we handle situation when source route table is not big enough? */
-#define ZB_NWK_MAX_SRC_ROUTES   ZB_NEIGHBOR_TABLE_SIZE
+/**
+ * NWK: source routing table size
+ *
+ * Default value `ZB_NEIGHBOR_TABLE_SIZE` left here for backward compatibility with R23 stack version without
+ * big networks support.
+ *
+ * @note The value will be overridden when "configurable memory" feature is used.
+ * */
+#define ZB_NWK_MAX_SRC_ROUTES ZB_NEIGHBOR_TABLE_SIZE
 /* 10/21/2019 EE CR:MINOR Better indicate in const name that this is time in seconds by adding _S suffix */
 /*! Expiration time of the source route table (300 sec) */
 #define ZB_NWK_SRC_ROUTE_TABLE_EXPIRY 60U
 
-/**
-   Minimal time between MTORR when ZBOSS decided to run MTORR at some event
- */
-#define ZB_MIN_TIME_BETWEEN_MTORR ZB_MILLISECONDS_TO_BEACON_INTERVAL(10000u)
 /**
    If advised to send MTORR, do it after that delay
  */
@@ -741,6 +726,29 @@ Ideally should rework the whole zb_config.h to suit better for that new concept.
 
 
 #define ZB_DELAY_BEFORE_ADVISED_MTORR_HIPRI ZB_MILLISECONDS_TO_BEACON_INTERVAL(500u)
+
+/**
+   This option is used when device is concentrator and
+   ZB_NWK_RTG_OPT_SRC_ROUTE_SOLICITATION_TLV routing optimization is enabled.
+   It sets the delay before sending MTORR with Source Route Solicitation TLV when concentrator
+   device needs to establish source route for specified device by its short address.
+
+   The MTORR will be delayed for the specified time for each new route discovery attempt to
+   allow concentrator to accumulate multiple addresses in the TLV value and reduce number of MTORR packets.
+ */
+#define ZB_DELAY_BEFORE_MTORR_SOLITICATION ZB_MILLISECONDS_TO_BEACON_INTERVAL(500u)
+
+/**
+ * @brief Maximum addresses number in Route Solicitation Addresses list for concentrator
+ * The value is not too large to reduce average length of MTORR packets.
+ */
+#define ZB_SOURCE_ROUTE_SOLICITATION_MAX_ADDRS (10U)
+
+/**
+ * @brief The address age represents maximum number of outgoing MTORR with the address
+ * in Source Route Solicitation TLV.
+ */
+#define ZB_SOURCE_ROUTE_SOLICITATION_MAX_ADDR_AGE (5U)
 
 /**
    Delay to Send MTORR just after boot
@@ -893,29 +901,32 @@ ZB_ED_RX_OFF_WHEN_IDLE
 /** @addtogroup ZB_CONFIG */
 /** @{ */
 
-#if !defined ZB_CONFIGURABLE_MEM && !defined ZB_NWK_DISC_TABLE_SIZE
+/**
+ * NWK: discovery table size
+ *
+ *  @note This is a default value of the define. This value can be changed by user.
+ *  The value will be overridden when "configurable memory" feature is used.
+ */
+#if !defined(ZB_NWK_DISC_TABLE_SIZE)
 #ifndef ZB_MEMORY_COMPACT
 #define ZB_NWK_DISC_TABLE_SIZE 32U
 #else
 #define ZB_NWK_DISC_TABLE_SIZE 6U
 #endif
-#endif
-
-
+#endif /* ZB_NWK_DISC_TABLE_SIZE */
 
 /**
- *   NWK: size of the neighbor table
+ *  NWK: size of the neighbor table
  *
  *  @note This is a default value of the define. This value can be changed by user.
+ *  The value will be overridden when "configurable memory" feature is used.
  */
 #ifndef ZB_NEIGHBOR_TABLE_SIZE
 
 #if defined ZB_COORDINATOR_ROLE
 #define ZB_NEIGHBOR_TABLE_SIZE 32U
-
 #elif defined ZB_ROUTER_ROLE
 #define ZB_NEIGHBOR_TABLE_SIZE 32U
-
 #elif defined ZB_ED_ROLE
 /* Space for Parent only. Now ext neighbor functionality is in nwk disc table */
 #define ZB_NEIGHBOR_TABLE_SIZE 1U
@@ -942,6 +953,7 @@ ZB_ED_RX_OFF_WHEN_IDLE
  *  Scheduler callbacks queue size. Usually not need to change it.
  *
  *  @note This is a default value of the define. This value can be changed by user.
+ *  The value will be overridden when "configurable memory" feature is used.
 */
 #ifndef ZB_SCHEDULER_Q_SIZE
 #ifdef ZB_ED_ROLE
@@ -1008,6 +1020,7 @@ ZB_ED_RX_OFF_WHEN_IDLE
  *  APS: SRC binding table size
  *
  *  @note This is a default value of the define. This value can be changed by user.
+ *  The value will be overridden when "configurable memory" feature is used.
 */
 #define ZB_APS_SRC_BINDING_TABLE_SIZE 32U
 #endif
@@ -1018,10 +1031,32 @@ ZB_ED_RX_OFF_WHEN_IDLE
  *   APS: DST binding table size
  *
  *   @note This is a default value of the define. This value can be changed by user.
+ *   The value will be overridden when "configurable memory" feature is used.
 */
 #define ZB_APS_DST_BINDING_TABLE_SIZE 32U
 #endif
 
+/**
+ * APS: size of APS binding transmission table
+ *
+ * @note This is a default value of the define. This value can be changed by user.
+ * The value will be overridden when "configurable memory" feature is used.
+ */
+#ifndef ZB_APS_BIND_TRANS_TABLE_SIZE
+#define ZB_APS_BIND_TRANS_TABLE_SIZE ((ZB_IOBUF_POOL_SIZE + 15U)/16U *4U)
+#endif /* ZB_APS_BIND_TRANS_TABLE_SIZE */
+
+/**
+ * APS: size of APS transmission indices table for each APS destination binding entry
+ *
+ * @note This is a default value of the define. This value can be changed by user.
+ * The value will be overridden when "configurable memory" feature is used.
+ *
+ * It should be 4-byte aligned if it is stored in NVRAM.
+ */
+#ifndef ZB_SINGLE_TRANS_INDEX_SIZE
+#define ZB_SINGLE_TRANS_INDEX_SIZE (((ZB_APS_BIND_TRANS_TABLE_SIZE + 31U) / 32U) * 4U)
+#endif /* ZB_SINGLE_TRANS_INDEX_SIZE */
 
 #ifndef ZB_APS_GROUP_TABLE_SIZE
 /**
@@ -1088,12 +1123,11 @@ ZB_ED_RX_OFF_WHEN_IDLE
  * APS: maximum number of tables with key-pair information
  *
  * @note This is a default value of the define. This value can be changed by user.
+ * The value will be overridden when "configurable memory" feature is used.
 */
 #ifdef ZB_ED_ROLE
 #define ZB_N_APS_KEY_PAIR_ARR_MAX_SIZE            5U
 #else
-/* [EE] 05/25/2016 CR:MINOR Set it to some big value - say, 128. This is total #
- * of devices in the network, not neighbor table size */
 #define ZB_N_APS_KEY_PAIR_ARR_MAX_SIZE            ZB_NEIGHBOR_TABLE_SIZE
 #endif
 #endif
@@ -1127,6 +1161,31 @@ ZB_ED_RX_OFF_WHEN_IDLE
   (ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY)
 #endif
 
+/*
+ * Retransmission timer slots (intervals) count for APS retransmission table
+ * In default configuration it equals to ZB_N_APS_ACK_WAIT_DURATION (1.6 sec.) / 0.1 sec = 16
+ */
+#if defined(ZB_CONFIGURABLE_RETRIES)
+/* Precision can be defined in vendor file, if not, set default value */
+#ifndef ZB_APS_RETRANS_TIMER_PRECISION_MS
+#define ZB_APS_RETRANS_TIMER_PRECISION_MS 100U
+#endif
+#else
+#define ZB_APS_RETRANS_TIMER_PRECISION_MS 100U
+#endif
+
+#define ZB_APS_RETRANS_TIMER_PRECISION_BI (ZB_MILLISECONDS_TO_BEACON_INTERVAL(ZB_APS_RETRANS_TIMER_PRECISION_MS))
+
+#ifdef ZB_CONFIGURABLE_RETRIES
+/* WARNING: This feature may violate the specification and its usage is not recommended */
+
+/* When converting from ms to beacon interval the number of slots may not align.
+   e.g. 10s (660 BI) / 0.1s (7 BI) + 1 = 95 time slots */
+#define ZB_APS_RETRANS_ENT_TIMER_SLOTS ((ZB_APS_MAX_ACK_WAITING_TIME / ZB_APS_RETRANS_TIMER_PRECISION_BI) + 1U)
+#else
+#define ZB_APS_RETRANS_ENT_TIMER_SLOTS ((ZB_N_APS_ACK_WAIT_DURATION_FROM_SLEEPY / ZB_APS_RETRANS_TIMER_PRECISION_BI) + 1U)
+#endif
+
 /****************************NWK layer options**************************/
 
 /*
@@ -1139,14 +1198,15 @@ ZB_ED_RX_OFF_WHEN_IDLE
 
 */
 /**
- *   NWK: size of the long-short address translation table
+ * NWK: size of the long-short address translation table
  *
- *   @note This is a default value of the define. This value can be changed by user.
+ * @note This is a default value of the define. This value can be changed by user.
+ * The value will be overridden when "configurable memory" feature is used.
 */
 #ifndef ZB_IEEE_ADDR_TABLE_SIZE
 #ifndef ZB_MEMORY_COMPACT
 #define ZB_IEEE_ADDR_TABLE_SIZE 101U
-#else /* ZB_MEMORY_COMPACT */
+#else
 #define ZB_IEEE_ADDR_TABLE_SIZE 32U
 #endif /* ZB_MEMORY_COMPACT */
 #endif /* ZB_IEEE_ADDR_TABLE_SIZE */
@@ -1245,9 +1305,10 @@ ZB_ED_RX_OFF_WHEN_IDLE
 #endif
 
 /**
- *   NWK Mesh route: routing table size
+ * NWK Mesh route: routing table size
  *
- *   @note This is a default value of the define. This value can be changed by user.
+ * @note This is a default value of the define. This value can be changed by user.
+ * The value will be overridden when "configurable memory" feature is used.
 */
 #ifndef ZB_MEMORY_COMPACT
 #define ZB_NWK_ROUTING_TABLE_SIZE ZB_NEIGHBOR_TABLE_SIZE
@@ -1262,12 +1323,14 @@ ZB_ED_RX_OFF_WHEN_IDLE
 /**
    Size of channel list structure
 */
+#define ZB_CHANNEL_PAGES_NUM_NO_SUBGHZ (1U)
+#define ZB_CHANNEL_PAGES_NUM_SUBGHZ (10U)
+
 #if defined ZB_SUBGHZ_BAND_ENABLED
-#define ZB_CHANNEL_PAGES_NUM 10U
+#define ZB_CHANNEL_PAGES_NUM ZB_CHANNEL_PAGES_NUM_SUBGHZ
 #else
-#define ZB_CHANNEL_PAGES_NUM 1u
+#define ZB_CHANNEL_PAGES_NUM ZB_CHANNEL_PAGES_NUM_NO_SUBGHZ
 #endif  /* !ZB_SUBGHZ_BAND_ENABLED */
-/** @endcond */
 
 /*! @cond DOXYGEN_INTERNAL_DOC */
 /**
@@ -1301,6 +1364,18 @@ exponent.
  */
 #define MAC_POLL_TIMEOUT_THRESHOLD (3U * ZB_TIME_ONE_SECOND)
 #endif /* ZB_MAC_POLL_INDICATION_CALLS_REDUCED */
+
+/*! @cond DOXYGEN_INTERNAL_DOC */
+/**
+ * pending transactions queue size is implementation-dependent but
+ * must be at least one.
+ * The value will be overridden when "configurable memory" feature is used.
+*/
+#ifndef ZB_MAC_PENDING_QUEUE_SIZE
+#define ZB_MAC_PENDING_QUEUE_SIZE (ZB_IOBUF_POOL_SIZE / 4U)
+#endif
+
+/** @endcond */ /* DOXYGEN_INTERNAL_DOC */
 
 /** @cond DOXYGEN_INTERNAL_DOC */
 #ifndef ZB_NWK_NEIGHBOUR_PATH_COST_RSSI_BASED
@@ -1392,6 +1467,7 @@ exponent.
  *   Number of packet buffers. More buffers - more memory. Less buffers - risk to be blocked due to buffer absence.
  *
  *   @note This is a default value of the define. This value can be changed by user.
+ *   The value will be overridden when "configurable memory" feature is used.
 */
 #ifndef ZB_IOBUF_POOL_SIZE
 #if defined ZB_MEMORY_COMPACT && defined ZB_ED_ROLE
@@ -1400,6 +1476,9 @@ exponent.
 #define ZB_IOBUF_POOL_SIZE 26U
 #endif
 #endif
+
+/* The value will be overridden when "configurable memory" feature is used. */
+#define ZB_BUF_POOL_BITMAP_SIZE ((ZB_IOBUF_POOL_SIZE + 7U) / 8U)
 
 /** @cond DOXYGEN_INTERNAL_DOC */
 /*
@@ -1423,6 +1502,9 @@ exponent.
 
 /**
  * ZDO: Maximum number of parallel Key Negotiation procedures on the TC side
+ *
+ * @note This is a default value of the define. This value can be changed by user.
+ * The value will be overridden when "configurable memory" feature is used.
  */
 #ifndef ZB_ED_ROLE
 #define ZB_ZDO_KEY_NEGOTIATIONS_NUM 10U
@@ -1439,7 +1521,20 @@ exponent.
 
 /** @cond DOXYGEN_INTERNAL_DOC */
 //#define ZB_ZDO_CHECK_FAILS_NWK_UPDATE_NOTIFY_LIMIT 4
-#define ZB_ZDO_CHECK_FAILS_CLEAR_TIMEOUT (30U * ZB_TIME_ONE_SECOND)
+/* R23.2 Annex E:
+    To avoid a device with communication problems
+    from constantly sending reports to the network manager,
+    the device SHOULD NOT send
+    a Mgmt_NWK_Unsolicited_Enhanced_Update_notify more than 4 times per hour.*/
+#define ZB_ZDO_CHECK_FAILS_CLEAR_TIMEOUT (ZB_SECONDS_TO_BEACON_INTERVAL(60U * 15U))
+/* Jitter to send Mgmt_NWK_Unsolicited_Enhanced_Update_notify
+     after communication problems appeared.
+   It is not directly allowed nor prohibited by spec to use such jitter.
+     Jitter value not described anywhere and might be changed freely.
+   Need it to reduce network load
+     if there are many routers joined
+     by decreasing amount of such commands sent at once. */
+#define ZB_ZDO_CHECK_FAILS_JTR           (ZB_SECONDS_TO_BEACON_INTERVAL(30U))
 
 #define ZB_PREDEFINED_ROUTER_ADDR 0x3344U
 #define ZB_PREDEFINED_ED_ADDR     0x3344U
@@ -1560,7 +1655,9 @@ exponent.
 #ifdef ZB_PLATFORM_LINUX
 
 /* NS runs in multi-threaded mode only if it has been compiled with `ZB_NCP_TRANSPORT_TYPE_NSNG`. */
-#if (defined ZB_NSNG && defined ZB_NCP_TRANSPORT_TYPE_NSNG) || (!defined ZB_NSNG)
+/* DSIM is temporary define here: DSIM will use two threads later.
+   Now, it isn't needed as we can't process signals while writing trace. */
+#if (defined ZB_NSNG && defined ZB_NCP_TRANSPORT_TYPE_NSNG) || (!defined ZB_NSNG && !defined ZB_DSIM)
 #define ZB_THREADS
 #endif
 #ifndef ZB_INIT_HAS_ARGS
@@ -1680,8 +1777,19 @@ exponent.
 #define ZB_DIAGNOSTIC_DUT_MODIFIERS_ENABLED
 #define ZB_DIAGNOSTIC_TH_MODIFIERS_ENABLED
 
+#define ZB_DIAGNOSTIC_KEY_EXPOSURE_ENABLED
+
 #endif /* ZB_CERTIFICATION_HACKS */
 
+#if defined(ZB_MACSPLIT_DEVICE)
+#if defined(ZB_DIAGNOSTIC_DUT_MODIFIERS_ENABLED) || defined(ZB_DIAGNOSTIC_TH_MODIFIERS_ENABLED) || defined(ZB_DIAGNOSTIC_KEY_EXPOSURE_ENABLED)
+/* This is a temporary solution. Need to implement DUT \ TH modifiers setting from macsplit host and remove this warning */
+#warning Key exposure, DUT and TH modifiers are NOT supported for MAC-split SoC!
+#undef ZB_DIAGNOSTIC_DUT_MODIFIERS_ENABLED
+#undef ZB_DIAGNOSTIC_TH_MODIFIERS_ENABLED
+#undef ZB_DIAGNOSTIC_KEY_EXPOSURE_ENABLED
+#endif /* ZB_DIAGNOSTIC_DUT_MODIFIERS_ENABLED || ZB_DIAGNOSTIC_TH_MODIFIERS_ENABLED || ZB_DIAGNOSTIC_KEY_EXPOSURE_ENABLED */
+#endif /* ZB_MACSPLIT_DEVICE */
 
 /* Testing mode for some pro certification tests */
 /** @cond DOXYGEN_INTERNAL_DOC */
@@ -1698,7 +1806,7 @@ exponent.
 /**
    Maximum number of addresses in the visibility limit arrays
 */
-#define ZB_N_VISIBLE_ADDRESSES 6U
+#define ZB_N_VISIBLE_ADDRESSES 256U
 #endif
 
 #if defined ZB_ROUTER_ROLE
@@ -1852,6 +1960,20 @@ exponent.
 #define ZB_GPD_COMMISSIONING_RETRY_INTERVAL ZB_MILLISECONDS_TO_BEACON_INTERVAL(500)
 #endif /* ZB_ZGPD_ROLE */
 
+#ifdef ZB_ZGP_IMMED_TX
+/** Number of zb_zgp_tx_pinfo_t in zb_zgp_tx_packet_info_q_t.
+ * The constant value depends on `ZB_IOBUF_POOL_SIZE`.
+ * `ZB_IOBUF_POOL_SIZE` will be overridden when "configurable memory" feature is used.
+ */
+#define ZB_ZGP_TX_PACKET_INFO_COUNT (ZB_ZGP_TX_QUEUE_SIZE + (ZB_IOBUF_POOL_SIZE / 4U))
+/** Value with which immed_tx_frame_counter is incremented upon a reboot. */
+#define ZB_GP_IMMED_TX_FRAME_COUNTER_UPDATE_INTERVAL 1000U
+#define ZGP_INCLUDE_DST_LONG_ADDR
+#else
+#define ZB_ZGP_TX_PACKET_INFO_COUNT ZB_ZGP_TX_QUEUE_SIZE
+#endif  /* ZB_ZGP_IMMED_TX */
+
+
 /** The maximum number of reports that GPD can send in the Application Description. */
 #ifndef ZB_ZGP_APP_DESCR_REPORTS_NUM
 #define ZB_ZGP_APP_DESCR_REPORTS_NUM 3U
@@ -1944,13 +2066,6 @@ exponent.
    Disable route discovery API (but keep implicit route discovery)
  */
 #define ZB_LITE_NO_NLME_ROUTE_DISCOVERY
-#endif
-
-#ifndef ZB_NO_NWK_MULTICAST
-/**
-   Disable NWK multicast. Use APS groups and NWK broadcast instead.
- */
-#define ZB_NO_NWK_MULTICAST
 #endif
 
 #ifndef ZB_LITE_NO_PANID_CONFLICT_DETECTION
@@ -2148,7 +2263,6 @@ exponent.
 #define ZB_LITE_NO_TRUST_CENTER_REQUIRE_KEY_EXCHANGE
 //#define ZB_LITE_NO_SOURCE_ROUTING
 #define ZB_LITE_NO_NLME_ROUTE_DISCOVERY
-//#define ZB_NO_NWK_MULTICAST
 #define ZB_LITE_NO_ORPHAN_SCAN
 #define ZB_LITE_NO_STORE_APS_COUNTERS
 //#define ZB_LITE_NO_FULL_FUNCLIONAL_MGMT_NWK_UPDATE
@@ -2205,15 +2319,19 @@ exponent.
 #undef ZB_TRAFFIC_DUMP_ON
 #endif
 
+#ifdef ZB_ROUTER_ROLE
+#define ZB_MAX_CHILDREN ZB_NEIGHBOR_TABLE_SIZE
 
-#ifndef ZB_NO_NWK_MULTICAST
-/**
-   Disable NWK multicast. Deprecated in R21.
-   Use APS groups and NWK broadcast instead.
- */
-#define ZB_NO_NWK_MULTICAST
-#endif
+/* The value is used to calculate default max ED capacity value and to
+ * calculate default ZB_CHILD_HASH_TABLE_SIZE value in case of
+ * enabled memory configuration (see ZB_CONFIG_CHILD_HASH_TABLE_SIZE) */
+#define ZB_MAX_ED_CAPACITY_DEFAULT_LIMIT 80U
 
+/* Reserve 50% of neighbor table for end devices, but no more than `ZB_MAX_ED_CAPACITY_DEFAULT_LIMIT` */
+#define ZB_MAX_ED_CAPACITY_DEFAULT                                \
+  (((ZB_NEIGHBOR_TABLE_SIZE/2U) > ZB_MAX_ED_CAPACITY_DEFAULT_LIMIT) ? ZB_MAX_ED_CAPACITY_DEFAULT_LIMIT : (ZB_NEIGHBOR_TABLE_SIZE/2U))
+
+#endif /* ZB_ROUTER_ROLE */
 
 #ifdef ZB_CONFIGURABLE_MEM
 
@@ -2226,6 +2344,9 @@ exponent.
 */
 #ifdef ZB_IOBUF_POOL_SIZE
 #undef ZB_IOBUF_POOL_SIZE
+#endif
+#ifdef ZB_BUF_POOL_BITMAP_SIZE
+#undef ZB_BUF_POOL_BITMAP_SIZE
 #endif
 #ifdef ZB_SCHEDULER_Q_SIZE
 #undef ZB_SCHEDULER_Q_SIZE
@@ -2264,7 +2385,24 @@ exponent.
 #ifdef ZB_ZDO_KEY_NEGOTIATIONS_NUM
 #undef ZB_ZDO_KEY_NEGOTIATIONS_NUM
 #endif
-
+#ifdef ZB_MAC_PENDING_QUEUE_SIZE
+#undef ZB_MAC_PENDING_QUEUE_SIZE
+#endif
+#ifdef ZB_N_APS_RETRANS_ENTRIES
+#undef ZB_N_APS_RETRANS_ENTRIES
+#endif
+#ifdef ZB_CHILD_HASH_TABLE_SIZE
+#undef ZB_CHILD_HASH_TABLE_SIZE
+#endif
+#ifdef ZB_NWK_DISC_TABLE_SIZE
+#undef ZB_NWK_DISC_TABLE_SIZE
+#endif
+#ifdef ZB_SCHEDULER_Q_SIZE_PROTECTED_STACK_POOL
+#undef ZB_SCHEDULER_Q_SIZE_PROTECTED_STACK_POOL
+#endif
+#ifdef ZB_NWK_ROUTE_DISCOVERY_TABLE_SIZE
+#undef ZB_NWK_ROUTE_DISCOVERY_TABLE_SIZE
+#endif
 #else
 /**
    The purpose of the define. Ret code handling implementation on the application side
@@ -2272,12 +2410,14 @@ exponent.
    of the callback and alarm queues which can not be used from the user app and always should be reserved
    for stack schedule purposes. So, let's define this part as 10 (for both immediate callbacks and alarms)
    for all configurations.
- */
 
+   The value will be overridden when "configurable memory" feature is used.
+ */
 #define ZB_SCHEDULER_Q_SIZE_PROTECTED_STACK_POOL 10U
 #if (ZB_SCHEDULER_Q_SIZE - ZB_SCHEDULER_Q_SIZE_PROTECTED_STACK_POOL) < 6U
 #error The size of application scheduler queue is very small! Please, change ZB_SCHEDULER_Q_SIZE_PROTECTED_STACK_POOL, ZB_SCHEDULER_Q_SIZE to set it at least 6
 #endif
+
 #endif  /* ZB_CONFIGURABLE_MEMORY */
 
 /* pending bit source matching intended for ZB_ROUTER_ROLE only */
@@ -2307,9 +2447,6 @@ exponent.
 #ifdef ZB_ENABLE_INTER_PAN_EXCHANGE
 #undef ZB_ENABLE_INTER_PAN_EXCHANGE
 #endif
-#ifdef ZB_REJOIN_BACKOFF
-#undef ZB_REJOIN_BACKOFF
-#endif
 #ifdef ZB_DISTRIBUTED_SECURITY_ON
 #undef ZB_DISTRIBUTED_SECURITY_ON
 #endif
@@ -2329,8 +2466,21 @@ exponent.
 
 /*! \addtogroup ZB_CONFIG */
 /*! @{ */
-/** Maximum buffer index. Buffer indexing starts from one. */
+
+/**
+ * Maximum buffer index. Buffer indexing starts from one.
+ * The constant value depends on `ZB_IOBUF_POOL_SIZE`.
+ * `ZB_IOBUF_POOL_SIZE` will be overridden when "configurable memory" feature is used.
+ */
 #define ZB_N_BUF_IDS (ZB_IOBUF_POOL_SIZE + 1U)
+
+/*
+ * Maximum num parallel nwk_addr/node_desc request
+ * Previously, the ZB_NWK_ADDR_REQ_PENDING_LIMIT definition was used,
+ * which limited the number of parallel requests for nwk_addr.
+ * Now used ZB_N_PARALLEL_NWK_NODE_REQ.
+ */
+#define ZB_N_PARALLEL_NWK_NODE_REQ 16U
 
 #ifdef ZB_PRODUCTION_CONFIG
 #define ZB_PRODUCTION_CONFIG_MAX_SIZE 128
@@ -2452,11 +2602,6 @@ exponent.
 #define ZB_ECDHE_P256_ENABLED
 #endif
 
-
-#ifndef ZB_NWK_ADDR_REQ_PENDING_LIMIT
-#define ZB_NWK_ADDR_REQ_PENDING_LIMIT 3U
-#endif
-
 /* By default keep counting children: it covered by ZOI CI, don't want to update it.. */
 #if !defined ZB_NO_COUNT_CHILDREN && !defined ZB_COUNT_CHILDREN
 #define ZB_COUNT_CHILDREN
@@ -2470,5 +2615,57 @@ exponent.
 #if !defined(ZB_DIAG_CORE_WATCHDOG_TMO_MS)
 #define ZB_DIAG_CORE_WATCHDOG_TMO_MS 1000U
 #endif /* !ZB_DIAG_CORE_WATCHDOG_TMO_MS */
+
+#if !defined(ZB_PRELOADER_HOOK)
+#define ZB_PRELOADER_HOOK()
+#endif /* ZB_PRELOADER_HOOK */
+
+/* Platform Security Architecture (PSA) defines */
+#if defined ZB_PSA_CRYPTO && defined ZB_PSA_CRYPTO_ENABLE_ALL_FEATURES
+
+#ifndef ZB_PSA_AES128
+#define ZB_PSA_AES128
+#endif
+
+#ifndef ZB_PSA_AES128_DEC
+#define ZB_PSA_AES128_DEC
+#endif
+
+#ifndef ZB_PSA_HMAC_SHA_256
+#define ZB_PSA_HMAC_SHA_256
+#endif
+
+#ifndef ZB_PSA_CCM_ENCRYPT_N_AUTH_RAW
+#define ZB_PSA_CCM_ENCRYPT_N_AUTH_RAW
+#endif
+
+#ifndef ZB_PSA_CCM_DECRYPT_N_AUTH_RAW
+#define ZB_PSA_CCM_DECRYPT_N_AUTH_RAW
+#endif
+
+#ifndef ZB_PSA_CRYPTO_SCALARMULT
+#define ZB_PSA_CRYPTO_SCALARMULT
+#endif
+
+#ifndef ZB_PSA_RANDOM
+#define ZB_PSA_RANDOM
+#endif
+
+#ifndef ZB_PSA_CRYPTO_STORAGE
+#define ZB_PSA_CRYPTO_STORAGE
+#endif
+
+#endif /* ZB_PSA_CRYPTO_ENABLED && ZB_PSA_CRYPTO_USE_ALL*/
+
+/* All zeroes IEEE address as invalid */
+#define ZB_IEEE_ADDRESS_INVALID_VALUE {0, 0, 0, 0, 0, 0, 0, 0}
+
+#if defined ZB_ROUTER_ROLE
+
+#ifndef ZB_DENSE_NET_ROUTING_OPTIMIZATION
+#define ZB_DENSE_NET_ROUTING_OPTIMIZATION
+#endif
+
+#endif /* ZB_ROUTER_ROLE */
 
 #endif /* ZB_CONFIG_H */

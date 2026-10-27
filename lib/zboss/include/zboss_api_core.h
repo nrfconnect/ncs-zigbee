@@ -49,15 +49,64 @@
 #include "zb_types.h"
 #include "zb_errors.h"
 
-/**
-   @typedef zb_uint8_t zb_cb_param_t
-   Callback handler
- */
-typedef zb_uint8_t zb_cb_param_t;
+/*! \addtogroup buf */
+/*! @{ */
 
-/* zb_callback_t is used in osif if we have serial API */
+/* ZBOSS big Zigbee networks (>256 dev) support */
+#ifndef ZB_NO_BIG_NET
+/**
+   @typedef zb_uint16_t zb_bufid_t
+   Buffer handler
+ */
+typedef zb_uint16_t zb_bufid_t;
+
+#else
+/**
+   @typedef zb_uint8_t zb_bufid_t
+   Buffer handler
+ */
+typedef zb_uint8_t zb_bufid_t;
+
+#endif /* !ZB_NO_BIG_NET */
+
+/** @} */
+
 /*! \addtogroup sched */
 /*! @{ */
+
+/**
+   @typedef zb_uint32_t zb_cb_param_t
+   Callback handler
+ */
+typedef zb_uint32_t zb_cb_param_t;
+
+/**
+   @typedef Pack two zb_uint16_t to zb_uint32_t
+ */
+#define ZB_PACK_2_U16_IN_U32(u16_l, u16_h) ((((zb_cb_param_t)u16_l) & 0x0000ffffU) | ((((zb_cb_param_t)u16_h) << 16) & 0xffff0000U))
+
+/**
+   @typedef Unpack low zb_uint16_t from zb_uint32_t
+ */
+#define ZB_UNPACK_LOW_U16_FROM_U32(u32) (zb_uint16_t)((u32) & 0xffffU)
+
+/**
+   @typedef Unpack high zb_uint16_t from zb_uint32_t
+ */
+
+#define ZB_UNPACK_HI_U16_FROM_U32(u32) (zb_uint16_t)((u32) >> 16)
+
+/**
+   @typedef Unpack zb_bufid_t from zb_uint32_t
+ */
+#define ZB_UNPACK_BUF_REF(u32) (zb_bufid_t)ZB_UNPACK_LOW_U16_FROM_U32((u32))
+
+/**
+   @typedef Unpack user param zb_uint16_t from zb_uint32_t
+ */
+#define ZB_UNPACK_USER_PARAM(u32) ZB_UNPACK_HI_U16_FROM_U32((u32))
+
+/* zb_callback_t is used in osif if we have serial API */
 
 /**
  *   Callback function typedef.
@@ -66,17 +115,7 @@ typedef zb_uint8_t zb_cb_param_t;
  *   @param param - callback parameter - usually, but not always, ref to packet buf
  *
  */
-typedef void (ZB_CODE * zb_callback_t)(zb_uint8_t param);
-
-/**
- *   Callback function with 2 parameters typedef.
- *   Callback is function planned to execute by another function.
- *
- *   @param param - callback parameter - usually, but not always, ref to packet buf
- *   @param cb_param - additional 2-byte callback parameter, user data.
- *
- */
-typedef void (ZB_CODE * zb_callback2_t)(zb_uint8_t param, zb_uint16_t cb_param);
+typedef void (ZB_CODE * zb_callback_t)(zb_cb_param_t cb_param);
 /*! @} */
 
 
@@ -201,8 +240,10 @@ zb_time_t zb_timer_get(void);
 
 /**
   Convert time from milliseconds to beacon intervals (32-bit platforms). Round the result up.
+  It does short-term conversion to 64-bit value to prevent overflow.
+  Note that result will be valid for all possible ms values (as 1 BI equal to 15.36 ms).
 */
-#define ZB_MILLISECONDS_TO_BEACON_INTERVAL_CEIL(ms) (((zb_time_t)(ms) * 1000U + (ZB_BEACON_INTERVAL_USEC - 1U)) / ZB_BEACON_INTERVAL_USEC)
+#define ZB_MILLISECONDS_TO_BEACON_INTERVAL_CEIL(ms) ((zb_time_t)(((zb_uint64_t)(ms) * 1000U + (ZB_BEACON_INTERVAL_USEC - 1U)) / ZB_BEACON_INTERVAL_USEC))
 
 /**
   Convert time from microseconds to beacon intervals (32-bit platforms). Round the result up. Note that result will be valid for all values less than UINT32_T_MAX - 15359 us.
@@ -211,8 +252,10 @@ zb_time_t zb_timer_get(void);
 
 /**
   Convert time from milliseconds to beacon intervals (32-bit platforms). Round the result down.
+  It does short-term conversion to 64-bit value to prevent overflow.
+  Note that result will be valid for all possible ms values (as 1 BI equal to 15.36 ms).
 */
-#define ZB_MILLISECONDS_TO_BEACON_INTERVAL_FLOOR(ms) ((zb_time_t)(ms) * 1000U / ZB_BEACON_INTERVAL_USEC)
+#define ZB_MILLISECONDS_TO_BEACON_INTERVAL_FLOOR(ms) ((zb_time_t)((zb_uint64_t)(ms) * 1000U / ZB_BEACON_INTERVAL_USEC))
 
 /**
   Convert time from microseconds to beacon intervals (32-bit platforms). Round the result down.
@@ -338,7 +381,7 @@ zb_time_t zb_timer_get(void);
     @return RET_OK or error code.
 
 */
-zb_ret_t zb_schedule_app_callback(zb_callback_t func, zb_uint8_t param);
+zb_ret_t zb_schedule_app_callback(zb_callback_t func, zb_cb_param_t cb_param);
 /** @endcond */ /* internals_doc */
 /**
    Schedule single-param callback execution.
@@ -355,37 +398,9 @@ zb_ret_t zb_schedule_app_callback(zb_callback_t func, zb_uint8_t param);
 #define ZB_SCHEDULE_APP_CALLBACK(func, param) zb_schedule_app_callback(func, param)
 #endif /* ZB_SCHEDULE_APP_CALLBACK */
 
-/** @cond internals_doc */
-/** Schedule two-param callback execution.
-    (use ZB_SCHEDULE_APP_CALLBACK2() macro instead of this function).
-
-    Schedule execution of function `func' in the main scheduler loop.
-
-    @param func - function to execute
-    @param param - callback parameter - usually, but not always ref to packet buffer
-    @param user_param - zb_uint16_t user parameter - usually, but not always short address
-
-    @return RET_OK or error code.
-*/
-zb_ret_t zb_schedule_app_callback2(zb_callback2_t func, zb_uint8_t param, zb_uint16_t user_param);
-/** @endcond */ /* internals_doc */
-/**
-   Schedule two-param callback execution.
-   Schedule execution of function `func' in the main scheduler loop.
-
-   @param func - function to execute
-   @param param - zb_uint8_t callback parameter - usually, but not always ref to
-   packet buffer
-   @param user_param - zb_uint16_t user parameter - usually, but not always short address
-
-   @return RET_OK or RET_OVERFLOW.
- */
-#ifndef ZB_SCHEDULE_APP_CALLBACK2
-#define ZB_SCHEDULE_APP_CALLBACK2(func, param, user_param) zb_schedule_app_callback2(func, param, user_param)
-#endif /* ZB_SCHEDULE_APP_CALLBACK2 */
 
 /** @cond internals_doc */
-zb_ret_t zb_schedule_app_alarm(zb_callback_t func, zb_uint8_t param, zb_time_t run_after);
+zb_ret_t zb_schedule_app_alarm(zb_callback_t func, zb_bufid_t param, zb_time_t run_after);
 /** @endcond */ /* internals_doc */
 
 /**
@@ -412,13 +427,13 @@ zb_ret_t zb_schedule_app_alarm(zb_callback_t func, zb_uint8_t param, zb_time_t r
 
    Cancel only one alarm without check for parameter
  */
-#define ZB_ALARM_ANY_PARAM (zb_uint8_t)(-1)
+#define ZB_ALARM_ANY_PARAM (zb_bufid_t)(-1)
 
 /**
    Special parameter for zb_schedule_alarm_cancel(): cancel alarm for all
    parameters
  */
-#define ZB_ALARM_ALL_CB (zb_uint8_t)(-2)
+#define ZB_ALARM_ALL_CB (zb_bufid_t)(-2)
 /** @cond internals_doc */
 /**
    Cancel scheduled alarm (use macro ZB_SCHEDULE_APP_ALARM_CANCEL()
@@ -433,7 +448,7 @@ zb_ret_t zb_schedule_app_alarm(zb_callback_t func, zb_uint8_t param, zb_time_t r
    @return RET_OK or error code
 
  */
-zb_ret_t zb_schedule_alarm_cancel(zb_callback_t func, zb_uint8_t param, zb_uint8_t *p_param);
+zb_ret_t zb_schedule_alarm_cancel(zb_callback_t func, zb_cb_param_t param, zb_cb_param_t *p_param);
 /** @endcond */ /* internals_doc */
 /**
    Cancel scheduled alarm.
@@ -450,7 +465,6 @@ zb_ret_t zb_schedule_alarm_cancel(zb_callback_t func, zb_uint8_t param, zb_uint8
 #define ZB_SCHEDULE_APP_ALARM_CANCEL(func, param) zb_schedule_alarm_cancel((func), (param), NULL)
 #endif /* ZB_SCHEDULE_APP_ALARM_CANCEL */
 
-
 /** @cond internals_doc */
 /**
    Get Schedule alarm time - seek alarm and return alarm time
@@ -460,7 +474,7 @@ zb_ret_t zb_schedule_alarm_cancel(zb_callback_t func, zb_uint8_t param, zb_uint8
    @param timeout_bi - pointer on alarm timeout, in beacon intervals
    @return RET_OK or error code
  */
-zb_ret_t zb_schedule_get_alarm_time(zb_callback_t func, zb_uint8_t param, zb_time_t *timeout_bi);
+zb_ret_t zb_schedule_get_alarm_time(zb_callback_t func, zb_bufid_t param, zb_time_t *timeout_bi);
 /** @endcond */ /* internals_doc */
 
 /**
@@ -489,6 +503,7 @@ zb_bool_t zb_scheduler_is_stop(void);
 */
 #define ZB_SCHEDULER_IS_STOP() zb_scheduler_is_stop()
 
+/** @cond internals_doc */
 /**
    Is scheduler is going to stop/stopped - Is scheduler running now
 

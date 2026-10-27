@@ -64,7 +64,7 @@
  * initialization if Poll Control server cluster is declared
  * @param param - buffer for check-in command
  * @param endpoint - endpoint to start poll control process on */
-void zb_zcl_poll_control_start(zb_uint8_t param, zb_uint8_t endpoint);
+void zb_zcl_poll_control_start(zb_bufid_t param, zb_uint8_t endpoint);
 
 
 /**
@@ -74,13 +74,13 @@ void zb_zcl_poll_control_start(zb_uint8_t param, zb_uint8_t endpoint);
  * @return reference to buffer which was previously reserved for check-in.
  *         It must be reused or explicitly freed.
  */
-zb_uint8_t zb_zcl_poll_control_stop(void);
+zb_bufid_t zb_zcl_poll_control_stop(void);
 
 
 /*! @brief Start Poll Control process on Server side
  * @param param - buffer for Poll Process
 */
-void zb_zcl_poll_control_start_check_in(zb_uint8_t param);
+void zb_zcl_poll_control_start_check_in(zb_cb_param_t param);
 
 /**
    @brief Register callback for Poll control cluster.
@@ -675,7 +675,7 @@ void zb_zcl_set_fast_poll_timeout(zb_uint8_t ep, zb_uint16_t fast_poll_timeout);
    @param param
    @note ignore param, set it to 0
 */
-void zb_zcl_poll_control_save_nvram(zb_uint8_t param);
+void zb_zcl_poll_control_save_nvram(zb_cb_param_t param);
 #endif /* ZB_USE_NVRAM */
 #endif /* ZB_ZCL_SUPPORT_CLUSTER_POLL_CONTROL */
 
