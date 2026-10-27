@@ -10,6 +10,23 @@
 
 #include <zephyr/settings/settings.h>
 
+int zigbee_settings_backend_init(void)
+{
+	static bool backend_ready;
+	int err;
+
+	if (backend_ready) {
+		return 0;
+	}
+
+	err = settings_subsys_init();
+	if (err == 0) {
+		backend_ready = true;
+	}
+
+	return err;
+}
+
 int zigbee_settings_subsys_init(void)
 {
 	static bool initialized;
@@ -19,7 +36,7 @@ int zigbee_settings_subsys_init(void)
 		return 0;
 	}
 
-	err = settings_subsys_init();
+	err = zigbee_settings_backend_init();
 	if (err != 0) {
 		return err;
 	}

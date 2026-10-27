@@ -845,7 +845,6 @@ static struct nus_entry commands[] = {
 	NUS_COMMAND(COMMAND_TOGGLE, toggle_cmd),
 	NUS_COMMAND(COMMAND_INCREASE, increase_cmd),
 	NUS_COMMAND(COMMAND_DECREASE, decrease_cmd),
-	NUS_COMMAND(NULL, NULL),
 };
 
 #endif /* CONFIG_BT_NUS */
@@ -1005,16 +1004,17 @@ int ZigbeeStart(void)
 	ZB_AF_SET_IDENTIFY_NOTIFICATION_HANDLER(CONFIG_ZIGBEE_FOTA_ENDPOINT, identify_cb);
 #endif /* CONFIG_ZIGBEE_FOTA */
 
-#if defined(CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER)
-	set_tx_power();
-#endif /* CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER */
-
 	/* Start Zigbee default thread. */
 	zigbee_enable();
 
+#if defined(CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER)
+	/* ZBOSS buffers/scheduling require a running stack (see multiprotocol docs). */
+	set_tx_power();
+#endif /* CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER */
+
 #if CONFIG_BT_NUS
-	/* Initialize NUS command service. */
-	nus_cmd_init(on_nus_connect, on_nus_disconnect, commands);
+	nus_cmd_init(on_nus_connect, on_nus_disconnect, commands,
+		     ARRAY_SIZE(commands));
 #endif /* CONFIG_BT_NUS */
 
 	LOG_INF("Zigbee R23 Light Switch application started");

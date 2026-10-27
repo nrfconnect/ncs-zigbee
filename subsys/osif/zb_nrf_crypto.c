@@ -56,9 +56,9 @@ void zb_psa_init(void)
 	psa_status_t status;
 
 #if defined(CONFIG_SETTINGS) && defined(CONFIG_MBEDTLS_PSA_CRYPTO_STORAGE_C)
-	int err = zigbee_settings_subsys_init();
+	int err = zigbee_settings_backend_init();
 
-	__ASSERT(err == 0, "Cannot initialize settings for PSA storage (err: %d)", err);
+	__ASSERT(err == 0, "Cannot initialize settings backend for PSA (err: %d)", err);
 #endif
 
 	status = psa_crypto_init();
