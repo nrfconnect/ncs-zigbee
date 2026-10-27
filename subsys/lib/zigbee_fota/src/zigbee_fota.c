@@ -140,7 +140,7 @@ ZB_HA_DECLARE_OTA_UPGRADE_CLIENT_EP(zigbee_fota_client_ep,
 				    CONFIG_ZIGBEE_FOTA_ENDPOINT,
 				    ota_upgrade_client_clusters);
 
-static void send_evt(zb_uint8_t id)
+static void send_evt(zb_cb_param_t id)
 {
 	__ASSERT(id != ZIGBEE_FOTA_EVT_PROGRESS, "use send_progress");
 	const struct zigbee_fota_evt evt = {
@@ -845,11 +845,11 @@ int zigbee_fota_init(zigbee_fota_callback_t client_callback)
 }
 
 
-void zigbee_fota_signal_handler(zb_bufid_t bufid)
+void zigbee_fota_signal_handler(zb_cb_param_t param)
 {
 	zb_zdo_app_signal_hdr_t  *sig_handler = NULL;
-	zb_zdo_app_signal_type_t  sig = zb_get_app_signal(bufid, &sig_handler);
-	zb_ret_t                  status = ZB_GET_APP_SIGNAL_STATUS(bufid);
+	zb_zdo_app_signal_type_t  sig = zb_get_app_signal(param, &sig_handler);
+	zb_ret_t                  status = ZB_GET_APP_SIGNAL_STATUS(param);
 
 	switch (sig) {
 	case ZB_BDB_SIGNAL_DEVICE_REBOOT:
@@ -872,8 +872,9 @@ void zigbee_fota_signal_handler(zb_bufid_t bufid)
 	}
 }
 
-void zigbee_fota_zcl_cb(zb_bufid_t bufid)
+void zigbee_fota_zcl_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = (zb_bufid_t)param;
 	zb_zcl_device_callback_param_t *device_cb_param =
 		ZB_BUF_GET_PARAM(bufid, zb_zcl_device_callback_param_t);
 

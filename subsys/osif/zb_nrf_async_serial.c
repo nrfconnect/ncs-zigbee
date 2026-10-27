@@ -51,12 +51,12 @@ static K_TIMER_DEFINE(uart_rx_timer, uart_rx_timeout, NULL);
 /**
  * Inform user about received data and unlock for the next reception.
  */
-static void uart_rx_notify(zb_bufid_t bufid)
+static void uart_rx_notify(zb_cb_param_t param)
 {
 	uint8_t *rx_buf = uart_rx_buf;
 	size_t rx_buf_len = uart_rx_buf_offset;
 
-	ARG_UNUSED(bufid);
+	ARG_UNUSED(param);
 
 	uart_rx_buf_len = 0;
 	uart_rx_buf_offset = 0;

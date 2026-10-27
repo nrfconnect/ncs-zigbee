@@ -78,8 +78,16 @@ void zb_osif_bootloader_report_successful_loading(void)
 #endif
 }
 
-static void custom_indication(zb_uint8_t buf, zb_uint16_t led_idx)
+static void custom_indication(zb_cb_param_t cb_param)
 {
+	zb_bufid_t buf = ZB_UNPACK_BUF_REF(cb_param);
+	zb_uint16_t led_idx = ZB_UNPACK_USER_PARAM(cb_param);
+
+	if (!buf) {
+		zb_buf_get_out_delayed_ext(custom_indication, led_idx, 0);
+		return;
+	}
+
 	zb_uint8_t *ind_data = zb_buf_initial_alloc(buf, VENDOR_SPECIFIC_IND_LEN);
 
 	*ind_data = (zb_uint8_t)led_idx;
@@ -87,15 +95,15 @@ static void custom_indication(zb_uint8_t buf, zb_uint16_t led_idx)
 	zb_ncp_custom_indication(buf);
 }
 
-static void perform_custom_indication(zb_uint8_t led_idx)
+static void perform_custom_indication(zb_cb_param_t led_idx)
 {
-	zb_buf_get_out_delayed_ext(custom_indication, led_idx, 0);
+	zb_buf_get_out_delayed_ext(custom_indication, (zb_uint16_t)led_idx, 0);
 }
 
 #if (defined ZBOSS_PLATFORM_MAJOR) && (ZBOSS_PLATFORM_MAJOR < 5U)
-static zb_ret_t ncp_vendor_specific_req_handler(zb_uint8_t buf)
+static zb_ret_t ncp_vendor_specific_req_handler(zb_bufid_t buf)
 #else /* (defined ZBOSS_PLATFORM_MAJOR) && (ZBOSS_PLATFORM_MAJOR < 5U) */
-static zb_uint16_t ncp_vendor_specific_req_handler(zb_uint8_t buf)
+static zb_uint16_t ncp_vendor_specific_req_handler(zb_bufid_t buf)
 #endif /* (defined ZBOSS_PLATFORM_MAJOR) && (ZBOSS_PLATFORM_MAJOR < 5U) */
 {
 	/* request tsn */

@@ -17,7 +17,6 @@
 #include <zigbee/zigbee_error_handler.h>
 #include <zigbee/zigbee_app_utils.h>
 #include <zb_nrf_platform.h>
-#include "zb_range_extender.h"
 
 
 /* Device endpoint, used to receive ZCL commands. */
@@ -62,12 +61,12 @@ ZB_ZCL_DECLARE_BASIC_ATTRIB_LIST(
 	&dev_ctx.basic_attr.zcl_version,
 	&dev_ctx.basic_attr.power_source);
 
-ZB_DECLARE_RANGE_EXTENDER_CLUSTER_LIST(
+ZB_HA_DECLARE_RANGE_EXTENDER_CLUSTER_LIST(
 	app_template_clusters,
 	basic_attr_list,
 	identify_attr_list);
 
-ZB_DECLARE_RANGE_EXTENDER_EP(
+ZB_HA_DECLARE_RANGE_EXTENDER_EP(
 	app_template_ep,
 	APP_TEMPLATE_ENDPOINT,
 	app_template_clusters);
@@ -93,25 +92,25 @@ static void app_clusters_attr_init(void)
  *
  * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
  */
-static void toggle_identify_led(zb_bufid_t bufid)
+static void toggle_identify_led(zb_cb_param_t param)
 {
 	static int blink_status;
 
 	dk_set_led(IDENTIFY_LED, (++blink_status) % 2);
-	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, bufid, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
+	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, param, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
 }
 
 /**@brief Function to handle identify notification events on the first endpoint.
  *
- * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
+ * @param  param  ZB_TRUE when identify starts, ZB_FALSE when it stops.
  */
-static void identify_cb(zb_bufid_t bufid)
+static void identify_cb(zb_cb_param_t param)
 {
 	zb_ret_t zb_err_code;
 
-	if (bufid) {
+	if (param) {
 		/* Schedule a self-scheduling function that will toggle the LED */
-		ZB_SCHEDULE_APP_CALLBACK(toggle_identify_led, bufid);
+		ZB_SCHEDULE_APP_CALLBACK(toggle_identify_led, param);
 	} else {
 		/* Cancel the toggling function alarm and turn off LED */
 		zb_err_code = ZB_SCHEDULE_APP_ALARM_CANCEL(toggle_identify_led, ZB_ALARM_ANY_PARAM);
@@ -125,9 +124,9 @@ static void identify_cb(zb_bufid_t bufid)
  *
  * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
  */
-static void start_identifying(zb_bufid_t bufid)
+static void start_identifying(zb_cb_param_t param)
 {
-	ZVUNUSED(bufid);
+	ZVUNUSED(param);
 
 	if (ZB_JOINED()) {
 		/* Check if endpoint is in identifying mode,
@@ -204,21 +203,21 @@ static void configure_gpio(void)
  * @param[in]   bufid   Reference to the Zigbee stack buffer
  *                      used to pass signal.
  */
-void zboss_signal_handler(zb_bufid_t bufid)
+void zboss_signal_handler(zb_cb_param_t param)
 {
 	/* Update network status LED. */
-	zigbee_led_status_update(bufid, ZIGBEE_NETWORK_STATE_LED);
+	zigbee_led_status_update(param, ZIGBEE_NETWORK_STATE_LED);
 
 	/* No application-specific behavior is required.
 	 * Call default signal handler.
 	 */
-	ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+	ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
 
 	/* All callbacks should either reuse or free passed buffers.
-	 * If bufid == 0, the buffer is invalid (not passed).
+	 * If param == 0, the buffer is invalid (not passed).
 	 */
-	if (bufid) {
-		zb_buf_free(bufid);
+	if (param) {
+		zb_buf_free(param);
 	}
 }
 

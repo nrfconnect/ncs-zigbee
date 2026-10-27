@@ -228,11 +228,11 @@ static inline bool parse_short_address(const char *input, zb_uint16_t *addr)
  *
  * @note This function does not free the Zigbee buffer.
  *
- * @param[in] bufid Reference to the Zigbee stack buffer used to pass signal.
+ * @param[in] param Reference to the Zigbee stack buffer used to pass signal.
  *
  * @return RET_OK on success or error code on failure.
  */
-zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid);
+zb_ret_t zigbee_default_signal_handler(zb_cb_param_t param);
 
 /**@brief Function for indicating the Zigbee network connection
  *        status on LED.
@@ -243,12 +243,12 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid);
  *
  * @note This function does not free the Zigbee buffer.
  *
- * @param[in] bufid   Reference to the Zigbee stack buffer
+ * @param[in] param   Reference to the Zigbee stack buffer
  *                    used to pass signal.
  * @param[in] led_idx LED index, as defined in the board-specific
  *                    BSP header. The index starts from 0.
  */
-void zigbee_led_status_update(zb_bufid_t bufid, uint32_t led_idx);
+void zigbee_led_status_update(zb_cb_param_t param, uint32_t led_idx);
 
 /**@brief Function for indicating the default signal handler
  *        about user input on the device.
@@ -327,7 +327,7 @@ void zigbee_touchlink_initiator_prepare_scan_channels(void);
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
 /** Call from @c zboss_signal_handler() before @ref zigbee_default_signal_handler(). */
-void zigbee_touchlink_target_signal_handler(zb_bufid_t bufid);
+void zigbee_touchlink_target_signal_handler(zb_cb_param_t param);
 #endif
 
 #ifdef __cplusplus
