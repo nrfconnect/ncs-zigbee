@@ -83,16 +83,16 @@ void zigbee_fota_abort(void);
 /**
  * @brief Function for passing Zigbee stack signals to the Zigbee FOTA logic.
  *
- * @param[in] bufid  Reference to the Zigbee stack buffer used to pass signal.
+ * @param[in] param  Reference to the Zigbee stack buffer used to pass signal.
  */
-void zigbee_fota_signal_handler(zb_bufid_t bufid);
+void zigbee_fota_signal_handler(zb_cb_param_t param);
 
 /**
  * @brief Function for passing ZCL callback events to the Zigbee FOTA logic.
  *
- * @param[in] bufid  Reference to the Zigbee stack buffer used to pass event.
+ * @param[in] param  Reference to the Zigbee stack buffer used to pass event.
  */
-void zigbee_fota_zcl_cb(zb_bufid_t bufid);
+void zigbee_fota_zcl_cb(zb_cb_param_t param);
 
 #ifdef __cplusplus
 }

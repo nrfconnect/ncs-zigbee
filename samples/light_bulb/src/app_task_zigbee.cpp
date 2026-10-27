@@ -552,25 +552,25 @@ static void zcl_device_cb(zb_cb_param_t param)
  * @param[in]   bufid   Reference to the Zigbee stack buffer
  *                      used to pass signal.
  */
-void zboss_signal_handler(zb_bufid_t bufid) {
+void zboss_signal_handler(zb_cb_param_t param) {
 #ifdef CONFIG_ZIGBEE_FOTA
-  zigbee_fota_signal_handler(bufid);
+  zigbee_fota_signal_handler(param);
 #endif
 
   /* Update network status LED. */
-  zigbee_led_status_update(bufid, ZIGBEE_NETWORK_STATE_LED);
+  zigbee_led_status_update(param, ZIGBEE_NETWORK_STATE_LED);
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
-  zigbee_touchlink_target_signal_handler(bufid);
+  zigbee_touchlink_target_signal_handler(param);
 #endif
 
-  ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+  ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
 
   /* All callbacks should either reuse or free passed buffers.
-   * If bufid == 0, the buffer is invalid (not passed).
+   * If param == 0, the buffer is invalid (not passed).
    */
-  if (bufid) {
-    zb_buf_free(bufid);
+  if (param) {
+    zb_buf_free(param);
   }
 }
 

@@ -218,17 +218,17 @@ ZBOSS_DECLARE_DEVICE_CTX_2_EP(dimmer_switch_ctx,
 /* Forward declarations. */
 static void light_switch_button_handler(struct k_timer *timer);
 static void find_light_bulb_alarm(struct k_timer *timer);
-static void find_light_bulb(zb_bufid_t bufid);
-static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t on_off);
+static void find_light_bulb(zb_cb_param_t param);
+static void light_switch_send_on_off(zb_cb_param_t param);
 
 
 /**@brief Starts identifying the device.
  *
  * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
  */
-static void start_identifying(zb_bufid_t bufid)
+static void start_identifying(zb_cb_param_t param)
 {
-	ZVUNUSED(bufid);
+	ZVUNUSED(param);
 
 	if (ZB_JOINED()) {
 		/* Check if endpoint is in identifying mode,
@@ -258,20 +258,20 @@ static void start_identifying(zb_bufid_t bufid)
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
 static bool touchlink_start_pending;
 
-static void light_switch_touchlink_begin(zb_uint8_t unused);
+static void light_switch_touchlink_begin(zb_cb_param_t unused);
 
-static void light_switch_touchlink_cancel_then_begin(zb_uint8_t param)
+static void light_switch_touchlink_cancel_then_begin(zb_cb_param_t param)
 {
-	if (param == ZB_UNDEFINED_BUFFER) {
+	if (!param) {
 		zb_buf_get_out_delayed(light_switch_touchlink_cancel_then_begin);
 		return;
 	}
 
 	touchlink_start_pending = true;
-	bdb_cancel_joining(param);
+	bdb_cancel_joining((zb_bufid_t)param);
 }
 
-static void light_switch_touchlink_begin(zb_uint8_t unused)
+static void light_switch_touchlink_begin(zb_cb_param_t unused)
 {
 	ZVUNUSED(unused);
 
@@ -285,9 +285,9 @@ static void light_switch_touchlink_begin(zb_uint8_t unused)
 	}
 }
 
-static void light_switch_touchlink_initiator_start_cb(zb_bufid_t bufid)
+static void light_switch_touchlink_initiator_start_cb(zb_cb_param_t param)
 {
-	ZVUNUSED(bufid);
+	ZVUNUSED(param);
 
 	zigbee_network_rejoin_abort();
 	ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_begin, 0);
@@ -420,25 +420,25 @@ static void app_clusters_attr_init(void)
  *
  * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
  */
-static void toggle_identify_led(zb_bufid_t bufid)
+static void toggle_identify_led(zb_cb_param_t param)
 {
 	static int blink_status;
 
 	led_set(IDENTIFY_LED, (++blink_status) % 2);
-	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, bufid, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
+	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, param, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
 }
 
 /**@brief Function to handle identify notification events on the first endpoint.
  *
- * @param  bufid  Unused parameter, required by ZBOSS scheduler API.
+ * @param  param  ZB_TRUE when identify starts, ZB_FALSE when it stops.
  */
-static void identify_cb(zb_bufid_t bufid)
+static void identify_cb(zb_cb_param_t param)
 {
 	zb_ret_t zb_err_code;
 
-	if (bufid) {
+	if (param) {
 		/* Schedule a self-scheduling function that will toggle the LED. */
-		ZB_SCHEDULE_APP_CALLBACK(toggle_identify_led, bufid);
+		ZB_SCHEDULE_APP_CALLBACK(toggle_identify_led, param);
 	} else {
 		/* Cancel the toggling function alarm and turn off LED. */
 		zb_err_code = ZB_SCHEDULE_APP_ALARM_CANCEL(toggle_identify_led, ZB_ALARM_ANY_PARAM);
@@ -459,8 +459,16 @@ static void identify_cb(zb_bufid_t bufid)
  *                       used to construct on/off request.
  * @param[in]   cmd_id   ZCL command id.
  */
-static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t cmd_id)
+static void light_switch_send_on_off(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+	zb_uint16_t cmd_id = ZB_UNPACK_USER_PARAM(param);
+
+	if (!bufid) {
+		zb_buf_get_out_delayed_ext(light_switch_send_on_off, cmd_id, 0);
+		return;
+	}
+
 	LOG_INF("Send ON/OFF command: %d", cmd_id);
 
 	ZB_ZCL_ON_OFF_SEND_REQ(bufid,
@@ -480,8 +488,16 @@ static void light_switch_send_on_off(zb_bufid_t bufid, zb_uint16_t cmd_id)
  *                           will be used to construct step request.
  * @param[in]   cmd_id       ZCL command id.
  */
-static void light_switch_send_step(zb_bufid_t bufid, zb_uint16_t cmd_id)
+static void light_switch_send_step(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+	zb_uint16_t cmd_id = ZB_UNPACK_USER_PARAM(param);
+
+	if (!bufid) {
+		zb_buf_get_out_delayed_ext(light_switch_send_step, cmd_id, 0);
+		return;
+	}
+
 	LOG_INF("Send step level command: %d", cmd_id);
 
 	ZB_ZCL_LEVEL_CONTROL_SEND_STEP_REQ(bufid,
@@ -502,8 +518,9 @@ static void light_switch_send_step(zb_bufid_t bufid, zb_uint16_t cmd_id)
  * @param[in]   bufid   Reference to Zigbee stack buffer used to pass
  *                      received data.
  */
-static void find_light_bulb_cb(zb_bufid_t bufid)
+static void find_light_bulb_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = (zb_bufid_t)param;
 	/* Get the beginning of the response. */
 	zb_zdo_match_desc_resp_t *resp =
 		(zb_zdo_match_desc_resp_t *) zb_buf_begin(bufid);
@@ -560,8 +577,9 @@ static void find_light_bulb_alarm(struct k_timer *timer)
  * @param[in]   bufid   Reference to Zigbee stack buffer that will be used to
  *                      construct find request.
  */
-static void find_light_bulb(zb_bufid_t bufid)
+static void find_light_bulb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = (zb_bufid_t)param;
 	zb_zdo_match_desc_param_t *req;
 	zb_uint8_t tsn = ZB_ZDO_INVALID_TSN;
 
@@ -674,8 +692,9 @@ static void ota_evt_handler(const struct zigbee_fota_evt *evt)
  * @param[in]   bufid   Reference to Zigbee stack buffer
  *                      used to pass received data.
  */
-static void zcl_device_cb(zb_bufid_t bufid)
+static void zcl_device_cb(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = (zb_bufid_t)param;
 	zb_zcl_device_callback_param_t *device_cb_param =
 		ZB_BUF_GET_PARAM(bufid, zb_zcl_device_callback_param_t);
 
@@ -692,18 +711,18 @@ static void zcl_device_cb(zb_bufid_t bufid)
  * @param[in]   bufid   Reference to the Zigbee stack buffer
  *                      used to pass signal.
  */
-void zboss_signal_handler(zb_bufid_t bufid)
+void zboss_signal_handler(zb_cb_param_t param)
 {
 	zb_zdo_app_signal_hdr_t *sig_hndler = NULL;
-	zb_zdo_app_signal_type_t sig = zb_get_app_signal(bufid, &sig_hndler);
-	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(bufid);
+	zb_zdo_app_signal_type_t sig = zb_get_app_signal(param, &sig_hndler);
+	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(param);
 
 	/* Update network status LED. */
-	zigbee_led_status_update(bufid, ZIGBEE_NETWORK_STATE_LED);
+	zigbee_led_status_update(param, ZIGBEE_NETWORK_STATE_LED);
 
 #ifdef CONFIG_ZIGBEE_FOTA
 	/* Pass signal to the OTA client implementation. */
-	zigbee_fota_signal_handler(bufid);
+	zigbee_fota_signal_handler(param);
 #endif /* CONFIG_ZIGBEE_FOTA */
 
 	switch (sig) {
@@ -714,11 +733,11 @@ void zboss_signal_handler(zb_bufid_t bufid)
 			ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_begin, 0);
 			break;
 		}
-		ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+		ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
 		break;
 
 	case ZB_BDB_SIGNAL_TOUCHLINK:
-		ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+		ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
 		if (status == RET_OK) {
 			LOG_INF("Touchlink done: start finding bulb");
 			zb_zdo_pim_set_long_poll_interval(3000);
@@ -734,7 +753,7 @@ void zboss_signal_handler(zb_bufid_t bufid)
 	/* fall-through */
 	case ZB_BDB_SIGNAL_STEERING:
 		/* Call default signal handler. */
-		ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+		ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
 		if (status == RET_OK) {
 			zb_zdo_pim_set_long_poll_interval(3000);
 
@@ -757,17 +776,17 @@ void zboss_signal_handler(zb_bufid_t bufid)
 			}
 		}
 		/* Call default signal handler. */
-		ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+		ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
 		break;
 
 	default:
 		/* Call default signal handler. */
-		ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+		ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
 		break;
 	}
 
-	if (bufid) {
-		zb_buf_free(bufid);
+	if (param) {
+		zb_buf_free(param);
 	}
 }
 
@@ -837,10 +856,11 @@ static struct nus_entry commands[] = {
  *
  * @param  param  Reference to Zigbee stack buffer.
  */
-static void tx_power_cb(zb_bufid_t param)
+static void tx_power_cb(zb_cb_param_t param)
 {
 	char *status = NULL;
-	zb_tx_power_params_t *power_params = zb_buf_begin(param);
+	zb_bufid_t bufid = (zb_bufid_t)param;
+	zb_tx_power_params_t *power_params = zb_buf_begin(bufid);
 
 	switch (power_params->status) {
 	case RET_OK:
@@ -863,26 +883,32 @@ static void tx_power_cb(zb_bufid_t param)
 	LOG_INF("Zigbee transceiver tx power set result (pg: %d, ch: %d, pw: %d): %s",
 		power_params->page, power_params->channel, power_params->tx_power, status);
 
-	zb_buf_free(param);
+	zb_buf_free(bufid);
 }
 
 /**@brief Function for scheduling TX power set.
  *
- * @param  param    Reference to Zigbee stack buffer.
- * @param  channel  Channel number.
+ * @param  param    Packed buffer reference and channel number.
  */
-static void schedule_tx_power_set(zb_bufid_t param, zb_uint16_t channel)
+static void schedule_tx_power_set(zb_cb_param_t param)
 {
+	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
+	zb_uint16_t channel = ZB_UNPACK_USER_PARAM(param);
 	zb_tx_power_params_t *power_params;
 
-	power_params = zb_buf_initial_alloc(param, sizeof(zb_tx_power_params_t));
+	if (!bufid) {
+		zb_buf_get_out_delayed_ext(schedule_tx_power_set, channel, 0);
+		return;
+	}
+
+	power_params = zb_buf_initial_alloc(bufid, sizeof(zb_tx_power_params_t));
 
 	power_params->page = ZB_CHANNEL_PAGE0_2_4_GHZ;
 	power_params->channel = channel;
 	power_params->tx_power = CONFIG_LIGHT_SWITCH_TX_POWER;
 	power_params->cb = tx_power_cb;
 
-	ZB_SCHEDULE_APP_CALLBACK(zb_set_tx_power_async, param);
+	ZB_SCHEDULE_APP_CALLBACK(zb_set_tx_power_async, bufid);
 }
 
 /**@brief Function for setting TX power for configured channels.

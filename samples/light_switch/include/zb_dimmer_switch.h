@@ -116,39 +116,6 @@ zb_zcl_cluster_desc_t cluster_list_name[] =					  \
 }
 
 
-/** @cond internals_doc */
-/**
- * @brief Declare simple descriptor for Dimmer switch device
- * @param ep_name - endpoint variable name
- * @param ep_id - endpoint ID
- * @param in_clust_num - number of supported input clusters
- * @param out_clust_num - number of supported output clusters
- */
-#define ZB_ZCL_DECLARE_DIMMER_SWITCH_SIMPLE_DESC(				    \
-	ep_name, ep_id, in_clust_num, out_clust_num)				    \
-	ZB_DECLARE_SIMPLE_DESC(in_clust_num, out_clust_num);			    \
-	ZB_AF_SIMPLE_DESC_TYPE(in_clust_num, out_clust_num) simple_desc_##ep_name = \
-	{									    \
-		ep_id,								    \
-		ZB_AF_HA_PROFILE_ID,						    \
-		ZB_DIMMER_SWITCH_DEVICE_ID,					    \
-		ZB_DEVICE_VER_DIMMER_SWITCH,					    \
-		0,								    \
-		in_clust_num,							    \
-		out_clust_num,							    \
-		{								    \
-			ZB_ZCL_CLUSTER_ID_BASIC,				    \
-			ZB_ZCL_CLUSTER_ID_IDENTIFY,				    \
-			ZB_ZCL_CLUSTER_ID_IDENTIFY,				    \
-			ZB_ZCL_CLUSTER_ID_SCENES,				    \
-			ZB_ZCL_CLUSTER_ID_GROUPS,				    \
-			ZB_ZCL_CLUSTER_ID_ON_OFF,				    \
-			ZB_ZCL_CLUSTER_ID_LEVEL_CONTROL,			    \
-		}								    \
-	}
-
-/** @endcond */ /* internals_doc */
-
 /**
  * @brief Declare endpoint for Dimmer Switch device
  * @param ep_name - endpoint variable name

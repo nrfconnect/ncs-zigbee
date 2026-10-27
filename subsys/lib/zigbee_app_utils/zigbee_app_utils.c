@@ -265,11 +265,11 @@ addr_type_t parse_address(const char *input, zb_addr_u *addr,
 	       ADDR_INVALID;
 }
 
-zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
+zb_ret_t zigbee_default_signal_handler(zb_cb_param_t param)
 {
 	zb_zdo_app_signal_hdr_t *sig_hndler = NULL;
-	zb_zdo_app_signal_type_t sig = zb_get_app_signal(bufid, &sig_hndler);
-	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(bufid);
+	zb_zdo_app_signal_type_t sig = zb_get_app_signal(param, &sig_hndler);
+	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(param);
 	zb_nwk_device_type_t role = zb_get_network_role();
 	zb_ret_t ret_code = RET_OK;
 	zb_bool_t comm_status = ZB_TRUE;
@@ -716,7 +716,7 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 		zb_bufid_t buf_copy = zb_buf_get_out();
 
 		if (buf_copy) {
-			zb_buf_copy(buf_copy, bufid);
+			zb_buf_copy(buf_copy, param);
 			ZVUNUSED(ZB_ZDO_SIGNAL_CUT_HEADER(buf_copy));
 
 			change_panid(buf_copy);
@@ -804,11 +804,11 @@ zb_ret_t zigbee_default_signal_handler(zb_bufid_t bufid)
 	return ret_code;
 }
 
-void zigbee_led_status_update(zb_bufid_t bufid, uint32_t led_idx)
+void zigbee_led_status_update(zb_cb_param_t param, uint32_t led_idx)
 {
 	zb_zdo_app_signal_hdr_t *p_sg_p = NULL;
-	zb_zdo_app_signal_type_t sig = zb_get_app_signal(bufid, &p_sg_p);
-	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(bufid);
+	zb_zdo_app_signal_type_t sig = zb_get_app_signal(param, &p_sg_p);
+	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(param);
 
 	switch (sig) {
 	case ZB_BDB_SIGNAL_DEVICE_REBOOT:
@@ -1373,16 +1373,16 @@ static bool zigbee_touchlink_target_request(void)
 	return true;
 }
 
-static void zigbee_touchlink_target_delayed_start(zb_uint8_t unused)
+static void zigbee_touchlink_target_delayed_start(zb_cb_param_t unused)
 {
 	ZVUNUSED(unused);
 	(void)zigbee_touchlink_target_request();
 }
 
-void zigbee_touchlink_target_signal_handler(zb_bufid_t bufid)
+void zigbee_touchlink_target_signal_handler(zb_cb_param_t param)
 {
-	zb_zdo_app_signal_type_t sig = zb_get_app_signal(bufid, NULL);
-	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(bufid);
+	zb_zdo_app_signal_type_t sig = zb_get_app_signal(param, NULL);
+	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(param);
 
 	if (sig == ZB_BDB_SIGNAL_DEVICE_REBOOT && status != RET_OK && !ZB_JOINED() &&
 	    zigbee_tl_target_state == ZIGBEE_TL_TARGET_STATE_IDLE) {
