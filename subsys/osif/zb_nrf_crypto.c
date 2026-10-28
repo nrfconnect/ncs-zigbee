@@ -94,9 +94,14 @@ static psa_status_t import_master_key(psa_key_lifetime_t lifetime)
 	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
 
 #if defined(CONFIG_ENTROPY_HAS_DRIVER)
-	__ASSERT(sys_csrand_get(key_material, sizeof(key_material)) == 0,
-		 "Cannot get random material for PSA master key");
+	int err;
+
+	err = sys_csrand_get(key_material, sizeof(key_material));
+	if (err != 0) {
+		return PSA_ERROR_INSUFFICIENT_ENTROPY;
+	}
 #else
+#warning Entropy driver required to generate cryptographically secure random numbers
 	sys_rand_get(key_material, sizeof(key_material));
 #endif
 
