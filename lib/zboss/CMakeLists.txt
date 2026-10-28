@@ -174,7 +174,15 @@ if ((NOT DEFINED CONFIG_ZBOSS_SOURCES_AVAILABLE) OR
   # Since the libncp-dev contains the application code, all object files has to
   # be included while linking.
   if (CONFIG_ZIGBEE_LIBRARY_NCP_DEV)
-    zephyr_library_import(zboss_libncp-dev ${ZBOSS_LIB_PATH}/libncp-dev${LIB_VARIANT}.a)
+    set(_ncp_dev_lib ${ZBOSS_LIB_PATH}/libncp-dev${LIB_VARIANT}.a)
+    if(NOT EXISTS "${_ncp_dev_lib}")
+      message(FATAL_ERROR
+        "The NCP development library is not available in this Zigbee R23 add-on release.\n"
+        "Building NCP connectivity firmware is not supported. Restoring support is planned\n"
+        "for a future release (timeline not confirmed).\n"
+        "Missing precompiled library: ${_ncp_dev_lib}")
+    endif()
+    zephyr_library_import(zboss_libncp-dev ${_ncp_dev_lib})
   elseif (CONFIG_ZIGBEE_LIBRARY_SOC)
   else()
     message(FATAL_ERROR "Unsupported Zigbee platform design")
