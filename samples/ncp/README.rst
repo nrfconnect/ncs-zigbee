@@ -9,7 +9,12 @@ Zigbee: NCP
 
 The :ref:`Zigbee <zigbee_index>` NCP sample demonstrates the usage of Zigbee's :ref:`ug_zigbee_platform_design_ncp_details` architecture.
 
-Together with the source code from :ref:`ug_zigbee_tools_ncp_host`, you can use this sample to create a complete and functional Zigbee device for development and evaluation.
+.. warning::
+   Building this sample is **not supported** in the current |addon| release because the precompiled NCP development libraries are not shipped.
+   A CMake configuration error explains this if you attempt to build the sample.
+   Restoring NCP connectivity firmware support is planned for a future add-on release (without a confirmed timeline).
+
+Together with the source code from :ref:`ug_zigbee_tools_ncp_host`, you can use this sample to create a complete and functional Zigbee device for development and evaluation once NCP libraries are available again.
 For example, as shown in the `Testing`_ scenario, you can program a development kit with the NCP sample and bundle it with the simple gateway application on the NCP host processor.
 
 |zigbee_ncp_cert_xref|
@@ -19,22 +24,16 @@ You can then use this sample together with the :ref:`Zigbee Light bulb <zigbee_l
 Requirements
 ************
 
-The sample supports the following development kits:
-
 .. include:: /includes/device_table_ncp.txt
 
-The nRF5340 DK (``nrf5340dk/nrf5340/cpuapp``) is supported only for development.
+.. note::
+   The ZBOSS NCP Host package is not included in the current |addon| release.
+   See :ref:`release_notes` for add-on releases that published a host package.
 
-You can use any of the development kits listed above.
-
-To test this sample, you also need the following:
+When using an add-on release that includes the host package, testing this sample also requires the following:
 
 * :ref:`ug_zigbee_tools_ncp_host` tool, which is based on the ZBOSS stack and requires a PC with an operating system compatible with the 64-bit Ubuntu |ubuntu_version| Linux.
-  The tool is available for download as a standalone :file:`zip` package using the following link:
-
-  * `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
-
-  For more information, see also the `NCP Host documentation`_ and :ref:`ug_zigbee_tools_ncp_host`.
+  For more information, see the `NCP Host documentation`_ and :ref:`ug_zigbee_tools_ncp_host`.
 * The :ref:`zigbee_light_bulb_sample` sample programmed on one separate device.
 
 This means that you need at least two development kits for testing this sample.
@@ -345,6 +344,9 @@ Building and running
 
 Testing
 =======
+
+.. note::
+   The steps in this section require an add-on release that ships both NCP connectivity firmware libraries and the ZBOSS NCP Host package.
 
 After building the sample and programming it to your development kit, complete the following steps to test it:
 
