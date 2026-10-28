@@ -369,6 +369,16 @@ void zigbee_deinit(void)
 	(void)atomic_clear((atomic_t *)&zb_app_cb_process_scheduled);
 }
 
+#if IS_ENABLED(CONFIG_ZIGBEE_LIBRARY_NCP_DEV)
+void zb_ncp_app_fw_custom_post_start(void)
+{
+	stack_is_started = true;
+#ifdef CONFIG_ZIGBEE_SHELL
+	zb_shell_configure_endpoint();
+#endif /* defined(CONFIG_ZIGBEE_SHELL) */
+}
+#endif
+
 static void zboss_thread(void *arg1, void *arg2, void *arg3)
 {
 #if !IS_ENABLED(CONFIG_ZIGBEE_LIBRARY_NCP_DEV)
@@ -387,11 +397,9 @@ static void zboss_thread(void *arg1, void *arg2, void *arg3)
 	}
 
 #else /* CONFIG_ZIGBEE_LIBRARY_NCP_DEV */
-	/* libncp-dev MAIN() owns ZB_INIT and stack startup. */
-#ifdef CONFIG_ZIGBEE_SHELL
-	zb_shell_configure_endpoint();
-#endif /* CONFIG_ZIGBEE_SHELL */
-	stack_is_started = true;
+	/* For NCP mode, the thread implementation (i.e. some initialization part
+	 * and main loop) is in the ZBOSS library.
+	 */
 	zboss_app_main();
 #endif
 }
