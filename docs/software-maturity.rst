@@ -69,8 +69,8 @@ The following table indicates the software maturity levels of the support for ea
 		  - --
 		  - --
 		  - --
-		  - Supported
-		  - Supported
+		  - --
+		  - --
 		* - **Zigbee Router**
 		  - --
 		  - --
@@ -98,7 +98,7 @@ The following table indicates the software maturity levels of the support for ea
 		* - **Zigbee Coordinator**
 		  - Supported
 		* - **Zigbee Network Co-Processor (NCP)**
-		  - Experimental
+		  - --
 		* - **Zigbee Router**
 		  - Supported
 
@@ -152,11 +152,11 @@ The following table indicates the software maturity levels of the support for ea
 		  - Supported
 		* - **Zigbee Network Co-Processor (NCP)**
 		  - --
-		  - Supported
-		  - Supported
-		  - Supported
-		  - Supported
-		  - Supported
+		  - --
+		  - --
+		  - --
+		  - --
+		  - --
 		* - **Zigbee Router**
 		  - --
 		  - --

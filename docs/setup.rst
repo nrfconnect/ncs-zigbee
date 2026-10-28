@@ -19,9 +19,6 @@ You can mix different development kits.
 .. note::
    Make sure that you have three development kits before proceeding to the next steps.
 
-.. note::
-   The nRF52833 SoC is supported only for NCP sample.
-   
 Software requirements
 *********************
 

@@ -34,6 +34,15 @@ A known issue can list one or both of the following entries:
 List of known issues
 ********************
 
+.. rst-class:: v1-4-99
+
+KRKNWK-22663: NCP connectivity firmware is not supported
+  The :ref:`NCP sample <zigbee_ncp_sample>` cannot be built in the current |addon| release because the precompiled NCP development libraries (``libncp-dev*.a``) are not shipped.
+  Attempting to build the sample fails at CMake configuration with an explicit error.
+  The :ref:`ZBOSS NCP Host <ug_zigbee_tools_ncp_host>` package is also not included in this release.
+
+  Restoring NCP connectivity firmware and the host package is planned for a future add-on release (without a confirmed timeline).
+
 .. rst-class:: v1-4-0
 
 KRKNWK-22613: Zigbee FOTA does not work for the light bulb sample

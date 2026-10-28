@@ -133,6 +133,11 @@ It also has the following trade-offs:
   They do not cover the host and NCP architecture.
   If you want to certify a host and NCP solution, contact the `ZBOSS Open Initiative (ZOI)`_.
 
+.. warning::
+   NCP connectivity firmware is not supported in the current |addon| release.
+   The precompiled NCP development libraries are not included in this release.
+   Restoring support is planned for a future add-on release (without a confirmed timeline).
+
 .. note::
    The NCP connectivity device firmware built with ``CONFIG_ZIGBEE_LIBRARY_NCP_DEV`` links libraries that are not part of the certified ZBOSS libraries shipped for single-SoC designs.
    See :ref:`zboss_configuration` for this Kconfig option.
@@ -143,17 +148,12 @@ It also has the following trade-offs:
    Split Zigbee architecture
 
 
-The |addon| for the |NCS| includes the :ref:`ug_zigbee_tools_ncp_host` tool.
-|zigbee_ncp_package|
+The host side of this design is described in :ref:`ug_zigbee_tools_ncp_host`.
 
-
-The tool is available for download as a standalone :file:`zip` package using the following link:
-
-  * `ZBOSS NCP Host`_ (|zigbee_ncp_package_version|)
-
-|zigbee_ncp_package_more_info|
-
-|zigbee_ncp_host_dev_only|
+.. note::
+   The ZBOSS NCP Host package is not included in the current |addon| release.
+   See :ref:`release_notes` for add-on releases that published a host package.
+   Restoring the host package together with NCP connectivity firmware support is planned for a future add-on release (without a confirmed timeline).
 
 This platform design is suitable for the following development kits:
 
