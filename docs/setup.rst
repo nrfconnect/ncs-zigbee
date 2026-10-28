@@ -33,22 +33,31 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
       In the `Get the nRF Connect SDK code <Installing the nRF Connect SDK_>`_ section, click :guilabel:`Create a new application`. 
       Select :guilabel:`Browse nRF Connect SDK Add-on Index`, then choose :guilabel:`Zigbee R23`. 
-      Select v\ |addon_version| of the |addon|. 
+      Select |release| of the |addon|. 
       This step also installs nRF Connect SDK v\ |ncs_version|.
 
    .. group-tab:: command line
 
-      You can initialize workspace in two alternative ways:
+      You can initialize workspace in two alternative ways.
+      In the following commands, replace *version* with the tag of the |addon| release you want to use, or with ``main`` to use the latest development state.
 
       **Initialize a new workspace:**
 
-      1. In the `Get the nRF Connect SDK code <Installing the nRF Connect SDK_>`_, run the following command to initialize west with |addon| v\ |addon_version|, which also initializes nRF Connect SDK v\ |ncs_version|:
+      1. In the `Get the nRF Connect SDK code <Installing the nRF Connect SDK_>`_, run the following command to initialize west with the |addon|, which also initializes the compatible version of the nRF Connect SDK:
 
          a. Initialize ``ncs`` for the add-on:
 
-            .. code-block:: console
+            .. parsed-literal::
+               :class: highlight
 
-               west init -m "https://github.com/nrfconnect/ncs-zigbee" --mr v1.4.0
+               west init -m "https\://github.com/nrfconnect/ncs-zigbee" --mr *version*
+
+            For example:
+
+            .. parsed-literal::
+               :class: highlight
+
+               west init -m "https\://github.com/nrfconnect/ncs-zigbee" --mr |release|
 
          #. Update the nRF Connect SDK modules:
 
@@ -68,9 +77,17 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
          #. Clone the add-on repository:
 
-            .. code-block:: console
+            .. parsed-literal::
+               :class: highlight
 
-               git clone https://github.com/nrfconnect/ncs-zigbee
+               git clone --branch *version* https\://github.com/nrfconnect/ncs-zigbee
+
+            For example:
+
+            .. parsed-literal::
+               :class: highlight
+
+               git clone --branch |release| https\://github.com/nrfconnect/ncs-zigbee
 
          #. Set manifest path to the add-on directory:
 
