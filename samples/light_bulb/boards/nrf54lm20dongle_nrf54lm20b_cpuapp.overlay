@@ -1,0 +1,43 @@
+/*
+ * Copyright (c) 2026 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+#include <nrf54lm20dongle_partitions.dtsi>
+
+/ {
+	chosen {
+		ncs,zigbee-timer = &timer23;
+		ncs,zboss-trace-uart = &board_cdc_acm_uart;
+	};
+};
+
+&pwm20 {
+	pinctrl-0 = <&pwm20_bulb_default>;
+	pinctrl-1 = <&pwm20_bulb_sleep>;
+};
+
+&pinctrl {
+	pwm20_bulb_default: pwm20_bulb_default {
+		group1 {
+			psels = <NRF_PSEL(PWM_OUT0, 1, 24)>,
+				<NRF_PSEL(PWM_OUT1, 1, 26)>,
+				<NRF_PSEL(PWM_OUT2, 1, 27)>;
+			nordic,invert;
+		};
+	};
+
+	pwm20_bulb_sleep: pwm20_bulb_sleep {
+		group1 {
+			psels = <NRF_PSEL(PWM_OUT0, 1, 24)>,
+				<NRF_PSEL(PWM_OUT1, 1, 26)>,
+				<NRF_PSEL(PWM_OUT2, 1, 27)>;
+			low-power-enable;
+		};
+	};
+};
+
+&timer23 {
+	status = "okay";
+};

@@ -72,6 +72,17 @@ User interface
 
 .. tabs::
 
+   .. group-tab:: nRF54LM20 Dongle
+
+      Blue LED 1:
+          Turns on when the device joins the network.
+
+      Red LED 2:
+          Blinks to indicate that the identification mode is on.
+
+      Button 1:
+          Starts or cancels the Identify mode.
+
    .. group-tab:: nRF54 DKs
 
       LED 2:
@@ -82,6 +93,7 @@ User interface
 
       Button 3:
           Starts or cancels the Identify mode.
+
    .. group-tab:: nRF52 and nRF53 DKs
 
       LED 3:
@@ -92,6 +104,7 @@ User interface
 
       Button 4:
           Starts or cancels the Identify mode.
+
    .. group-tab:: nRF52840 Dongle
 
       LED 1:
