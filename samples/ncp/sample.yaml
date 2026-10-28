@@ -1,3 +1,5 @@
+# KRKNWK-22663: Twister scenarios are skipped while NCP libncp-dev libraries are
+# not shipped. Builds fail at CMake with an explicit error.
 sample:
   description: Zigbee network co-processor
   name: Zigbee NCP
@@ -9,6 +11,7 @@ common:
     - ci_samples_zigbee
 tests:
   sample.zigbee.ncp:
+    skip: true
     sysbuild: true
     build_only: true
     integration_platforms:
@@ -25,6 +28,7 @@ tests:
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
   sample.zigbee.ncp.usb:
+    skip: true
     sysbuild: true
     build_only: true
     integration_platforms:
@@ -39,6 +43,7 @@ tests:
     extra_args:
       - FILE_SUFFIX=usb
   sample.zigbee.ncp.dongle:
+    skip: true
     sysbuild: true
     build_only: true
     integration_platforms:
