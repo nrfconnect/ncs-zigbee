@@ -63,6 +63,20 @@ Additionally, the following Kconfig option is available when setting :ref:`zigbe
 
 * ``CONFIG_ZBOSS_OSIF_LOG_LEVEL`` - Configures the custom logger options for the ZBOSS OSIF layer.
 
+.. _zigbee_osif_thread_safe_scheduler:
+
+Thread-safe scheduler wrappers
+******************************
+
+The OSIF exposes thread- and ISR-safe variants of a subset of the ZBOSS scheduler APIs (see :file:`lib/zboss/include/osif/zb_osif_platform.h`).
+
+* :c:func:`zigbee_schedule_callback` forwards a full :c:type:`zb_cb_param_t` (32-bit packed callback argument).
+* :c:func:`zigbee_schedule_alarm` accepts only a buffer reference (:c:type:`zb_bufid_t`), matching :c:func:`zb_schedule_app_alarm` in ZBOSS 5.
+* :c:func:`zigbee_schedule_alarm_cancel` accepts :c:type:`zb_cb_param_t`, matching :c:func:`zb_schedule_alarm_cancel` in ZBOSS 5.
+
+When an alarm is set from another thread through :c:func:`zigbee_schedule_alarm`, pass the same buffer reference to :c:func:`zigbee_schedule_alarm_cancel`.
+Alarms that rely on packed user data in the upper 16 bits of :c:type:`zb_cb_param_t` must be scheduled from the ZBOSS thread (for example with :c:macro:`ZB_SCHEDULE_APP_ALARM`) or use :c:func:`zigbee_schedule_callback` instead.
+
 .. _zigbee_osif_zboss_osif_serial:
 
 ZBOSS OSIF serial abstract

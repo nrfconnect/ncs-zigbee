@@ -149,7 +149,8 @@ zb_ret_t zigbee_schedule_callback(zb_callback_t func, zb_cb_param_t param);
  *  - Wakes up the Zigbee task.
  *
  * @param func       function to call via scheduler
- * @param param      parameter to pass to the function
+ * @param param      buffer reference passed to the alarm callback (matches
+ *                   @c zb_schedule_app_alarm() in ZBOSS 5, @c zb_bufid_t).
  * @param timeout_bi timeout, in beacon intervals
  *
  * @return RET_OK or RET_OVERFLOW
@@ -168,7 +169,14 @@ zb_ret_t zigbee_schedule_alarm(zb_callback_t func, zb_bufid_t param,
  *  - Wakes up the Zigbee task.
  *
  * @param func - function to call via scheduler
- * @param param - parameter to pass to the function
+ * @param param - alarm match parameter (matches @c zb_schedule_alarm_cancel()
+ *                in ZBOSS 5, full @c zb_cb_param_t). When cancelling an alarm
+ *                scheduled through @c zigbee_schedule_alarm(), use the same
+ *                @c zb_bufid_t value that was passed to the set call. Packed
+ *                callback parameters (user data in the upper 16 bits of
+ *                @c zb_cb_param_t) are not supported for cross-thread alarm
+ *                set/cancel; that limitation comes from the ZBOSS 5 scheduler
+ *                API (@c zb_schedule_app_alarm() vs @c zb_schedule_alarm_cancel()).
  *
  * @return RET_OK or RET_OVERFLOW
  */
