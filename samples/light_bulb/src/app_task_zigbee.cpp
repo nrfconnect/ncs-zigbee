@@ -115,8 +115,9 @@ extern "C" {
 
 #if DT_NODE_HAS_STATUS(PWM_DK_LED_NODE, okay)
 static const struct pwm_dt_spec led_pwm = PWM_DT_SPEC_GET(PWM_DK_LED_NODE);
+#define LIGHT_BULB_HAS_PWM_LED 1
 #else
-#error "Choose supported PWM driver"
+#define LIGHT_BULB_HAS_PWM_LED 0
 #endif
 
 /* Led PWM period, calculated for 100 Hz signal - in microseconds. */
@@ -257,9 +258,11 @@ static void button_changed(uint32_t button_state, uint32_t has_changed) {
 
 /**@brief Function for initializing additional PWM leds. */
 static void pwm_led_init(void) {
+#if LIGHT_BULB_HAS_PWM_LED
   if (!device_is_ready(led_pwm.dev)) {
     LOG_ERR("Error: PWM device %s is not ready", led_pwm.dev->name);
   }
+#endif
 }
 
 /**@brief Function for initializing LEDs and Buttons. */
@@ -285,12 +288,18 @@ static void configure_gpio(void) {
  *                             0 - turn off, 255 - full brightness.
  */
 static void light_bulb_set_brightness(zb_uint8_t brightness_level) {
+#if LIGHT_BULB_HAS_PWM_LED
   uint32_t pulse = brightness_level * LED_PWM_PERIOD_US / 255U;
 
   if (pwm_set_dt(&led_pwm, PWM_USEC(LED_PWM_PERIOD_US), PWM_USEC(pulse))) {
     LOG_ERR("Pwm led 4 set fails:\n");
     return;
   }
+#else
+  if (dk_set_led(BULB_LED, brightness_level > 0U ? 1U : 0U)) {
+    LOG_ERR("DK LED set fails");
+  }
+#endif
 }
 
 /**@brief Return PWM brightness to apply when the bulb is turned on. */
