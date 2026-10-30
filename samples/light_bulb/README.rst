@@ -46,6 +46,7 @@ This sample is split into the following source files:
 * The :file:`main` file is the application entry point only.
 * The :file:`app_task_zigbee` file manages the application task flow, user input handling, and Zigbee-specific startup and control logic.
   It also implements the dimmable light device behavior, including cluster handling and PWM-based brightness control.
+  On boards without a devicetree PWM LED (for example the nRF54LC10 DK), the sample uses the DK LED library GPIO API instead of PWM.
 
 ..
   FEM support

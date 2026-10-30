@@ -82,3 +82,6 @@ Check the compatibility matrices for your device to find the latest certificatio
 * `Zigbee CIDs for nRF5340`_
 * `Zigbee CIDs for nRF52840`_
 * `Zigbee CIDs for nRF52833`_
+
+There is no Zigbee compatibility matrix entry for the nRF54LC10A SoC yet.
+When a matrix is published, it will be linked from this page together with the other nRF54 Series devices.

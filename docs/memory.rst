@@ -53,6 +53,7 @@ The following table lists the available files, which targets they cover, and whe
        | nRF5340 application and network cores (SoC)
        | nRF54L05 (SoC)
        | nRF54L10 (SoC)
+       | nRF54LC10A (SoC)
        | nRF54L15 (SoC)
        | nRF54LM20 (SoC)
      - Required starting point for any Zigbee application.
@@ -74,10 +75,16 @@ The following table lists the available files, which targets they cover, and whe
        | nRF54L10 DK (DK only)
        | nRF54L15 DK (DK only)
        | nRF54LM20 DK (DK only)
-     - Keeps the primary image on internal flash and places the secondary upgrade slot (``slot1_partition``) on external flash.
+     - Keeps the primary image on internal flash and places the secondary upgrade slot (``slot1_partition``) on external SPI NOR.
        Adds ``boot_partition`` (MCUboot) and resizes ``slot0_partition`` to fit.
        On the nRF5340 DK, external flash can also hold ``image-3``.
-       Reference layout for :ref:`lib_zigbee_fota` over external flash.
+       Used with the ``zigbee_fota`` snippet.
+
+   * - Internal RRAM dual-slot (FOTA)
+     - :file:`dts/fota_internal/<board>_partitions.dtsi`
+     - | nRF54LC10 DK (DK only)
+     - MCUboot plus ``slot0_partition`` and ``slot1_partition`` in internal RRAM.
+       Selected through the ``zigbee_fota`` snippet on this board (no external flash on the DK).
 
 To add an overlay file to your application, add an ``#include`` line to :file:`app.overlay` or to a board overlay in :file:`boards/`.
 Always include the base :file:`.dtsi` first, then any optional overlay.
@@ -88,6 +95,13 @@ See an example for the nRF54LM20 DK with external-flash FOTA in the :file:`board
 
    #include <nrf54lm20_cpuapp_partitions.dtsi>
    #include <ext_flash/nrf54lm20dk_cpuapp_partitions.dtsi>
+
+On the nRF54LC10 DK:
+
+.. code-block:: dts
+
+   #include <nrf54lc10_cpuapp_partitions.dtsi>
+   #include <fota_internal/nrf54lc10dk_cpuapp_partitions.dtsi>
 
 RAM and flash memory requirements
 *********************************
@@ -154,6 +168,13 @@ Other NVM columns list the reserved partition size for that region.
             .. memory-board::
                :board: nrf54l10
 
+         .. group-tab:: nRF54LC10
+
+            Memory requirements for samples running on the `nRF54LC10 DK <Board support_>`_ (`nrf54lc10dk`_).
+
+            .. memory-board::
+               :board: nrf54lc10
+
          .. group-tab:: nRF54L15
 
             Memory requirements for samples running on the `nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
@@ -213,6 +234,13 @@ Other NVM columns list the reserved partition size for that region.
 
             .. memory-table::
                :board: nrf54l10
+
+         .. group-tab:: nRF54LC10
+
+            The following table lists memory requirements for samples running on the `nRF54LC10 DK <Board support_>`_ (`nrf54lc10dk`_).
+
+            .. memory-table::
+               :board: nrf54lc10
 
          .. group-tab:: nRF54L15
 

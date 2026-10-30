@@ -15,7 +15,7 @@ To test DFU over Bluetooth SMP in a Zigbee-only build, complete the following st
          a. Install `nRF Connect Device Manager`_.
          #. Use the :file:`dfu_application.zip` file from the build directory.
 
-         For detailed instructions, see `FOTA updates on nRF54L Series devices`_ (nRF54L15 and nRF54LM20 DKs) or `FOTA updates with nRF5340 DK`_ (nRF5340 DK).
+         For detailed instructions, see `FOTA updates on nRF54L Series devices`_ (nRF54L15, nRF54LC10, and nRF54LM20 DKs) or `FOTA updates with nRF5340 DK`_ (nRF5340 DK).
 
       .. group-tab:: PC (mcumgr)
 

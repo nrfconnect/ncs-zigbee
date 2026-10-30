@@ -8,7 +8,7 @@ This page outlines the requirements that you need to meet before you start worki
 Hardware requirements
 *********************
 
-The Zigbee R23 add-on supports the nRF52840, nRF52833, nRF5340, nRF54L15, nRF54L10, nRF54L05, nRF54LM20A, and nRF54LM20B SoCs.
+The Zigbee R23 add-on supports the nRF52840, nRF52833, nRF5340, nRF54L15, nRF54L10, nRF54LC10A, nRF54L05, nRF54LM20A, and nRF54LM20B SoCs.
 
 For the :ref:`zigbee_quickstart`, you need three development kits of the following types:
 
