@@ -18,6 +18,10 @@
      - PCA10156
      - `nrf54l15dk`_
      - ``nrf54l15dk/nrf54l10/cpuapp``
+   * - `nRF54LC10 DK <Developing with nRF54L Series_>`_
+     - PCA10226
+     - `nrf54lc10dk`_
+     - ``nrf54lc10dk/nrf54lc10a/cpuapp``
    * - `nRF54L15 DK <Developing with nRF54L Series_>`_
      - PCA10156
      - `nrf54l15dk`_
