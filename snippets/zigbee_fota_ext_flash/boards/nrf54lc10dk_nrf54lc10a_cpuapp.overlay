@@ -1,0 +1,18 @@
+/*
+ * Copyright (c) 2026 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+#include <nrf54lc10_cpuapp_partitions.dtsi>
+#include <ext_flash/nrf54lc10dk_cpuapp_partitions.dtsi>
+
+/ {
+	chosen {
+		ncs,zigbee-timer = &timer20;
+	};
+};
+
+&timer20 {
+	status = "okay";
+};

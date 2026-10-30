@@ -50,6 +50,7 @@ path_triggers:
           - nrf52840dk/nrf52840
           - nrf5340dk/nrf5340/cpuapp
           - nrf54l15dk/nrf54l15/cpuapp
+          - nrf54lc10dk/nrf54lc10a/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
       - scenario: light_bulb
         variants:
@@ -65,6 +66,7 @@ path_triggers:
         platform:
           - nrf52840dk/nrf52840
           - nrf54l15dk/nrf54l15/cpuapp
+          - nrf54lc10dk/nrf54lc10a/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
       - scenario: light_switch
         variants:
@@ -84,6 +86,7 @@ path_triggers:
         platform:
           - nrf52840dk/nrf52840
           - nrf54l15dk/nrf54l15/cpuapp
+          - nrf54lc10dk/nrf54lc10a/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
       - scenario: light_switch
         variants:
@@ -135,6 +138,7 @@ path_triggers:
         platform:
           - nrf5340dk/nrf5340/cpuapp
           - nrf54l15dk/nrf54l15/cpuapp
+          - nrf54lc10dk/nrf54lc10a/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
 
   shell-sample:
@@ -146,6 +150,7 @@ path_triggers:
           - nrf52840dk/nrf52840
           - nrf5340dk/nrf5340/cpuapp
           - nrf54l15dk/nrf54l15/cpuapp
+          - nrf54lc10dk/nrf54lc10a/cpuapp
           - nrf54lm20dk/nrf54lm20b/cpuapp
       - scenario: shell
         variants:
@@ -162,6 +167,7 @@ path_triggers:
       - scenario: template
         platform:
           - nrf54l15dk/nrf54l10/cpuapp
+          - nrf54lc10dk/nrf54lc10a/cpuapp
           - nrf54lm20dk/nrf54lm20a/cpuapp
 
   # ---------------------------------------------------------------------------

@@ -1,0 +1,35 @@
+/*
+ * Copyright (c) 2026 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+/*
+ * Zigbee FOTA on nRF54LC10 DK: MCUboot plus dual application slots in internal
+ * RRAM. The secondary slot (slot1) is on RRAM (no external SPI NOR on this DK).
+ * Layout preserves ZBOSS NVRAM partitions from nrf54lc10_cpuapp_partitions.dtsi.
+ */
+
+/delete-node/ &slot0_partition;
+
+&cpuapp_rram {
+	partitions {
+		boot_partition: partition@0 {
+			compatible = "zephyr,mapped-partition";
+			label = "mcuboot";
+			reg = <0x0 DT_SIZE_K(80)>;
+		};
+
+		slot0_partition: partition@14000 {
+			compatible = "zephyr,mapped-partition";
+			label = "image-0";
+			reg = <0x14000 DT_SIZE_K(444)>;
+		};
+
+		slot1_partition: partition@83000 {
+			compatible = "zephyr,mapped-partition";
+			label = "image-1";
+			reg = <0x83000 DT_SIZE_K(444)>;
+		};
+	};
+};
