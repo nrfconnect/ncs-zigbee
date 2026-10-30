@@ -66,7 +66,7 @@ tests:
     build_only: true
     extra_args:
       - FILE_SUFFIX=fota
-      - SNIPPET=zigbee_fota_ext_flash
+      - SNIPPET=zigbee_fota
     integration_platforms:
       - nrf52840dk/nrf52840
       - nrf54l15dk/nrf54l15/cpuapp
@@ -85,7 +85,7 @@ tests:
     build_only: true
     extra_args:
       - FILE_SUFFIX=fota
-      - SNIPPET=zigbee_fota_ext_flash
+      - SNIPPET=zigbee_fota
       - OVERLAY_CONFIG=overlay-multiprotocol_ble.conf
     integration_platforms:
       - nrf5340dk/nrf5340/cpuapp

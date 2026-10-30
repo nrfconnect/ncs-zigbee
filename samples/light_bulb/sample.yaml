@@ -30,7 +30,7 @@ tests:
     build_only: true
     extra_args:
       - FILE_SUFFIX=fota
-      - SNIPPET=zigbee_fota_ext_flash
+      - SNIPPET=zigbee_fota
       - CONFIG_ZIGBEE_BT_DFU=y
     integration_platforms:
       - nrf54lm20dk/nrf54lm20b/cpuapp

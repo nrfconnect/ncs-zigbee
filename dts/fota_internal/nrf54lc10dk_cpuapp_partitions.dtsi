@@ -6,7 +6,8 @@
 
 /*
  * Zigbee FOTA on nRF54LC10 DK: MCUboot plus dual application slots in internal
- * RRAM. The secondary slot (slot1) is on RRAM (no external SPI NOR on this DK).
+ * RRAM (no external SPI NOR on this DK). slot0 is larger than slot1 because
+ * FOTA stores a compressed image in the secondary slot (see MCUboot compression).
  * Layout preserves ZBOSS NVRAM partitions from nrf54lc10_cpuapp_partitions.dtsi.
  */
 
@@ -23,13 +24,13 @@
 		slot0_partition: partition@14000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-0";
-			reg = <0x14000 DT_SIZE_K(444)>;
+			reg = <0x14000 DT_SIZE_K(556)>;
 		};
 
-		slot1_partition: partition@83000 {
+		slot1_partition: partition@9f000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-1";
-			reg = <0x83000 DT_SIZE_K(444)>;
+			reg = <0x9f000 DT_SIZE_K(332)>;
 		};
 	};
 };

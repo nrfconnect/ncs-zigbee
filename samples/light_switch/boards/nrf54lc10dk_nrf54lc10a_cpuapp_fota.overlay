@@ -5,4 +5,4 @@
  */
 
 #include <nrf54lc10_cpuapp_partitions.dtsi>
-#include <ext_flash/nrf54lc10dk_cpuapp_partitions.dtsi>
+#include <fota_internal/nrf54lc10dk_cpuapp_partitions.dtsi>
