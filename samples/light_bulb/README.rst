@@ -46,6 +46,7 @@ This sample is split into the following source files:
 * The :file:`main` file is the application entry point only.
 * The :file:`app_task_zigbee` file manages the application task flow, user input handling, and Zigbee-specific startup and control logic.
   It also implements the dimmable light device behavior, including cluster handling and PWM-based brightness control.
+  On boards without a devicetree PWM LED (for example the nRF54LC10 DK), the sample uses the DK LED library GPIO API instead of PWM.
 
 ..
   FEM support
@@ -83,17 +84,42 @@ User interface
 
 .. tabs::
 
-   .. group-tab:: nRF54 DKs
+   .. group-tab:: nRF54L15, nRF54L10, and nRF54LM20 DKs
 
       LED 0:
           Blinks to indicate that the main application thread is running.
 
-      LED 1:
+      LED 2:
           Indicates the dimmable light option, that is changes to the light bulb brightness.
           It can be controlled by another Zigbee device in the network, for example a light switch.
           Blinks when the light bulb is in Identify mode.
 
+      LED 3:
+          Turns on when the light bulb joins the network.
+
+      Button 3:
+          Depending on how long the button is pressed:
+
+          * If pressed for less than five seconds, it starts or cancels the Identify mode.
+          * If pressed for five seconds, it initiates the `factory reset of the device <Resetting to factory defaults_>`_.
+            The length of the button press can be edited using the ``CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS`` Kconfig option from :ref:`lib_zigbee_application_utilities`.
+            Releasing the button within this time does not trigger the factory reset procedure.
+
+   .. group-tab:: nRF54LC10 DK
+
+      The sample still implements a Zigbee Dimmable Light (Level Control cluster, brightness 0–255 over the air).
+      This development kit has no devicetree PWM LED, so the firmware drives the indicator with GPIO: the LED is **on** when the current level is greater than 0 and **off** at level 0.
+      A light switch can still send gradual level commands, but you will not see PWM fading on the DK (unlike nRF54L15, nRF54L10, and nRF54LM20 DK builds).
+
+      LED 0:
+          Blinks to indicate that the main application thread is running.
+
       LED 2:
+          Indicates the simplified dimmable-light state described above (same position as on the **nRF54L15, nRF54L10, and nRF54LM20 DKs** tab).
+          It can be controlled by another Zigbee device in the network, for example a light switch.
+          Blinks when the light bulb is in Identify mode.
+
+      LED 3:
           Turns on when the light bulb joins the network.
 
       Button 3:
@@ -142,7 +168,7 @@ After programming the sample to your development kits, complete the following st
 
 .. tabs::
 
-   .. group-tab:: nRF54 DKs
+   .. group-tab:: nRF54L15, nRF54L10, and nRF54LM20 DKs
 
       1. Turn on the development kit that runs the Network coordinator sample.
 
@@ -165,7 +191,15 @@ After programming the sample to your development kits, complete the following st
 
       #. Use the buttons on the development kit that runs the :ref:`zigbee_light_switch_sample` sample to control the light bulb.
 
-         The result of using the buttons is reflected on the light bulb's **LED 1**.
+         The result of using the buttons is reflected on the light bulb's **LED 2**.
+
+   .. group-tab:: nRF54LC10 DK
+
+      Follow the steps in the **nRF54L15, nRF54L10, and nRF54LM20 DKs** tab, with these differences:
+
+      * When checking whether the light bulb joined the network, use **LED 3** as in that tab.
+      * When using the light switch to change brightness, watch **LED 2** on the light bulb DK.
+        Short presses and on/off behave as on other DKs; long-press dimming still updates the Level Control attribute, but the LED switches between **off** (level 0) and **on** (any level above 0) instead of fading with PWM.
 
    .. group-tab:: nRF52 and nRF53 DKs
 

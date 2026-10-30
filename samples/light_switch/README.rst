@@ -12,7 +12,7 @@ You can use the this Light switch sample to change the state of light sources on
 You can use it together with the :ref:`Zigbee Network coordinator <zigbee_network_coordinator_sample>` and the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` samples to set up a basic Zigbee network.
 
 This sample supports the optional `Sleepy End Device behavior`_ and :ref:`zigbee_light_switch_sample_nus`.
-It also supports :ref:`lib_zigbee_fota` for nRF52840, nRF5340, nRF54L10, nRF54L15 and nRF54LM20 SoCs.
+It also supports :ref:`lib_zigbee_fota` for nRF52840, nRF5340, nRF54L10, nRF54LC10A, nRF54L15 and nRF54LM20 SoCs.
 See :ref:`zigbee_light_switch_activating_variants` for details about how to enable these variants.
 
 Requirements

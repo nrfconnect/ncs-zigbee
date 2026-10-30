@@ -44,10 +44,21 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 
 The following release is `supported <Software maturity levels_>`_.
 
+* Added:
+
+  * Experimental support for the nRF54LC10 DK (nRF54LC10A SoC) in the :ref:`zigbee_samples`.
+
 * Updated:
 
   * Improved ZBOSS NVRAM storage by batching flash writes into fewer operations.
     Cache size is controlled by ``CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE``.
+  * Renamed the FOTA snippets from ``zigbee_fota_ext_flash`` and ``zigbee_fota_mcuboot_ext_flash`` to ``zigbee_fota`` and ``zigbee_fota_mcuboot``.
+    One application snippet still covers all supported FOTA boards; board overlays select ``dts/ext_flash/`` or ``dts/fota_internal/`` as needed.
+
+* Migration notes:
+
+  * FOTA builds must pass ``SNIPPET=zigbee_fota`` instead of ``zigbee_fota_ext_flash``.
+    Sysbuild still remaps the MCUboot image to ``zigbee_fota_mcuboot`` automatically.
 
 .. _zigbee_release:
 

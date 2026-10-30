@@ -105,7 +105,9 @@ The Zigbee FOTA library has the following limitations:
 
 * The endpoint definition in the library includes the endpoint ID, defined with ``CONFIG_ZIGBEE_FOTA_ENDPOINT``.
   When using the Zigbee FOTA library, this endpoint ID cannot be used for other endpoints.
-* The Zigbee FOTA upgrades are currently supported on the nRF52840 DK (PCA10056), nRF5340 DK (PCA10095), nRF54L15 DK (PCA10156), and nRF54LM20 DK (PCA10157).
+* The Zigbee FOTA upgrades are currently supported on the nRF52840 DK (PCA10056), nRF5340 DK (PCA10095), nRF54L15 DK (PCA10156), nRF54LC10 DK (PCA10226), and nRF54LM20 DK (PCA10157).
+* On the nRF54LC10 DK, both MCUboot slots are placed in internal RRAM (partitions under :file:`dts/fota_internal/`) because the board has no external SPI NOR flash.
+  Use the same ``zigbee_fota`` snippet as on other supported boards; see :ref:`zigbee_memory` for the layout.
 * The Zigbee FOTA library does not currently support bootloader upgrades.
 
 Additionally, the following limitations apply on the nRF5340 SoCs:
