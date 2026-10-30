@@ -1,14 +1,14 @@
 Activating optional extensions
 ------------------------------
 
-To activate the :ref:`lib_zigbee_fota`, use the :file:`prj_fota.conf` configuration file together with the ``zigbee_fota_ext_flash`` snippet.
-The snippet provides external-flash partition layouts, sysbuild MCUboot settings, and the matching MCUboot configuration (through ``zigbee_fota_mcuboot_ext_flash``).
+To activate the :ref:`lib_zigbee_fota`, use the :file:`prj_fota.conf` configuration file together with the ``zigbee_fota`` snippet.
+The snippet selects board-specific FOTA partition layouts (see :ref:`zigbee_memory`), sysbuild MCUboot settings, and the matching MCUboot configuration (through ``zigbee_fota_mcuboot`` on the bootloader image).
 For example, when building from the command line, use the following command:
 
 .. parsed-literal::
    :class: highlight
 
-   west build |sample dir| -b *board_target* -- -DFILE_SUFFIX=fota -DSNIPPET=zigbee_fota_ext_flash
+   west build |sample dir| -b *board_target* -- -DFILE_SUFFIX=fota -DSNIPPET=zigbee_fota
 
 The FOTA variant enables `MCUboot image compression`_.
 The generated Zigbee update file contains a compressed MCUboot image, and MCUboot decompresses it while applying the update.
@@ -25,12 +25,14 @@ Alternatively, you can :ref:`configure Zigbee FOTA manually <ug_zigbee_configuri
 Device firmware upgrade over Bluetooth SMP
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+On the nRF54LC10 DK, SMP DFU uses the same MCUboot FOTA layout as Zigbee OTA and is **Experimental** (see :ref:`software_maturity`).
+
 To additionally enable Device Firmware Upgrade (DFU) over Bluetooth LE using the Simple Management Protocol (SMP), add ``CONFIG_ZIGBEE_BT_DFU=y`` to the FOTA build command:
 
 .. parsed-literal::
    :class: highlight
 
-   west build |sample dir| -b *board_target* -- -DFILE_SUFFIX=fota -DSNIPPET=zigbee_fota_ext_flash -DCONFIG_ZIGBEE_BT_DFU=y
+   west build |sample dir| -b *board_target* -- -DFILE_SUFFIX=fota -DSNIPPET=zigbee_fota -DCONFIG_ZIGBEE_BT_DFU=y
 
 This option enables the MCUmgr SMP server over Bluetooth LE alongside :ref:`lib_zigbee_fota`.
 
