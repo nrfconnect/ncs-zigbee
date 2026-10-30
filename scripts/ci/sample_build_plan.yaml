@@ -78,6 +78,7 @@ path_triggers:
 
   light-switch-fota:
     paths:
+      - dts/fota_internal/**
       - samples/light_switch/prj_fota.conf
     samples:
       - scenario: light_switch
@@ -175,8 +176,8 @@ path_triggers:
   # ---------------------------------------------------------------------------
   snippet-fota-ext-flash:
     paths:
-      - snippets/zigbee_fota_ext_flash/**
-      - snippets/zigbee_fota_mcuboot_ext_flash/**
+      - snippets/zigbee_fota/**
+      - snippets/zigbee_fota_mcuboot/**
     samples:
       - scenario: light_bulb
         variants:
