@@ -820,6 +820,8 @@ void zigbee_led_status_update(zb_cb_param_t param, uint32_t led_idx)
 	zb_ret_t status = ZB_GET_APP_SIGNAL_STATUS(param);
 
 	switch (sig) {
+	case ZB_BDB_SIGNAL_DEVICE_FIRST_START:
+	/* fall-through */
 	case ZB_BDB_SIGNAL_DEVICE_REBOOT:
 	/* fall-through */
 	case ZB_BDB_SIGNAL_STEERING:
