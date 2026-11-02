@@ -484,6 +484,13 @@ Rejoin Timeout
     To adjust maximum timeout for when an end device is attempting to join or rejoin a network, use the ``CONFIG_ZIGBEE_DEV_REJOIN_TIMEOUT_MS`` Kconfig option.
     This option is set to 200 seconds by default.
 
+Demo commissioning
+    To let devices without an install code join a network formed by the device as Coordinator, enable the ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option.
+    Upon reception of `ZB_ZDO_SIGNAL_SKIP_STARTUP`_, the default signal handler then sets the install code policy to ``ZB_INSTALL_CODE_NOT_REQUIRED`` and logs a warning.
+    This option is disabled by default and is insecure.
+    Use it only for demonstrations and testing, for example through the ``zigbee_demo_commissioning`` snippet.
+    See :ref:`zigbee_commissioning_security`.
+
 For detailed steps about configuring the library in a Zigbee sample or application, see :ref:`ug_zigbee_configuring_components_application_utilities`.
 
 API documentation

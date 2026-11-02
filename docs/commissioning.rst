@@ -170,6 +170,113 @@ Each Router can provide the network key to the joining device.
 This happens by using a distributed security global link key.
 The link key value is provided as a result of a successful end product certification.
 
+.. _zigbee_commissioning_security:
+
+Trust Center security policy
+----------------------------
+
+If a joining device knows only the well-known ``"ZigBeeAlliance09"`` link key, the Trust Center must encrypt the network key with that key.
+Any device in radio range that captures this exchange can then decrypt the network key.
+
+In a network with centralized security, the Coordinator acts as the Trust Center.
+When a device running the |addon| acts as the Coordinator, the ZBOSS stack applies the default high security mode for the Trust Center.
+This mode is defined by the Trust Center policies in BDB 3.1, sections 5.6.1 and 5.6.2:
+
+* Every joining device must use an install code (``requireInstallCodesOrPresetPassphrase`` set to ``0x02``).
+* Trust Center rejoins with the well-known key are not allowed (``allowRejoinsWithWellKnownKey`` set to ``FALSE``).
+* Unsecured Trust Center rejoins are not allowed.
+* Dynamic Link Key (DLK) negotiation uses only a link key derived from an install code or a unique passphrase, never the well-known key, as required by BDB 3.1, section 5.6.4.
+  If the Trust Center has no key for a device that joins using DLK, it rejects the join, even if the install code policy is disabled.
+
+As a result, a Coordinator accepts a new device only if the device install code was added on the Trust Center before the device joins.
+
+BDB 3.1, section 5.6.2 lets a Trust Center provide a backwards compatibility mode to permit legacy devices without install codes to join.
+Select this mode through a user interface.
+The Trust Center then reverts to the high security mode when the commissioning window closes.
+A Trust Center without the user interface must not change the high security policies.
+The |addon| does not provide a backwards compatibility mode.
+
+The :ref:`Zigbee samples <zigbee_samples>` use the secure default.
+For demonstrations and testing, you can build the :ref:`Network coordinator <zigbee_network_coordinator_sample>` and :ref:`Zigbee shell <zigbee_shell_sample>` samples with the ``zigbee_demo_commissioning`` snippet (``-S zigbee_demo_commissioning``).
+The snippet enables the ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option, which lets devices without an install code join using the well-known link key.
+
+Demo commissioning differs from the backward compatibility mode of BDB 3.1, section 5.6.2, in the following ways:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 40 40
+
+   * - Aspect
+     - Backward compatibility mode (BDB 3.1, section 5.6.2)
+     - Demo commissioning
+   * - How it is selected
+     - By the user, through a user interface
+     - At build time, using the ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option
+   * - When it ends
+     - When the commissioning window closes
+     - It does not end. It applies to every commissioning window while the firmware runs.
+   * - Trust Center rejoins with the well-known key
+     - Allowed during the commissioning window
+     - Not allowed
+   * - Compliance with BDB 3.1
+     - Compliant
+     - Not compliant
+
+.. note::
+   Demo commissioning does not comply with BDB 3.1.
+   Do not use it in products.
+   While the network is open, any device in radio range can join and obtain the network key, and any device that captures a join can decrypt the network key.
+
+.. _zigbee_install_code_commissioning:
+
+Commissioning devices with install codes
+----------------------------------------
+
+The Trust Center accepts a new device only if you add the device's install code to the Trust Center before the device joins.
+This section describes how to provide install codes to joining devices and to the Trust Center.
+
+Install codes on joining devices
+   Program a unique install code into each joining device as part of its :ref:`ug_zigbee_configuring_production_config`.
+   The production configuration is stored outside of the application image, so all devices can run the same firmware.
+   Do not hardcode install codes in the application, because every device programmed with the same image would then share the same install code.
+
+Install codes on the Trust Center
+   Provide the install code and the EUI-64 address of each device to the Trust Center out of band, for example through a label or QR code on the product.
+   On a Trust Center implemented with the |addon|, add them with the :c:func:`zb_secur_ic_add` function before the device joins.
+   On a Trust Center that runs the :ref:`Zigbee shell <zigbee_shell_sample>` sample, use the ``bdb ic add`` command.
+
+Joining a device using development kits
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To join a device with an install code using development kits, complete the following steps:
+
+1. Program the joining device with its application, for example the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` sample.
+
+#. Generate and program its production configuration with an install code using the :file:`scripts/zigbee_production_config.py` script, as described in :ref:`ug_zigbee_configuring_production_config`.
+   For testing, you can use the ``83FED3407A939723A5C639B26916D505C3B5`` install code.
+   Every product must have a unique install code.
+
+#. On a Coordinator that runs the :ref:`Zigbee shell <zigbee_shell_sample>` sample, form the network using the following commands:
+
+   .. code-block:: console
+
+      bdb role zc
+      bdb start
+
+#. Get the EUI-64 address of the joining device:
+
+   * If you set the ``--eui64`` parameter of the script, use that value.
+   * Otherwise, reset the joining device and read the ``long`` address in the ``Device update received`` message that the Coordinator logs.
+     The Coordinator rejects this first join attempt.
+
+#. On the Coordinator, add the install code with its CRC, as printed by the script, and the EUI-64 address:
+
+   .. code-block:: console
+
+      bdb ic add <install_code> <eui64>
+
+#. Reset the joining device.
+
 .. _zigbee_commissioning_modes_fb:
 
 Finding and Binding

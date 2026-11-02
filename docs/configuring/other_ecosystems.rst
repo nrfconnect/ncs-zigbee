@@ -30,10 +30,14 @@ Connecting Nordic device to a third-party Coordinator
   This will allow your device to scan all channels to find the Coordinator's Zigbee network.
 
 Connecting a third-party Zigbee 3.0 device to a Nordic-based Coordinator
-  If you are connecting a third-party Zigbee device that is compatible with Zigbee 3.0 to a Zigbee Coordinator that is programmed onto a Nordic Semiconductor's device, no additional configuration is needed.
+  Before a third-party Zigbee 3.0 device joins a Zigbee Coordinator running on a Nordic Semiconductor device, add the device's install code to the Coordinator.
+  If the device does not provide an install code, you must build the Coordinator with the ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option enabled.
+  This option is not secure and is intended for testing only.
+  See :ref:`zigbee_commissioning_security` for more information.
 
 Connecting a third-party Zigbee legacy device to a Nordic-based Coordinator
   If you are connecting a third-party Zigbee device that is not compatible with Zigbee 3.0 to a Zigbee Coordinator that is programmed onto a Nordic Semiconductor's device, you must enable the legacy mode on the Coordinator by calling :c:func:`zb_bdb_set_legacy_device_support`.
+  The install code requirement described for Zigbee 3.0 devices also applies.
 
 For the scenarios with the Nordic-based Coordinator, you can select the 802.15.4 channel on which the Coordinator will form the network by setting the ``CONFIG_ZIGBEE_CHANNEL`` Kconfig option.
 Alternatively, you can enable the ``CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI`` Kconfig option to allow the Coordinator to use the best channel with least RF interference.

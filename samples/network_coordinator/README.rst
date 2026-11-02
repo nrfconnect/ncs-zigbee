@@ -42,6 +42,36 @@ Configuration
 
 |config|
 
+The Network coordinator acts as the Trust Center of the network.
+By default, it uses the high security mode of the ZBOSS stack and accepts only devices whose install code was added to it before they join.
+The sample has no user interface for adding install codes.
+As a result, the :ref:`Zigbee Light bulb <zigbee_light_bulb_sample>` and :ref:`Zigbee Light switch <zigbee_light_switch_sample>` samples cannot join a Network coordinator built with the default configuration.
+
+To commission devices securely with install codes, use the :ref:`Zigbee shell <zigbee_shell_sample>` sample as the Coordinator instead.
+See :ref:`zigbee_install_code_commissioning`.
+For details about the Trust Center policy, see :ref:`zigbee_commissioning_security`.
+
+Snippets
+========
+
+Use the ``zigbee_demo_commissioning`` snippet, that enables the ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option.
+It allows devices without an install code to join the network using the well-known link key.
+The sample logs a warning at startup when this option is enabled.
+Build only the Network coordinator with this snippet.
+The joining samples do not need any changes.
+
+To build the sample with this snippet, run the following command:
+
+.. parsed-literal::
+   :class: highlight
+
+   west build samples/network_coordinator -b *board_target* -S zigbee_demo_commissioning
+
+.. note::
+   This configuration is not secure and does not comply with BDB 3.1.
+   While the network is open, any device in radio range can join and obtain the network key, and any device that captures a join can decrypt the network key.
+   Use it only for demonstrations and testing.
+
 ..
   FEM support
   ===========
@@ -124,6 +154,7 @@ Building and running
 Testing
 =======
 
+The following steps require the sample to be built with the ``zigbee_demo_commissioning`` snippet, as described in `Snippets`_.
 After programming the sample to your development kit, complete the following steps to test it:
 
 .. tabs::
