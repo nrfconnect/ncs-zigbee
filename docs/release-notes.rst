@@ -63,6 +63,7 @@ The following release is `supported <Software maturity levels_>`_.
     Cache size is controlled by ``CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE``.
   * Renamed the FOTA snippets from ``zigbee_fota_ext_flash`` and ``zigbee_fota_mcuboot_ext_flash`` to ``zigbee_fota`` and ``zigbee_fota_mcuboot``.
     One application snippet still covers all supported FOTA boards; board overlays select ``dts/ext_flash/`` or ``dts/fota_internal/`` as needed.
+  * Corrected LED assignments for the :ref:`zigbee_light_bulb_sample` and user interface references in the documentation.
 
 * Migration notes:
 
@@ -71,6 +72,8 @@ The following release is `supported <Software maturity levels_>`_.
   * Applications that target Zigbee 3.0 product certification must now explicitly set ``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22`` to ``y``.
   * Coordinators now require install codes for all joining devices by default, following the ZBOSS high-security Trust Center policy.
     Add the install code of each device on the Trust Center before it joins (see :ref:`zigbee_install_code_commissioning`), or build demonstration setups with the ``zigbee_demo_commissioning`` snippet (see :ref:`zigbee_commissioning_security`).
+  * In the :ref:`zigbee_light_bulb_sample` on nRF52 and nRF53 DKs, use LED 2 instead of LED 4 for the dimmable light output.
+    In FOTA builds of the :ref:`zigbee_light_bulb_sample`, use LED 4 instead of LED 2 for FOTA activity.
 
 .. _zigbee_release:
 

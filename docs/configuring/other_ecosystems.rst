@@ -59,16 +59,34 @@ If the following message or similar is shown, the joining was not successful:
 The connection process can fail for different reasons.
 The following instructions can help you troubleshoot the connection problem:
 
-1. Make sure that the Coordinator node is up and running.
-#. Make sure that the network is accepting new devices.
-   The most immediate way to verify this is to check if the **LED 1** on the Zigbee Coordinator node.
-   If the LED is on, the network is configured correctly and it is open to new nodes.
+.. tabs::
 
-   .. note::
-      Each ecosystem can also offer its own method for checking the network configuration.
-      For example, on the Amazon Alexa ecosystem, you can say "Alexa, find my devices".
+   .. group-tab:: nRF54 DKs
 
-#. Make sure that the device is scanning through all channels to find the Zigbee network.
-   For example, verify that the ``CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI`` Kconfig option is correctly set.
-#. Check if the device is compatible with Zigbee 3.0.
-   If it is *not* compatible, enable the legacy mode by including a call to `zb_bdb_set_legacy_device_support`_.
+      1. Make sure that the Coordinator node is up and running.
+      #. Make sure that the network is accepting new devices.
+         If the **LED 2** on the Zigbee Coordinator node lights up, the network is configured correctly.
+
+         .. note::
+            Each ecosystem offers its own method for checking the network configuration.
+            For example, on the Amazon Alexa ecosystem, you can say "Alexa, find my devices".
+
+      #. Make sure that the device is scanning through all channels to find the Zigbee network.
+         For example, verify that the ``CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI`` Kconfig option is correctly set.
+      #. Check if the device is compatible with Zigbee v3.0.
+         If it is not compatible, enable the legacy mode by including a call to `zb_bdb_set_legacy_device_support`_.
+
+   .. group-tab:: nRF52 and nRF53 DKs
+
+      1. Make sure that the Coordinator node is up and running.
+      #. Make sure that the network is accepting new devices.
+         If the **LED 3** on the Zigbee Coordinator node lights up, the network is configured correctly.
+
+         .. note::
+            Each ecosystem offers its own method for checking the network configuration.
+            For example, on the Amazon Alexa ecosystem, you can say "Alexa, find my devices".
+
+      #. Make sure that the device is scanning through all channels to find the Zigbee network.
+         For example, verify that the ``CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI`` Kconfig option is correctly set.
+      #. Check if the device is compatible with Zigbee v3.0.
+         If it is not compatible, enable the legacy mode by including a call to `zb_bdb_set_legacy_device_support`_.
