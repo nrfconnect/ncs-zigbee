@@ -199,6 +199,8 @@ This affects to all frames sent by the device, even in the network scan phase.
 
 .. note::
     The ``CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER`` Kconfig option is enabled by default and this sample's transmission power is set to 0 dBm.
+    This setting overrides the TX power from the :ref:`ug_zigbee_configuring_production_config` for the channels used by the sample.
+    To use the TX power from the production configuration, disable the ``CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER`` Kconfig option.
 
 When the ``CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_MULTI`` Kconfig option is set to ``y``, the ``CONFIG_ZIGBEE_APP_CB_QUEUE_LENGTH`` Kconfig option must be increased depending on the channel mask.
 For example, in case 16 channels are active, a proper value for ``CONFIG_ZIGBEE_APP_CB_QUEUE_LENGTH`` would be ``17``.
