@@ -99,10 +99,10 @@ extern "C" {
 /* LED immitaing dimmable light bulb - define for informational
  * purposes only.
  */
-#define BULB_LED DK_LED4
+#define BULB_LED DK_LED2
 
 #if CONFIG_ZIGBEE_FOTA
-#define OTA_ACTIVITY_LED DK_LED2
+#define OTA_ACTIVITY_LED DK_LED4
 #endif
 
 /* Button used to enter the Bulb into the Identify mode. */
@@ -116,7 +116,7 @@ extern "C" {
 #ifdef CONFIG_BOARD_NRF54LM20DONGLE
 #define PWM_DK_LED_NODE DT_NODELABEL(red_pwm_led)
 #else
-#define PWM_DK_LED_NODE DT_NODELABEL(pwm_led3)
+#define PWM_DK_LED_NODE DT_NODELABEL(pwm_led1)
 #endif /* defined CONFIG_BOARD_NRF54LM20DONGLE */
 
 #if DT_NODE_HAS_STATUS(PWM_DK_LED_NODE, okay)

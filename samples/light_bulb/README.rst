@@ -93,12 +93,12 @@ User interface
       LED 0:
           Blinks to indicate that the main application thread is running.
 
-      LED 2:
+      LED 1:
           Indicates the dimmable light option, that is changes to the light bulb brightness.
           It can be controlled by another Zigbee device in the network, for example a light switch.
           Blinks when the light bulb is in Identify mode.
 
-      LED 3:
+      LED 2:
           Turns on when the light bulb joins the network.
 
       Button 3:
@@ -118,12 +118,12 @@ User interface
       LED 0:
           Blinks to indicate that the main application thread is running.
 
-      LED 2:
+      LED 1:
           Indicates the simplified dimmable-light state described above (same position as on the **nRF54L15, nRF54L10, and nRF54LM20 DKs** tab).
           It can be controlled by another Zigbee device in the network, for example a light switch.
           Blinks when the light bulb is in Identify mode.
 
-      LED 3:
+      LED 2:
           Turns on when the light bulb joins the network.
 
       Button 3:
@@ -163,7 +163,7 @@ User interface
       LED 3:
           Turns on when the light bulb joins the network.
 
-      LED 4:
+      LED 2:
           Indicates the dimmable light option, that is changes to the light bulb brightness.
           It can be controlled by another Zigbee device in the network, for example a light switch.
           Blinks when the light bulb is in Identify mode.
@@ -219,14 +219,14 @@ After programming the samples to your devices, complete the following steps to t
 
       #. Use the buttons on the development kit that runs the :ref:`zigbee_light_switch_sample` sample to control the light bulb.
 
-         The result of using the buttons is reflected on the light bulb's **LED 2**.
+         The result of using the buttons is reflected on the light bulb's **LED 1**.
 
    .. group-tab:: nRF54LC10 DK
 
       Follow the steps in the **nRF54L15, nRF54L10, and nRF54LM20 DKs** tab, with these differences:
 
-      * When checking whether the light bulb joined the network, use **LED 3** as in that tab.
-      * When using the light switch to change brightness, watch **LED 2** on the light bulb DK.
+      * When checking whether the light bulb joined the network, use **LED 2** as in that tab.
+      * When using the light switch to change brightness, watch **LED 1** on the light bulb DK.
         Short presses and on/off behave as on other DKs; long-press dimming still updates the Level Control attribute, but the LED switches between **off** (level 0) and **on** (any level above 0) instead of fading with PWM.
 
    .. group-tab:: nRF54LM20 Dongle
@@ -277,7 +277,7 @@ After programming the samples to your devices, complete the following steps to t
 
       #. Use the buttons on the development kit that runs the :ref:`zigbee_light_switch_sample` sample to control the light bulb.
 
-         The result of using the buttons is reflected on the light bulb's **LED 4**.
+         The result of using the buttons is reflected on the light bulb's **LED 2**.
 
 You can now use buttons on the light switch to control the light bulb, as described in the :ref:`zigbee_light_switch_user_interface` section of the Light switch sample page.
 

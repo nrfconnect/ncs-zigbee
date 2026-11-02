@@ -397,7 +397,7 @@ After building the sample and programming it to your development kit, complete t
 	  When the light bulb joins the network, the **LED 3** on the light bulb device turns on to indicate that it is connected to the simple gateway.
 	  The gateway then starts discovering the On/Off cluster.
 	  When it is found, the simple gateway configures bindings and reporting for the device.
-	  It then starts sending On/Off toggle commands with a 15-second interval that toggle the **LED 4** on the light bulb on and off.
+	  It then starts sending On/Off toggle commands with a 15-second interval that toggle the **LED 2** on the light bulb on and off.
 
 Dependencies
 ************
