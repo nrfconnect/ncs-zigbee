@@ -55,11 +55,14 @@ The following release is `supported <Software maturity levels_>`_.
     Cache size is controlled by ``CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE``.
   * Renamed the FOTA snippets from ``zigbee_fota_ext_flash`` and ``zigbee_fota_mcuboot_ext_flash`` to ``zigbee_fota`` and ``zigbee_fota_mcuboot``.
     One application snippet still covers all supported FOTA boards; board overlays select ``dts/ext_flash/`` or ``dts/fota_internal/`` as needed.
+  * Corrected LED assignments for the :ref:`zigbee_light_bulb_sample` and user interface references in the documentation.
 
 * Migration notes:
 
   * FOTA builds must pass ``SNIPPET=zigbee_fota`` instead of ``zigbee_fota_ext_flash``.
     Sysbuild still remaps the MCUboot image to ``zigbee_fota_mcuboot`` automatically.
+  * In the :ref:`zigbee_light_bulb_sample` on nRF52 and nRF53 DKs, use LED 2 instead of LED 4 for the dimmable light output.
+    In FOTA builds of the :ref:`zigbee_light_bulb_sample`, use LED 4 instead of LED 2 for FOTA activity.
 
 .. _zigbee_release:
 
