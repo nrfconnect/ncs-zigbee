@@ -51,6 +51,8 @@ The following release is `supported <Software maturity levels_>`_.
 
 * Updated:
 
+  * The default Zigbee PRO core runtime behavior to R23 mode (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R23``), which is required for Zigbee 4.0 product certification.
+    R22 mode (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22``) remains available for Zigbee 3.0 product certification.
   * Improved ZBOSS NVRAM storage by batching flash writes into fewer operations.
     Cache size is controlled by ``CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE``.
   * Renamed the FOTA snippets from ``zigbee_fota_ext_flash`` and ``zigbee_fota_mcuboot_ext_flash`` to ``zigbee_fota`` and ``zigbee_fota_mcuboot``.
@@ -60,6 +62,7 @@ The following release is `supported <Software maturity levels_>`_.
 
   * FOTA builds must pass ``SNIPPET=zigbee_fota`` instead of ``zigbee_fota_ext_flash``.
     Sysbuild still remaps the MCUboot image to ``zigbee_fota_mcuboot`` automatically.
+  * Applications that target Zigbee 3.0 product certification must now explicitly set ``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22`` to ``y``.
 
 .. _zigbee_release:
 
