@@ -14,12 +14,12 @@
 
 	aliases {
 		/* Configure PWM module for led1 (LED2 on the board) */
-		pwm-led1 = &pwm_led3;
+		pwm-led1 = &pwm_led1;
 	};
 
 	pwmleds {
 		compatible = "pwm-leds";
-		pwm_led3: pwm_led_3 {
+		pwm_led1: pwm_led_1 {
 			pwms = <&pwm20 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
 		};
 	};

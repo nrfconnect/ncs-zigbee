@@ -49,6 +49,11 @@ The following release is `supported <Software maturity levels_>`_.
   * Improved ZBOSS NVRAM storage by batching flash writes into fewer operations.
     Cache size is controlled by ``CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE``.
 
+* Migration notes:
+
+  * In the :ref:`zigbee_light_bulb_sample` on nRF52 and nRF53 DKs, use LED 2 instead of LED 4 for the dimmable light output.
+    In FOTA builds of the :ref:`zigbee_light_bulb_sample`, use LED 4 instead of LED 2 for FOTA activity.
+
 .. _zigbee_release:
 
 |addon| v1.4.0 - 04/08/2026

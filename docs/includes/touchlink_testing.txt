@@ -62,6 +62,6 @@ To test Touchlink commissioning on two development kits (no Zigbee Coordinator r
       .. group-tab:: nRF52 and nRF53 DKs
 
          Use **Button 1** to turn the light bulb on and **Button 2** to turn it off.
-         **LED 4** indicates the dimmable light level.
+         **LED 2** indicates the dimmable light level.
 
 For more information on Touchlink commissioning, see :ref:`zigbee_commissioning_modes_touchlink`.
