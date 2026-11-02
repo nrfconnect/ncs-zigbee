@@ -49,6 +49,7 @@ The following release is `supported <Software maturity levels_>`_.
   * Support for the nRF54LM20 Dongle in the :ref:`zigbee_light_bulb_sample`, :ref:`zigbee_light_switch_sample`, and :ref:`zigbee_shell_sample` samples.
   * Experimental support for the nRF54LC10 DK (nRF54LC10A SoC) in the :ref:`zigbee_samples`.
   * The ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option, which lets a Coordinator accept devices without an install code (insecure, for demonstrations and testing only).
+  * The ``zigbee_demo_commissioning`` snippet, which enables the ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option.
 
 * Updated:
 
