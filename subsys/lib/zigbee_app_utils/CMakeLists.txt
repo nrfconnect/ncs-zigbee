@@ -9,3 +9,10 @@ zephyr_library_sources(zigbee_app_utils.c)
 
 zephyr_library_link_libraries(zboss)
 zephyr_library_link_libraries(zigbee)
+
+if(CONFIG_ZIGBEE_DEMO_COMMISSIONING)
+  message(WARNING "CONFIG_ZIGBEE_DEMO_COMMISSIONING is enabled: the Trust Center accepts "
+                  "devices without install codes. Any device in radio range can join the "
+                  "open network and obtain the network key. Use it only for demonstrations "
+                  "and testing, never in products.")
+endif()

@@ -35,4 +35,19 @@ config FACTORY_RESET_PRESS_TIME_SECONDS
 
 endif # ZIGBEE_FACTORY_RESET
 
+config ZIGBEE_DEMO_COMMISSIONING
+	bool "Allow joining without install codes (insecure, demo only)"
+	depends on ZIGBEE_ROLE_COORDINATOR || ZIGBEE_ROLE_ROUTER
+	help
+	  When the device acts as Trust Center, the default signal handler
+	  sets the install code policy to ZB_INSTALL_CODE_NOT_REQUIRED.
+	  Devices without an install code can then join using the
+	  well-known link key, which any device in radio range can use to
+	  obtain the network key.
+	  By default, ZBOSS requires install codes on the Trust Center.
+	  This option is not the BDB 3.1 backwards compatibility mode: it
+	  stays active across all commissioning windows until reboot.
+	  Use this option only for demonstrations and testing, never in
+	  products.
+
 endif # ZIGBEE_APP_UTILS

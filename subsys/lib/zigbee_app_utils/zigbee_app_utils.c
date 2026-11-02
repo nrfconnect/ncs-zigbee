@@ -113,6 +113,14 @@ static void skip_startup_continue(zb_cb_param_t param)
 	zboss_start_continue();
 }
 
+#if defined(CONFIG_ZIGBEE_DEMO_COMMISSIONING) && defined(ZB_SECURITY_INSTALLCODES)
+static void demo_commissioning_apply(void)
+{
+	LOG_WRN("Demo commissioning: joining without install codes allowed, not for products");
+	ZB_ERROR_CHECK(zb_set_installcode_policy(ZB_INSTALL_CODE_NOT_REQUIRED));
+}
+#endif
+
 /* A ZBOSS internal API needed for workaround for KRKNWK-14112 */
 struct zb_aps_device_key_pair_set_s ZB_PACKED_PRE
 {
@@ -308,6 +316,14 @@ zb_ret_t zigbee_default_signal_handler(zb_cb_param_t param)
 			zb_zcl_set_backward_compatible_statuses_mode(ZB_ZCL_STATUSES_ZCL8_MODE));
 		stack_initialised = true;
 		LOG_INF("Zigbee stack initialized");
+#if defined(CONFIG_ZIGBEE_DEMO_COMMISSIONING) && defined(ZB_SECURITY_INSTALLCODES)
+		/* Must run after the coordinator role is set, because setting it
+		 * re-applies the ZBOSS high-security Trust Center policy.
+		 */
+		if (role == ZB_NWK_DEVICE_TYPE_COORDINATOR) {
+			demo_commissioning_apply();
+		}
+#endif
 		ZB_SCHEDULE_APP_CALLBACK(skip_startup_continue, 0);
 		break;
 
