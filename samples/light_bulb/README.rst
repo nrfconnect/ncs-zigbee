@@ -112,7 +112,7 @@ User interface
       LED 3:
           Turns on when the light bulb joins the network.
 
-      LED 4:
+      LED 2:
           Indicates the dimmable light option, that is changes to the light bulb brightness.
           It can be controlled by another Zigbee device in the network, for example a light switch.
           Blinks when the light bulb is in Identify mode.
@@ -190,7 +190,7 @@ After programming the sample to your development kits, complete the following st
 
       #. Use the buttons on the development kit that runs the :ref:`zigbee_light_switch_sample` sample to control the light bulb.
 
-         The result of using the buttons is reflected on the light bulb's **LED 4**.
+         The result of using the buttons is reflected on the light bulb's **LED 2**.
 
 You can now use buttons on the light switch to control the light bulb, as described in the :ref:`zigbee_light_switch_user_interface` section of the Light switch sample page.
 
