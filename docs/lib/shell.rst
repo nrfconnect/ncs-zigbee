@@ -338,6 +338,11 @@ bdb ic policy
 
 Set the trust center install code policy.
 
+The install code policy is enabled by default.
+Disabling it lets devices without an install code join using the well-known link key, which is insecure.
+The policy stays disabled until it is enabled again or the device reboots, so it is not the backwards compatibility mode defined in BDB 3.1, section 5.6.2.
+See :ref:`zigbee_commissioning_security`.
+
 .. parsed-literal::
    :class: highlight
 

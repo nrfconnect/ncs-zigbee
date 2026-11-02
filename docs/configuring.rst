@@ -187,52 +187,87 @@ At the end of the configuration process, you can check the EUI-64 value using :r
 Production configuration
 ========================
 
-The ZBOSS stack reads the production configuration from the ``zboss_product_config`` partition at startup, right after it reads the ZBOSS NVRAM and before it signals `ZB_ZDO_SIGNAL_SKIP_STARTUP`_.
-The values from the production configuration override the corresponding values stored in the NVRAM.
-The production configuration is stored separately from the application image, so you can program different values on each device that runs the same firmware.
-It can provide the following device-specific data:
+The production configuration contains device-specific data, such as the install code and EUI-64 address.
+It is stored in the ``zboss_product_config`` partition, separately from the application image, so devices that run the same firmware can have different values.
+Every device must have a unique install code or passcode.
 
-* The install code of a joining device.
-  The install code is ignored when the device acts as the Trust Center.
-* The Zigbee R23 PAKE passcode of a joining device, which the Trust Center can use instead of the install code for the Dynamic Link Key negotiation.
-  The passcode is ignored when the device acts as the Trust Center.
-* The EUI-64 address, which takes precedence over the :ref:`ug_zigbee_configuring_eui64`.
-* The 2.4 GHz channel mask, which takes precedence over the options described in `Device operational channel`_.
-* The TX power for the 2.4 GHz channels, for example to apply a per-device calibration.
-  Without it, the stack uses its default TX power of +20 dBm, limited to the highest TX power supported by the radio.
-  TX power set by the application at runtime with ``zb_set_tx_power_async()`` overrides the production configuration, for example in the :ref:`Light switch <zigbee_light_switch_sample>` sample with the ``CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER`` Kconfig option.
-* Application-specific data of up to 128 bytes, for example a serial number.
-  The stack passes this data to the application with the `ZB_ZDO_SIGNAL_PRODUCTION_CONFIG_READY`_ signal.
-  To use it, handle the signal in the application before calling the :ref:`lib_zigbee_signal_handler`.
+At startup, the ZBOSS stack reads the production configuration after it reads the ZBOSS NVRAM and before it signals `ZB_ZDO_SIGNAL_SKIP_STARTUP`_.
+Values in the production configuration override the corresponding values stored in the NVRAM.
+
+Production configuration contents
+---------------------------------
+
+The production configuration can contain the following data:
+
+* Install code — Used when the device joins a network.
+* Zigbee R23 PAKE passcode — Used when the device joins a network, as an alternative to the install code for Dynamic Link Key (DLK) negotiation.
+* EUI-64 address — Takes precedence over the :ref:`ug_zigbee_configuring_eui64`.
+* 2.4 GHz channel mask — Takes precedence over the options described in `Device operational channel`_.
+* TX power for the 2.4 GHz channels — For example, to apply a per-device calibration.
+  If it is not set, the stack uses its default TX power of +20 dBm, limited to the highest TX power that the radio supports.
+  TX power that the application sets at runtime with :c:func:`zb_set_tx_power_async` overrides this value.
+  For example, the :ref:`Light switch <zigbee_light_switch_sample>` sample does this when the ``CONFIG_LIGHT_SWITCH_CONFIGURE_TX_POWER`` Kconfig option is enabled.
+* Application-specific data — Up to 128 bytes, for example a serial number.
+  The stack passes this data to the application in the `ZB_ZDO_SIGNAL_PRODUCTION_CONFIG_READY`_ signal.
+  To use it, handle this signal in your application's signal handler before passing the remaining signals to the :ref:`lib_zigbee_signal_handler`.
+
+The stack ignores the install code and passcode when the device acts as the Trust Center.
+
+Generating a production configuration
+-------------------------------------
 
 To generate a production configuration, use the :file:`scripts/zigbee_production_config.py` script from the |addon| repository.
 The script reads the partition address from the build directory of the application and writes an Intel HEX file that contains only the production configuration.
 
-Complete the following steps to program a production configuration:
+The script accepts the following parameters.
+You must provide the build directory and at least one value to store.
+To list all parameters, run the script with ``--help``.
+
+``-d`` *build_dir*
+   The build directory of the application.
+   Required.
+
+``--install-code`` *install_code*
+   The 128-bit install code as printed on the product label, with or without its CRC.
+   The script validates the CRC if you provide it, or calculates it if you do not.
+   To use the grouped format of the BDB Specification, enclose the value in quotes, because it contains spaces.
+   For example: ``"83FE D340 7A93 9723 A5C6 39B2 6916 D505 C3B5"``.
+
+``--qr-code`` *qr_code*
+   A QR code string that follows the Zigbee Alliance QR Code Requirements (document 18-01000).
+   Use it instead of ``--install-code`` and ``--eui64``.
+   Enclose the string in single quotes so that the shell does not interpret the ``$`` character.
+   For example: ``'Z:0123456789ABCDEF$I:023047432043AF3456FEB23452423423621A'``.
+
+``--passcode`` *setup_code*
+   The Zigbee R23 PAKE passcode, as the setup code printed on the product, using the encoding described in section 6.12.1 of the BDB Specification v3.1.
+   For example: ``U4DXS2``.
+
+``--eui64`` *eui64*
+   The EUI-64 address to assign to the device, most significant byte first.
+   Omit it to keep the EUI-64 address configured by the application.
+
+``-o`` *output_file*
+   The output Intel HEX file.
+
+The script prints the install code with its CRC.
+This is the format that the Trust Center requires.
+
+Programming a production configuration
+--------------------------------------
+
+Complete the following steps:
 
 1. Build and program the application.
-#. Generate the production configuration for the device.
-   Replace *build_dir* with the build directory of the application, *install_code* with the install code of the device, and *eui64* with the EUI-64 address of the device, most significant byte first:
+#. Generate the production configuration.
+   Replace *build_dir*, *install_code*, and *eui64* with your values:
 
    .. parsed-literal::
       :class: highlight
 
       python3 scripts/zigbee_production_config.py -d *build_dir* --install-code *install_code* --eui64 *eui64* -o zboss_production_config.hex
 
-   Provide the 128-bit install code as printed on the product label, with or without its CRC.
-   To use the grouped format of the Base Device Behavior specification, for example ``"83FE D340 7A93 9723 A5C6 39B2 6916 D505 C3B5"``, enclose it in quotes.
-   The script validates or calculates the CRC, and prints the install code with its CRC, which is the format required by the :c:func:`zb_secur_ic_add` function on the Trust Center.
-
-   If the product has a QR code that follows the Zigbee Alliance QR Code Requirements (document 18-01000), you can replace the ``--install-code`` and ``--eui64`` parameters with the ``--qr-code`` parameter followed by the QR code string, enclosed in single quotes, for example ``--qr-code 'Z:0123456789ABCDEF$I:023047432043AF3456FEB23452423423621A'``.
-
-   To provide a Zigbee R23 PAKE passcode, use the ``--passcode`` parameter followed by the setup code printed on the product, using the encoding described in the Base Device Behavior specification v3.1, section 6.12.1, for example ``U4DXS2``.
-
-   All parameters except the build directory are optional, but you must provide at least one of them.
-   The ``--eui64`` parameter is required only if you want to replace the EUI-64 address of the device.
-   To keep the EUI-64 address configured by the application, omit it and read the address with the ``zdo eui64`` command of the :ref:`lib_zigbee_shell` or from the device label.
-   Run the script with the ``--help`` parameter to list all options.
-
-#. Program the production configuration without erasing the application.
+#. Program the production configuration without erasing the application, and reset the device.
    Replace *serial_number* with the serial number of your debugger:
 
    .. parsed-literal::
@@ -241,23 +276,23 @@ Complete the following steps to program a production configuration:
       nrfutil device program --serial-number *serial_number* --firmware zboss_production_config.hex --options chip_erase_mode=ERASE_RANGES_TOUCHED_BY_FIRMWARE,verify=VERIFY_READ
       nrfutil device reset --serial-number *serial_number*
 
-When the stack loads the production configuration, the :ref:`lib_zigbee_signal_handler` logs ``Production configuration successfully loaded``.
-The ``zdo eui64`` command of the :ref:`lib_zigbee_shell` shows the EUI-64 address from the production configuration only after the Zigbee stack is started.
+#. Check that the :ref:`lib_zigbee_signal_handler` logs ``Production configuration successfully loaded``.
+
+#. To add the device to the Trust Center, you need its EUI-64 address.
+   If you did not set ``--eui64``, read the address from the device label, or start the Zigbee stack and run the ``zdo eui64`` command of the :ref:`lib_zigbee_shell`.
+   The command shows the address from the production configuration only after the stack has started.
+   To add the install code or passcode to the Trust Center, see :ref:`zigbee_install_code_commissioning`.
 
 .. note::
    The ``west flash`` command keeps the production configuration, unless you use the ``--erase`` option or recover the device.
-   In that case, program the production configuration again.
+   In those cases, program the production configuration again.
 
 .. note::
-   You cannot program a production configuration on the nRF54LM20 Dongle.
-   The dongle can only be programmed through its bootloader, which writes only the application image.
-   To test samples on the dongle, build the Coordinator with the ``zigbee_demo_commissioning`` snippet, or, on the :ref:`Zigbee shell <zigbee_shell_sample>` sample, set the install code or passcode with the ``bdb ic set`` command.
+   You cannot program a production configuration on the nRF54LM20 Dongle, because its bootloader writes only the application image.
+   To use the dongle as a joining device, do one of the following:
 
-Every device must have a unique install code or passcode.
-Provide the install code or passcode and the EUI-64 address of each device to the Trust Center out of band, for example through a label or QR code on the product.
-On a Trust Center implemented with the |addon|, add a passcode with the :c:func:`zb_secur_ic_add` function and the ``ZB_IC_TYPE_PASSCODE`` type.
-The ``bdb ic add`` command of the :ref:`lib_zigbee_shell` supports only 128-bit install codes.
-See :ref:`zigbee_commissioning_security`.
+   * Build the Coordinator with the ``zigbee_demo_commissioning`` snippet.
+   * If the dongle runs the :ref:`Zigbee shell <zigbee_shell_sample>` sample, set its install code or passcode with the ``bdb ic set`` command.
 
 ZBOSS stack start options
 =========================

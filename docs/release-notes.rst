@@ -51,6 +51,7 @@ The following release is `supported <Software maturity levels_>`_.
   * The ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option, which lets a Coordinator accept devices without an install code (insecure, for demonstrations and testing only).
   * The ``zigbee_demo_commissioning`` snippet, which enables the ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option.
   * The :ref:`ug_zigbee_tools_production_config` script, which generates the ZBOSS production configuration of a device, including its install code or passcode from the product label or QR code.
+  * The :ref:`zigbee_commissioning_security` section describing the Trust Center security policy.
 
 * Updated:
 
@@ -66,6 +67,8 @@ The following release is `supported <Software maturity levels_>`_.
   * FOTA builds must pass ``SNIPPET=zigbee_fota`` instead of ``zigbee_fota_ext_flash``.
     Sysbuild still remaps the MCUboot image to ``zigbee_fota_mcuboot`` automatically.
   * Applications that target Zigbee 3.0 product certification must now explicitly set ``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22`` to ``y``.
+  * Coordinators now require install codes for all joining devices by default, following the ZBOSS high-security Trust Center policy.
+    Add the install code of each device on the Trust Center before it joins (see :ref:`zigbee_install_code_commissioning`), or build demonstration setups with the ``zigbee_demo_commissioning`` snippet (see :ref:`zigbee_commissioning_security`).
 
 .. _zigbee_release:
 

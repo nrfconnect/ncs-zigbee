@@ -189,6 +189,9 @@ Building and running
 Testing
 =======
 
+Build the :ref:`Network coordinator <zigbee_network_coordinator_sample>` sample with the ``zigbee_demo_commissioning`` snippet, so that it accepts devices without an install code (see :ref:`zigbee_commissioning_security`).
+To join with an install code instead, see :ref:`zigbee_install_code_commissioning`.
+
 After programming the samples to your devices, complete the following steps to test them:
 
 .. tabs::

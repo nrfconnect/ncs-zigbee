@@ -161,12 +161,20 @@ Testing
 
 In this testing procedure, both of the development kits are programmed with the Zigbee Shell sample.
 One of these samples acts as Zigbee Coordinator, the other one as Zigbee Router.
+The Router joins the network using an install code, as required by the default Trust Center policy (see :ref:`zigbee_commissioning_security`).
 
 After building the sample and programming it to your development kits, complete the following steps to test it:
 
 #. Turn on the development kits.
 #. Set up the serial connection with the development kits using one of the `Available shell interfaces`_.
-#. To set one shell device to work as coordinator, run the following shell command:
+#. On the second board, read its EUI64 address and set its install code:
+
+   .. code-block::
+
+      zdo eui64
+      bdb ic set 83FED3407A939723A5C639B26916D505C3B5
+
+#. To set the first shell device to work as coordinator, run the following shell command:
 
    .. code-block::
 
@@ -178,6 +186,17 @@ After building the sample and programming it to your development kits, complete 
    .. code-block::
 
       bdb start
+
+#. Add the install code of the second board on the shell coordinator node, using the EUI64 address read earlier:
+
+   .. parsed-literal::
+      :class: highlight
+
+      bdb ic add 83FED3407A939723A5C639B26916D505C3B5 *eui64*
+
+   .. note::
+      To let devices without an install code join instead, build the shell coordinator node with the ``zigbee_demo_commissioning`` snippet (not secure, use it for demonstrations and testing only), or run ``bdb ic policy disable`` on it.
+      See :ref:`zigbee_commissioning_security`.
 
 #. Run the following command on the second board programmed with the Shell sample:
 
