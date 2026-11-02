@@ -476,15 +476,16 @@ config ZIGBEE_PRO_CORE_BEHAVIOR_R22
 	  before the ZBOSS thread is started. The stack uses legacy R22
 	  joining (classic association and transport-key flow).
 
-	  R22 mode is required to certify a Zigbee 3.0 product on an
+	  Select R22 mode only to certify a Zigbee 3.0 product on an
 	  R23-compliant platform.
 
 config ZIGBEE_PRO_CORE_BEHAVIOR_R23
 	bool "R23 mode"
 	help
 	  The stack keeps the native R23 behavior (NWK Commissioning
-	  followed by Dynamic Link Key negotiation). This mode is not
-	  suitable for Zigbee 3.0 product certification on R23 platforms.
+	  followed by Dynamic Link Key negotiation). This mode is required
+	  for Zigbee 4.0 product certification. It is not suitable for
+	  Zigbee 3.0 product certification on R23 platforms.
 
 endchoice
 

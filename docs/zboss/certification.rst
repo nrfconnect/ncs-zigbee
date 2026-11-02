@@ -33,10 +33,13 @@ To certify a host and NCP solution, contact the `ZBOSS Open Initiative (ZOI)`_.
 
 .. _zboss_certification_r22_mode:
 
-R22 behavior mode for Zigbee 3.0 product certification
-******************************************************
+Core behavior mode for Zigbee 4.0 and Zigbee 3.0 product certification
+**********************************************************************
 
-This page explains why Zigbee 3.0 products built on the Zigbee PRO R23 and R23.2 platforms must run the core stack in R22 behavior mode during certification, and how the |addon| applies this mode by default.
+Zigbee 4.0 products run the Zigbee PRO R23.2 core in native R23 behavior mode.
+This is the default in the |addon| (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R23``).
+
+The following section explains why Zigbee 3.0 products built on the Zigbee PRO R23 and R23.2 platforms must run the core stack in R22 behavior mode during certification, and how to select this mode in the |addon|.
 
 .. include:: /includes/zigbee_r22_certification_note.txt
 
@@ -50,8 +53,7 @@ For Zigbee 3.0 product certification, CSA requires the R23 core to run in R22 be
 As of late 2025, the PRO Core TSG determined that Zigbee 3.0 devices based on the R23 stack must operate the core in R22 mode (originally defined for Test Harness use in the R23 Platform Test Specification).
 The same requirement applies to both R23 and R23.2 specification versions.
 
-R22 behavior mode is therefore the default in the |addon|.
-The add-on applies it automatically through the Zigbee PRO core runtime behavior Kconfig choice (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22``).
+To certify a Zigbee 3.0 product, select R22 mode in the Zigbee PRO core runtime behavior Kconfig choice (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22``).
 See :ref:`zigbee_ug_r22_behavior` for configuration details.
 
 When certifying a Zigbee 3.0 product, declare R23.2 as the core version.
