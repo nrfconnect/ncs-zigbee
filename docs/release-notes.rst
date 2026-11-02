@@ -50,6 +50,7 @@ The following release is `supported <Software maturity levels_>`_.
   * Experimental support for the nRF54LC10 DK (nRF54LC10A SoC) in the :ref:`zigbee_samples`.
   * The ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option, which lets a Coordinator accept devices without an install code (insecure, for demonstrations and testing only).
   * The ``zigbee_demo_commissioning`` snippet, which enables the ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option.
+  * The :ref:`ug_zigbee_tools_production_config` script, which generates the ZBOSS production configuration of a device, including its install code or passcode from the product label or QR code.
 
 * Updated:
 

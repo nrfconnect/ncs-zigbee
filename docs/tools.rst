@@ -45,6 +45,16 @@ See :ref:`release_notes` for those versions.
 
 |zigbee_ncp_host_dev_only|
 
+.. _ug_zigbee_tools_production_config:
+
+Production configuration generator
+**********************************
+
+The :file:`scripts/zigbee_production_config.py` script generates the ZBOSS production configuration of a device, which contains, for example, its install code and EUI-64 address.
+Unlike the other tools on this page, you can use it to provision production devices.
+
+See :ref:`ug_zigbee_configuring_production_config` for documentation.
+
 .. _ug_zigbee_tools_logger_endpoint:
 
 Zigbee endpoint logger
