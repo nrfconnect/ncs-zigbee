@@ -5,13 +5,12 @@
 #
 
 # Global SNIPPET/SB_SNIPPET is applied to every sysbuild image. Some addon
-# snippets target the application only and need a different MCUboot counterpart.
-# This hook remaps those pairs on the mcuboot image so builds can pass a single
-# -DSNIPPET=<app_snippet>. Extend the list below as <app_snippet> <mcuboot_snippet>.
+# snippets target the application only: they are removed from the other images,
+# and some of them need a different MCUboot counterpart. This hook adjusts the
+# snippets of those images so builds can pass a single -DSNIPPET=<app_snippet>.
+# Extend the lists below as needed.
 function(${SYSBUILD_CURRENT_MODULE_NAME}_pre_cmake)
-  if(NOT SB_CONFIG_BOOTLOADER_MCUBOOT)
-    return()
-  endif()
+  cmake_parse_arguments(PRE_CMAKE "" "" "IMAGES" ${ARGN})
 
   zephyr_get(SB_SNIPPET)
   if(SB_SNIPPET)
@@ -21,32 +20,52 @@ function(${SYSBUILD_CURRENT_MODULE_NAME}_pre_cmake)
     set(global_snippets ${SNIPPET})
   endif()
 
-  # Extend this list as needed.
+  set(app_only_snippets
+    zigbee_demo_commissioning
+  )
+
+  # <app_snippet> <mcuboot_snippet> pairs.
   set(app_mcuboot_snippet_pairs
     zigbee_fota zigbee_fota_mcuboot
   )
 
-  set(mcuboot_snippets ${global_snippets})
-  set(remapped FALSE)
-  list(LENGTH app_mcuboot_snippet_pairs pair_count)
-  math(EXPR last_pair_idx "${pair_count} - 2")
-  foreach(idx RANGE 0 ${last_pair_idx} 2)
-    list(GET app_mcuboot_snippet_pairs ${idx} app_snippet)
-    math(EXPR mcuboot_idx "${idx} + 1")
-    list(GET app_mcuboot_snippet_pairs ${mcuboot_idx} mcuboot_snippet)
+  foreach(image ${PRE_CMAKE_IMAGES})
+    if(image STREQUAL DEFAULT_IMAGE)
+      continue()
+    endif()
 
-    if(app_snippet IN_LIST global_snippets)
-      set(remapped TRUE)
-      list(REMOVE_ITEM mcuboot_snippets ${app_snippet})
-      if(NOT mcuboot_snippet IN_LIST mcuboot_snippets)
-        list(APPEND mcuboot_snippets ${mcuboot_snippet})
+    set(image_snippets ${global_snippets})
+    set(changed FALSE)
+
+    foreach(app_snippet ${app_only_snippets})
+      if(app_snippet IN_LIST image_snippets)
+        set(changed TRUE)
+        list(REMOVE_ITEM image_snippets ${app_snippet})
       endif()
+    endforeach()
+
+    if(image STREQUAL "mcuboot" AND SB_CONFIG_BOOTLOADER_MCUBOOT)
+      list(LENGTH app_mcuboot_snippet_pairs pair_count)
+      math(EXPR last_pair_idx "${pair_count} - 2")
+      foreach(idx RANGE 0 ${last_pair_idx} 2)
+        list(GET app_mcuboot_snippet_pairs ${idx} app_snippet)
+        math(EXPR mcuboot_idx "${idx} + 1")
+        list(GET app_mcuboot_snippet_pairs ${mcuboot_idx} mcuboot_snippet)
+
+        if(app_snippet IN_LIST global_snippets)
+          set(changed TRUE)
+          list(REMOVE_ITEM image_snippets ${app_snippet})
+          if(NOT mcuboot_snippet IN_LIST image_snippets)
+            list(APPEND image_snippets ${mcuboot_snippet})
+          endif()
+        endif()
+      endforeach()
+    endif()
+
+    if(changed)
+      set(${image}_SNIPPET "${image_snippets}" CACHE STRING "" FORCE)
     endif()
   endforeach()
-
-  if(remapped)
-    set(mcuboot_SNIPPET ${mcuboot_snippets} CACHE STRING "" FORCE)
-  endif()
 endfunction()
 
 function(${SYSBUILD_CURRENT_MODULE_NAME}_post_cmake)
