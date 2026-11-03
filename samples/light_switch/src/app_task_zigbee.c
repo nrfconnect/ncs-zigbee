@@ -530,6 +530,7 @@ static void light_switch_send_on_off(zb_cb_param_t param)
  *                           will be used to construct step request.
  * @param[in]   cmd_id       ZCL command id.
  */
+#if !defined(CONFIG_BOARD_NRF54LM20DONGLE) || CONFIG_BT_NUS
 static void light_switch_send_step(zb_cb_param_t param)
 {
 	zb_bufid_t bufid = ZB_UNPACK_BUF_REF(param);
@@ -554,6 +555,7 @@ static void light_switch_send_step(zb_cb_param_t param)
 					   DIMM_STEP,
 					   DIMM_TRANSACTION_TIME);
 }
+#endif
 
 /**@brief Callback function receiving finding procedure results.
  *
