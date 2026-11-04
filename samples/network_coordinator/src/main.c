@@ -16,6 +16,7 @@
 #include <zboss_api.h>
 #include <zigbee/zigbee_error_handler.h>
 #include <zigbee/zigbee_app_utils.h>
+#include <zigbee/zigbee_app_io_shell.h>
 #include <zb_nrf_platform.h>
 
 
@@ -110,7 +111,7 @@ static void toggle_identify_led(zb_cb_param_t param)
 {
 	static int blink_status;
 
-	dk_set_led(IDENTIFY_LED, (++blink_status) % 2);
+	zigbee_app_io_set_led(IDENTIFY_LED, (++blink_status) % 2);
 	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, param, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
 }
 
@@ -130,7 +131,7 @@ static void identify_cb(zb_cb_param_t param)
 		zb_err_code = ZB_SCHEDULE_APP_ALARM_CANCEL(toggle_identify_led, ZB_ALARM_ANY_PARAM);
 		ZVUNUSED(zb_err_code);
 
-		dk_set_led(IDENTIFY_LED, 0);
+		zigbee_app_io_set_led(IDENTIFY_LED, 0);
 	}
 }
 
@@ -177,7 +178,7 @@ static void steering_finished(zb_cb_param_t param)
 	ARG_UNUSED(param);
 
 	LOG_INF("Network steering finished");
-	dk_set_led_off(ZIGBEE_NETWORK_STATE_LED);
+	zigbee_app_io_set_led_off(ZIGBEE_NETWORK_STATE_LED);
 }
 
 /**@brief Callback for button events.
@@ -236,6 +237,8 @@ static void configure_gpio(void)
 	if (err) {
 		LOG_ERR("Cannot init LEDs (err: %d)", err);
 	}
+
+	zigbee_app_io_shell_init(button_changed);
 }
 
 /**@brief Zigbee stack event handler.
@@ -320,9 +323,9 @@ void zboss_signal_handler(zb_cb_param_t param)
 	if (ZB_JOINED() &&
 	    (ZB_SCHEDULE_GET_ALARM_TIME(steering_finished, ZB_ALARM_ANY_PARAM,
 					&timeout_bi) == RET_OK)) {
-		dk_set_led_on(ZIGBEE_NETWORK_STATE_LED);
+		zigbee_app_io_set_led_on(ZIGBEE_NETWORK_STATE_LED);
 	} else {
-		dk_set_led_off(ZIGBEE_NETWORK_STATE_LED);
+		zigbee_app_io_set_led_off(ZIGBEE_NETWORK_STATE_LED);
 	}
 
 	/*
@@ -358,7 +361,7 @@ int main(void)
 	LOG_INF("Zigbee R23 Network Coordinator application started");
 
 	while (1) {
-		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
+		zigbee_app_io_set_led(RUN_STATUS_LED, (++blink_status) % 2);
 		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
 	}
 }
