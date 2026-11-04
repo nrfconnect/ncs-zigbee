@@ -23,6 +23,7 @@
 #include <zboss_api_addons.h>
 #include <zboss_api_zcl.h>
 #include <zigbee/zigbee_app_utils.h>
+#include <zigbee/zigbee_app_io_shell.h>
 #include <zigbee/zigbee_error_handler.h>
 #include <zb_nrf_platform.h>
 #include "zb_dimmer_switch.h"
@@ -138,9 +139,9 @@ static inline void led_set(uint32_t led, uint32_t val) { ARG_UNUSED(led); ARG_UN
 static inline void led_set_on(uint32_t led) { ARG_UNUSED(led); }
 static inline void led_set_off(uint32_t led) { ARG_UNUSED(led); }
 #else
-static inline void led_set(uint32_t led, uint32_t val) { dk_set_led(led, val); }
-static inline void led_set_on(uint32_t led) { dk_set_led_on(led); }
-static inline void led_set_off(uint32_t led) { dk_set_led_off(led); }
+static inline void led_set(uint32_t led, uint32_t val) { zigbee_app_io_set_led(led, val); }
+static inline void led_set_on(uint32_t led) { zigbee_app_io_set_led_on(led); }
+static inline void led_set_off(uint32_t led) { zigbee_app_io_set_led_off(led); }
 #endif
 
 struct bulb_context {
@@ -439,6 +440,8 @@ static void configure_gpio(void)
 		LOG_ERR("Cannot init LEDs (err: %d)", err);
 	}
 #endif
+
+	zigbee_app_io_shell_init(button_handler);
 }
 
 static void alarm_timers_init(void)
@@ -666,7 +669,7 @@ static void light_switch_button_handler(struct k_timer *timer)
 #if defined(CONFIG_BOARD_NRF54LM20DONGLE)
 	ARG_UNUSED(timer);
 
-	if (dk_get_buttons() & buttons_ctx.state) {
+	if (zigbee_app_io_get_buttons() & buttons_ctx.state) {
 		atomic_set(&buttons_ctx.long_poll, ZB_TRUE);
 		ZB_SCHEDULE_APP_CALLBACK(start_identifying, 0);
 	}
@@ -674,7 +677,7 @@ static void light_switch_button_handler(struct k_timer *timer)
 	zb_ret_t zb_err_code;
 	zb_uint16_t cmd_id;
 
-	if (dk_get_buttons() & buttons_ctx.state) {
+	if (zigbee_app_io_get_buttons() & buttons_ctx.state) {
 		atomic_set(&buttons_ctx.long_poll, ZB_TRUE);
 		if (buttons_ctx.state == BUTTON_ON) {
 			cmd_id = ZB_ZCL_LEVEL_CONTROL_STEP_MODE_UP;
@@ -1017,7 +1020,7 @@ int ZigbeeStart(void)
 #if defined(CONFIG_LIGHT_SWITCH_LOW_POWER)
 	bool enable_sleepy = true;
 #else
-	bool enable_sleepy = (dk_get_buttons() & BUTTON_SLEEPY) ? true : false;
+	bool enable_sleepy = (zigbee_app_io_get_buttons() & BUTTON_SLEEPY) ? true : false;
 #endif
 
 	if (enable_sleepy) {

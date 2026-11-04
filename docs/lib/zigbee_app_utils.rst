@@ -13,6 +13,7 @@ Zigbee application utilities library provides a set of components that are ready
 * API for parsing and converting Zigbee data types.
   Available functions are listed in :file:`include/zigbee/zigbee_app_utils.h`.
 * :c:func:`zigbee_led_status_update` for indicating the status of the device in a network using LEDs.
+* :ref:`lib_zigbee_app_io_shell` for simulating button presses and reading LED states from the shell.
 
 .. note::
     Links to ZBOSS functions and signals on this page point to ZBOSS `API documentation`_.
@@ -456,6 +457,67 @@ Use the following code as reference, with a call to :c:func:`zigbee_default_sign
         }
     }
 
+.. _lib_zigbee_app_io_shell:
+
+Button and LED shell commands
+******************************
+
+The button and LED shell provides the ``app_io`` shell command.
+Use this command to simulate button presses and read the states of buttons and LEDs.
+
+To enable the button and LED shell in an application, complete the following steps:
+
+1. Enable the ``CONFIG_ZIGBEE_APP_IO_SHELL`` Kconfig option.
+   The option depends on the ``CONFIG_SHELL`` and ``CONFIG_DK_LIBRARY`` Kconfig options.
+#. Call :c:func:`zigbee_app_io_shell_init` after ``dk_buttons_init()``.
+   Pass the button handler that you passed to ``dk_buttons_init()``.
+#. Call :c:func:`zigbee_app_io_get_buttons` instead of ``dk_get_buttons()`` wherever the application checks whether a button is still pressed, such as when detecting a long press.
+   This function also reports simulated presses.
+#. Call :c:func:`zigbee_app_io_set_led` instead of ``dk_set_led()`` to set the LEDs.
+   The shell records the LED changes made with this function.
+
+The ``app_io`` command supports the following subcommands:
+
+``app_io button press <id>``
+    Presses and immediately releases the button with the specified ID.
+
+``app_io button hold <id> <time_ms>``
+    Holds the button with the specified ID for the specified time.
+    The maximum hold time is 60000 ms.
+
+``app_io button get <id>``
+    Prints the state of the button with the specified ID.
+    The command prints ``1`` for pressed and ``0`` for released.
+
+``app_io led get <id>``
+    Prints the state of the LED with the specified ID.
+    The command prints ``1`` for on and ``0`` for off.
+
+``app_io led get_toggle_rate <id>``
+    Prints the average time in milliseconds between the last four changes of the LED with the specified ID.
+    The command prints ``0`` if the LED is not blinking, that is, if the LED has changed fewer than four times or has not changed for more than two intervals.
+    The command reports only the changes made with :c:func:`zigbee_app_io_set_led`.
+
+``app_io pwm get <id>``
+    Prints the PWM level in percent, from ``0`` to ``100``, of the PWM LED with the specified ID.
+
+``app_io pwm get_toggle_rate <id>``
+    Prints the average time in milliseconds between the last four on and off changes of the PWM LED with the specified ID.
+    The PWM LED is on if its PWM level is greater than ``0``.
+    The command prints ``0`` if the PWM LED is not blinking.
+
+The ``app_io pwm`` commands are available only if the ``CONFIG_PWM`` Kconfig option is enabled.
+They report only the changes made with :c:func:`zigbee_app_io_set_pwm`.
+
+Button, LED, and PWM LED IDs start at 0.
+The IDs follow the order of the ``buttons`` and ``leds`` devicetree nodes, as in the DK Buttons and LEDs library.
+The PWM LED IDs follow the order of the ``pwmleds`` devicetree node children whose PWM controller is enabled.
+
+Simulated presses have the following behavior:
+
+* The shell passes simulated presses to the application button handler from the system workqueue, as the DK Buttons and LEDs library does for physical button presses.
+* Only one simulated press can be active at a time.
+
 .. _lib_zigbee_application_utilities_options:
 
 Configuration
@@ -475,6 +537,11 @@ Factory reset button
     This option is set to 5 seconds by default.
 
     For more information about the factory reset, see the `Resetting to factory defaults`_ section in the ZBOSS stack documentation.
+
+Button and LED shell
+    To enable the ``app_io`` shell command, use the ``CONFIG_ZIGBEE_APP_IO_SHELL`` Kconfig option.
+    This option is disabled by default.
+    See :ref:`lib_zigbee_app_io_shell`.
 
 Trust Center Rejoin
     To enable the Trust Center Rejoin feature, use the ``CONFIG_ZIGBEE_TC_REJOIN_ENABLED`` Kconfig option.
@@ -500,4 +567,10 @@ API documentation
 | Source file: :file:`subsys/lib/zigbee_app_utils/zigbee_app_utils.c`
 
 .. doxygengroup:: zigbee_app_utils
+   :members:
+
+| Header file: :file:`include/zigbee/zigbee_app_io_shell.h`
+| Source file: :file:`subsys/lib/zigbee_app_utils/zigbee_app_io_shell.c`
+
+.. doxygengroup:: zigbee_app_io_shell
    :members:

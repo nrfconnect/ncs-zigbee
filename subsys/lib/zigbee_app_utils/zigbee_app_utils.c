@@ -14,6 +14,7 @@
 #include <zephyr/logging/log.h>
 
 #include <zigbee/zigbee_app_utils.h>
+#include <zigbee/zigbee_app_io_shell.h>
 #include <zigbee/zigbee_error_handler.h>
 #include <zb_nrf_platform.h>
 #include <zboss_api.h>
@@ -833,23 +834,23 @@ void zigbee_led_status_update(zb_cb_param_t param, uint32_t led_idx)
 	/* fall-through */
 	case ZB_BDB_SIGNAL_STEERING:
 		if (status == RET_OK) {
-			dk_set_led_on(led_idx);
+			zigbee_app_io_set_led_on(led_idx);
 		} else {
-			dk_set_led_off(led_idx);
+			zigbee_app_io_set_led_off(led_idx);
 		}
 		break;
 
 #if defined(CONFIG_ZB_BDB_TOUCHLINK) && defined(ZB_BDB_SIGNAL_TOUCHLINK_NWK)
 	case ZB_BDB_SIGNAL_TOUCHLINK_NWK:
 		if (status == RET_OK) {
-			dk_set_led_on(led_idx);
+			zigbee_app_io_set_led_on(led_idx);
 		}
 		break;
 #endif
 
 	case ZB_ZDO_SIGNAL_LEAVE:
 		/* Update network status LED */
-		dk_set_led_off(led_idx);
+		zigbee_app_io_set_led_off(led_idx);
 		break;
 
 	default:
@@ -1153,10 +1154,8 @@ void zigbee_configure_sleepy_behavior(bool enable)
 
 static void factory_reset_timer_expired(struct k_timer *timer_id)
 {
-	uint32_t button_state = 0;
-	uint32_t has_changed = 0;
+	uint32_t button_state = zigbee_app_io_get_buttons();
 
-	dk_read_buttons(&button_state, &has_changed);
 	if (button_state & factory_reset_context.button) {
 		LOG_DBG("FR button pressed for %d [s]", timer_id->status);
 		if (timer_id->status >= CONFIG_FACTORY_RESET_PRESS_TIME_SECONDS) {

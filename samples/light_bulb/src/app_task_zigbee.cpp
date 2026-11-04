@@ -36,6 +36,7 @@ extern "C" {
 #include <zboss_api.h>
 #include <zboss_api_addons.h>
 #include <zigbee/zigbee_app_utils.h>
+#include <zigbee/zigbee_app_io_shell.h>
 #include <zigbee/zigbee_error_handler.h>
 #ifdef CONFIG_ZIGBEE_SCENES
 #include <zigbee/zigbee_zcl_scenes.h>
@@ -242,6 +243,8 @@ static void start_identifying(zb_cb_param_t param)
 
 /**@brief Callback wrapper for button events. */
 static void button_changed(uint32_t button_state, uint32_t has_changed) {
+  LOG_DBG("Button state: 0x%x, changed: 0x%x", button_state, has_changed);
+
   if (IDENTIFY_MODE_BUTTON & has_changed) {
     if (IDENTIFY_MODE_BUTTON & button_state) {
       /* Button changed its state to pressed */
@@ -286,6 +289,8 @@ static void configure_gpio(void) {
   }
 
   pwm_led_init();
+
+  zigbee_app_io_shell_init(button_changed);
 }
 
 /**@brief Sets brightness of bulb luminous executive element
@@ -297,12 +302,12 @@ static void light_bulb_set_brightness(zb_uint8_t brightness_level) {
 #if LIGHT_BULB_HAS_PWM_LED
   uint32_t pulse = brightness_level * LED_PWM_PERIOD_US / 255U;
 
-  if (pwm_set_dt(&led_pwm, PWM_USEC(LED_PWM_PERIOD_US), PWM_USEC(pulse))) {
+  if (zigbee_app_io_set_pwm(&led_pwm, PWM_USEC(LED_PWM_PERIOD_US), PWM_USEC(pulse))) {
     LOG_ERR("Pwm led 4 set fails:\n");
     return;
   }
 #else
-  if (dk_set_led(BULB_LED, brightness_level > 0U ? 1U : 0U)) {
+  if (zigbee_app_io_set_led(BULB_LED, brightness_level > 0U ? 1U : 0U)) {
     LOG_ERR("DK LED set fails");
   }
 #endif
@@ -374,6 +379,8 @@ static void toggle_identify_led(zb_cb_param_t param)
 static void identify_cb(zb_cb_param_t param)
 {
   zb_ret_t zb_err_code;
+
+  LOG_DBG("Identify LED: %s", param ? "on" : "off");
 
   if (param) {
     /* Schedule a self-scheduling function that will toggle the LED. */
@@ -465,7 +472,7 @@ static void confirm_image(void) {
 static void ota_evt_handler(const struct zigbee_fota_evt *evt) {
   switch (evt->id) {
   case ZIGBEE_FOTA_EVT_PROGRESS:
-    dk_set_led(OTA_ACTIVITY_LED, evt->dl.progress % 2);
+    zigbee_app_io_set_led(OTA_ACTIVITY_LED, evt->dl.progress % 2);
     break;
 
   case ZIGBEE_FOTA_EVT_FINISHED:
@@ -575,6 +582,9 @@ void zboss_signal_handler(zb_cb_param_t param) {
   /* Update network status LED. */
   zigbee_led_status_update(param, ZIGBEE_NETWORK_STATE_LED);
 
+  bool joined = ZB_JOINED();
+  LOG_DBG("Network LED: %s", joined ? "on" : "off");
+
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_TARGET)
   zigbee_touchlink_target_signal_handler(param);
 #endif
@@ -656,7 +666,7 @@ extern "C" int ZigbeeStart(void) {
   LOG_INF("Zigbee R23 Light Bulb application started");
 
   while (1) {
-    dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
+    zigbee_app_io_set_led(RUN_STATUS_LED, (++blink_status) % 2);
     k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
   }
 
