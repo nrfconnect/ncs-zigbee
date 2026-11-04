@@ -35,6 +35,14 @@ config FACTORY_RESET_PRESS_TIME_SECONDS
 
 endif # ZIGBEE_FACTORY_RESET
 
+config ZIGBEE_APP_IO_SHELL
+	bool "Shell commands for simulating buttons and reading LED states"
+	depends on SHELL
+	depends on DK_LIBRARY
+	help
+	  Adds the app_io shell command, which simulates button presses
+	  of any duration and prints the state of the LEDs.
+
 config ZIGBEE_DEMO_COMMISSIONING
 	bool "Allow joining without install codes (insecure, demo only)"
 	depends on ZIGBEE_ROLE_COORDINATOR || ZIGBEE_ROLE_ROUTER
