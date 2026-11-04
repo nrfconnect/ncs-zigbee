@@ -4,8 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
+#include <ctype.h>
 #include <string.h>
 #include <zephyr/shell/shell.h>
+#include <zephyr/sys/byteorder.h>
+#include <zephyr/sys/crc.h>
 
 #include <zboss_api.h>
 #include <zigbee/zigbee_app_utils.h>
@@ -14,8 +17,10 @@
 #include "zigbee_shell_utils.h"
 
 #define IC_ADD_HELP \
-	("Add install code for device with given eui64.\n" \
-	"Usage: add <h:install_code> <h:eui64>")
+	("Add install code or passcode for device with given eui64.\n" \
+	"Usage: add <h:install_code> <h:eui64>\n" \
+	"install_code: 128-bit install code with or without CRC, or passcode as\n" \
+	"a 4 to 6-character setup code or 4-byte hex.")
 
 #define IC_LIST_HELP \
 	("Read install codes stored at the device.\n" \
@@ -26,8 +31,10 @@
 	"Usage: policy <enable|disable>")
 
 #define IC_SET_HELP \
-	("Add install code for the device.\n" \
-	"Usage: set <h:install_code>")
+	("Add install code or passcode for the device.\n" \
+	"Usage: set <h:install_code>\n" \
+	"install_code: 128-bit install code with or without CRC, or passcode as\n" \
+	"a 4 to 6-character setup code or 4-byte hex.")
 
 #define CHANNEL_HELP \
 	("Set/get channel.\n" \
@@ -69,9 +76,19 @@ struct __packed zb_secur_ic_list_entry {
 struct ic_cmd_ctx {
 	volatile bool taken;
 	zb_ieee_addr_t addr;
+	zb_uint8_t ic_type;
 	zb_uint8_t ic[ZB_CCM_KEY_SIZE + ZB_CCM_KEY_CRC_SIZE];
 	const struct shell *shell;
 };
+
+#define IC_WITH_CRC_SIZE (ZB_CCM_KEY_SIZE + ZB_CCM_KEY_CRC_SIZE)
+
+/* Setup code alphabet of BDB 3.1, section 6.12.1, mapping each character to 5 bits. */
+static const char passcode_base32_alphabet[] = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+#define PASSCODE_BASE32_BITS 5
+/* 20 to 30 bits recommended by BDB 3.1, section 6.12, within the 32 bits stored by ZBOSS. */
+#define PASSCODE_BASE32_MIN_LEN 4
+#define PASSCODE_BASE32_MAX_LEN 6
 
 struct ic_cmd_list_ctx {
 	volatile bool taken;
@@ -599,7 +616,75 @@ static void zb_shell_bdb_set_legacy_support(zb_cb_param_t param)
 	zb_bdb_set_legacy_device_support((zb_uint8_t)param);
 }
 
+static bool parse_passcode_base32(const char *str, size_t len, zb_uint8_t *passcode)
+{
+	uint32_t value = 0;
+
+	if ((len < PASSCODE_BASE32_MIN_LEN) || (len > PASSCODE_BASE32_MAX_LEN)) {
+		return false;
+	}
+
+	/* The first character holds the least significant bits. */
+	for (size_t i = 0; i < len; i++) {
+		const char *pos = strchr(passcode_base32_alphabet, toupper((unsigned char)str[i]));
+
+		if (pos == NULL) {
+			return false;
+		}
+		value |= (uint32_t)(pos - passcode_base32_alphabet) << (PASSCODE_BASE32_BITS * i);
+	}
+
+	memset(passcode, 0, IC_WITH_CRC_SIZE);
+	sys_put_le32(value, passcode);
+	return true;
+}
+
+/**@brief Parse an install code or a passcode and detect its type from its length.
+ *
+ * @param[in]  str      128-bit install code as ASCII-encoded hex, with or without CRC,
+ *                      or passcode as a BDB 3.1 setup code or ASCII-encoded hex.
+ * @param[out] ic       Buffer for the parsed value, of IC_WITH_CRC_SIZE bytes.
+ * @param[out] ic_type  Detected ZB_IC_TYPE_* value.
+ *
+ * @retval true   if the value was parsed
+ * @retval false  if the value has an unsupported length or format
+ */
+static bool parse_install_code(const char *str, zb_uint8_t *ic, zb_uint8_t *ic_type)
+{
+	size_t len = strlen(str);
+
+	if ((len > 2) && (str[0] == '0') && (tolower((unsigned char)str[1]) == 'x')) {
+		str += 2;
+		len -= 2;
+	}
+
+	switch (len) {
+	case 2 * ZB_CCM_KEY_SIZE:
+		*ic_type = ZB_IC_TYPE_128;
+		if (!parse_hex_str(str, len, ic, IC_WITH_CRC_SIZE, false)) {
+			return false;
+		}
+		sys_put_le16((uint16_t)~crc16_ccitt(0xFFFF, ic, ZB_CCM_KEY_SIZE),
+			     &ic[ZB_CCM_KEY_SIZE]);
+		return true;
+	case 2 * IC_WITH_CRC_SIZE:
+		*ic_type = ZB_IC_TYPE_128;
+		return parse_hex_str(str, len, ic, IC_WITH_CRC_SIZE, false);
+	case 2 * ZB_PAKE_PASSCODE_LENGTH:
+		*ic_type = ZB_IC_TYPE_PASSCODE;
+		return parse_hex_str(str, len, ic, IC_WITH_CRC_SIZE, false);
+	default:
+		*ic_type = ZB_IC_TYPE_PASSCODE;
+		return parse_passcode_base32(str, len, ic);
+	}
+}
+
 #if !defined(ZB_ED_ROLE)
+
+static zb_uint8_t ic_size_by_type(zb_uint8_t ic_type)
+{
+	return (ic_type == ZB_IC_TYPE_PASSCODE) ? ZB_PAKE_PASSCODE_LENGTH : IC_WITH_CRC_SIZE;
+}
 
 static void zb_secur_ic_add_cb(zb_ret_t status)
 {
@@ -628,7 +713,7 @@ void zb_install_code_add(zb_cb_param_t param)
 		return;
 	}
 
-	zb_secur_ic_add(ic_add_ctx.addr, ZB_IC_TYPE_128, ic_add_ctx.ic, zb_secur_ic_add_cb);
+	zb_secur_ic_add(ic_add_ctx.addr, ic_add_ctx.ic_type, ic_add_ctx.ic, zb_secur_ic_add_cb);
 }
 
 /**@brief Function to print install codes list table header.
@@ -657,6 +742,8 @@ static inline void zb_install_code_list_print_summary(zb_uint8_t total_entries)
  */
 static void zb_install_code_list_print_row(struct zb_secur_ic_list_entry *ic, zb_uint8_t index)
 {
+	zb_uint8_t ic_size = ic_size_by_type(ic->options);
+
 	/* Print row index. */
 	shell_fprintf(ic_list_ctx.shell, SHELL_NORMAL, "[%3d] ", index);
 	/* Print device long address. */
@@ -664,13 +751,10 @@ static void zb_install_code_list_print_row(struct zb_secur_ic_list_entry *ic, zb
 	/* Print space to separate device address and install code fields. */
 	shell_fprintf(ic_list_ctx.shell, SHELL_NORMAL, " ");
 	/* Print the install code. */
-	zb_shell_print_hexdump(
-		ic_list_ctx.shell,
-		ic->installcode,
-		(ZB_CCM_KEY_SIZE + ZB_CCM_KEY_CRC_SIZE),
-		false);
-	/* Print space to separate install code and options fields. */
-	shell_fprintf(ic_list_ctx.shell, SHELL_NORMAL, " ");
+	zb_shell_print_hexdump(ic_list_ctx.shell, ic->installcode, ic_size, false);
+	/* Pad shorter install codes to keep the options column aligned. */
+	shell_fprintf(ic_list_ctx.shell, SHELL_NORMAL, "%*s ",
+		      2 * (IC_WITH_CRC_SIZE - ic_size), "");
 	/* Print options with additional newline character. */
 	shell_print(ic_list_ctx.shell, "%#02x", ic->options);
 }
@@ -804,6 +888,9 @@ static void zb_install_code_list_read_impl(zb_bufid_t buffer, zb_uint16_t start_
  * <tt>bdb ic list</tt> must only be used on a coordinator.
  *
  * Provide the install code as an ASCII-encoded hex including CRC16.
+ * The value type is detected from its length: 128-bit install code with or
+ * without CRC16, or Zigbee R23 PAKE passcode as a BDB 3.1 setup code of 4 to 6
+ * characters or as 4-byte hex.
  *
  * For production devices, an install code must be installed by the production
  * configuration present in flash.
@@ -822,6 +909,7 @@ static int cmd_zb_install_code(const struct shell *shell, size_t argc,
 
 	if ((argc == 2) && (strcmp(argv[0], "set") == 0)) {
 		zb_uint8_t ic[ZB_CCM_KEY_SIZE + ZB_CCM_KEY_CRC_SIZE];
+		zb_uint8_t ic_type;
 
 		if (zb_shell_get_network_role() == ZB_NWK_DEVICE_TYPE_COORDINATOR) {
 			zb_shell_print_error(shell, "Device can't be a coordinator", ZB_FALSE);
@@ -833,13 +921,12 @@ static int cmd_zb_install_code(const struct shell *shell, size_t argc,
 			return -ENOEXEC;
 		}
 
-		if (!parse_hex_str(argv[1], strlen(argv[1]), ic, sizeof(ic),
-				   false)) {
+		if (!parse_install_code(argv[1], ic, &ic_type)) {
 			err_msg = "Failed to parse IC";
 			goto exit;
 		}
 
-		if (zb_secur_ic_set(ZB_IC_TYPE_128, ic) != RET_OK) {
+		if (zb_secur_ic_set(ic_type, ic) != RET_OK) {
 			err_msg = "Failed to set IC";
 			goto exit;
 		}
@@ -867,8 +954,7 @@ static int cmd_zb_install_code(const struct shell *shell, size_t argc,
 
 		ic_add_ctx.taken = true;
 
-		if (!parse_hex_str(argv[1], strlen(argv[1]), ic_add_ctx.ic,
-				   sizeof(ic_add_ctx.ic), false)) {
+		if (!parse_install_code(argv[1], ic_add_ctx.ic, &ic_add_ctx.ic_type)) {
 			err_msg = "Failed to parse IC";
 			ic_add_ctx.taken = false;
 			goto exit;

@@ -57,6 +57,8 @@ The following release is `supported <Software maturity levels_>`_.
 
   * The default Zigbee PRO core runtime behavior to R23 mode (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R23``), which is required for Zigbee 4.0 product certification.
     R22 mode (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22``) remains available for Zigbee 3.0 product certification.
+  * The :ref:`bdb_ic_add` and :ref:`bdb_ic_set` shell commands to accept 128-bit install codes without their CRC, and Zigbee R23 PAKE passcodes as setup codes or hexadecimal strings.
+    The type is detected from the length of the value, and values of other lengths are rejected.
   * Improved ZBOSS NVRAM storage by batching flash writes into fewer operations.
     Cache size is controlled by ``CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE``.
   * Renamed the FOTA snippets from ``zigbee_fota_ext_flash`` and ``zigbee_fota_mcuboot_ext_flash`` to ``zigbee_fota`` and ``zigbee_fota_mcuboot``.
