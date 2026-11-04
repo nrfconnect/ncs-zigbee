@@ -280,7 +280,16 @@ Add information about the install code on the trust center.
    bdb ic add *h:install code* *h:eui64*
 
 For *h:eui64*, use the address of the joining device.
-For *h:install code*, use 128bit install code with correct CRC value.
+For *h:install code*, use one of the following formats.
+The command identifies the format by the length of the value.
+
+* 32 hexadecimal characters – A 128-bit install code without its CRC.
+  The command calculates the CRC.
+* 36 hexadecimal characters – A 128-bit install code with its 16-bit CRC, as printed on the device label or encoded in the device's QR code.
+  The command rejects the value if the CRC is incorrect.
+* 4 to 6 characters – A Zigbee R23 PAKE passcode as a setup code, for example ``U4DXS2``.
+  For the encoding, see section 6.12.1 of the Zigbee Base Device Behavior Specification v3.1.
+* 8 hexadecimal characters – A Zigbee R23 PAKE passcode in little-endian byte order, for example ``528F0A31`` for the ``U4DXS2`` setup code.
 
 .. note::
     |precondition3|
@@ -296,6 +305,8 @@ Example:
 .. code-block::
 
    > bdb ic add 83FED3407A939723A5C639B26916D505C3B5 0B010E2F79E9DBFA
+   Done
+   > bdb ic add U4DXS2 0B010E2F79E9DBFB
    Done
 
 ----
@@ -326,8 +337,11 @@ Example:
    > bdb ic list
    [idx] EUI64:           IC:                                  options:
    [  0] 0b010e2f79e9dbfa 83fed3407a939723a5c639b26916d505c3b5 0x3
-   Total entries for the install codes table: 1
+   [  1] 0b010e2f79e9dbfb 528f0a31                             0x4
+   Total entries for the install codes table: 2
    Done
+
+The ``options`` column shows the type of the entry: ``0x3`` for a 128-bit install code and ``0x4`` for a passcode.
 
 ----
 
@@ -339,9 +353,10 @@ bdb ic policy
 Set the trust center install code policy.
 
 The install code policy is enabled by default.
-Disabling it lets devices without an install code join using the well-known link key, which is insecure.
-The policy stays disabled until it is enabled again or the device reboots, so it is not the backwards compatibility mode defined in BDB 3.1, section 5.6.2.
-See :ref:`zigbee_commissioning_security`.
+If you disable it, devices without an install code can join the network using the well-known link key.
+This is not secure, because the link key is publicly known.
+The policy remains disabled until you enable it again or the Coordinator reboots.
+See :ref:`zigbee_commissioning_security` for how this behavior differs from the backwards compatibility mode of BDB 3.1, section 5.6.2.
 
 .. parsed-literal::
    :class: highlight
@@ -376,6 +391,7 @@ Set install code on the device.
    bdb ic set *h:install code*
 
 Must only be used on a joining device.
+For *h:install code*, use the same values as for :ref:`bdb_ic_add`.
 
 .. note::
     |precondition2|
@@ -1445,7 +1461,7 @@ Disable Zigbee NVRAM.
 
 .. |precondition4| replace:: Use only after :ref:`bdb_start`.
 
-.. |precondition5| replace:: Provide the install code as an ASCII-encoded hexadecimal file that includes CRC16/X-25 in little-endian order.
+.. |precondition5| replace:: Provide the install code as an ASCII-encoded hexadecimal string in the byte order of the product label, where the optional CRC16/X-25 is in little-endian order.
 
 .. |precondition6| replace:: For production devices, make sure that an install code is installed by the production configuration present in the flash.
 

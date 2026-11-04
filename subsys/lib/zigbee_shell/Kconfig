@@ -8,6 +8,7 @@ menuconfig ZIGBEE_SHELL
 	bool "Enable Zigbee Shell"
 	depends on ZIGBEE_ADD_ON
 	imply SHELL
+	select CRC
 	help
 	  Enable the Zigbee shell library for controlling device behavior and
 	  performing operations on a Zigbee network from a serial shell.
