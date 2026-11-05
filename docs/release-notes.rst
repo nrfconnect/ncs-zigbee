@@ -48,6 +48,9 @@ The following release is `supported <Software maturity levels_>`_.
 
   * Improved ZBOSS NVRAM storage by batching flash writes into fewer operations.
     Cache size is controlled by ``CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE``.
+  * Default thread stack sizes for add-on applications: ``CONFIG_MAIN_STACK_SIZE`` 1280,
+    ``CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE`` 3328, and ``CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE`` 1024.
+    ``CONFIG_ZIGBEE_BT_DFU`` still uses a larger system workqueue for SMP.
 
 * Migration notes:
 
