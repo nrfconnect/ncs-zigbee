@@ -35,6 +35,15 @@ menuconfig ZIGBEE_ADD_ON
 
 if ZIGBEE_ADD_ON
 
+config MAIN_STACK_SIZE
+	# nRF5340 uses TRUSTED_STORAGE_BACKEND_AEAD_KEY_DERIVE_FROM_HUK (NCS default),
+	# which selects HW_UNIQUE_KEY_RANDOM; that symbol requires MAIN_STACK_SIZE >= 2048.
+	default 2048 if SOC_NRF5340_CPUAPP
+	default 1280
+
+config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 1024 if !ZIGBEE_BT_DFU
+
 if !BUILD_WITH_TFM
 
 choice TRUSTED_STORAGE_BACKEND_AEAD_KEY
@@ -158,7 +167,7 @@ config ZBOSS_DEFAULT_THREAD_PRIORITY
 
 config ZBOSS_DEFAULT_THREAD_STACK_SIZE
 	int "Stack size of ZBOSS Zephyr task"
-	default 5120
+	default 3328
 	help
 	  Stack size of ZBOSS Zephyr task. This is the task zboss_main_loop_iteration is called from.
 
