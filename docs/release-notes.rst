@@ -16,7 +16,7 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 +-------------------+------------------+-----------------------+---------------------+
 | |addon| version   | |NCS| version    | ZBOSS stack version   | NCP host version    |
 +===================+==================+=======================+=====================+
-| 2.0.0             | 3.4.1            | 5.0.5.1               | N/A                 |
+| 2.0.0             | 3.4.2            | 5.0.5.1               | N/A                 |
 +-------------------+------------------+-----------------------+---------------------+
 | 1.4.0             | 3.4.0            | 4.2.2.5               | 3.7.0               |
 +-------------------+------------------+-----------------------+---------------------+
@@ -60,6 +60,7 @@ The following release is `supported <Software maturity levels_>`_.
 
 * Updated:
 
+  * Support for the nRF Connect SDK v3.4.2.
   * The OSIF layer, application libraries, Zigbee Shell, and :ref:`zigbee_samples` for ZBOSS 5 APIs, including unified :c:type:`zb_cb_param_t` delayed callbacks and BDB channel list handling.
     Thread-safe scheduler wrappers are documented in :ref:`zigbee_osif_thread_safe_scheduler`.
   * The default Zigbee PRO core runtime behavior to R23 mode (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R23``), which is required for Zigbee 4.0 product certification.

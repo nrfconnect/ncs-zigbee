@@ -2,7 +2,7 @@
 
 .. |r22_addon_version| replace:: 1.0.1
 .. |addon_version| replace:: 2.0.0
-.. |ncs_version| replace:: 3.4.1
+.. |ncs_version| replace:: 3.4.2
 .. |zigbee_version| replace:: Zigbee 4.0
 .. |zboss_version| replace:: 5.0.5.1
 .. |ubuntu_version| replace:: 24.04
