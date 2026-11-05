@@ -7,7 +7,7 @@ Memory requirements
    :local:
    :depth: 2
 
-This page provides information about the amount of flash memory and RAM that is required by the :ref:`zigbee_samples`, as well as stack memory requirements for ``main`` and ``zboss`` threads.
+This page provides information about the amount of flash memory and RAM that is required by the :ref:`zigbee_samples`.
 Use it to check if your application has enough space for a given configuration.
 Values are provided for :ref:`ZBOSS libraries <zigbee_zboss>`.
 
@@ -262,82 +262,4 @@ Other NVM columns list the reserved partition size for that region.
             The following table lists memory requirements for samples running on the `nRF54LM20 DK <Board support_>`_ (`nrf54lm20dk`_) with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
 
             .. memory-table::
-               :board: nrf54lm20
-
-
-Stack memory requirements
-*************************
-
-The following tables and bar charts list stack memory requirement values for ``main`` and ``zboss`` threads.
-These measurements were carried out with Zephyr's `Thread analyzer`_, using the following Kconfig options for configuration:
-
-* For the stack memory size of the ``main`` thread - ``CONFIG_MAIN_STACK_SIZE``
-* For the stack memory size of the ``zboss`` thread - ``CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE``
-
-Values are provided in bytes (B).
-
-.. tabs::
-
-   .. group-tab:: Charts
-
-      .. tabs::
-
-         .. group-tab:: nRF52840
-
-            Stack usage for samples running on the `nRF52840 DK <Board support_>`_ (`nrf52840dk`_).
-
-            .. stack-board::
-               :board: nrf52840
-
-         .. group-tab:: nRF5340
-
-            Stack usage for samples running on the `nRF5340 DK <Board support_>`_ (`nrf5340dk`_).
-
-            .. stack-board::
-               :board: nrf5340
-
-         .. group-tab:: nRF54L15
-
-            Stack usage for samples running on the `nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
-
-            .. stack-board::
-               :board: nrf54l15
-
-         .. group-tab:: nRF54LM20
-
-            Stack usage for samples running on the `nRF54LM20 DK <Board support_>`_ (`nrf54lm20dk`_) with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
-
-            .. stack-board::
-               :board: nrf54lm20
-
-   .. group-tab:: Tables
-
-      .. tabs::
-
-         .. group-tab:: nRF52840
-
-            The following table lists stack usage for samples running on the `nRF52840 DK <Board support_>`_ (`nrf52840dk`_).
-
-            .. stack-table::
-               :board: nrf52840
-
-         .. group-tab:: nRF5340
-
-            The following table lists stack usage for samples running on the `nRF5340 DK <Board support_>`_ (`nrf5340dk`_).
-
-            .. stack-table::
-               :board: nrf5340
-
-         .. group-tab:: nRF54L15
-
-            The following table lists stack usage for samples running on the `nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
-
-            .. stack-table::
-               :board: nrf54l15
-
-         .. group-tab:: nRF54LM20
-
-            The following table lists stack usage for samples running on the `nRF54LM20 DK <Board support_>`_ (`nrf54lm20dk`_) with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
-
-            .. stack-table::
                :board: nrf54lm20
