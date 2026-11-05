@@ -67,6 +67,7 @@ The following release is `supported <Software maturity levels_>`_.
   * Default thread stack sizes for add-on applications: ``CONFIG_MAIN_STACK_SIZE`` 1280,
     ``CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE`` 3328, and ``CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE`` 1024.
     ``CONFIG_ZIGBEE_BT_DFU`` still uses a larger system workqueue for SMP.
+  * Removed the stack memory requirements section from the :ref:`Memory requirements <zigbee_memory>` page.
 
 * Migration notes:
 
