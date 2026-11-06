@@ -63,6 +63,10 @@ The following release is `supported <Software maturity levels_>`_.
     Cache size is controlled by ``CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE``.
   * Renamed the FOTA snippets from ``zigbee_fota_ext_flash`` and ``zigbee_fota_mcuboot_ext_flash`` to ``zigbee_fota`` and ``zigbee_fota_mcuboot``.
     One application snippet still covers all supported FOTA boards; board overlays select ``dts/ext_flash/`` or ``dts/fota_internal/`` as needed.
+  * Default thread stack sizes for add-on applications: ``CONFIG_MAIN_STACK_SIZE`` 1280,
+    ``CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE`` 3328, and ``CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE`` 1024.
+    ``CONFIG_ZIGBEE_BT_DFU`` still uses a larger system workqueue for SMP.
+  * Removed the stack memory requirements section from the :ref:`Memory requirements <zigbee_memory>` page.
 
 * Migration notes:
 
