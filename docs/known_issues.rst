@@ -34,6 +34,39 @@ A known issue can list one or both of the following entries:
 List of known issues
 ********************
 
+.. rst-class:: v1-4-0 v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
+
+KRKNWK-22734: Increased power consumption when using precompiled ZBOSS libraries
+  Precompiled libraries shipped with the |addon| include ZBOSS diagnostic features that are intended for testing and certification tooling only.
+  The diag core watchdog can reschedule a stack alarm about every second, which increases average power consumption on sleepy end devices.
+
+  **Workaround:** Cancel the diag core watchdog alarm in the application's :c:func:`zboss_signal_handler` when handling the ``ZB_ZDO_SIGNAL_SKIP_STARTUP`` signal.
+  The alarm is scheduled during the stack initialization, and ``ZB_ZDO_SIGNAL_SKIP_STARTUP`` is the first signal the stack sends after :c:func:`zigbee_enable` is called, so the cancellation runs once, from the ZBOSS thread context:
+
+  .. code-block:: c
+
+     #include <zboss_api.h>
+
+     void zboss_signal_handler(zb_bufid_t bufid)
+     {
+             zb_zdo_app_signal_type_t sig = zb_get_app_signal(bufid, NULL);
+
+             switch (sig) {
+             case ZB_ZDO_SIGNAL_SKIP_STARTUP:
+                     (void)ZB_SCHEDULE_APP_ALARM_CANCEL(zb_diag_core_watchdog, ZB_ALARM_ANY_PARAM);
+                     ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+                     break;
+             /* ... other signals ... */
+             default:
+                     ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+                     break;
+             }
+
+             if (bufid) {
+                     zb_buf_free(bufid);
+             }
+     }
+
 .. rst-class:: v1-4-0
 
 KRKNWK-22613: Zigbee FOTA does not work for the light bulb sample
