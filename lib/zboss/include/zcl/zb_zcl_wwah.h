@@ -664,21 +664,23 @@ ZB_PACKED_STRUCT zb_zcl_wwah_cluster_list_t;
   if (zb_buf_len((data_buf)) >= sizeof(zb_uint8_t))                                            \
   {                                                                                            \
     (req).number_of_clusters = number_of_clusters;                                             \
-    if (number_of_clusters > 0)                                                                \
+    if (number_of_clusters == 0)                                                               \
     {                                                                                          \
-      if (zb_buf_len((data_buf)) >= sizeof(zb_uint8_t) +                                       \
-          number_of_clusters * sizeof(zb_uint16_t))                                            \
-      {                                                                                        \
-        ZB_MEMCPY(                                                                             \
-          (zb_uint8_t*)((req).cluster_id),                                                     \
-          (src_ptr + 1),                                                                       \
-          number_of_clusters * sizeof(zb_uint16_t));                                           \
-        (status) = ZB_ZCL_PARSE_STATUS_SUCCESS;                                                \
-      }                                                                                        \
+      (status) = ZB_ZCL_PARSE_STATUS_SUCCESS;                                                  \
+    }                                                                                          \
+    else if (number_of_clusters <= ZB_ZCL_WWAH_CLUSTER_LIST_MAX_SIZE &&                        \
+             zb_buf_len((data_buf)) >= sizeof(zb_uint8_t) +                                    \
+                 number_of_clusters * sizeof(zb_uint16_t))                                     \
+    {                                                                                          \
+      ZB_MEMCPY(                                                                               \
+        (zb_uint8_t*)((req).cluster_id),                                                       \
+        (src_ptr + 1),                                                                         \
+        number_of_clusters * sizeof(zb_uint16_t));                                             \
+      (status) = ZB_ZCL_PARSE_STATUS_SUCCESS;                                                  \
     }                                                                                          \
     else                                                                                       \
     {                                                                                          \
-      (status) = ZB_ZCL_PARSE_STATUS_SUCCESS;                                                  \
+      /* MISRA rule 15.7 requires empty 'else' branch. */                                      \
     }                                                                                          \
   }                                                                                            \
 }

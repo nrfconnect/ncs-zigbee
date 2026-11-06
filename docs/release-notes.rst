@@ -16,7 +16,7 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 +-------------------+------------------+-----------------------+---------------------+
 | |addon| version   | |NCS| version    | ZBOSS stack version   | NCP host version    |
 +===================+==================+=======================+=====================+
-| 2.0.0             | 3.4.2            | 5.0.5.1               | N/A                 |
+| 2.0.0             | 3.4.2            | 5.0.5.2               | N/A                 |
 +-------------------+------------------+-----------------------+---------------------+
 | 1.4.0             | 3.4.0            | 4.2.2.5               | 3.7.0               |
 +-------------------+------------------+-----------------------+---------------------+
@@ -48,7 +48,7 @@ The following release is `supported <Software maturity levels_>`_.
 
 * Added:
 
-  * Zigbee 4.0 compatible ZBOSS stack v5.0.5.1, replacing the ZBOSS 4.2 prebuilt libraries.
+  * Zigbee 4.0 compatible ZBOSS stack v5.0.5.2, replacing the ZBOSS 4.2 prebuilt libraries.
     See the `ZBOSS 5 changelog`_ and :ref:`migration_zboss5`.
   * PSA-backed cryptography integration in the OSIF layer, with Settings initialized before :c:func:`psa_crypto_init` and ZMS-backed PSA storage on nRF54 RRAM SoCs when enabled.
   * Support for the nRF54LM20 Dongle in the :ref:`zigbee_light_bulb_sample`, :ref:`zigbee_light_switch_sample`, and :ref:`zigbee_shell_sample` samples.
