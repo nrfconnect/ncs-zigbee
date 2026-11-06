@@ -160,9 +160,15 @@
 .. ### ZBOSS documentation
 
 .. _`API documentation`:
-.. _`ZBOSS API documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23
-.. _`ZBOSS stack release notes`: https://ncsdoc.z6.web.core.windows.net/zboss-r23
-.. _`external ZBOSS development guide and API documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.4/zigbee_devguide.html
+.. _`ZBOSS API documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/5.0.5.1/index.html
+.. _`ZBOSS stack release notes`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/5.0.5.1/zboss_release_notes.html
+.. _`ZBOSS 5 API documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/5.0.5.1/index.html
+.. _`ZBOSS 5 API reference`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/5.0.5.1/modules.html
+.. _`ZBOSS 5 deprecated API list`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/5.0.5.1/deprecated.html
+.. _`ZBOSS 5 development guide`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/5.0.5.1/zigbee_devguide.html
+.. _`ZBOSS 5 changelog`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/5.0.5.1/zboss_release_notes.html
+.. _`ZBOSS 5 NVRAM API`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/5.0.5.1/group__zboss__nvram.html
+.. _`external ZBOSS development guide and API documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/5.0.5.1/zigbee_devguide.html
 .. _`Stack commissioning start sequence`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.4/using_zigbee__z_c_l.html#stack_start_initiation
 .. _`ZBOSS NCP Host`: https://github.com/nrfconnect/ncs-zigbee/releases/download/v1.2.1/ncp_host_v3.5.0.zip
 .. _`NCP Host documentation`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.4/zboss_ncp_host_intro.html
@@ -181,7 +187,7 @@
 .. _`Registering device context`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.4/using_zigbee__z_c_l.html#register_zigbee_device
 .. _`Support for Zigbee commissioning`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.4/using_zigbee__z_c_l.html#zcl_zigbee_commissioning
 .. _`BDB Commissioning API`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.4/group__zboss__bdb__api.html
-.. _`ZBOSS R23 changelog`: https://ncsdoc.z6.web.core.windows.net/zboss-r23
+.. _`ZBOSS R23 changelog`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/5.0.5.1/zboss_release_notes.html
 .. _`ZBOSS Zigbee 2023 (R23) features`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.4/r23_new_features.html
 .. _`Runtime switch of R23 ZBOSS into R22 mode`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.4/r23_new_features.html#r23_r23_switch
 .. _`PANID conflict resolution API`: https://ncsdoc.z6.web.core.windows.net/zboss-r23/4.2.2.4/r23_new_features.html#r23_panid_conflict
