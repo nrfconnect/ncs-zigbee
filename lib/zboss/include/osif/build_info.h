@@ -11,9 +11,9 @@
  * Please use release scripts to update it's contents.
  *
  * Repositories:
- * platform_ncs       02f13f2ec240f1d97ecc804851f6d63b47ab77d9 https://bitbucket.org/nordicsemi/zbp_ncs.git
- * zboss-stack-src    51f46c54b8ce91ef212b03c17ee06b96bc2778bd https://bitbucket.org/nordicsemi/zbc_draco
- * ncs-zigbee         228216916e45b5649b3190ba048c5a0fe08f7119 https://github.com/nrfconnect/ncs-zigbee
+ * platform_ncs       bb312666ebb25bab519401ea7bab2ecfcdf991e8 https://bitbucket.org/nordicsemi/zbp_ncs.git
+ * zboss-stack-src    eddc4b87a74301291feab34197ab89b0a70d4a28 https://bitbucket.org/nordicsemi/zbc_draco
+ * ncs-zigbee         544d77b51ea57a999ee2e21d0fa19f5ff4d08898 https://github.com/nrfconnect/ncs-zigbee
  * nrf                b20f8619ba9a5530f8c34b0a130d829947cfe55d https://github.com/nrfconnect/sdk-nrf
  * zephyr             33fa6a7aac6a4401d16a67cb9f27a3483fa02dd6 https://github.com/nrfconnect/sdk-zephyr
  * wfa-qt-control-app 1f19f0b23e42205bab5f34ace335fffa5e7d32ff https://github.com/nrfconnect/sdk-wi-fiquicktrack-controlappc
@@ -72,16 +72,16 @@
 
 
 /** ZBOSS build tag */
-#define ZBOSS_BUILD_TAG "ncs_release-v5.0.5.1"
+#define ZBOSS_BUILD_TAG "ncs_release-v5.0.5.2"
 
 /** ZBOSS platform build tag */
-#define ZBOSS_PLATFORM_BUILD_TAG "v5.0.5.1+v7.0.0"
+#define ZBOSS_PLATFORM_BUILD_TAG "v5.0.5.2+v7.0.0"
 
 /** ZBOSS build date (UTC) */
-#define ZBOSS_BUILD_DATE 20261027
+#define ZBOSS_BUILD_DATE 20261106
 
 /** ZBOSS build time (UTC) */
-#define ZBOSS_BUILD_TIME 094147
+#define ZBOSS_BUILD_TIME 153107
 
 
 #endif /* ZBOSS_BUILD_INFO_H__ */
