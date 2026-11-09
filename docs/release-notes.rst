@@ -16,6 +16,8 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 +-------------------+------------------+-----------------------+---------------------+
 | |addon| version   | |NCS| version    | ZBOSS stack version   | NCP host version    |
 +===================+==================+=======================+=====================+
+| 2.0.0             | 3.4.1            | 5.0.5.1               | N/A                 |
++-------------------+------------------+-----------------------+---------------------+
 | 1.4.0             | 3.4.0            | 4.2.2.5               | 3.7.0               |
 +-------------------+------------------+-----------------------+---------------------+
 | 1.3.0             | 2.9.2            | 4.2.2.4               | 3.6.0               |
@@ -39,13 +41,16 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 | 0.1.0             |                  |                       | N/A                 | 
 +-------------------+------------------+-----------------------+---------------------+
 
-|addon| vX.Y.Z - TBD
-***************************
+|addon| v2.0.0 - TBD
+********************
 
 The following release is `supported <Software maturity levels_>`_.
 
 * Added:
 
+  * Zigbee 4.0 compatible ZBOSS stack v5.0.5.1, replacing the ZBOSS 4.2 prebuilt libraries.
+    See the `ZBOSS 5 changelog`_ and :ref:`migration_zboss5`.
+  * PSA-backed cryptography integration in the OSIF layer, with Settings initialized before :c:func:`psa_crypto_init` and ZMS-backed PSA storage on nRF54 RRAM SoCs when enabled.
   * Support for the nRF54LM20 Dongle in the :ref:`zigbee_light_bulb_sample`, :ref:`zigbee_light_switch_sample`, and :ref:`zigbee_shell_sample` samples.
   * Experimental support for the nRF54LC10 DK (nRF54LC10A SoC) in the :ref:`zigbee_samples`.
   * The ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option, which lets a Coordinator accept devices without an install code (insecure, for demonstrations and testing only).
@@ -55,6 +60,8 @@ The following release is `supported <Software maturity levels_>`_.
 
 * Updated:
 
+  * The OSIF layer, application libraries, Zigbee Shell, and :ref:`zigbee_samples` for ZBOSS 5 APIs, including unified :c:type:`zb_cb_param_t` delayed callbacks and BDB channel list handling.
+    Thread-safe scheduler wrappers are documented in :ref:`zigbee_osif_thread_safe_scheduler`.
   * The default Zigbee PRO core runtime behavior to R23 mode (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R23``), which is required for Zigbee 4.0 product certification.
     R22 mode (``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22``) remains available for Zigbee 3.0 product certification.
   * The :ref:`bdb_ic_add` and :ref:`bdb_ic_set` shell commands to accept 128-bit install codes without their CRC, and Zigbee R23 PAKE passcodes as setup codes or hexadecimal strings.
@@ -69,12 +76,18 @@ The following release is `supported <Software maturity levels_>`_.
     ``CONFIG_ZIGBEE_BT_DFU`` still uses a larger system workqueue for SMP.
   * Removed the stack memory requirements section from the :ref:`Memory requirements <zigbee_memory>` page.
 
+* Removed:
+
+  * Precompiled NCP development libraries (``libncp-dev``) and a matching ZBOSS NCP Host package release.
+    The :ref:`NCP sample <zigbee_ncp_sample>` cannot be built in this release; see :ref:`known_issues` (KRKNWK-22663).
+
 * Migration notes:
 
+  * Follow :ref:`migration_zboss5` when upgrading from |addon| v1.4.x (ZBOSS 4.2).
   * FOTA builds must pass ``SNIPPET=zigbee_fota`` instead of ``zigbee_fota_ext_flash``.
     Sysbuild still remaps the MCUboot image to ``zigbee_fota_mcuboot`` automatically.
   * Applications that target Zigbee 3.0 product certification must now explicitly set ``CONFIG_ZIGBEE_PRO_CORE_BEHAVIOR_R22`` to ``y``.
-  * Coordinators now require install codes for all joining devices by default, following the ZBOSS high-security Trust Center policy.
+  * Coordinators now require install codes for all joining devices by default, following the ZBOSS 5 high-security Trust Center policy.
     Add the install code of each device on the Trust Center before it joins (see :ref:`zigbee_install_code_commissioning`), or build demonstration setups with the ``zigbee_demo_commissioning`` snippet (see :ref:`zigbee_commissioning_security`).
   * In the :ref:`zigbee_light_bulb_sample` on nRF52 and nRF53 DKs, use LED 2 instead of LED 4 for the dimmable light output.
     In FOTA builds of the :ref:`zigbee_light_bulb_sample`, use LED 4 instead of LED 2 for FOTA activity.
