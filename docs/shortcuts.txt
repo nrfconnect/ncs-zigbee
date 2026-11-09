@@ -1,10 +1,10 @@
 .. ### Versions
 
 .. |r22_addon_version| replace:: 1.0.1
-.. |addon_version| replace:: 1.4.0
+.. |addon_version| replace:: 2.0.0
 .. |ncs_version| replace:: 3.4.1
-.. |zigbee_version| replace:: Zigbee 3.0
-.. |zboss_version| replace:: 4.2.2.5
+.. |zigbee_version| replace:: Zigbee 4.0
+.. |zboss_version| replace:: 5.0.5.1
 .. |ubuntu_version| replace:: 24.04
 
 .. |NCS| replace:: nRF Connect SDK
