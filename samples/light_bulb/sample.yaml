@@ -57,6 +57,14 @@ tests:
     platform_allow:
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
+  sample.zigbee.light_bulb.io_shell:
+    sysbuild: true
+    build_only: true
+    extra_args: light_bulb_SNIPPET=io_shell
+    integration_platforms:
+      - nrf54lm20dongle/nrf54lm20b/cpuapp
+    platform_allow:
+      - nrf54lm20dongle/nrf54lm20b/cpuapp
   sample.zigbee.light_bulb.with_shell:
     sysbuild: true
     build_only: true

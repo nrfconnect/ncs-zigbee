@@ -16,6 +16,7 @@
 #include <zboss_api.h>
 #include <zigbee/zigbee_error_handler.h>
 #include <zigbee/zigbee_app_utils.h>
+#include <zigbee/zigbee_app_io_shell.h>
 #include <zb_nrf_platform.h>
 
 /* Device endpoint, used to receive ZCL commands. */
@@ -102,7 +103,7 @@ static void toggle_identify_led(zb_cb_param_t param)
 {
 	static int blink_status;
 
-	dk_set_led(IDENTIFY_LED, (++blink_status) % 2);
+	zigbee_app_io_set_led(IDENTIFY_LED, (++blink_status) % 2);
 	ZB_SCHEDULE_APP_ALARM(toggle_identify_led, param, ZB_MILLISECONDS_TO_BEACON_INTERVAL(100));
 }
 
@@ -122,7 +123,7 @@ static void identify_cb(zb_cb_param_t param)
 		zb_err_code = ZB_SCHEDULE_APP_ALARM_CANCEL(toggle_identify_led, ZB_ALARM_ANY_PARAM);
 		ZVUNUSED(zb_err_code);
 
-		dk_set_led(IDENTIFY_LED, 0);
+		zigbee_app_io_set_led(IDENTIFY_LED, 0);
 	}
 }
 
@@ -191,6 +192,8 @@ static void configure_gpio(void)
 	if (err) {
 		LOG_ERR("Cannot init LEDs (err: %d)", err);
 	}
+
+	zigbee_app_io_shell_init(button_changed);
 }
 
 /**@brief Zigbee stack event handler.

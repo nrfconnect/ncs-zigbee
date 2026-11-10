@@ -57,6 +57,8 @@ The following release is `supported <Software maturity levels_>`_.
   * The ``zigbee_demo_commissioning`` snippet, which enables the ``CONFIG_ZIGBEE_DEMO_COMMISSIONING`` Kconfig option.
   * The :ref:`ug_zigbee_tools_production_config` script, which generates the ZBOSS production configuration of a device, including its install code or passcode from the product label or QR code.
   * The :ref:`zigbee_commissioning_security` section describing the Trust Center security policy.
+  * The ``app_io`` shell command in the Zigbee application utilities, which simulates button presses and reads LED and PWM LED states.
+    Enable it with the ``CONFIG_ZIGBEE_APP_IO_SHELL`` Kconfig option.
 
 * Updated:
 

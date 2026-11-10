@@ -44,6 +44,14 @@ tests:
       - nrf54lm20dk/nrf54lm20a/cpuapp
       - nrf54lm20dk/nrf54lm20b/cpuapp
       - nrf54lm20dongle/nrf54lm20b/cpuapp
+  sample.zigbee.light_switch.io_shell:
+    sysbuild: true
+    build_only: true
+    extra_args: light_switch_SNIPPET=io_shell
+    integration_platforms:
+      - nrf54lm20dongle/nrf54lm20b/cpuapp
+    platform_allow:
+      - nrf54lm20dongle/nrf54lm20b/cpuapp
   sample.zigbee.light_switch.with_shell:
     sysbuild: true
     build_only: true
