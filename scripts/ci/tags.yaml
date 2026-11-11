@@ -1,0 +1,21 @@
+# Maps changed files in NCS smart-home addon repositories to twister tags.
+#
+# Selective PR builds (sample / variant / platform) are defined in
+# sample_build_plan.yaml and processed by SmartHomeDiffBasedTwisterStages.
+# This file is kept for tag-based associations when needed.
+#
+# File format matches nrf/scripts/ci/tags.yaml (see test_plan.py --alt-tags).
+# Paths are relative to the repository passed to test_plan.py via -r.
+
+ci_samples_zigbee:
+  files:
+    - dts/
+    - lib/
+    - samples/
+    - scripts/
+    - snippets/
+    - subsys/
+    - sysbuild/
+    - CMakeLists.txt
+    - Kconfig
+    - west.yml

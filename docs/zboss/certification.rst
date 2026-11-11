@@ -25,8 +25,11 @@ The certification is based on CSA's `Zigbee certification policy`_, which distin
 
 The certification guarantees that a platform or product will work and will interoperate with other compliant platforms or certified products, respectively.
 
-Nordic Semiconductor provides the Zigbee Compliant Platform.
+Nordic Semiconductor provides the Zigbee Compliant Platform (Zigbee PRO + Green Power).
 You can use this platform as the building block for your Zigbee Certified Product, which is conformant with the ZCL and BDB standard.
+
+You must acquire a separate Zigbee Compliant Platform certification for each combination of host processor and NCP SoC, as described in :ref:`ug_zigbee_platform_design_ncp_details`.
+To certify a host and NCP solution, contact the `ZBOSS Open Initiative (ZOI)`_.
 
 .. _zboss_certification_r22_mode:
 

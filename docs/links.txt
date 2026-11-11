@@ -152,6 +152,10 @@
 .. _`Zigbee certification policy`: https://zigbeealliance.org/wp-content/uploads/2021/04/07-4842-13-Zigbee-certification-policy.pdf
 .. _`Zigbee Cluster Library specification`: https://zigbeealliance.org/wp-content/uploads/2019/12/07-5123-06-zigbee-cluster-library-specification.pdf
 
+.. ### ZBOSS Open Initiative
+
+.. _`ZBOSS Open Initiative (ZOI)`: https://dsr-zoi.com/
+
 .. ### ZBOSS documentation
 
 .. _`API documentation`:

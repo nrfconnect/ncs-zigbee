@@ -34,6 +34,69 @@ A known issue can list one or both of the following entries:
 List of known issues
 ********************
 
+.. rst-class:: v1-4-0 v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
+
+KRKNWK-22734: Increased power consumption when using precompiled ZBOSS libraries
+  Precompiled libraries shipped with the |addon| include ZBOSS diagnostic features that are intended for testing and certification tooling only.
+  The diag core watchdog can reschedule a stack alarm about every second, which increases average power consumption on sleepy end devices.
+
+  **Workaround:** Cancel the diag core watchdog alarm in the application's :c:func:`zboss_signal_handler` when handling the ``ZB_ZDO_SIGNAL_SKIP_STARTUP`` signal.
+  The alarm is scheduled during the stack initialization, and ``ZB_ZDO_SIGNAL_SKIP_STARTUP`` is the first signal the stack sends after :c:func:`zigbee_enable` is called, so the cancellation runs once, from the ZBOSS thread context:
+
+  .. code-block:: c
+
+     #include <zboss_api.h>
+
+     void zboss_signal_handler(zb_bufid_t bufid)
+     {
+             zb_zdo_app_signal_type_t sig = zb_get_app_signal(bufid, NULL);
+
+             switch (sig) {
+             case ZB_ZDO_SIGNAL_SKIP_STARTUP:
+                     (void)ZB_SCHEDULE_APP_ALARM_CANCEL(zb_diag_core_watchdog, ZB_ALARM_ANY_PARAM);
+                     ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+                     break;
+             /* ... other signals ... */
+             default:
+                     ZB_ERROR_CHECK(zigbee_default_signal_handler(bufid));
+                     break;
+             }
+
+             if (bufid) {
+                     zb_buf_free(bufid);
+             }
+     }
+
+.. rst-class:: v1-4-0
+
+KRKNWK-22613: Zigbee FOTA does not work for the light bulb sample
+  When Zigbee FOTA variant is enabled using the :file:`prj_fota.conf` file, the light bulb sample does not compile.
+  This issue is related to the missing Kconfig options for the FOTA variant.
+
+  **Workaround:** Cherry-pick and apply commit with the fix from ``main`` (commit hash: ``fda1f10981dc88553078f9f3aa14e3d4189007d2``).
+
+.. rst-class:: v1-4-0
+
+KRKNWK-22334: Zigbee Touchlink commissioning does not work reliably when Zigbee FOTA is enabled
+  When Zigbee Firmware-Over-the-Air (FOTA) is enabled, Zigbee Touchlink commissioning does not work reliably.
+  This issue is not observed when Zigbee FOTA is disabled.
+
+.. rst-class:: v1-4-0
+
+KRKNWK-22335: Zigbee Touchlink initiator is not always able to pair after single button activation
+  In some cases, pressing the dedicated button does not pair the :ref:`zigbee_light_switch_sample`, acting as Touchlink initiator, with the :ref:`zigbee_light_bulb_sample`, acting as Touchlink target.
+
+  **Workaround:** If the devices are not paired within 5–7 seconds after pressing the button, short-press the button once again on the light switch.
+
+.. rst-class:: v1-4-0
+
+KRKNWK-22343: Zigbee Touchlink initiator does not work when Zigbee Sleepy End Device behavior is enabled
+  Touchlink commissioning uses inter-PAN frames that require the Zigbee End Device to keep its radio receiver active.
+  Sleepy End Device behavior disables the receiver between polls to the parent, so Touchlink pairing fails when it is enabled.
+
+  **Workaround:** Do not enable both ``CONFIG_LIGHT_SWITCH_LOW_POWER`` and ``CONFIG_ZIGBEE_TOUCHLINK_INITIATOR`` Kconfig options at the same time.
+  Use Sleepy End Device behavior for low-power operation without Touchlink, or disable sleepy mode when building with Touchlink initiator support.
+
 .. rst-class:: v1-2-1 v1-2-0 v1-1-0 v1-0-0
 
 KRKNWK-21267: NCP crashes when migrating from the R22 to R23 firmware

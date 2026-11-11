@@ -39,6 +39,25 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 | 0.1.0             |                  |                       | N/A                 | 
 +-------------------+------------------+-----------------------+---------------------+
 
+|addon| vX.Y.Z - TBD
+***************************
+
+The following release is `supported <Software maturity levels_>`_.
+
+* Updated:
+
+  * Improved ZBOSS NVRAM storage by batching flash writes into fewer operations.
+    Cache size is controlled by ``CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE``.
+  * Default thread stack sizes for add-on applications: ``CONFIG_MAIN_STACK_SIZE`` 1280,
+    ``CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE`` 3328, and ``CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE`` 1024.
+    ``CONFIG_ZIGBEE_BT_DFU`` still uses a larger system workqueue for SMP.
+  * Removed the stack memory requirements section from the :ref:`Memory requirements <zigbee_memory>` page.
+
+* Migration notes:
+
+  * In the :ref:`zigbee_light_bulb_sample` on nRF52 and nRF53 DKs, use LED 2 instead of LED 4 for the dimmable light output.
+    In FOTA builds of the :ref:`zigbee_light_bulb_sample`, use LED 4 instead of LED 2 for FOTA activity.
+
 .. _zigbee_release:
 
 |addon| v1.4.0 - 04/08/2026

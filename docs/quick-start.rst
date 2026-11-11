@@ -55,7 +55,7 @@ To program the samples, complete the following steps:
             .. figure:: images/zigbee_qsg_vsc_flash.png
                :alt: nRF Connect for Visual Studio Code - Refresh Connected Devices and Flash buttons
 
-         When the programming is done, the **LED 1** on the development kit turns on to indicate that the Zigbee network is open.
+         When the programming is done, the **LED 2** on the development kit turns on to indicate that the Zigbee network is open.
          After some time, it turns off and the Zigbee network needs to be reopened (see below).
       #. Add the Zigbee light switch sample.
 
@@ -63,20 +63,20 @@ To program the samples, complete the following steps:
       #. Add the Zigbee light bulb sample.
 
          Repeat the previous steps (building an application and programming).
-         The **LED 2** turns on when the application is started.
+         The **LED 0** blinks when the application is started.
       #. Press **Button 0** on the development kit programmed with the network coordinator sample to reopen the Zigbee network.
          After some time, the devices join the Zigbee network.
 
-         * On the development kit programmed with the light bulb sample, **LED 1** turns on when the light bulb joins the network.
-         * On the development kit programmed with the light switch sample, **LED 1** turns on when the device joins the network and **LED 2** turns on when the light switch finds a light bulb to control.
+         * On the development kit programmed with the light bulb sample, **LED 2** turns on when the light bulb joins the network.
+         * On the development kit programmed with the light switch sample, **LED 2** turns on when the device joins the network and **LED 3** turns on when the light switch finds a light bulb to control.
 
       Reopening the network
          If you find that you are having issues with your devices joining the Zigbee network, it may be because the network needs to be reopened manually.
          By default, the network remains open for 180 seconds at startup and after **Button 0** is pressed.
          After 180 seconds have passed, the network will close and needs to be re-opened.
 
-         When the network is open, **LED 1** on the development kit programmed with the network coordinator sample will be on.
-         If **LED 1** is not on, then the network is closed and needs to be reopened again.
+         When the network is open, **LED 2** on the development kit programmed with the network coordinator sample will be on.
+         If **LED 2** is not on, then the network is closed and needs to be reopened again.
 
          To reopen the network, press **Button 0** on the development kit that has been programmed as the network coordinator.
 
@@ -106,7 +106,7 @@ To program the samples, complete the following steps:
       #. Add the Zigbee light bulb sample.
 
          Repeat the previous steps (building an application and programming).
-         The **LED 4** turns on when the application is started.
+         The **LED 1** blinks when the application is started.
       #. Press **Button 1** on the development kit programmed with the network coordinator sample to reopen the Zigbee network.
          After some time, the devices join the Zigbee network.
 
@@ -143,10 +143,10 @@ After forming the Zigbee network, test the interaction between the devices.
 
    .. group-tab:: nRF52 and nRF53 DKs
 
-      1. Press **Button 2** once on the development kit programmed with the light switch sample to turn off the light bulb's **LED 4**.
-      #. Press **Button 1** once on the development kit programmed with the light switch sample to turn on the light bulb's **LED 4**.
-      #. Press and hold **Button 2** on the development kit programmed with the light switch sample to decrease the light bulb's **LED 4** brightness.
-      #. Press and hold **Button 1** on the development kit programmed with the light switch sample to increase the light bulb's **LED 4** brightness.
+      1. Press **Button 2** once on the development kit programmed with the light switch sample to turn off the light bulb's **LED 2**.
+      #. Press **Button 1** once on the development kit programmed with the light switch sample to turn on the light bulb's **LED 2**.
+      #. Press and hold **Button 2** on the development kit programmed with the light switch sample to decrease the light bulb's **LED 2** brightness.
+      #. Press and hold **Button 1** on the development kit programmed with the light switch sample to increase the light bulb's **LED 2** brightness.
 
 Next steps
 **********

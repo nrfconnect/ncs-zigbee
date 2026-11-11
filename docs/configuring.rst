@@ -8,7 +8,6 @@ Configuring |addon|
    :depth: 2
 
 This page describes what is needed to start working with Zigbee using the |addon| for the |NCS|.
-|kconfig_search|
 
 .. _zigbee_ug_libs:
 
@@ -193,7 +192,7 @@ The ZBOSS stack can be started using one of the following options:
 The dedicated thread can be configured using the following Kconfig options:
 
 * ``CONFIG_ZBOSS_DEFAULT_THREAD_PRIORITY`` - Defines thread priority; set to ``3`` by default.
-* ``CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE`` - Defines the size of the thread stack; set to ``2048`` by default.
+* ``CONFIG_ZBOSS_DEFAULT_THREAD_STACK_SIZE`` - Defines the size of the thread stack; set to ``3328`` by default.
 
 .. _zigbee_ug_logging:
 
@@ -222,6 +221,10 @@ To customize them, use the following Kconfig options:
 * ``CONFIG_ZBOSS_ERROR_PRINT_TO_LOG`` - Allows the application to log ZBOSS error names; enabled by default.
 * ``CONFIG_ZBOSS_TRACE_MASK`` - Sets the modules from which ZBOSS will log the debug messages with ``CONFIG_ZBOSS_TRACE_LOG_LEVEL``; no module is set by default.
 * ``CONFIG_ZBOSS_TRAF_DUMP`` - Enables logging of the received 802.15.4 frames over ZBOSS trace log if ``CONFIG_ZBOSS_TRACE_LOG_LEVEL`` is set; disabled by default.
+
+  .. note::
+     ``CONFIG_ZBOSS_TRAF_DUMP`` and other ZBOSS binary trace features are intended for development, testing, and evaluation purposes only and are not intended for use in production end products.
+     See also :ref:`ug_zigbee_configuring_zboss_traces`.
 
 The stack logs are provided in a binary format.
 You can configure how they are printed with the following Kconfig options:

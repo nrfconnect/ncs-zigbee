@@ -44,6 +44,10 @@ BUILD_ASSERT(FIXED_PARTITION_EXISTS(zboss_product_config),
 #define PHYSICAL_PAGE_SIZE 0x1000
 BUILD_ASSERT((ZBOSS_NVRAM_PAGE_SIZE % PHYSICAL_PAGE_SIZE) == 0,
 	     "The size must be a multiply of physical page size.");
+#if CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE > 0
+BUILD_ASSERT(CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE <= ZBOSS_NVRAM_PAGE_SIZE,
+	     "ZIGBEE_NVRAM_WRITE_CACHE_SIZE must not exceed a ZBOSS NVRAM page");
+#endif
 
 LOG_MODULE_DECLARE(zboss_osif, CONFIG_ZBOSS_OSIF_LOG_LEVEL);
 
@@ -99,29 +103,32 @@ static int nvram_flash_write(const struct flash_area *area, off_t off,
 	uint8_t block_buf[NVRAM_MAX_WRITE_BLOCK_SIZE];
 	int err;
 
+	/* Trivial case: alignment does not matter. */	
 	if (write_block <= 1) {
 		return flash_area_write(area, off, data, len);
 	}
 
 	__ASSERT_NO_MSG(write_block <= sizeof(block_buf));
 
-	while (len > 0) {
+	/* Unaligned start: flash requires writes on block boundaries (4 B or 16 B).
+	 Read-modify-write one block.
+	 */
+	if (off & (write_block - 1)) {
 		off_t block_start = off & ~(write_block - 1);
-		off_t block_off = off - block_start;
+		size_t block_off = off - block_start;
 		size_t chunk = MIN(len, write_block - block_off);
 
-		if (block_off == 0 && chunk == write_block) {
-			err = flash_area_write(area, block_start, src, write_block);
-		} else {
-			err = flash_area_read(area, block_start, block_buf, write_block);
-			if (err) {
-				return err;
-			}
-
-			memcpy(block_buf + block_off, src, chunk);
-			err = flash_area_write(area, block_start, block_buf, write_block);
+		/* Read the full block from flash. */
+		err = flash_area_read(area, block_start, block_buf, write_block);
+		if (err) {
+			return err;
 		}
 
+		/* Patch in the new bytes at the correct offset. */
+		memcpy(block_buf + block_off, src, chunk);
+
+		/* Write the whole block back. */
+		err = flash_area_write(area, block_start, block_buf, write_block);
 		if (err) {
 			return err;
 		}
@@ -131,8 +138,119 @@ static int nvram_flash_write(const struct flash_area *area, off_t off,
 		len -= chunk;
 	}
 
+	size_t aligned_len = len & ~((size_t)write_block - 1);
+
+	/* Aligned middle: write the largest contiguous aligned chunk in one
+	 * flash_area_write(). This avoids the need to read-modify-write multiple
+	 * blocks.
+	 */
+	if (aligned_len) {
+		err = flash_area_write(area, off, src, aligned_len);
+		if (err) {
+			return err;
+		}
+
+		off += aligned_len;
+		src += aligned_len;
+		len -= aligned_len;
+	}
+
+	/* Unaligned tail: same read-modify-write as the head. */
+	if (len) {
+		err = flash_area_read(area, off, block_buf, write_block);
+		if (err) {
+			return err;
+		}
+
+		memcpy(block_buf, src, len);
+		err = flash_area_write(area, off, block_buf, write_block);
+		if (err) {
+			return err;
+		}
+	}
+
 	return 0;
 }
+
+#if CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE > 0
+
+/* ZBOSS stores a dataset as a sequence of small writes that continue each other and
+ * calls zb_osif_nvram_flush() once the dataset is complete, so consecutive writes are
+ * gathered here and committed as one flash operation.
+ */
+static struct {
+	zb_uint8_t data[CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE];
+	zb_uint8_t page;
+	zb_uint32_t pos;
+	size_t len;
+} write_cache;
+
+/* Note: a dataset is committed from zb_osif_nvram_flush(), which cannot report
+ * failures back to ZBOSS, so a commit error is logged here as well.
+ */
+static int write_cache_commit(void)
+{
+	int err;
+
+	if (write_cache.len == 0) {
+		return 0;
+	}
+
+	err = nvram_flash_write(fa, get_page_base_offset(write_cache.page) + write_cache.pos,
+				write_cache.data, write_cache.len);
+	if (err) {
+		LOG_ERR("Cached write error: %d", err);
+		return err;
+	}
+
+	write_cache.len = 0;
+
+	return 0;
+}
+
+static bool write_cache_continues(zb_uint8_t page, zb_uint32_t pos, zb_uint16_t len)
+{
+	return (write_cache.len != 0) && (write_cache.page == page) &&
+	       (pos == write_cache.pos + write_cache.len) &&
+	       (write_cache.len + len <= sizeof(write_cache.data));
+}
+
+static int write_cache_add(zb_uint8_t page, zb_uint32_t pos, const void *buf, zb_uint16_t len)
+{
+	if (!write_cache_continues(page, pos, len)) {
+		int err = write_cache_commit();
+
+		if (err) {
+			return err;
+		}
+
+		if (len > sizeof(write_cache.data)) {
+			return nvram_flash_write(fa, get_page_base_offset(page) + pos, buf, len);
+		}
+
+		write_cache.page = page;
+		write_cache.pos = pos;
+	}
+
+	memcpy(write_cache.data + write_cache.len, buf, len);
+	write_cache.len += len;
+
+	return 0;
+}
+
+#else /* CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE > 0 */
+
+static int write_cache_commit(void)
+{
+	return 0;
+}
+
+static int write_cache_add(zb_uint8_t page, zb_uint32_t pos, const void *buf, zb_uint16_t len)
+{
+	return nvram_flash_write(fa, get_page_base_offset(page) + pos, buf, len);
+}
+
+#endif /* CONFIG_ZIGBEE_NVRAM_WRITE_CACHE_SIZE > 0 */
 
 zb_ret_t zb_osif_nvram_read(zb_uint8_t page, zb_uint32_t pos, zb_uint8_t *buf,
 			    zb_uint16_t len)
@@ -157,6 +275,11 @@ zb_ret_t zb_osif_nvram_read(zb_uint8_t page, zb_uint32_t pos, zb_uint8_t *buf,
 
 	uint32_t flash_addr = get_page_base_offset(page) + pos;
 
+	/* Make cached writes visible to the reader. */
+	if (write_cache_commit()) {
+		return RET_ERROR;
+	}
+
 	int err = flash_area_read(fa, flash_addr, buf, len);
 
 	if (err) {
@@ -169,8 +292,6 @@ zb_ret_t zb_osif_nvram_read(zb_uint8_t page, zb_uint32_t pos, zb_uint8_t *buf,
 zb_ret_t zb_osif_nvram_write(zb_uint8_t page, zb_uint32_t pos, void *buf,
 			     zb_uint16_t len)
 {
-	uint32_t flash_addr = get_page_base_offset(page) + pos;
-
 	if (page >= zb_get_nvram_page_count()) {
 		return RET_PAGE_NOT_FOUND;
 	}
@@ -194,7 +315,7 @@ zb_ret_t zb_osif_nvram_write(zb_uint8_t page, zb_uint32_t pos, void *buf,
 	LOG_DBG("Function: %s, page: %d, pos: %d, len: %d",
 		__func__, page, pos, len);
 
-	int err = nvram_flash_write(fa, flash_addr, buf, len);
+	int err = write_cache_add(page, pos, buf, len);
 
 	if (err) {
 		LOG_ERR("Write error: %d", err);
@@ -207,6 +328,10 @@ zb_ret_t zb_osif_nvram_write(zb_uint8_t page, zb_uint32_t pos, void *buf,
 zb_ret_t zb_osif_nvram_erase_async(zb_uint8_t page)
 {
 	zb_ret_t ret = RET_OK;
+
+	if (write_cache_commit()) {
+		ret = RET_ERROR;
+	}
 
 	if (page < zb_get_nvram_page_count()) {
 		int err = flash_area_erase(fa, get_page_base_offset(page),
@@ -222,12 +347,12 @@ zb_ret_t zb_osif_nvram_erase_async(zb_uint8_t page)
 
 void zb_osif_nvram_wait_for_last_op(void)
 {
-	/* empty for synchronous erase and write */
+	(void)write_cache_commit();
 }
 
 void zb_osif_nvram_flush(void)
 {
-	/* empty for synchronous erase and write */
+	(void)write_cache_commit();
 }
 
 
