@@ -828,7 +828,13 @@ void zigbee_led_status_update(zb_cb_param_t param, uint32_t led_idx)
 
 	switch (sig) {
 	case ZB_BDB_SIGNAL_DEVICE_FIRST_START:
-	/* fall-through */
+		/* RET_OK on first start means BDB init succeeded, not necessarily joined. */
+		if ((status == RET_OK) && ZB_JOINED()) {
+			dk_set_led_on(led_idx);
+		} else if (status != RET_OK) {
+			dk_set_led_off(led_idx);
+		}
+		break;
 	case ZB_BDB_SIGNAL_DEVICE_REBOOT:
 	/* fall-through */
 	case ZB_BDB_SIGNAL_STEERING:

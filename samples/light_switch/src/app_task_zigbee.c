@@ -802,6 +802,18 @@ void zboss_signal_handler(zb_cb_param_t param)
 		}
 		break;
 #endif /* CONFIG_ZIGBEE_TOUCHLINK_INITIATOR */
+	case ZB_BDB_SIGNAL_DEVICE_FIRST_START:
+		/* Call default signal handler. */
+		ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
+		/* On factory-new join ZBOSS reports DEVICE_FIRST_START (not STEERING). */
+		if ((status == RET_OK) && ZB_JOINED() &&
+		    (bulb_ctx.short_addr == 0xFFFF)) {
+			zb_zdo_pim_set_long_poll_interval(3000);
+			k_timer_start(&bulb_ctx.find_alarm,
+				      MATCH_DESC_REQ_START_DELAY,
+				      MATCH_DESC_REQ_TIMEOUT);
+		}
+		break;
 	case ZB_BDB_SIGNAL_DEVICE_REBOOT:
 	/* fall-through */
 	case ZB_BDB_SIGNAL_STEERING:
