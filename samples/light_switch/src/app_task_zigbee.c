@@ -234,6 +234,7 @@ static void light_switch_button_handler(struct k_timer *timer);
 static void find_light_bulb_alarm(struct k_timer *timer);
 static void find_light_bulb(zb_cb_param_t param);
 static void light_switch_send_on_off(zb_cb_param_t param);
+static void light_switch_schedule_bulb_find(void);
 
 
 /**@brief Starts identifying the device.
@@ -557,6 +558,18 @@ static void light_switch_send_step(zb_cb_param_t param)
 }
 #endif
 
+static void light_switch_schedule_bulb_find(void)
+{
+	if (bulb_ctx.short_addr != 0xFFFF) {
+		return;
+	}
+
+	zb_zdo_pim_set_long_poll_interval(3000);
+	k_timer_start(&bulb_ctx.find_alarm,
+		      MATCH_DESC_REQ_START_DELAY,
+		      MATCH_DESC_REQ_TIMEOUT);
+}
+
 /**@brief Callback function receiving finding procedure results.
  *
  * @param[in]   bufid   Reference to Zigbee stack buffer used to pass
@@ -793,41 +806,18 @@ void zboss_signal_handler(zb_cb_param_t param)
 		ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
 		if (status == RET_OK) {
 			LOG_INF("Touchlink done: start finding bulb");
-			zb_zdo_pim_set_long_poll_interval(3000);
-			if (bulb_ctx.short_addr == 0xFFFF) {
-				k_timer_start(&bulb_ctx.find_alarm,
-					      MATCH_DESC_REQ_START_DELAY,
-					      MATCH_DESC_REQ_TIMEOUT);
-			}
+			light_switch_schedule_bulb_find();
 		}
 		break;
 #endif /* CONFIG_ZIGBEE_TOUCHLINK_INITIATOR */
 	case ZB_BDB_SIGNAL_DEVICE_FIRST_START:
-		/* Call default signal handler. */
-		ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
-		/* On factory-new join ZBOSS reports DEVICE_FIRST_START (not STEERING). */
-		if ((status == RET_OK) && ZB_JOINED() &&
-		    (bulb_ctx.short_addr == 0xFFFF)) {
-			zb_zdo_pim_set_long_poll_interval(3000);
-			k_timer_start(&bulb_ctx.find_alarm,
-				      MATCH_DESC_REQ_START_DELAY,
-				      MATCH_DESC_REQ_TIMEOUT);
-		}
-		break;
+	/* fall-through */
 	case ZB_BDB_SIGNAL_DEVICE_REBOOT:
 	/* fall-through */
 	case ZB_BDB_SIGNAL_STEERING:
-		/* Call default signal handler. */
 		ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
-		if (status == RET_OK) {
-			zb_zdo_pim_set_long_poll_interval(3000);
-
-			/* Check the light device address. */
-			if (bulb_ctx.short_addr == 0xFFFF) {
-				k_timer_start(&bulb_ctx.find_alarm,
-					      MATCH_DESC_REQ_START_DELAY,
-					      MATCH_DESC_REQ_TIMEOUT);
-			}
+		if ((status == RET_OK) && ZB_JOINED()) {
+			light_switch_schedule_bulb_find();
 		}
 		break;
 	case ZB_ZDO_SIGNAL_LEAVE:
