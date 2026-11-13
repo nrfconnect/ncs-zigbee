@@ -41,8 +41,8 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 | 0.1.0             |                  |                       | N/A                 | 
 +-------------------+------------------+-----------------------+---------------------+
 
-|addon| v2.0.0 - TBD
-********************
+|addon| v2.0.0 - 13/11/2026
+***************************
 
 This is the first release to support Zigbee 4.0, integrating a Zigbee R23.2-compatible stack.
 This release has `supported <Software maturity levels_>`_ maturity status.
