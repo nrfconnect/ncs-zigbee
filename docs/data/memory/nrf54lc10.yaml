@@ -1,10 +1,11 @@
-# Memory requirement data for nRF54LC10 DK (nRF54LC10A SoC).
+# Memory requirement data for nRF54LC10 DK (no external flash).
 # Partition sizes are derived from dts/*.dtsi.
+# Sample usage is generated from Twister build logs.
 
 board:
-  name: nRF54LC10 DK
+  name: nRF54LC10 DK (no external flash)
   nvm_total_kb: 1012
-  ram_total_kb: 191
+  ram_total_kb: 192
 legend_threshold_kb: 4
 layouts:
   base:
@@ -46,7 +47,7 @@ layouts:
         order: 1
         offset: 81920
       - id: slot1
-        label: Upgrade slot (compressed)
+        label: Upgrade slot
         size_kb: 332
         order: 2
         offset: 651264
@@ -55,47 +56,43 @@ samples:
     layout: base
     usage:
       nvm:
-        slot0: 362
-      ram_used_kb: 73
+        slot0: 386
+      ram_used_kb: 72
   - label: ':ref:`Light bulb <zigbee_light_bulb_sample>`'
     layout: base
     usage:
       nvm:
-        slot0: 387
-      ram_used_kb: 53
+        slot0: 403
+      ram_used_kb: 52
   - label: ':ref:`Light switch <zigbee_light_switch_sample>`'
     layout: base
     usage:
       nvm:
-        slot0: 294
-      ram_used_kb: 43
+        slot0: 313
+      ram_used_kb: 42
   - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`lib_zigbee_fota`'
     layout: fota
     usage:
       nvm:
-        boot: 56
-        slot0: 317
-        slot1: 190
-      ram_used_kb: 46
+        boot: 41
+        slot0: 333
+        slot1: 198
+      ram_used_kb: 45
   - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`zigbee_light_switch_sample_nus`'
     layout: base
     usage:
       nvm:
-        slot0: 397
-      ram_used_kb: 60
-  - label: ':ref:`NCP <zigbee_ncp_sample>`'
-    not_applicable: true
+        slot0: 415
+      ram_used_kb: 58
   - label: ':ref:`Zigbee application template <zigbee_template_sample>`'
     layout: base
     usage:
       nvm:
-        slot0: 362
+        slot0: 386
       ram_used_kb: 62
   - label: ':ref:`Zigbee shell <zigbee_shell_sample>`'
     layout: base
     usage:
       nvm:
-        slot0: 443
-      ram_used_kb: 79
-  - label: ':ref:`Zigbee shell over USB <zigbee_shell_sample>`'
-    not_applicable: true
+        slot0: 468
+      ram_used_kb: 78

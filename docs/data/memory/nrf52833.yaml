@@ -51,6 +51,10 @@ samples:
     not_applicable: true
   - label: ':ref:`Light bulb <zigbee_light_bulb_sample>`'
     not_applicable: true
+  - label: ':ref:`Light bulb <zigbee_light_bulb_sample>` with :ref:`lib_zigbee_fota`'
+    not_applicable: true
+  - label: ':ref:`Light bulb <zigbee_light_bulb_sample>` with :ref:`lib_zigbee_fota` and :ref:`DFU over Bluetooth SMP <zigbee_light_bulb_testing_zigbee_bt_dfu>`'
+    not_applicable: true
   - label: ':ref:`Light switch <zigbee_light_switch_sample>`'
     not_applicable: true
   - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`lib_zigbee_fota`'
@@ -60,18 +64,9 @@ samples:
   - label: ':ref:`Light switch <zigbee_light_switch_sample>` with :ref:`zigbee_light_switch_sample_nus` and :ref:`lib_zigbee_fota`'
     not_applicable: true
   - label: ':ref:`NCP <zigbee_ncp_sample>`'
-    layout: base
-    usage:
-      nvm:
-        slot0: 367
-      ram_used_kb: 86
+    not_applicable: true
   - label: ':ref:`NCP with USB transport <zigbee_ncp_sample>`'
-    layout: mcuboot_usb
-    usage:
-      nvm:
-        boot: 51
-        slot0: 393
-      ram_used_kb: 94
+    not_applicable: true
   - label: ':ref:`Zigbee application template <zigbee_template_sample>`'
     not_applicable: true
   - label: ':ref:`Zigbee shell <zigbee_shell_sample>`'

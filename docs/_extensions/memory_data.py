@@ -47,11 +47,13 @@ PADDING_LABEL = "Unused"
 
 
 def applicable_samples(data: dict[str, Any]) -> list[dict[str, Any]]:
-    return [sample for sample in data["samples"] if not sample.get("not_applicable")]
+    samples = data.get("samples") or []
+    return [sample for sample in samples if not sample.get("not_applicable")]
 
 
 def stack_samples(data: dict[str, Any]) -> list[dict[str, Any]]:
-    return [sample for sample in data.get("samples", []) if sample.get("stack")]
+    samples = data.get("samples") or []
+    return [sample for sample in samples if sample.get("stack")]
 
 
 def stack_thread_sizes(samples: list[dict[str, Any]]) -> tuple[int, int]:
