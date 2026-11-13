@@ -17,7 +17,7 @@
 		slot0_partition: partition@e000 {
 			compatible = "zephyr,mapped-partition";
 			label = "image-0";
-			reg = <0xe000 DT_SIZE_K(1940)>;
+			reg = <0xe000 DT_SIZE_K(1936)>;
 		};
 	};
 };
@@ -32,7 +32,7 @@
 
 		slot1_partition: partition@0 {
 			label = "image-1";
-			reg = <0x00000000 DT_SIZE_K(1940)>;
+			reg = <0x00000000 DT_SIZE_K(1936)>;
 		};
 	};
 };
