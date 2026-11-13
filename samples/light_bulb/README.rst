@@ -68,6 +68,26 @@ You can find the configuration files in the :file:`samples/light_bulb` directory
 
 .. include:: /includes/zigbee_bt_dfu_activation.txt
 
+Zigbee FOTA download time and ZBOSS memory configuration
+--------------------------------------------------------
+
+The FOTA variant uses the same :ref:`lib_zigbee_fota` integration and Kconfig options as the :ref:`zigbee_light_switch_sample` (see the :file:`prj_fota.conf` file).
+The bulb sample is a :ref:`Zigbee Router <zigbee_roles>` and uses the default medium ZBOSS RAM profile from :file:`zb_mem_config_med.h` (included from :file:`zboss_mem_globals.c`).
+
+How long a Zigbee OTA download takes depends on the firmware image size, the negotiated Image Block size (``CONFIG_ZIGBEE_FOTA_DATA_BLOCK_SIZE``, default 64 bytes), and how quickly the ZBOSS OTA client may send the next Image Block Request.
+In ZBOSS, a lower limit for the delay between block requests is derived from ``ZB_APS_DUPS_TABLE_SIZE`` (set in the application memory profile as ``ZB_CONFIG_APS_DUPS_TABLE_SIZE`` in :file:`zb_mem_config_common.h`).
+A smaller APS duplicate-rejection table corresponds to a longer minimum spacing between block requests and therefore a longer FOTA transfer for the same image.
+
+The moderate profile used by this sample sets ``ZB_CONFIG_APS_DUPS_TABLE_SIZE`` to 16, which is appropriate for a general-purpose router build but can make full multi-image FOTA updates noticeably slower than on the light switch sample.
+
+The :ref:`zigbee_light_switch_sample` uses a custom memory configuration in :file:`zb_mem_config_custom.h` that raises ``ZB_CONFIG_APS_DUPS_TABLE_SIZE`` to 64 to shorten OTA block pacing (see also :ref:`zigbee_memory`).
+You may apply a similar override in a router-specific custom header if you need shorter FOTA times; do not copy the light switch header as-is, because it selects an end-device-oriented profile.
+
+.. note::
+   Increasing ``ZB_CONFIG_APS_DUPS_TABLE_SIZE`` uses extra static RAM and makes OTA block requests more frequent.
+   On a router, that can affect behavior while FOTA is in progress: the device still relays traffic for children and handles application ZCL traffic, so a faster OTA download increases airtime and stack load on the same radio.
+   Validate FOTA together with typical routing and application traffic before adopting aggressive pacing in a product.
+
 .. _zigbee_light_bulb_touchlink:
 
 Touchlink variant
