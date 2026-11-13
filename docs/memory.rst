@@ -199,6 +199,13 @@ Other NVM columns list the reserved partition size for that region.
             .. memory-board::
                :board: nrf54lm20
 
+         .. group-tab:: nRF54LM20 Dongle
+
+            Memory requirements for samples running on the nRF54LM20 Dongle with the ``nrf54lm20dongle/nrf54lm20b/cpuapp`` board target.
+
+            .. memory-board::
+               :board: nrf54lm20_dongle
+
    .. group-tab:: Tables
 
       .. tabs::
@@ -267,3 +274,10 @@ Other NVM columns list the reserved partition size for that region.
 
             .. memory-table::
                :board: nrf54lm20
+
+         .. group-tab:: nRF54LM20 Dongle
+
+            The following table lists memory requirements for samples running on the nRF54LM20 Dongle with the ``nrf54lm20dongle/nrf54lm20b/cpuapp`` board target.
+
+            .. memory-table::
+               :board: nrf54lm20_dongle
