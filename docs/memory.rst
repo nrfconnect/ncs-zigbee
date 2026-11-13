@@ -134,12 +134,13 @@ Other NVM columns list the reserved partition size for that region.
 
       .. tabs::
 
-         .. group-tab:: nRF52833
+         ..
+            .. group-tab:: nRF52833
 
-            Memory requirements for samples running on the `nRF52833 DK <Board support_>`_ (`nrf52833dk`_).
+               Memory requirements for samples running on the `nRF52833 DK <Board support_>`_ (`nrf52833dk`_).
 
-            .. memory-board::
-               :board: nrf52833
+               .. memory-board::
+                  :board: nrf52833
 
          .. group-tab:: nRF52840
 
@@ -162,12 +163,13 @@ Other NVM columns list the reserved partition size for that region.
             .. memory-board::
                :board: nrf5340
 
-         .. group-tab:: nRF54L05
+         ..
+            .. group-tab:: nRF54L05
 
-            Memory requirements for samples running on the `nRF54L05 emulation on the nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
+               Memory requirements for samples running on the `nRF54L05 emulation on the nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
 
-            .. memory-board::
-               :board: nrf54l05
+               .. memory-board::
+                  :board: nrf54l05
 
          .. group-tab:: nRF54L10
 
@@ -201,12 +203,13 @@ Other NVM columns list the reserved partition size for that region.
 
       .. tabs::
 
-         .. group-tab:: nRF52833
+         ..
+            .. group-tab:: nRF52833
 
-            The following table lists memory requirements for samples running on the `nRF52833 DK <Board support_>`_ (`nrf52833dk`_).
+               The following table lists memory requirements for samples running on the `nRF52833 DK <Board support_>`_ (`nrf52833dk`_).
 
-            .. memory-table::
-               :board: nrf52833
+               .. memory-table::
+                  :board: nrf52833
 
          .. group-tab:: nRF52840
 
@@ -229,12 +232,13 @@ Other NVM columns list the reserved partition size for that region.
             .. memory-table::
                :board: nrf5340
 
-         .. group-tab:: nRF54L05
+         ..
+            .. group-tab:: nRF54L05
 
-            The following table lists memory requirements for samples running on the `nRF54L05 emulation on the nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
+               The following table lists memory requirements for samples running on the `nRF54L05 emulation on the nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
 
-            .. memory-table::
-               :board: nrf54l05
+               .. memory-table::
+                  :board: nrf54l05
 
          .. group-tab:: nRF54L10
 

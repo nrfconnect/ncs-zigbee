@@ -32,10 +32,4 @@ layouts:
         order: 3
         offset: 507904
         legend_only: true
-samples:
-  - label: ':ref:`NCP <zigbee_ncp_sample>`'
-    layout: base
-    usage:
-      nvm:
-        slot0: 384
-      ram_used_kb: 90
+samples: []
