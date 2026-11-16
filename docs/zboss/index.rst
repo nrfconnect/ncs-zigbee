@@ -17,7 +17,7 @@ For detailed documentation of the ZBOSS API for these versions and instructions 
 
     .. rst-class:: doc-link-image
 
-    .. image:: images/zoi-logo.png
+    .. image:: images/zoi-logo.svg
        :target: `ZBOSS API documentation`_
 
     .. rst-class:: doc-link-text
