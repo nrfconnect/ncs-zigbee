@@ -53,6 +53,11 @@ The following release is `supported <Software maturity levels_>`_.
     ``CONFIG_ZIGBEE_BT_DFU`` still uses a larger system workqueue for SMP.
   * Removed the stack memory requirements section from the :ref:`Memory requirements <zigbee_memory>` page.
 
+* Removed:
+
+  * Experimental ``CONFIG_ZIGBEE_GP_CB`` (Green Power Combo Basic) and ``libgpcb`` linking when building ZBOSS from sources.
+    Zigbee Green Power on routers and coordinators continues to use ``CONFIG_ZIGBEE_GP_PB`` (``libgppb``), which is the default and matches shipped prebuilt libraries.
+
 * Migration notes:
 
   * In the :ref:`zigbee_light_bulb_sample` on nRF52 and nRF53 DKs, use LED 2 instead of LED 4 for the dimmable light output.
