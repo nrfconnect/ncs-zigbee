@@ -163,8 +163,6 @@ if ((NOT DEFINED CONFIG_ZBOSS_SOURCES_AVAILABLE) OR
   if (CONFIG_ZIGBEE_ROLE_COORDINATOR OR CONFIG_ZIGBEE_ROLE_ROUTER)
     if (CONFIG_ZIGBEE_GP_PB)
       target_link_libraries(zboss INTERFACE ${ZBOSS_LIB_PATH}/libgppb${LIB_VARIANT}.a)
-    elseif (CONFIG_ZIGBEE_GP_CB)
-      target_link_libraries(zboss INTERFACE ${ZBOSS_LIB_PATH}/libgpcb${LIB_VARIANT}.a)
     else()
       message( FATAL_ERROR "Unsupported Zigbee Green Power feature set")
     endif()

@@ -42,11 +42,6 @@ config ZIGBEE_GP_NONE
 config ZIGBEE_GP_PB
 	bool "Enable Zigbee Green Power Proxy Basic functionality"
 
-config ZIGBEE_GP_CB
-	bool "Enable Zigbee Green Power Combo Basic functionality [EXPERIMENTAL]"
-	select EXPERIMENTAL
-	depends on !ZIGBEE_ROLE_END_DEVICE && ZBOSS_SOURCES_AVAILABLE
-
 endchoice
 
 config ZIGBEE_ENABLE_TRACES
