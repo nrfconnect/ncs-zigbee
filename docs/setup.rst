@@ -39,7 +39,13 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
    .. group-tab:: command line
 
       You can initialize workspace in two alternative ways.
-      In the following commands, replace *version* with the tag of the |addon| release you want to use, or with ``main`` to use the latest development state.
+      In the following commands, replace *version* with the tag of the |addon| release you want to use.
+      It is recommended to use the latest stable release.
+
+      .. note::
+
+         To use the latest development state with unreleased features and fixes, replace *version* with ``main``.
+         This version may contain untested or breaking changes and is not recommended for production use.
 
       **Initialize a new workspace:**
 
