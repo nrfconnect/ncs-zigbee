@@ -1901,6 +1901,8 @@ typedef struct zb_zcl_thermostat_context_s
   zb_uint8_t setpoint_mode;
 }
 zb_zcl_thermostat_context_t;
+/*! @}
+ *  @endcond */ /* internals_doc */
 
 /** @brief Declare run Thermostat command for User Application
 */
@@ -1910,8 +1912,6 @@ typedef ZB_PACKED_PRE struct zb_zcl_thermostat_value_param_s
   zb_uint16_t heat_setpoint;    /*!< Heat Set Point */
   zb_uint16_t cool_setpoint;    /*!< Cool Set Point */
 } zb_zcl_thermostat_value_param_t;
-/*! @}
- *  @endcond */ /* internals_doc */
 /** @endcond */ /* DOXYGEN_ZCL_SECTION */
 
 void zb_zcl_thermostat_init(void);

@@ -421,6 +421,9 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
     case ZB_ZCL_ATTR_TYPE_S16:
     case ZB_ZCL_ATTR_TYPE_16BITMAP:
     case ZB_ZCL_ATTR_TYPE_16BIT_ENUM:
+    case ZB_ZCL_ATTR_TYPE_SEMI:
+    case ZB_ZCL_ATTR_TYPE_CLUSTER_ID:
+    case ZB_ZCL_ATTR_TYPE_ATTRIBUTE_ID:
        ZB_ZCL_PACKET_PUT_DATA16(cmd_ptr, attr_value);
       break;
 
@@ -429,13 +432,17 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
     case ZB_ZCL_ATTR_TYPE_S32:
     case ZB_ZCL_ATTR_TYPE_32BITMAP:
     case ZB_ZCL_ATTR_TYPE_UTC_TIME:
+    case ZB_ZCL_ATTR_TYPE_TIME_OF_DAY:
+    case ZB_ZCL_ATTR_TYPE_DATE:
+    case ZB_ZCL_ATTR_TYPE_BACNET_OID:
     case ZB_ZCL_ATTR_TYPE_SINGLE:
       ZB_ZCL_PACKET_PUT_DATA32(cmd_ptr, attr_value);
       break;
 
     case ZB_ZCL_ATTR_TYPE_U48:
     case ZB_ZCL_ATTR_TYPE_S48:
-//TODO: fix it, put data taking into account bytes order
+    case ZB_ZCL_ATTR_TYPE_48BIT:
+    case ZB_ZCL_ATTR_TYPE_48BITMAP:
       ZB_ZCL_PACKET_PUT_DATA48(cmd_ptr, attr_value);
       break;
 
@@ -443,8 +450,21 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
     case ZB_ZCL_ATTR_TYPE_U24:
     case ZB_ZCL_ATTR_TYPE_24BIT:
     case ZB_ZCL_ATTR_TYPE_24BITMAP:
-//TODO: fix it, put data taking into account bytes order
       ZB_ZCL_PACKET_PUT_DATA24(cmd_ptr, attr_value);
+      break;
+
+    case ZB_ZCL_ATTR_TYPE_U40:
+    case ZB_ZCL_ATTR_TYPE_S40:
+    case ZB_ZCL_ATTR_TYPE_40BIT:
+    case ZB_ZCL_ATTR_TYPE_40BITMAP:
+      ZB_ZCL_PACKET_PUT_DATA40(cmd_ptr, attr_value);
+      break;
+
+    case ZB_ZCL_ATTR_TYPE_U56:
+    case ZB_ZCL_ATTR_TYPE_S56:
+    case ZB_ZCL_ATTR_TYPE_56BIT:
+    case ZB_ZCL_ATTR_TYPE_56BITMAP:
+      ZB_ZCL_PACKET_PUT_DATA56(cmd_ptr, attr_value);
       break;
 
     case ZB_ZCL_ATTR_TYPE_OCTET_STRING:
@@ -509,6 +529,7 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
     case ZB_ZCL_ATTR_TYPE_64BITMAP:
     case ZB_ZCL_ATTR_TYPE_U64:
     case ZB_ZCL_ATTR_TYPE_S64:
+    case ZB_ZCL_ATTR_TYPE_DOUBLE:
     case ZB_ZCL_ATTR_TYPE_IEEE_ADDR:
       ZB_ZCL_PACKET_PUT_DATA64(cmd_ptr, attr_value);
       break;
@@ -519,6 +540,7 @@ zb_uint8_t* zb_zcl_put_value_to_packet(zb_uint8_t *cmd_ptr, zb_uint8_t attr_type
 
     default:
       TRACE_MSG(TRACE_ZCL1, "Error, unsupported type!", (FMT__0));
+      //ZB_ASSERT(0);
       break;
   }
 
@@ -538,11 +560,13 @@ zb_uint8_t zb_zcl_get_analog_attribute_size(zb_uint8_t attr_type)
   switch (attr_type)
   {
     case ZB_ZCL_ATTR_TYPE_U8:
+    case ZB_ZCL_ATTR_TYPE_S8:
       ret = sizeof(zb_uint8_t);
       break;
 
     case ZB_ZCL_ATTR_TYPE_U16:
     case ZB_ZCL_ATTR_TYPE_S16:
+    case ZB_ZCL_ATTR_TYPE_SEMI:
       ret = sizeof(zb_uint16_t);
       break;
 
@@ -553,6 +577,8 @@ zb_uint8_t zb_zcl_get_analog_attribute_size(zb_uint8_t attr_type)
 
     case ZB_ZCL_ATTR_TYPE_U32:
     case ZB_ZCL_ATTR_TYPE_S32:
+    case ZB_ZCL_ATTR_TYPE_SINGLE:
+    case ZB_ZCL_ATTR_TYPE_UTC_TIME:
       ret = sizeof(zb_uint32_t);
       break;
 
@@ -563,6 +589,7 @@ zb_uint8_t zb_zcl_get_analog_attribute_size(zb_uint8_t attr_type)
 
     case ZB_ZCL_ATTR_TYPE_U64:
     case ZB_ZCL_ATTR_TYPE_S64:
+    case ZB_ZCL_ATTR_TYPE_DOUBLE:
       ret = sizeof(zb_uint64_t);
       break;
 
@@ -596,6 +623,9 @@ zb_bool_t zb_zcl_is_analog_data_type(zb_uint8_t attr_type)
     case ZB_ZCL_ATTR_TYPE_S48:
     case ZB_ZCL_ATTR_TYPE_S64:
     case ZB_ZCL_ATTR_TYPE_UTC_TIME:
+    case ZB_ZCL_ATTR_TYPE_SEMI:
+    case ZB_ZCL_ATTR_TYPE_SINGLE:
+    case ZB_ZCL_ATTR_TYPE_DOUBLE:
       ret = ZB_TRUE;
       break;
 
@@ -824,6 +854,7 @@ void zb_zcl_fix_endian(zb_uint8_t *data_ptr, zb_uint8_t data_type)
     case ZB_ZCL_ATTR_TYPE_U16:
     case ZB_ZCL_ATTR_TYPE_S16:
     case ZB_ZCL_ATTR_TYPE_16BITMAP:
+    case ZB_ZCL_ATTR_TYPE_SEMI:
       ZB_HTOLE16(&int_vars.u16, data_ptr);
       ZB_MEMCPY(data_ptr, &int_vars.u16, sizeof(zb_uint16_t));
       break;
@@ -832,12 +863,14 @@ void zb_zcl_fix_endian(zb_uint8_t *data_ptr, zb_uint8_t data_type)
     case ZB_ZCL_ATTR_TYPE_U32:
     case ZB_ZCL_ATTR_TYPE_S32:
     case ZB_ZCL_ATTR_TYPE_32BITMAP:
+    case ZB_ZCL_ATTR_TYPE_SINGLE:
       ZB_HTOLE32(&int_vars.u32, data_ptr);
       ZB_MEMCPY(data_ptr, &int_vars.u32, sizeof(zb_uint32_t));
       break;
 
     case ZB_ZCL_ATTR_TYPE_64BIT:
     case ZB_ZCL_ATTR_TYPE_IEEE_ADDR:
+    case ZB_ZCL_ATTR_TYPE_DOUBLE:
       ZB_HTOLE64(&int_vars.u64, data_ptr);
       ZB_MEMCPY(data_ptr, &int_vars.u64, sizeof(zb_ieee_addr_t));
       break;
@@ -943,6 +976,7 @@ zb_uint8_t zb_zcl_check_attribute_writable(
 */
 static void zb_zcl_conform_singleton(zb_uint8_t ep_first, zb_uint16_t cluster_id, zb_uint8_t cluster_role, zb_uint16_t attr_id, zb_uint8_t *value, zb_uint16_t manuf_code)
 {
+  zb_af_endpoint_desc_t *endp_desc;
   zb_uindex_t i;
   TRACE_MSG(TRACE_ZCL1, ">> zb_zcl_conform_singleton ep %hd, cluster %d, attr 0x%x, manuf_code 0x%x",
             (FMT__H_D_D_D, ep_first, cluster_id, attr_id, manuf_code));
@@ -955,12 +989,13 @@ static void zb_zcl_conform_singleton(zb_uint8_t ep_first, zb_uint16_t cluster_id
   ZCL_DEVICE_CONTEXT_ITERATOR(i);
   while (device_ctx != NULL && i < device_ctx->ep_count)
   {
-    TRACE_MSG(TRACE_ZCL3, "ep_id %hd", (FMT__H, device_ctx->ep_desc_list[i]->ep_id));
-    if (device_ctx->ep_desc_list[i]->ep_id != ep_first)
+    endp_desc = device_ctx->ep_desc_list[i++];
+    TRACE_MSG(TRACE_ZCL3, "ep_id %hd", (FMT__H, endp_desc->ep_id));
+    if (endp_desc->ep_id != ep_first)
     {
       zb_zcl_attr_t *attr_desc;
       zb_zcl_cluster_desc_t *cluster_desc = get_cluster_desc(
-        device_ctx->ep_desc_list[i], cluster_id, cluster_role);
+        endp_desc, cluster_id, cluster_role);
 
       if (cluster_desc == NULL)
       {
@@ -973,7 +1008,7 @@ static void zb_zcl_conform_singleton(zb_uint8_t ep_first, zb_uint16_t cluster_id
         continue;
       }
 
-      zb_zcl_write_attr_hook(device_ctx->ep_desc_list[i]->ep_id,
+      zb_zcl_write_attr_hook(endp_desc->ep_id,
                              cluster_id, cluster_role, attr_id, value, manuf_code);
 
       ZB_MEMCPY(attr_desc->data_p, value,
@@ -983,12 +1018,11 @@ static void zb_zcl_conform_singleton(zb_uint8_t ep_first, zb_uint16_t cluster_id
       /* check, if reporting is needed for an attribute */
       if (ZB_ZCL_IS_ATTR_REPORTABLE(attr_desc))
       {
-        zb_zcl_mark_attr_for_reporting_manuf(device_ctx->ep_desc_list[i]->ep_id,
+        zb_zcl_mark_attr_for_reporting_manuf(endp_desc->ep_id,
                                              cluster_id, cluster_role, attr_id, manuf_code);
       }
 #endif
     }
-    i++;
   }
   ZCL_DEVICE_CONTEXT_ITERATOR_END;
 
@@ -2493,7 +2527,16 @@ zb_ret_t zb_zcl_finish_and_send_packet_common(zb_bufid_t buffer,
   }
 
 #ifdef APS_FRAGMENTATION
-  if (frag)
+  /* Do not set fragmentation flag for any broadcasts/group sending
+      as fragmentation not allowed for broadcasts.
+     See r23.2 spec 2.2.4.1.1.3. */
+  if (frag
+      && dst_addr_mode != ZB_APS_ADDR_MODE_16_GROUP_ENDP_NOT_PRESENT
+      /* Add check for broadcast address here, just in case.
+         It seems that there is no strong limitations
+          to have only unicasts here. */
+      && !(apsde_req->addr_mode == ZB_APS_ADDR_MODE_16_ENDP_PRESENT
+          && (ZB_NWK_IS_ADDRESS_BROADCAST(dst_addr->addr_short))))
   {
     apsde_req->tx_options |= ZB_APSDE_TX_OPT_FRAG_PERMITTED;
   }

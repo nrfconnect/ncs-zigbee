@@ -384,7 +384,7 @@ static zb_ret_t zb_bdb_find_respondent(zb_uint16_t nwk_addr, zb_uint8_t *resp_in
 {
   zb_ret_t ret = RET_NOT_FOUND;
   zb_uindex_t i;
-  zb_address_ieee_ref_t addr_ref = 0;
+  zb_address_ieee_ref_t addr_ref = ZB_ADDRESS_IEEE_REF_NONE;
 
   TRACE_MSG(TRACE_ZCL1, "> zb_bdb_find_respondent by addr %d", (FMT__D, nwk_addr));
 
@@ -1151,7 +1151,7 @@ void zb_bdb_fb_send_active_ep_req(zb_uint8_t param, zb_uint16_t src_addr)
   if (resp_idx != 0xff)
   {
     zb_zdo_active_ep_req_t *req;
-    zb_address_ieee_ref_t addr_ref = 0;
+    zb_address_ieee_ref_t addr_ref = ZB_ADDRESS_IEEE_REF_NONE;
     respondent = &BDB_COMM_CTX().respondent[resp_idx];
 
     if (zb_address_get_by_short(src_addr, &addr_ref) == RET_OK)

@@ -793,7 +793,7 @@ typedef ZB_PACKED_PRE struct zb_zcl_read_attr_res_s
  */
 #define ZB_ZCL_GENERAL_INIT_READ_ATTR_RESP_EXT(_buffer, _cmd_ptr, _direction, _seq, _is_manuf, _manuf_id)       \
 {                                                                                                               \
-  cmd_ptr = ZB_ZCL_START_PACKET((_buffer));                                                                     \
+  (_cmd_ptr) = ZB_ZCL_START_PACKET((_buffer));                                                                     \
   ZB_ZCL_CONSTRUCT_GENERAL_COMMAND_RESP_FRAME_CONTROL_A((_cmd_ptr), (_direction), (_is_manuf));                 \
   ZB_ZCL_CONSTRUCT_COMMAND_HEADER_EXT((_cmd_ptr), (_seq), (_is_manuf), (_manuf_id), ZB_ZCL_CMD_READ_ATTRIB_RESP);       \
 }
@@ -2448,7 +2448,7 @@ zb_zcl_disc_attr_ext_res_t;
     (_status) = ZB_ZCL_PARSE_STATUS_SUCCESS;                            \
     ZB_HTOLE16(&((_data_ptr)->attr_id), &(src_ptr->attr_id));           \
     (_data_ptr)->data_type = src_ptr->data_type;                        \
-    (_data_ptr)->data_access = src_ptr->data_access;                    \
+    (_data_ptr)->attr_access = src_ptr->attr_access;                    \
     (void)zb_buf_cut_left((_buffer), sizeof(zb_zcl_disc_attr_ext_info_t)); \
   }                                                                     \
 }

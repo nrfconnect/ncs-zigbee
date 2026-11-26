@@ -89,6 +89,11 @@ union zb_zcl_attr_var_u
   zb_uint32_t u32;
   zb_int32_t s32;
   zb_uint48_t u48;
+#ifdef ZB_FLOAT_HALF_PRECISION_SUPPORT
+  zb_semi_t semi;
+#endif
+  zb_single_t single;
+  zb_64bit_data_t data64; /* DOUBLE, raw bytes: keeps the union 4-byte aligned */
   zb_uint8_t data_buf[4];
   zb_uint32_t data_buf_crc32;
 };
@@ -144,7 +149,7 @@ zb_zcl_reporting_info_t;
 /* FIXME: Dataset is not aligned (21 bytes)! Fix align and use u48 instead of u32 for delta! */
 
 /** @brief Structure for storing Reporting information to NVRAM */
-typedef ZB_PACKED_PRE struct zb_zcl_reporting_info_nvram_s
+typedef ZB_PACKED_PRE struct zb_zcl_reporting_info_nvram_v1_s
 {
   zb_uint8_t direction;   /*!< Direction: report is send or received */
   zb_uint8_t ep;          /*!< Endpoint number */
@@ -158,13 +163,37 @@ typedef ZB_PACKED_PRE struct zb_zcl_reporting_info_nvram_s
   zb_uint16_t max_interval; /*!< Maximum reporting interval */
   /* FIXME: Should be U48 here! Leave it as is to do not perform migration! U32 delta is enough for
    * the most cases... */
-  zb_uint32_t delta; /*!< Reportable change */
+  zb_uint32_t delta; /*!< Reportable change */ /* change it to 64 bits */
 
   zb_uint16_t short_addr_dest; /*!< Destination short address */
   zb_uint8_t  endpoint_dest;   /*!< Destination endpoint */
   zb_uint16_t profile_id_dest; /*!< Profile id */
   zb_uint8_t align[1];
-} ZB_PACKED_STRUCT zb_zcl_reporting_info_nvram_t;
+} ZB_PACKED_STRUCT zb_zcl_reporting_info_nvram_v1_t;
+
+typedef ZB_PACKED_PRE struct zb_zcl_reporting_info_nvram_v2_s
+{
+  zb_uint8_t direction;   /*!< Direction: report is send or received */
+  zb_uint8_t ep;          /*!< Endpoint number */
+  zb_uint16_t cluster_id; /*!< Cluster ID for reporting */
+  zb_uint8_t cluster_role; /*!< Cluster role */
+  zb_uint16_t attr_id;    /*!< Attribute ID for reporting */
+  zb_uint16_t manuf_code;      /*!< Manufacturer specific code */
+  zb_uint8_t flags;       /*!< Flags to inform status of reporting */
+
+  zb_uint16_t min_interval; /*!< Minimum reporting interval or timeout for client*/
+  zb_uint16_t max_interval; /*!< Maximum reporting interval */
+  /* FIXME: Should be U48 here! Leave it as is to do not perform migration! U32 delta is enough for
+   * the most cases... */
+  zb_64bit_data_t delta; /*!< Reportable change */
+
+  zb_uint16_t short_addr_dest; /*!< Destination short address */
+  zb_uint8_t  endpoint_dest;   /*!< Destination endpoint */
+  zb_uint16_t profile_id_dest; /*!< Profile id */
+  zb_uint8_t align[1];
+} ZB_PACKED_STRUCT zb_zcl_reporting_info_nvram_v2_t;
+
+typedef zb_zcl_reporting_info_nvram_v2_t zb_zcl_reporting_info_nvram_t;
 
 #endif /* defined ZB_USE_NVRAM */
 

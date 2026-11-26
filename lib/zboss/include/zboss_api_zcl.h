@@ -265,10 +265,6 @@
 #include "zcl/zb_zcl_ir_blaster.h"
 #endif /* ZB_ENABLE_CUSTOM_CLUSTERS */
 
-#if defined ZB_ENABLE_ZGP_CLUSTER
-//#include "zgp/zgp_internal.h"
-#endif
-
 #if defined (ZB_ZCL_SUPPORT_CLUSTER_DIRECT_CONFIGURATION)
 #include "zcl/zb_zcl_direct_configuration.h"
 #endif
@@ -466,29 +462,74 @@
  */
 typedef enum zb_zcl_device_callback_id_e
 {
-  /** Inform user about attribute value modification */
+  /** Inform user about attribute value modification
+   *
+   * @param[in] set_attr_value_param @ref zb_zcl_set_attr_value_param_t \n
+   *                                 @ref zb_zcl_device_callback_param_s::cb_param
+   *
+   * One of the following statuses must be returned:
+   * @return RET_OK - successfully handle command.
+   * @return RET_NOT_IMPLEMENTED - command is not implemented.
+   *
+  */
   ZB_ZCL_SET_ATTR_VALUE_CB_ID = 0,
 /** @cond DOXYGEN_INTERNAL_DOC */
+  /** Inform user about received attribute value */
+  ZB_ZCL_READ_ATTR_RESP_CB_ID,
+  /** Inform user about sent attribute value */
+  ZB_ZCL_WRITE_ATTR_RESP_CB_ID,
   /** Inform user about received attribute report */
   ZB_ZCL_REPORT_ATTR_CB_ID,
   /** Inform user that report was not received during defined time interval */
   ZB_ZCL_NO_REPORTING_CB_ID,
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
-  /** Inform user about change On/Off effect @see ZCL spec 6.6.1.4.4.2 */
+  /** Inform user about change On/Off effect @see ZCL spec 6.6.1.4.4.2
+   *
+   * @param[in] on_off_set_effect_value_param @ref zb_zcl_on_off_set_effect_value_param_t \n
+   *                                          @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_ON_OFF_WITH_EFFECT_VALUE_CB_ID,
-  /** Inform user about ZCL Shade cluster shade position value modification */
+  /** Inform user about ZCL Shade cluster shade position value modification
+   *
+   * @param[in] shade_set_value_param @ref zb_zcl_shade_set_value_param_t \n
+  *                                   @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_SHADE_SET_VALUE_CB_ID,
-  /** Inform user that shade_get_value_param of ZCL Shade custer could be changed */
+  /** Inform user that shade_get_value_param of ZCL Shade custer could be changed
+   *
+   * @param[in] shade_get_value_param @ref zb_zcl_shade_get_value_param_t \n
+   *                                  @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_SHADE_GET_VALUE_CB_ID,
-  /** Inform user about call identify effect command @see ZCL spec 6.3.1.2.1 */
+  /** Inform user about call identify effect command @see ZCL spec 6.3.1.2.1
+   *
+   * @param[in] identify_effect_value_param @ref zb_zcl_identify_effect_value_param_t \n
+   *                                        @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_IDENTIFY_EFFECT_CB_ID,
-  /** Inform user about ZCL Level Control cluster attributes value modification */
+  /** Inform user about ZCL Level Control cluster attributes value modification
+   *
+   * @param[in] level_control_set_value_param @ref zb_zcl_level_control_set_value_param_t \n
+   *                                          @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_LEVEL_CONTROL_SET_VALUE_CB_ID,
-  /** Inform user about enroll result command @see ZCL spec 8.2.2.3.1 */
+  /** Inform user about enroll result command @see ZCL spec 8.2.2.3.1
+   *
+   * @param[in] enroll_response_value_param @ref zb_zcl_ias_zone_enroll_response_value_param_t \n
+   *                                        @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_IAS_ZONE_ENROLL_RESPONSE_VALUE_CB_ID,
-  /** Inform user about call Start warning command @see ZCL spec 8.4.2.3.1 */
+  /** Inform user about call Start warning command @see ZCL spec 8.4.2.3.1
+   *
+   * @param[in] start_warning_value_param @ref zb_zcl_ias_wd_start_warning_value_param_s \n
+   *                                      @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_IAS_WD_START_WARNING_VALUE_CB_ID,
-  /** Inform user about call Squawk command @see ZCL spec 8.4.2.3.2 */
+  /** Inform user about call Squawk command @see ZCL spec 8.4.2.3.2
+   *
+   * @param[in] squawk_value_param @ref zb_zcl_ias_wd_squawk_value_param_s \n
+   *                               @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_IAS_WD_SQUAWK_VALUE_CB_ID,
   /** @b Server. Inform user about IAS ACE Arm command.
    *
@@ -699,19 +740,35 @@ typedef enum zb_zcl_device_callback_id_e
    *
    */
   ZB_ZCL_IAS_ACE_GET_ZONE_STATUS_RESP_CB_ID,
-  /** Inform user about OTA Upgrade commands  */
+  /** Inform user about OTA Upgrade commands
+   *
+   * Callback param (@ref zb_zcl_device_callback_param_s::cb_param) is filled differently depending on the OTA upgrade status:
+   *
+   * @param[in] ota_value_param \n
+   *  - ZB_ZCL_OTA_UPGRADE_STATUS_START: @ref zb_zcl_ota_upgrade_value_param_s::start \n
+   *  - ZB_ZCL_OTA_UPGRADE_STATUS_RECEIVE: @ref zb_zcl_ota_upgrade_value_param_s::receive \n
+   *  - For other Status: @ref zb_zcl_ota_upgrade_value_param_s - only upgrade_status is set
+  */
   ZB_ZCL_OTA_UPGRADE_VALUE_CB_ID,
   /** Inform user about Basic Reset to Factory Defaults commands  */
   ZB_ZCL_BASIC_RESET_CB_ID,
-  /** Inform user about call Thermostat command @see HA spec 10.1.3.3 */
+  /** Inform user about call Thermostat command @see HA spec 10.1.3.3
+   *
+   * @param[in] thermostat_value_param @ref zb_zcl_thermostat_value_param_s \n
+   *                                   @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_THERMOSTAT_VALUE_CB_ID,
-  /** Inform user about Check-In command from polled device */
+  /** Inform user about Check-In command from polled device
+   *
+   * @param[in] checkin_cli_param @ref zb_zcl_poll_control_check_in_cli_param_t \n
+   *                              @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_POLL_CONTROL_CHECK_IN_CLI_CB_ID,
   /** @b Server. Inform user about EN50523 Appliance Events and Alerts Get Alerts command.
    *
    * User's application callback is initialized by RET_OK status of device
    * callback parameters.
-   * @param[out] param_out zb_zcl_en50523_appl_ev_and_alerts_get_alerts_resp_t
+   * @param[out] param_out @ref zb_zcl_en50523_appl_ev_and_alerts_get_alerts_resp_t
    *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command.
@@ -723,7 +780,8 @@ typedef enum zb_zcl_device_callback_id_e
    *
    * User's application callback is initialized by RET_OK status of device
    * callback parameters.
-   * @param[in] param_in zb_zcl_en50523_appl_ev_and_alerts_get_alerts_resp_t
+   * @param[in] param_in @ref zb_zcl_en50523_appl_ev_and_alerts_get_alerts_resp_t
+   *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command. Default Response will be send if requested.
    * @return RET_ERROR - command is handled with errors.
@@ -734,7 +792,7 @@ typedef enum zb_zcl_device_callback_id_e
    *
    * User's application callback is initialized by RET_OK status of device
    * callback parameters.
-   * @param[in] param_in zb_zcl_en50523_appl_ev_and_alerts_alerts_notif_t
+   * @param[in] param_in @ref zb_zcl_en50523_appl_ev_and_alerts_alerts_notif_t
    *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command. Default Response will be send if requested.
@@ -746,19 +804,37 @@ typedef enum zb_zcl_device_callback_id_e
    *
    * User's application callback is initialized by RET_OK status of device
    * callback parameters.
-   * @param[in] param_in zb_zcl_en50523_appl_ev_and_alerts_event_notif_t
+   * @param[in] param_in @ref zb_zcl_en50523_appl_ev_and_alerts_event_notif_t
+   *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command. Default Response will be send if requested.
    * @return RET_ERROR - command is handled with errors.
    */
   ZB_ZCL_EN50523_APPL_EV_AND_ALERTS_EVENT_NOTIFICATION_CB_ID,
-  /** @b Server. Inform user about Query next image request */
+  /** @b Server. Inform user about Query next image request
+   *
+   * @param[in] ota_upgrade_srv_query_img_param @ref zb_zcl_ota_upgrade_srv_query_img_param_s \n
+   *                                            @ref zb_zcl_device_callback_param_s::cb_param
+   *
+  */
   ZB_ZCL_OTA_UPGRADE_SRV_QUERY_IMAGE_CB_ID,
-  /** @b Server. Inform user about the first Image block request */
+  /** @b Server. Inform user about the first Image block request
+   *
+   * @param[in] ota_upgrade_srv_upgrade_started_param @ref zb_zcl_ota_upgrade_srv_upgrade_started_param_s \n
+   *                                                  @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_OTA_UPGRADE_SRV_UPGRADE_STARTED_CB_ID,
-  /** @b Server. Inform user about the aborted Image block request  */
+  /** @b Server. Inform user about the aborted Image block request
+   *
+   * @param[in] ota_upgrade_srv_upgrade_aborted_param @ref zb_zcl_ota_upgrade_srv_upgrade_aborted_param_s \n
+   *                                                  @ref zb_zcl_device_callback_param_s::cb_param
+   */
   ZB_ZCL_OTA_UPGRADE_SRV_UPGRADE_ABORTED_CB_ID,
-  /** @b Server. Inform user about finished OTA upgrade */
+  /** @b Server. Inform user about finished OTA upgrade
+   *
+   * @param[in] ota_upgrade_srv_upgrade_end_param @ref zb_zcl_ota_upgrade_srv_upgrade_end_param_s \n
+   *                                              @ref zb_zcl_device_callback_param_s::cb_param
+  */
   ZB_ZCL_OTA_UPGRADE_SRV_UPGRADE_END_CB_ID,
   /**@b Server. Ask user about payload for PublishPrice request.
    *
@@ -957,7 +1033,7 @@ typedef enum zb_zcl_device_callback_id_e
    * User's application callback is initialized by RET_OK status of device
    * callback parameters.
    * @param[in] param_in @ref zb_zcl_tunneling_request_tunnel_t
-   * @param[out] param_out tunnel_status
+   * @param[out] param_out @ref zb_zcl_tunnel_request_params_out_s - tunnel_status
    *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command.
@@ -1469,7 +1545,10 @@ typedef enum zb_zcl_device_callback_id_e
   ZB_ZCL_BIG_DATA_TRANSFER_COMPLETE_CB_ID,
 /** @endcond */ /* DOXYGEN_INTERNAL_DOC */
 #ifdef ZB_ENABLE_SE
-  /** Inform user about Time receiving from Time server */
+  /** Inform user about Time receiving from Time server
+   *
+   * @param[in] param_in @ref zb_zcl_time_sync_payload_t
+  */
   ZB_ZCL_TIME_SYNC_CB_ID,
   ZB_ZCL_TIME_SYNC_FAILED_CB_ID,
 #endif /* ZB_ENABLE_SE */
@@ -1822,7 +1901,6 @@ typedef enum zb_zcl_device_callback_id_e
    *
    * User's application callback is initialized by RET_NOT_FOUND status of device
    * callback parameters.
-   * @param[in] param_in zb_zcl_wwah_enable_wwah_app_event_retry_algorithm_t
    *
    * One of the following statuses must be returned:
    * @return RET_OK - successfully handle command. Default Response will be send if requested.
@@ -1882,6 +1960,18 @@ typedef enum zb_zcl_device_callback_id_e
    */
   ZB_ZCL_DIRECT_CONFIGURATION_CONFIGURE_INTERFACE_CB_ID,
   /** @endcond */ /* DOXYGEN_DIRECT_FEATURE */
+  /** @b Server. Inform user about device can clear cluster attributes during leave command.
+   *
+   * User's application callback is initialized by RET_ERROR status of device
+   * callback parameters.
+   *
+   * One of the following statuses must be returned:
+   * @return RET_OK - successfully handle command. It is mean that the user callback derived
+   *                  clusters attributes value after leave.
+   * @return RET_ERROR - command is handled with errors. In this case application sets clusters
+   *                  attributes by calls ZCL_CTX().set_default_attr_cb() if last exist.
+   */
+  ZB_ZCL_CLEAR_AFTER_LEAVE_CB_ID,
 } zb_zcl_device_callback_id_t;
 
 /** @cond internals_doc */

@@ -106,6 +106,11 @@
 /** An APSME-GET.request or APSME-SET.request has been issued with an unknown attribute identifier.
  */
 #define ZB_APS_STATUS_UNSUPPORTED_ATTRIBUTE 0xb0U
+/** Custom status.
+ *  Produced by APS layer if TX have been interrupted by some event:
+ *  e.g. if destination device leaves network.
+ */
+#define ZB_APS_STATUS_CANCELLED             0xb1U
 /** @} */
 
 /**

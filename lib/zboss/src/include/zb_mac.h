@@ -1436,6 +1436,9 @@ zb_mac_scan_confirm_t;
 #define ZB_PHY_PIB_CURRENT_PAGE    0x04U
 
 /* MAC PIB */
+/* Note IDs for MAC PIB attributes have been deprecated since 802.15.4-2011 spec.
+   Both MLME-SET.request and confirm use attribute name as octet string instead of ID
+    since then. */
 #define ZB_PIB_ATTRIBUTE_ACK_WAIT_DURATION            0x40U
 #define ZB_PIB_ATTRIBUTE_ASSOCIATION_PERMIT           0x41U
 #define ZB_PIB_ATTRIBUTE_AUTO_REQUEST                 0x42U
@@ -1479,7 +1482,7 @@ zb_mac_scan_confirm_t;
 #define ZB_PIB_ATTRIBUTE_JOINING_POLICY                 0x87U /*!< mibJoiningPolicy, r22 */
 #define ZB_PIB_ATTRIBUTE_IEEE_EXPIRY_INTERVAL           0x88U /*!< mibIeeeExpiryInterval, r22 */
 #define ZB_PIB_ATTRIBUTE_IEEE_EXPIRY_INTERVAL_COUNTDOWN 0x89U /*!< mibIeeeExpiryIntervalCountdown */
-#define ZB_PIB_ATTRIBUTE_SKIP_ALL_GPF                   0x8AU /*!< zgp_skip_all_packets */
+#define ZB_PIB_ATTRIBUTE_SKIP_ALL_GPF                   0x8CU /*!< zgp_skip_all_packets */
 #define ZB_PIB_ATTRIBUTE_BEACON_JITTER                  0x8BU /*!< Beacon jitter (custom option) */
 
 #define ZB_PIB_ATTRIBUTE_IEEE_DIAGNOSTIC_INFO           0x8FU /*!< Get diagnostics counters. */
@@ -1505,6 +1508,7 @@ zb_mac_scan_confirm_t;
 
 #define ZB_PIB_ATTRIBUTE_TRAFF_DUMP_STATE               0x98U
 #define ZB_PIB_ATTRIBUTE_RESET_TO_BOOTLOADER            0x99U
+#define ZB_PIB_ATTRIBUTE_MAC_DIAGNOSTICS                0x9AU
 
 /** @} */
 

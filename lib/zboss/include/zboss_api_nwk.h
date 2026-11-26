@@ -64,12 +64,14 @@
   #define ZB_NWK_MAC_IFACE_TBL_SIZE 1U
 #elif defined(ZB_MACSPLIT_DEVICE) && !defined(ZB_MAC_MONOLITHIC) && !defined(ZB_MAC_BLE) && !defined(ZB_MACSPLIT_HOST) && !defined(ZB_MAC_SUBGHZ)
   #define ZB_NWK_MAC_IFACE_TBL_SIZE 1U
-  /* MAC-split SoC uses default MAC interface, so for building device with only SoC interface just declare monolithic MAC */
+  /* MAC-Split SoC uses default MAC interface, so for building device with only SoC interface just declare monolithic MAC */
 #elif defined(NCP_MODE_HOST)
   /* Preserve default table size to keep previous stack behaviour, but
    * do not use any interfaces in that case */
   #define ZB_NWK_MAC_IFACE_TBL_SIZE 1U
 #elif defined(ZB_EXTMAC)
+  #define ZB_NWK_MAC_IFACE_TBL_SIZE 1U
+#elif defined(ZB_MAC_BLE)
   #define ZB_NWK_MAC_IFACE_TBL_SIZE 1U
 #else
   #error Multi-MAC configuration is not supported, at least one interface should be enabled
@@ -619,6 +621,8 @@ zb_nwk_pib_cache_t *zb_nwk_get_pib_cache(void);
 
 /**
    Arguments of the NLME-PERMIT_JOINING.request routine.
+
+   @deprecated After March 2027 it will be moved to the internal header.
 */
 typedef ZB_PACKED_PRE struct zb_nlme_permit_joining_request_s
 {
@@ -639,6 +643,8 @@ zb_nlme_permit_joining_signal_info_t;
 
 /**
    NLME-PERMIT-JOINING.request primitive
+
+   @deprecated After March 2027 it will be moved to the internal header.
 
    Allow/disallow network joining
 
@@ -987,6 +993,11 @@ zb_ret_t zb_nwk_nbr_iterator_next(zb_uint8_t bufid, zb_callback_t cb);
 
 /**
    Set the number of end device a device is allow to have.
+
+   @param value maximum number of EDs reserved in neighbor table.
+
+   @note if device is ZED/ZR, @p value must be < ZB_NEIGHBOR_TABLE_SIZE
+         if device is ZC, @p value must be <= ZB_NEIGHBOR_TABLE_SIZE
 
    @return RET_OK if successful
  */

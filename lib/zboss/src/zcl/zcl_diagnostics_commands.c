@@ -74,6 +74,8 @@ void zb_zcl_diagnostics_init_server()
                               check_value_diagnostics_server,
                               (zb_zcl_cluster_write_attr_hook_t)NULL,
                               (zb_zcl_cluster_handler_t)NULL);
+
+  ZDO_DIAGNOSTICS_ENABLE(ZB_TRUE, NULL);
 }
 
 void zb_zcl_diagnostics_init_client()

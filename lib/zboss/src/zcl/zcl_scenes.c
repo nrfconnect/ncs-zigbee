@@ -1004,11 +1004,16 @@ static void zb_zcl_scenes_process_recall_scene_command(zb_uint8_t param, const z
   }
   else
   {
-    ZB_MEMCPY(&req_copy, req, req_len);
     if (req_len < ZB_ZCL_SCENES_RECALL_SCENE_REQ_PAYLOAD_LEN)
     {
-      req_copy.transition_time = ZB_ZCL_SCENES_RECALL_SCENE_REQ_TRANSITION_TIME_INVALID_VALUE;  
+      req_copy.transition_time = ZB_ZCL_SCENES_RECALL_SCENE_REQ_TRANSITION_TIME_INVALID_VALUE;
     }
+    else
+    {
+      req_len = ZB_ZCL_SCENES_RECALL_SCENE_REQ_PAYLOAD_LEN;
+    }
+
+    ZB_MEMCPY(&req_copy, req, req_len);
     recall_scene_status = (zb_zcl_status_t)zb_zcl_scenes_process_recall_scene(param, &req_copy, cmd_info);
   }
 

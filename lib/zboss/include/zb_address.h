@@ -98,6 +98,16 @@ typedef zb_uint8_t zb_address_pan_id_ref_t;
 */
 typedef zb_uint8_t zb_address_ieee_ref_t;
 
+/**
+   NONE IEEE address reference
+*/
+#define ZB_ADDRESS_IEEE_REF_NONE (zb_address_ieee_ref_t)(-1)
+
+/**
+   First IEEE address reference
+*/
+#define ZB_ADDRESS_IEEE_REF_FIRST (zb_address_ieee_ref_t)(0)
+
 /*! @cond internals_doc */
 
 /**

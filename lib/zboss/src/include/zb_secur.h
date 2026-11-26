@@ -493,6 +493,9 @@ typedef enum zb_secur_frame_type_e
 #define ZB_SECUR_SET_LINK_KEY_ENC(bmask)      ((bmask) |= 0x02U)
 #define ZB_SECUR_SET_LEAVE_REQ_ALLOWED(bmask) ((bmask) |= 0x04U)
 
+#define ZB_SECUR_TC_VERSION_LEGACY_PRE_21          (20u)
+#define ZB_SECUR_TC_VERSION_23_OR_HIGHER           (23u)
+
 /**
    Initialize APS security data structures
  */
@@ -1260,6 +1263,11 @@ void secur_forget_unauth_dev(zb_uint8_t addr_ref);
 zb_uint8_t *secur_nwk_key_by_seq(zb_ushort_t key_seq_number);
 
 /**
+  Get count of active APS keypair entries
+ */
+zb_uint_t zb_secur_aps_keypair_count(void);
+
+/**
   Update/create AIB Key-Pair table - legacy r22 call
 
   Calls zb_secur_update_key_pair_ex() setting defaults:
@@ -1875,10 +1883,6 @@ zb_bool_t zdo_need_aps_enc(zb_uint16_t cmd_id, zb_uint16_t dst_addr);
 #ifdef ZB_COORDINATOR_ROLE
 zb_ret_t zb_zdo_ecdhe_common_ctx_find_confirm_key_param(zb_uint8_t param, zb_secur_ecdhe_common_ctx_t **dlk_ctx);
 zb_ret_t zb_zdo_ecdhe_common_ctx_find_start_key_neg_rsp_param(zb_uint8_t param, zb_secur_ecdhe_common_ctx_t **dlk_ctx);
-
-void zdo_secur_confirm_key_legacy_confirm(zb_ieee_addr_t ieee_addr);
-void zdo_secur_confirm_key_dlk_confirm(zb_secur_ecdhe_common_ctx_t *dlk_ctx);
-void zb_confirm_key_ack_received(zb_secur_ecdhe_common_ctx_t *dlk_ctx_p, zb_address_ieee_ref_t addr_ref);
 #endif
 
 #ifndef ZB_COORDINATOR_ONLY

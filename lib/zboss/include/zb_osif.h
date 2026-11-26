@@ -337,7 +337,7 @@ void zb_osif_uart_sleep(void);
 void zb_osif_uart_wake_up(void);
 
 /**
-   Process UART RX activities, doesn't depend on any upper logic such as MAC-split.
+   Process UART RX activities, doesn't depend on any upper logic such as MAC-Split.
    The purpose is polling and handling UART driver events.
    To be called from a main loop.
 */

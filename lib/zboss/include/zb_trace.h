@@ -73,6 +73,7 @@
  *      The mode may be selected only before calling TRACE_INIT() function otherwise the selection call will be ignored
  *
  *    - ZB_BINARY_TRACE in order to have only BINARY mode
+ *      decoded with win_com_dump/lin_com_dump utility
  *
  *    - ZB_TRAFFIC_DUMP_ON in order to have ZB communication traffic be dumped
  *      It is dumped into the same trace file in case BINARY mode is used,
@@ -101,6 +102,8 @@
  *    - ZB_TRACE_FROM_CS in order to have trace messages be generated under critical section
  *      but be issued with a delay along with next trace message once this next trace
  *      message is generated outside of critical section
+ *
+ *   Decoded with win_com_dump/lin_com_dump utility
  *
  * @{
  */
@@ -133,6 +136,11 @@ void zb_trace_set_off(void);
 
 void zb_trace_set_on(void);
 
+/**
+   Check whether trace enabled or not.
+   @return ZB_TRUE if trace enabled, ZB_FALSE otherwise.
+ */
+zb_bool_t zb_trace_is_on(void);
 /**
    Switch on trace at runtime
 
@@ -1177,6 +1185,8 @@ typedef struct zb_byte128_struct_s
 #define FMT__D_P_D_H_H                                  TRACE_ARG_SIZE(2,2,0,1,0)
 #define FMT__D_D_D_D_H_D                                TRACE_ARG_SIZE(1,5,0,0,0)
 #define FMT__D_P_H                                      TRACE_ARG_SIZE(1,1,0,1,0)
+#define FMT__P_P_L_L_D_D_D                              TRACE_ARG_SIZE(0,3,2,2,0)
+#define FMT__P_P_L_L_D                                  TRACE_ARG_SIZE(0,1,2,2,0)
 
 /** @} */ /* TRACE_DATA_FORMAT */
 

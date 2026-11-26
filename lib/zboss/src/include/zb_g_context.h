@@ -190,7 +190,7 @@ extern zb_intr_globals_t g_izb;
 #include "zb_sleep.h"
 #include "zb_signals.h"
 #include "zb_bufpool_globals.h"
-#if (!(defined ZB_MACSPLIT_DEVICE)) || (defined ZB_TH_ENABLED) || (defined ZB_DIAGNOSTIC_FEATURES_ENABLED)
+#if (!(defined ZB_MACSPLIT_DEVICE)) || (defined ZB_TH_ENABLED)
 #include "zb_addr_globals.h"
 #include "zb_nwk_globals.h"
 #include "zb_aps_globals.h"
@@ -268,9 +268,9 @@ typedef struct zb_sec_globals_s
   zb_bufid_t              encryption_buf[ZB_NWK_MAC_IFACE_TBL_SIZE]; /* buffer used for NWK encryption */
 
 /* 08/22/2018 EE CR:MINOR APS_FRAME_SECURITY is never used now. */
-/* MAC-split host is not considered as alien MAC in multi-MAC configuration, but
+/* MAC-Split host is not considered as alien MAC in multi-MAC configuration, but
  * it also requires second encryption buffer */
-#if defined ZB_ALIEN_MAC || defined ZB_ENABLE_ZGP_SECUR || defined APS_FRAME_SECURITY || !defined ZB_MAC_INTERFACE_SINGLE
+#if defined ZB_ALIEN_MAC || defined ZB_ENABLE_ZGP || defined APS_FRAME_SECURITY || !defined ZB_MAC_INTERFACE_SINGLE
   zb_bufid_t              encryption_buf2[ZB_NWK_MAC_IFACE_TBL_SIZE]; /* buffer used for APS encryption */
 #endif
 #if defined TC_SWAPOUT && defined ZB_COORDINATOR_ROLE
@@ -358,6 +358,18 @@ typedef zb_bool_t (*zb_mac_pending_data_confirm_cb) (zb_uint8_t param);
 #endif /* ZB_MAC_MONOLITHIC */
 
 /**
+ * @brief Called on mcps data indication after frame has been decrypted,
+ *        but before any other action has been done.
+ * @param zb_bufid_t param - buffer which contains NWK-decrypted packet.
+ *                           NWK header is at beginning of the buffer)
+ * @return ZB_TRUE if packet has been intercepted by application and
+ *                 its processing should be terminated.
+ *                 Its up to application whether to free buffer or not in this case.
+ *         ZB_FALSE if packet processing should be continued by ZBOSS.
+ */
+typedef zb_bool_t (*zb_nwk_frame_ind_handler_t) (zb_bufid_t param);
+
+/**
    Flags, callbacks and attributes for tests, allows to switch stack behavior in run-time.
    Note: some customers express their concern regarding existing of hacks in ZBOSS.
    Don't worry, please: that 'hacks' are flags forcing some Test Harness behavior in the stack core:
@@ -420,13 +432,6 @@ typedef struct zb_cert_hacks_s
                                                                  authenticates device.
                                                                  @see zb_authenticate_dev */
 #endif /* defined(ZB_MAC_MONOLITHIC) || defined(ZB_MACSPLIT_HOST) */
-  zb_callback2_t                 deliver_conf_key_cb;       /*!< This callback called before TC
-                                                                 sends confirm key to joiner (TC
-                                                                 link key).
-                                                                 Passed up with buffer and keypair_i
-                                                                 (for joiners apsDeviceKeyPairSet entry)
-                                                                 in params.
-                                                                 @see test CS-NFS-TC-01. */
   zb_ccm_check_cb_t              ccm_check_cb;              /*!< Called before frame encryption.
                                                                  @see cs-nfs-tc-01 */
   zb_aps_secur_counter_hack_cb_t secur_aps_counter_hack_cb; /*!< Called before APS frame security
@@ -447,6 +452,14 @@ typedef struct zb_cert_hacks_s
   zb_mac_pending_data_confirm_cb pending_data_conf_handler_cb; /*!< Callback that will be handle confirm on data req.
                                                                   It will replace default callback, so this confirm won't be handled on upper layers. */
 #endif /* ZB_MAC_MONOLITHIC */
+
+  zb_nwk_frame_ind_handler_t nwk_frame_ind_handler_cb;         /*!< Callback called on mcps data indication after frame has been decrypted,
+                                                                    but before any other action has been done.
+                                                                    Returns TRUE if frame processing should be stopped:
+                                                                      - ZBOSS won't process buffer further.
+                                                                      - Application "owns" buffer in this case.
+                                                                        Its up to it whether to free buffer or not.
+                                                                    Returns FALSE if frame processing should be continued. */
 
   zb_bitfield_t override_tc_significance_flag: 1;              /*!< Allows to override default value
                                                                     of tc_significance in MgmtPermitJoin;
@@ -687,6 +700,7 @@ typedef struct zb_cert_hacks_s
   zb_bitfield_t disable_link_power_negotiation:1; /*!< Disable power negotiation */
   zb_bitfield_t disable_rejoin_after_key_switch_fail:1; /*!< Disable rejoin if key switch command was not proceeded */
   zb_bitfield_t disable_aps_sec_for_start_kn_req:1; /*!< Disable rejoin if key switch command was not proceeded */
+  zb_bitfield_t drop_sec_start_key_upd_req:1; /*!< Drop security start key update request */
 } zb_cert_hacks_t;
 
 #define ZB_CERT_HACKS() ZG->cert_hacks
@@ -812,6 +826,9 @@ typedef struct zb_reg_api_s
   zb_bool_t duplicate_nwk_comm_req_with_invalid_status; /*!< Duplicates received Network Commissioning Request, prepares and sends Response with invalid MAC status, and postpones processing of the original Request */
   zb_bool_t enable_delay_nwk_comm_rsp_handling;         /*!< Enables delaying Network Commissioning Response with error status processing while setting PIB attributes */
   zb_bool_t delay_nwk_comm_rsp_handling;                /*!< Delays processing Network Commissioning Response while setting PIB attributes */
+  zb_bool_t delay_join_failure_conf_handling;           /*!< Delays processing Join Failure Confirm */
+  zb_bool_t ignore_scanlist_join_attempts;              /*!< Ignore scanlist join attempts to simulate the last try immediately */
+  zb_bool_t stop_poll_after_join_once;
 } zb_reg_api_t;
 
 #define ZB_REGRESSION_TESTS_API() ZG->reg_api
@@ -885,9 +902,6 @@ struct zb_globals_s
 #if defined ZB_ENABLE_ZLL
   zb_zll_ctx_t            zll;
 #endif /* defined ZB_ENABLE_ZLL */
-#if defined ZB_ENABLE_ZGP_INFRA
-  zb_zgp_ctx_t            zgp;
-#endif /* defined ZB_ENABLE_ZGP_EP */
 #if defined ZB_USE_NVRAM
   zb_nvram_globals_t     nvram;     /*!< Global NVRAM context - ZB_NVRAM */
 #endif // defined ZB_USE_NVRAM

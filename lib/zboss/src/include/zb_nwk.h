@@ -824,7 +824,7 @@ void zb_nlme_leave_request(zb_uint8_t param);
     zb_nlme_leave_indication_t *request = NULL;
     request = ZB_BUF_GET_PARAM(ZB_BUF_FROM_REF(param), zb_nlme_leave_indication_t);
 
-    if (addr_ref == (zb_address_ieee_ref_t)-1)
+    if (addr_ref == ZB_ADDRESS_IEEE_REF_NONE)
     {
       ZB_IEEE_ADDR_ZERO(request->device_address);
     }
@@ -1241,6 +1241,7 @@ typedef ZB_PACKED_PRE struct zb_nwk_alloc_hdr_req_s
 #endif
   zb_bool_t      is_secured;
   zb_bool_t      is_cmd_frame;
+  zb_bool_t      no_source_route;
   zb_bool_t      is_has_src_ieee;
   zb_bool_t      is_has_dst_ieee;
   zb_uint16_t    src_addr;
@@ -1777,13 +1778,19 @@ void zb_nwk_source_routing_record_delete(zb_uint16_t addr);
 void zb_nwk_source_delete_routes_by_first_hop_addr(zb_uint16_t first_hop_addr);
 #endif
 
+typedef struct zb_nwk_update_beacon_payload_s
+{
+  zb_callback_t cb;    /*!< Callback to be called after request is completed */
+} zb_nwk_update_beacon_payload_request_t;
+
 /**
    Update beacon payload in the PIB.
 
    To be called after any network configuration change: formation, join etc.
    As a side effect increments NIB Update id.
  */
-void zb_nwk_update_beacon_payload(zb_uint8_t param);
+void zb_nwk_update_beacon_payload(zb_bufid_t param, zb_callback_t cb);
+void zb_nwk_update_beacon_payload_with_no_cb(zb_bufid_t param);
 
 /**
    3.4.9 Network Report Command
@@ -2103,7 +2110,7 @@ void zb_nwk_set_dev_associate_cb(zb_addr_assignment_cb_t cb);
    Convert cost to LQI
    To be used for testing, like in TP/PRO-BV-04
  */
-#define NWK_COST_TO_LQI(cost)   (zb_uint8_t)((7U - (cost)) << 5U)
+#define NWK_COST_TO_LQI(cost)   (zb_uint8_t)(cost == (zb_uint8_t)1u ? (zb_uint8_t)255u : ((7U - (cost)) << 5U))
 
 /** @} */
 
@@ -2264,6 +2271,7 @@ typedef struct zb_nwk_direct_leave_req_s
 zb_nwk_direct_leave_req_t;
 
 zb_ret_t zb_nwk_get_neighbor_element(zb_uint16_t addr, zb_bool_t create_if_absent, zb_nwk_neighbor_element_t *update);
+void zb_nwk_update_neighbor_element(zb_neighbor_tbl_ent_t *nbt, zb_nwk_neighbor_element_t *update);
 zb_ret_t zb_nwk_set_neighbor_element(zb_uint16_t addr, zb_nwk_neighbor_element_t *update);
 
 zb_ret_t zb_nwk_delete_neighbor_by_short(zb_uint16_t addr);
@@ -2289,7 +2297,7 @@ void nwk_mark_nwk_encr1(zb_bufid_t buf, zb_uint16_t file_id, zb_uint16_t line);
 void nwk_unmark_nwk_encr(zb_bufid_t buf);
 #define nwk_mark_nwk_encr(buf) nwk_mark_nwk_encr1((buf), ZB_TRACE_FILE_ID, __LINE__)
 
-void nwk_router_start_common(zb_uint8_t param);
+void nwk_router_start_common(zb_uint8_t param, zb_callback_t cb);
 
 #ifdef ZB_FORMATION
 void zb_nwk_formation_force_link(void);
@@ -2320,8 +2328,8 @@ zb_uint32_t zb_nwk_get_octet_duration_us(void);
  * Even while you can't eliminate a function call, you can exclude additional calculations.
  * Function call can get time in octets and return time in BE.
  */
-#define ZB_NWK_OCTETS_TO_US(octets_cnt) ((octets_cnt) * ZB_NWK_OCTET_DURATION_US)
-#define ZB_NWK_OCTETS_TO_BI(octets_cnt) ZB_MILLISECONDS_TO_BEACON_INTERVAL(ZB_NWK_OCTETS_TO_US(octets_cnt) / 1000U)
+#define ZB_NWK_OCTETS_TO_US(octets_cnt) ((zb_uint64_t)(octets_cnt) * (zb_uint64_t)ZB_NWK_OCTET_DURATION_US)
+#define ZB_NWK_OCTETS_TO_BI(octets_cnt) ZB_MILLISECONDS_TO_BEACON_INTERVAL(ZB_NWK_OCTETS_TO_US(octets_cnt) / 1000UL)
 
 #define ZB_SET_R22_GU_BEHAVIOR(val) (ZB_NIB().r22_gu_behavior_enabled = (val))
 #define ZB_R22_GU_BEHAVIOR_ENABLED() (ZB_U2B(ZB_NIB().r22_gu_behavior_enabled))

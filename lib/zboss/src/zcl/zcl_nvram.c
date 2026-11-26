@@ -370,6 +370,10 @@ void zb_nvram_read_zcl_reporting_dataset(
   zb_uint8_t page, zb_uint32_t pos, zb_uint16_t length, zb_nvram_ver_t nvram_ver, zb_uint16_t ds_ver)
 {
   zb_zcl_reporting_info_nvram_t rec;
+#ifndef ZB_NO_NVRAM_VER_MIGRATION
+  zb_zcl_reporting_info_nvram_v1_t rec_v1;
+#endif
+
   zb_zcl_reporting_info_t *rep_info;
   zb_uindex_t i, j, k, l, count;
   zb_ret_t ret;
@@ -395,8 +399,34 @@ void zb_nvram_read_zcl_reporting_dataset(
 
   for( i=0, j=0; i<count; i++)
   {
-      /* If we fail, trace is given and assertion is triggered */
-      ret = zb_nvram_read_data(page, pos, (zb_uint8_t*)&rec, sizeof(rec));
+#ifndef ZB_NO_NVRAM_VER_MIGRATION
+      if (ds_ver == ZB_NVRAM_ZCL_REPORTING_DATA_DS_VER_1)
+      {
+        ret = zb_nvram_read_data(page, pos, (zb_uint8_t*)&rec_v1, (zb_uint16_t)(sizeof(rec_v1)));
+
+        if (ret == RET_OK)
+        {
+          rec.direction = rec_v1.direction;
+          rec.ep = rec_v1.ep;
+          rec.cluster_id = rec_v1.cluster_id;
+          rec.cluster_role = rec_v1.cluster_role;
+          rec.attr_id = rec_v1.attr_id;
+          rec.manuf_code = rec_v1.manuf_code;
+          rec.flags = rec_v1.flags;
+          rec.min_interval = rec_v1.min_interval;
+          rec.max_interval = rec_v1.max_interval;
+          ZB_MEMCPY(rec.delta, &(rec_v1.delta), sizeof(zb_uint32_t));
+          rec.short_addr_dest = rec_v1.short_addr_dest;
+          rec.endpoint_dest = rec_v1.endpoint_dest;
+          rec.profile_id_dest = rec_v1.profile_id_dest;
+        }
+      }
+      else
+#endif
+      {
+        /* If we fail, trace is given and assertion is triggered */
+        ret = zb_nvram_read_data(page, pos, (zb_uint8_t*)&rec, sizeof(rec));
+      }
       pos += sizeof(rec);
       if (ret == RET_OK)
       {
@@ -440,7 +470,7 @@ void zb_nvram_read_zcl_reporting_dataset(
         {
           rep_info->u.send_info.min_interval = rec.min_interval;
           rep_info->u.send_info.max_interval = rec.max_interval;
-          rep_info->u.send_info.delta.u48.low = rec.delta;
+          ZB_MEMCPY(rep_info->u.send_info.delta.data64, rec.delta, sizeof(rec.delta));
         }
         else
         {
@@ -555,7 +585,7 @@ zb_ret_t zb_nvram_write_zcl_reporting_dataset(zb_uint8_t page, zb_uint32_t pos)
               {
                 rec.min_interval = rep_info->u.send_info.min_interval;
                 rec.max_interval = rep_info->u.send_info.max_interval;
-                rec.delta = rep_info->u.send_info.delta.u48.low;
+                ZB_MEMCPY(rec.delta, rep_info->u.send_info.delta.data64, sizeof(rep_info->u.send_info.delta));
               }
               else
               {

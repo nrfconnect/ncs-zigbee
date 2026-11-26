@@ -227,7 +227,7 @@ typedef struct zb_leave_context_s
 /**
    rejoin command context
  */
-typedef struct zb_rejoin_context_s /* do not pack for IAR */
+typedef ZB_PACKED_PRE struct zb_rejoin_context_s /* do not pack for IAR */
 {
   zb_uint16_t addr;                     /*!< "Old" network address */
   zb_address_ieee_ref_t addr_ref;       /*!< Address ref of "new" address */
@@ -303,8 +303,6 @@ typedef struct zb_nwk_handle_s  /* do not pac for IAR */
     } formation;
 #endif
   } tmp;
-
-  zb_callback_t run_after_update_beacon_payload;    /*!< Run after update beacon payload */
 
   zb_uint16_t status_addr; /* Used to report NWK status indication */
 
@@ -574,7 +572,7 @@ typedef struct zb_nwk_globals_s
 #define ZB_NWK_MAC_IFACE_IS_TRUSTED_LINK(iface_id) ZB_U2B(ZB_NIB().mac_iface_tbl[iface_id].trusted_link)
 
 #ifdef ZB_NWK_USE_SEND_JITTER
-#define ZB_NWK_JITTER(interval) ((interval) + ZB_RANDOM_JTR(ZB_NWK_OCTETS_TO_BI(ZB_NWKC_MAX_BROADCAST_JITTER_OCTETS)))
+#define ZB_NWK_JITTER(interval) ((zb_uint64_t)(interval) + (zb_uint64_t)ZB_RANDOM_JTR(ZB_NWK_OCTETS_TO_BI(ZB_NWKC_MAX_BROADCAST_JITTER_OCTETS)))
 #else
 #define ZB_NWK_JITTER(interval) (interval)
 #endif

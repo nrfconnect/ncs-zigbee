@@ -695,17 +695,6 @@ typedef struct zb_nib_s
 #endif /* ZB_CONFIGURABLE_RETRIES */
   zb_ext_pan_id_t  extended_pan_id;      /*!< Extended Pan ID for the PAN for which the device is a member */
   zb_nwk_device_type_t device_type;      /*!< Current device role, @see @ref nwk_device_type */
-  /**
-   * This value is used to save device type between JOINED states.
-   * Originally, device_type value would be preserved even after LEAVE is done,
-   * which may lead to wrong behaviour in logic, which is dependent on device_type.
-   * So, device_type shall be cleared after LEAVE is done.
-   * But in such case, next JOIN will require calling zb_set_*_role again, which is not convenient,
-   * and likely is not expected by currently implemented logic.
-   *
-   * Because of that, device_type value is being saved and then restored, if needed, during next commissioning
-   */
-  zb_nwk_device_type_t device_type_last; /*!< Last device role before leave, default is ZB_NWK_DEVICE_TYPE_NONE */
   zb_uint8_t     update_id;              /*!< nwkUpdateId - The value identifying a snapshot of the network settings with which this node is operating with. */
   zb_uint32_t    nwk_next_channel_change;
   zb_uint16_t    nwk_next_pan_id;
@@ -847,9 +836,6 @@ typedef struct zb_nib_s
   zb_bitfield_t r22_gu_behavior_enabled:1; /*!< if 1, this device ignores all r23 features*/
   zb_bitfield_t nwk_disable_tlvs_in_beacon:1;      /*!< TLV presence in beacons */
   zb_bitfield_t nwk_use_r22_joining:1;      /*!< Use R22 joining instead nwk_commis_req */
-#ifdef ZB_JOIN_CLIENT
-  zb_bitfield_t disable_silent_rejoin:1;      /*!< Disable silent rejoin for ZR */
-#endif /* ZB_JOIN_CLIENT */
 
   zb_tx_stat_window_t tx_stat;  /*!< TX/TX fail counters  */
   zb_uint8_t nwk_keepalive_modes;
