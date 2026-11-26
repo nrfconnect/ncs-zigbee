@@ -63,15 +63,15 @@ samples:
     layout: base
     usage:
       nvm:
-        slot0: 367
-      ram_used_kb: 86
+        slot0: 379
+      ram_used_kb: 84
   - label: ':ref:`NCP with USB transport <zigbee_ncp_sample>`'
     layout: mcuboot_usb
     usage:
       nvm:
         boot: 51
-        slot0: 393
-      ram_used_kb: 94
+        slot0: 406
+      ram_used_kb: 92
   - label: ':ref:`Zigbee application template <zigbee_template_sample>`'
     not_applicable: true
   - label: ':ref:`Zigbee shell <zigbee_shell_sample>`'
