@@ -1471,13 +1471,11 @@ void zb_zcl_level_control_send_move_to_closest_frequency_req(zb_bufid_t buffer, 
                                                                prfl_id, def_resp, cb, frequency);                         \
 }
 
-/** @cond internals_doc */
+/** @brief ZCL Level Control Set Value attribute */
 typedef struct zb_zcl_level_control_set_value_param_s
 {
   zb_uint8_t new_value;
 } zb_zcl_level_control_set_value_param_t;
-/*! @}
- *  @endcond */ /* internals_doc */
 
   /* definition to parse request */
 

@@ -50,6 +50,8 @@
 /*! \addtogroup channel_page */
 /*! @{ */
 
+#define ZB_INVALID_CHANNEL_MASK_VALUE 0U
+
 #define ZB_CHANNEL_PAGE_PAGE_BITMASK           0xF8000000u
 #define ZB_CHANNEL_PAGE_MASK_BITMASK           0x07FFFFFFu
 

@@ -201,8 +201,10 @@ zb_time_t zb_timer_get(void);
 
 /**
   Convert time from milliseconds to beacon intervals (32-bit platforms). Round the result up.
+  It does short-term conversion to 64-bit value to prevent overflow.
+  Note that result will be valid for all possible ms values (as 1 BI equal to 15.36 ms).
 */
-#define ZB_MILLISECONDS_TO_BEACON_INTERVAL_CEIL(ms) (((zb_time_t)(ms) * 1000U + (ZB_BEACON_INTERVAL_USEC - 1U)) / ZB_BEACON_INTERVAL_USEC)
+#define ZB_MILLISECONDS_TO_BEACON_INTERVAL_CEIL(ms) ((zb_time_t)(((zb_uint64_t)(ms) * 1000U + (ZB_BEACON_INTERVAL_USEC - 1U)) / ZB_BEACON_INTERVAL_USEC))
 
 /**
   Convert time from microseconds to beacon intervals (32-bit platforms). Round the result up. Note that result will be valid for all values less than UINT32_T_MAX - 15359 us.
@@ -211,8 +213,10 @@ zb_time_t zb_timer_get(void);
 
 /**
   Convert time from milliseconds to beacon intervals (32-bit platforms). Round the result down.
+  It does short-term conversion to 64-bit value to prevent overflow.
+  Note that result will be valid for all possible ms values (as 1 BI equal to 15.36 ms).
 */
-#define ZB_MILLISECONDS_TO_BEACON_INTERVAL_FLOOR(ms) ((zb_time_t)(ms) * 1000U / ZB_BEACON_INTERVAL_USEC)
+#define ZB_MILLISECONDS_TO_BEACON_INTERVAL_FLOOR(ms) ((zb_time_t)((zb_uint64_t)(ms) * 1000U / ZB_BEACON_INTERVAL_USEC))
 
 /**
   Convert time from microseconds to beacon intervals (32-bit platforms). Round the result down.

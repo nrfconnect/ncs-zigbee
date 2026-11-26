@@ -71,10 +71,8 @@ constants etc.
 
 #ifdef ZB_BDB_MODE
 #define ZB_BDB_ENABLE_FINDING_BINDING
-#if !defined(NCP_MODE_HOST)
 /* BDB mandates GPPB */
 #define ZB_ENABLE_ZGP
-#endif /* !NCP_MODE_HOST */
 /* Starting from BDB 3.1 rejoin backoff is mandatory. */
 #define ZB_REJOIN_BACKOFF
 /* Distributed is M for BDB, but not for SE */
@@ -101,14 +99,11 @@ constants etc.
 
 /*
  * ZC/ZR - GPPB role library     (default) (implementation of Basic Proxy is mandatory for Zigbee 3.0 ZR)
- * ZC/ZR - GPCB role library               (Options file shall use ZB_ENABLE_ZGP_COMBO define)
- * ZC/ZR - GP Commissioning Tool           (Options file shall use ZGP_COMMISSIONING_TOOL define)
- * ZED   - Target role library   (default) (Options file shall use ZB_ENABLE_ZGP_TARGET define)
- * ZED   - Target+ role library            (Options file shall use ZB_ENABLE_ZGP_TARGET_PLUS define)
- *
- * To enable advanced features (not covered by the current version of GP specification) please
- * define ZB_ENABLE_ZGP_ADVANCED, so in this case the GPPB/GPCB/GPCT basic libs will be re-compiled
- * to GPP/GPC/GPCT advanced libs
+ * ZC/ZR - GPCB role library               (Separated Sink library)
+ * ZC/ZR - GP Commissioning Tool           (Separated Sink+CT library)
+ * ZED   - No ZGP implementation (default)
+ * ZED   - Target role library
+ *  ZED   - Target+ role library
  *
  * GP infrastructure devices:
  *
@@ -135,9 +130,21 @@ constants etc.
  *
  */
 
+#ifdef ZB_ED_ROLE
+#if defined ZB_ENABLE_ZGP && !defined ZB_ENABLE_ZGP_TARGET
+/* for ED role if ZB_ENABLE_ZGP_TARGET is not explicitly declared - disable the whole ZGP functionality */
+#undef ZB_ENABLE_ZGP
+#endif
+#if defined ZB_ENABLE_ZGP_DIRECT && !defined ZB_ENABLE_ZGP_TARGET_PLUS
+/* for ED role if ZB_ENABLE_ZGP_TARGET_PLUS is not explicitly declared - disable ZB_ENABLE_ZGP_DIRECT functionality */
+#undef ZB_ENABLE_ZGP_DIRECT
+#endif
+#endif /* ZB_ED_ROLE */
+
+#if defined ZB_ENABLE_ZGP || defined ZB_DOCUMENT_ZGP
+
 #ifdef ZB_ZGPD_ROLE
 #define ZB_ENABLE_ZGP_DIRECT
-#define ZB_ENABLE_ZGP_SECUR
 #define APP_ONLY_NVRAM
 
 #ifndef ZB_MAC_INTERFACE_SINGLE
@@ -147,64 +154,26 @@ constants etc.
 #ifndef ZB_MAC_MONOLITHIC
 #define ZB_MAC_MONOLITHIC
 #endif
-
-#elif defined ZB_ENABLE_ZGP && !defined ZB_ENABLE_ZGP_TARGET && defined ZB_ED_ROLE
-#undef ZB_ENABLE_ZGP
-#endif
-
-#if defined ZB_ENABLE_ZGP_DIRECT && !defined ZB_ENABLE_ZGP_TARGET && defined ZB_ED_ROLE
-#undef ZB_ENABLE_ZGP_DIRECT
-#endif
-
-
-#if (defined ZB_ENABLE_ZGP && !defined ZB_ZGPD_ROLE) || defined ZB_DOCUMENT_ZGP
-
-/*
-#define ZB_ENABLE_ZGP_ADVANCED
-*/
-
-#define ZB_ENABLE_ZGP_CLUSTER
-#define ZB_ENABLE_ZGP_SECUR
-#define ZB_USEALIAS
+#else /* ZB_ZGPD_ROLE */
 
 #ifndef ZB_ED_ROLE
 /* ZED can only be implemented as GP Target/Target+ */
 #define ZB_ENABLE_ZGP_PROXY
 #endif
 
+#define ZB_ENABLE_ZGP_SINK
+#define ZB_ENABLE_ZGP_INFRA
+#define ZB_USEALIAS
+
 #ifndef ZB_ENABLE_ZGP_TARGET
 #define ZB_ENABLE_ZGP_DIRECT
 #define ZB_ENABLE_ZGP_TX_QUEUE
 #endif
 
-#if (defined ZB_ENABLE_ZGP_COMBO || defined ZB_ENABLE_ZGP_TARGET || defined ZB_ENABLE_ZGP_TARGET_PLUS || defined ZGP_COMMISSIONING_TOOL)
-#define ZB_ENABLE_ZGP_SINK
-
-/* Old implementation of 8 bit vector handling on ZGP Sink Side is deprecated now.
- *   Let's keep it until SC will decide to discontinue it
- *   All the code under this define should be removed once it will be discontinued */
-#ifndef ZB_ZGP_SINK_SUPPORT_LEGACY_8BIT_VECTOR_HANDLING
-#define ZB_ZGP_SINK_SUPPORT_LEGACY_8BIT_VECTOR_HANDLING
-#endif
-
-/**< ZGP Sink Match Info is legacy and is deprecated now.
- *   Let's keep it until SC will decide to discontinue it
- *   All the code under this define should be removed once it will be discontinued */
-#ifndef ZB_ZGP_SINK_SUPPORT_LEGACY_MATCH_INFO
-#define ZB_ZGP_SINK_SUPPORT_LEGACY_MATCH_INFO
-#endif
-
-#ifdef ZB_ZGP_SINK_SUPPORT_LEGACY_MATCH_INFO
-/** Max number of command identifiers in one
- *  functionality matching table entry */
-#define ZB_ZGP_MATCH_TBL_MAX_CMDS_FOR_MATCH 5U
-
-/** Max number of cluster identifiers in one
- *  functionality matching table entry */
-#define ZB_ZGP_TBL_MAX_CLUSTERS 5U
-#endif  /* ZB_ZGP_SINK_SUPPORT_LEGACY_MATCH_INFO */
-
-#endif
+#ifdef NCP_MODE_HOST
+#undef ZB_ENABLE_ZGP_DIRECT
+#undef ZB_ENABLE_ZGP_TX_QUEUE
+#endif /* NCP_MODE_HOST */
 
 /** Sink table size */
 #ifndef ZB_ZGP_SINK_TBL_SIZE
@@ -275,6 +244,7 @@ constants etc.
 #endif  /* ZB_ENABLE_ZGP_PROXY */
 
 #endif  /* !ZB_ZGPD_ROLE */
+#endif /* defined ZB_ENABLE_ZGP || defined ZB_DOCUMENT_ZGP */
 
 /** @cond DOXYGEN_INTERNAL_DOC */
 /**
@@ -443,7 +413,7 @@ Ideally should rework the whole zb_config.h to suit better for that new concept.
    * There are several available MACs:
    *   - ZB_MAC_MONOLITHIC - monolithic MAC (used by default)
    *   - ZB_MACSPLIT_HOST
-   *   - ZB_MACSPLIT_DEVICE - MAC that is used as SoC part for MAC-split host
+   *   - ZB_MACSPLIT_DEVICE - MAC that is used as SoC part for MAC-Split host
    *   - ZB_EXTMAC - external MAC
    *   - ZB_MAC_SUBGHZ
    *   - ZB_MAC_BLE - BLE MAC that is used as a part of Zigbee Direct feature
@@ -451,7 +421,7 @@ Ideally should rework the whole zb_config.h to suit better for that new concept.
    * Supported MAC types should be defined in vendors, BLE MAC will be registered automatically after Zigbee Direct linking
    * and initialization.
    *
-   * ZB_COMPILE_MAC_MONOLITHIC is used to compile monolithic MAC and use it as a part of MAC-split device.
+   * ZB_COMPILE_MAC_MONOLITHIC is used to compile monolithic MAC and use it as a part of MAC-Split device.
    */
 
   /* Monolithic MAC is a default interface and used when enabled interfaces are not specified in vendors */
@@ -1680,8 +1650,19 @@ exponent.
 #define ZB_DIAGNOSTIC_DUT_MODIFIERS_ENABLED
 #define ZB_DIAGNOSTIC_TH_MODIFIERS_ENABLED
 
+#define ZB_DIAGNOSTIC_KEY_EXPOSURE_ENABLED
+
 #endif /* ZB_CERTIFICATION_HACKS */
 
+#if defined(ZB_MACSPLIT_DEVICE)
+#if defined(ZB_DIAGNOSTIC_DUT_MODIFIERS_ENABLED) || defined(ZB_DIAGNOSTIC_TH_MODIFIERS_ENABLED) || defined(ZB_DIAGNOSTIC_KEY_EXPOSURE_ENABLED)
+/* This is a temporary solution. Need to implement DUT \ TH modifiers setting from macsplit host and remove this warning */
+#warning Key exposure, DUT and TH modifiers are NOT supported for MAC-split SoC!
+#undef ZB_DIAGNOSTIC_DUT_MODIFIERS_ENABLED
+#undef ZB_DIAGNOSTIC_TH_MODIFIERS_ENABLED
+#undef ZB_DIAGNOSTIC_KEY_EXPOSURE_ENABLED
+#endif /* ZB_DIAGNOSTIC_DUT_MODIFIERS_ENABLED || ZB_DIAGNOSTIC_TH_MODIFIERS_ENABLED || ZB_DIAGNOSTIC_KEY_EXPOSURE_ENABLED */
+#endif /* ZB_MACSPLIT_DEVICE */
 
 /* Testing mode for some pro certification tests */
 /** @cond DOXYGEN_INTERNAL_DOC */

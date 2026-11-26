@@ -560,7 +560,7 @@ static zb_ret_t image_notify_handler(zb_uint8_t param)
       }
       if(is_agree_file)
       {
-        zb_uint8_t my_jitter_rnd = ZB_RANDOM_JTR(ZB_ZCL_OTA_UPGRADE_QUERY_JITTER_MAX_VALUE) + 1;
+        zb_uint8_t my_jitter_rnd = ZB_RANDOM_JTR(ZB_ZCL_OTA_UPGRADE_QUERY_JITTER_MAX_VALUE);
 #ifdef ZB_STACK_REGRESSION_TESTING_API
         if (ZB_REGRESSION_TESTS_API().zcl_ota_custom_query_jitter)
         {

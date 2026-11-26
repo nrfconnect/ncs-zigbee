@@ -162,19 +162,20 @@ enum zb_zcl_shade_config_mode_e
   ZB_ZCL_ATTR_SHADE_CONFIG_MODE_RESERVED  = 0x02
 };
 
-/** @cond internals_doc */
+/** @brief ZCL Shade set values attribute
+    @see ZCL spec, subclause 7.2.2.1.2 */
 typedef struct zb_zcl_shade_set_value_param_s
 {
   zb_uint16_t new_value;
   zb_bool_t is_config;
 } zb_zcl_shade_set_value_param_t;
 
+/** @brief ZCL Shade get values attribute
+    @see ZCL spec, subclause 7.2.2.1.2 */
 typedef struct zb_zcl_shade_get_value_param_s
 {
   zb_uint16_t ret_value;
 } zb_zcl_shade_get_value_param_t;
-/*! @}
- *  @endcond */ /* internals_doc */
 
  /** @brief Default value for Shade Configuration cluster revision global attribute */
 #define ZB_ZCL_SHADE_CONFIG_CLUSTER_REVISION_DEFAULT ((zb_uint16_t)0x0001u)

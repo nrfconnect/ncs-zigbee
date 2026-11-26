@@ -226,7 +226,7 @@ static void zb_preinst_nwk_apply_parameters(void)
   else
   {
     /* No TCLK, assume Legacy <R21 here */
-    ZB_AIB().coordinator_version = 20U;
+    ZB_AIB().coordinator_version = ZB_SECUR_TC_VERSION_LEGACY_PRE_21;
   }
 
   ZB_SET_JOINED_STATUS(ZB_TRUE);

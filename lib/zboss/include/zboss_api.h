@@ -126,6 +126,15 @@ void zb_secur_set_ignore_tc_rejoin(zb_bool_t enable);
  *  If set to ZB_FALSE, remote requests that attempt to change Trust Center
  *  policy (such as MgmtPermitJoin requests) will be rejected.
  *
+ *  'allow_remote_policy_change' is TRUE by default,
+ *  see BDB 3.1 specification, document 22-65816-030, Table 9 – Trust Center policy values.
+ *
+ *  BDB 3.0.1 doesn't have such a policy, but its behavior corresponds to the TRUE value.
+ *
+ *  It's NOT RECOMMENDED to change this value to FALSE to avoid compatibility issues with other ZigBee devices!
+ *
+ *  @note According to SE specification, this policy must be set to FALSE and should NOT be changed
+ *
  *  @param enable - whether to enable or disable remote policy changes.
  */
 void zb_secur_set_allow_remote_policy_change(zb_bool_t enable);
@@ -1670,7 +1679,7 @@ typedef enum zb_nvram_dataset_types_e
   ZB_NVRAM_INSTALLCODES          = 13, /**< Dataset contains APS installcodes data */
   ZB_NVRAM_IB_COUNTERS           = 14, /**< Dataset, contains APS secure keys data */
   ZB_NVRAM_APS_BINDING_DATA      = 15, /**< Dataset, contains APS binding data */
-  ZB_NVRAM_DATASET_GP_PRPOXYT    = 16, /**< Green Power Proxy table */
+  ZB_NVRAM_DATASET_GP_PROXYT     = 16, /**< Green Power Proxy table */
   ZB_NVRAM_DATASET_GP_SINKT      = 17, /**< Green Power Sink table */
   ZB_NVRAM_DATASET_GP_CLUSTER    = 18, /**< Green Power Cluster data */
   ZB_NVRAM_APS_GROUPS_DATA       = 19, /**< Dataset, contains APS groups data */

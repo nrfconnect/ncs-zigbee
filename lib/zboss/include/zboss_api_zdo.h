@@ -1102,6 +1102,24 @@ To be used mainly for certification testing, when run-time visibility setting is
  *  - @ref zb_debug_signal_tclk_ready_params_t
 */
 #define ZB_DEBUG_SIGNAL_TCLK_READY 68U
+
+/** @cond DOXYGEN_ZGP_SECTION */
+/** ZGP set device role status signal.
+ *
+ * @parblock
+ * When generated:
+ *  - GP subsystem issues it as a result on zb_zgp_set_device_role() call
+ *
+ * Status codes:
+ * - RET_OK: device role is accepted.
+ * - RET_NOT_IMPLEMENTED: device role is not available.
+ *
+ * Signal parameters:
+ *  - @ref zb_zgp_signal_set_device_role_status_params_t
+ *
+ * @endparblock */
+#define ZB_ZGP_SIGNAL_SET_DEVICE_ROLE_STATUS 69U
+/** @endcond */ /* DOXYGEN_ZGP_SECTION */
 /** @} */
 
 /**
@@ -1218,6 +1236,18 @@ typedef struct zb_zgp_signal_mode_change_params_s
   zb_zgp_mode_change_reason_t reason; /*!< mode change reason, see @ref zb_zgp_mode_change_reason_t */
   zb_zgp_mode_t new_mode;
 } zb_zgp_signal_mode_change_params_t;
+
+/**
+   @brief ZGP set device role status signal parameters
+
+   Stack passes this signal to application to notify about the result of setting GP device role.
+  */
+typedef struct zb_zgp_signal_set_device_role_status_params_s
+{
+  zb_zgp_gp_device_t requested_device_role;
+  zb_zgp_gp_device_t actual_device_role;
+  zb_ret_t           status;
+} zb_zgp_signal_set_device_role_status_params_t;
 /** @endcond */
 #endif  /* ZB_ENABLE_ZGP_SINK */
 
@@ -2686,9 +2716,9 @@ zb_zdo_active_scan_resp_t;
  * zb_zdo_active_scan_request_t. The only
  * argument from this callback is the index of a buffer with
  * zb_zdo_active_scan_resp_t param, followed by a sequence of
- * zb_nlme_network_descriptor_t params (count is determined by 
+ * zb_nlme_network_descriptor_t params (count is determined by
  * zb_zdo_active_scan_resp_t - network_count)
- * 
+ *
  * Sample use of active scan request:
  * @snippet zdo_startup_nwk_scan/zdo_start_ze.c active_scan_complete_cb
  * @snippet zdo_startup_nwk_scan/zdo_start_ze.c zb_zdo_active_scan_request
@@ -3323,8 +3353,11 @@ zb_zdo_mgmt_permit_joining_req_param_t;
 
 /**
    @brief sends   Mgmt_Permit_Joining_req (See Zigbee spec 2.4.3.3.7)
-   @param param - Index of buffer with request
+   @param param - Index of buffer with request of type zb_zdo_mgmt_permit_joining_req_param_t
+                   in buffer tail (see ZB_BUF_GET_PARAM).
    @param cb    - user's function to call when got response from the remote.
+                  The response will be stored in zb_zdo_mgmt_permit_joining_resp_t structure
+                  at buffer begin.
    @return        0xFF if the operation was NOT executed (not enough memory,
                   resources, etc.), a valid ZDP transaction sequence number
                   otherwise
@@ -3334,6 +3367,14 @@ zb_zdo_mgmt_permit_joining_req_param_t;
                   If called with destination address != local address (can be unicast or broadcast),
                   forces nlme-permit_joining.req call on remote device (devices),
                   but not on a local device keeping local permit joining state unchanged.
+
+   @note          Error codes stored in zb_zdo_mgmt_permit_joining_resp_t.status field.
+                  Possible error codes are:
+                  - ZB_ZDP_STATUS_TEMPORARY_FAILURE - impossible to send permit join at this moment,
+                                                      but retry after some time may succeed.
+                  - ZB_ZDP_STATUS_NOT_PERMITTED     - device not joined (or any other NWK-related error).
+                  - ZB_ZDP_STATUS_SUCCESS           - request has been successfully sent or successful response
+                                                      has been received.
 
    @snippet onoff_server/on_off_switch_zed_app_tsn.c zdo_mgmt_permit_joining_req
 

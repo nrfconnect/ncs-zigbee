@@ -1801,7 +1801,13 @@ request command frame.
 #define ZB_ASDU_MAX_LEN_MULTIPLIER ((ZB_APS_MSG_MAX_SIZE + sizeof(zb_apsde_data_indication_t) + ZB_APS_HEADER_MAX_LEN)/ZB_IO_BUF_SIZE + 1U)
 #define ZB_ASDU_MAX_FRAG_LEN (ZB_ASDU_MAX_LEN_MULTIPLIER*ZB_IO_BUF_SIZE - sizeof(zb_apsde_data_indication_t) - ZB_APS_HEADER_MAX_LEN)
 #define ZB_APS_MAX_WINDOW_SIZE 1U
+#if ZB_APS_MAX_WINDOW_SIZE == 1U
+/* According to Zigbee R23 Core Specification section 2.2.8.4.5.2 
+   Interframe delay is not applicable for Window size 1. */
+#define ZB_APS_INTERFRAME_DELAY 0U
+#else
 #define ZB_APS_INTERFRAME_DELAY 50U /* milliseconds */
+#endif
 
 #if defined(ZB_SE_ENABLE_SERVICE_DISCOVERY_PROCESSING)
 

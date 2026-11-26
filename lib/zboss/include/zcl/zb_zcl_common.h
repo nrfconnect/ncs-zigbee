@@ -880,19 +880,19 @@ zb_zcl_attr_t;
 /*! Mark attribute ID to distinguish if it is common/manufacturer
     specific/internal attribute:
     - set bit 15 (the highest) for internal attributes
-    - set bit 14 for manufacturer specific attributes
+    - set bit 14 for custom attributes
 */
-/*! @internal @brief Mark attribute Id as custom/manufacture specific attribute */
+/*! @internal @brief Mark attribute Id as internal attribute */
 #define ZB_ZCL_ATTR_INTERNAL_ID(_attr_id) ((_attr_id) | (1U << 15))
 
-/*! @internal @brief Check if attribute Id is custom/manufacture specific */
+/*! @internal @brief Check if attribute Id is internal */
 #define ZB_ZCL_ATTR_CHECK_INTERNAL_ID(_attr_id) ((_attr_id) & (1U << 15))
 
 
-/*! @internal @brief Mark attribute Id as custom/manufacture specific attribute */
+/*! @internal @brief Mark attribute Id as custom attribute */
 #define ZB_ZCL_ATTR_CUSTOM_ID(_attr_id) ((_attr_id) | (1U << 14))
 
-/*! @internal @brief Check if attribute Id is custom/manufacture specific */
+/*! @internal @brief Check if attribute Id is custom */
 #define ZB_ZCL_ATTR_CHECK_CUSTOM_ID(_attr_id) ((_attr_id) & (1U << 14))
 
 
@@ -1669,6 +1669,44 @@ do                                         \
    (PUT_DATA48(ptr, val))
 
 /**
+ *  @brief Put 40-bit value to packet.
+ *  @param ptr - pointer to the place to put value to
+ *  @param val - value to put into packet
+ *  @hideinitializer
+ */
+#define ZB_ZCL_PACKET_PUT_DATA40_VAL(ptr, val) \
+    (PUT_DATA40_VAL(ptr, val))
+
+/**
+ *  @brief Put 40-bit value to packet.
+ *  @param ptr - pointer to the place to put value to
+ *  @param val - pointer to the value to put into packet
+ *  @hideinitializer
+ */
+#define ZB_ZCL_PACKET_PUT_DATA40(ptr, val)       \
+    (PUT_DATA40(ptr, val))
+
+
+/**
+ *  @brief Put 56-bit value to packet.
+ *  @param ptr - pointer to the place to put value to
+ *  @param val - value to put into packet
+ *  @hideinitializer
+ */
+#define ZB_ZCL_PACKET_PUT_DATA56_VAL(ptr, val) \
+    (PUT_DATA56_VAL(ptr, val))
+
+/**
+ *  @brief Put 56-bit value to packet.
+ *  @param ptr - pointer to the place to put value to
+ *  @param val - pointer to the value to put into packet
+ *  @hideinitializer
+ */
+#define ZB_ZCL_PACKET_PUT_DATA56(ptr, val)       \
+    (PUT_DATA56(ptr, val))
+
+
+/**
  *  @brief Put 24-bit value to packet.
  *  @param ptr - pointer to the place to put value to
  *  @param val - value to put into packet
@@ -2368,6 +2406,7 @@ zb_uint8_t zb_zcl_check_accept_command(zb_uint8_t param);
     @return endpoint ID
  */
 zb_uint8_t zb_get_current_endpoint_id(void);
+/** @endcond DOXYGEN_INTERNAL_DOC */
 
 /** @brief Common continue command
 

@@ -146,6 +146,7 @@ typedef struct zb_commissioning_ctx_s
 
 #ifdef ZB_JOIN_CLIENT
   zb_bitfield_t enable_joining_to_distributed:1; /* Is the device allowed to join to distributed network */
+  zb_bitfield_t disable_silent_rejoin:1;         /* Disable silent rejoin for ZR */
 #endif /* ZB_JOIN_CLIENT */
 } zb_commissioning_ctx_t;
 

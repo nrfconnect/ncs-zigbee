@@ -411,6 +411,8 @@ static void check_in_res_handler_check_binding_response_cb(zb_bufid_t param)
 
   check_binding_resp = ZB_BUF_GET_PARAM(param, zb_aps_check_binding_resp_t);
 
+  check_in_res_handler_unpack_params(param, &payload, &cmd_info);
+
   /*
     ZCL8: If the Poll Control Server receives a Check-In Response from a client
     for which there is no binding (unbound), it SHOULD respond with a Default Response
@@ -424,7 +426,6 @@ static void check_in_res_handler_check_binding_response_cb(zb_bufid_t param)
 
   if (status == ZB_ZCL_STATUS_SUCCESS)
   {
-    check_in_res_handler_unpack_params(param, &payload, &cmd_info);
     endpoint = ZB_ZCL_PARSED_HDR_SHORT_DATA(&cmd_info).dst_endpoint;
   }
 
@@ -646,11 +647,8 @@ static zb_ret_t set_long_poll_interval_handler(zb_uint8_t param)
   else if( /*!*/zb_zcl_check_attr_value(ZB_ZCL_CLUSTER_ID_POLL_CONTROL, ZB_ZCL_CLUSTER_SERVER_ROLE, endpoint,
       ZB_ZCL_ATTR_POLL_CONTROL_LONG_POLL_INTERVAL_ID, (zb_uint8_t*)(&payload.interval)) == RET_ERROR)
   {
-    /* TODO: DO NOT send Default response here - do it in the
-     * zb_zcl_process_poll_control_specific_commands() */
-    ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, ZB_ZCL_STATUS_INVALID_VALUE);
-    ret = RET_BUSY;   // not need send answer yet
-    TRACE_MSG(TRACE_ZCL1, "set RET_BUSY", (FMT__0));
+    TRACE_MSG(TRACE_ZCL1, "Error value", (FMT__0));
+    ret = RET_INVALID_PARAMETER;
   }
   else
   {
@@ -695,8 +693,8 @@ static zb_ret_t set_short_poll_interval_handler(zb_uint8_t param)
   else if( /*!*/zb_zcl_check_attr_value(ZB_ZCL_CLUSTER_ID_POLL_CONTROL, ZB_ZCL_CLUSTER_SERVER_ROLE, endpoint,
       ZB_ZCL_ATTR_POLL_CONTROL_SHORT_POLL_INTERVAL_ID, (zb_uint8_t*)(&payload.interval)) == RET_ERROR)
   {
-    ZB_ZCL_PROCESS_COMMAND_FINISH(param, &cmd_info, ZB_ZCL_STATUS_INVALID_VALUE);
-    ret = RET_BUSY;   // not need send answer yet
+    TRACE_MSG(TRACE_ZCL1, "Error value", (FMT__0));
+    ret = RET_INVALID_PARAMETER;
   }
   else
   {
@@ -780,6 +778,10 @@ zb_bool_t zb_zcl_process_poll_control_specific_commands_srv(zb_uint8_t param)
 
       case RET_TIMEOUT:
         resp_code = ZB_ZCL_STATUS_TIMEOUT;
+        break;
+
+      case RET_INVALID_PARAMETER:
+        resp_code = ZB_ZCL_STATUS_INVALID_VALUE;
         break;
 
       default:

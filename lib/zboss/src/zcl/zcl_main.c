@@ -822,18 +822,21 @@ zb_bool_t zb_zcl_send_default_handler(zb_uint8_t param,
 
 void zb_zcl_process_command_finish(zb_bufid_t buffer, const zb_zcl_parsed_hdr_t *pcmd_info, zb_uint8_t status)
 {
+  zb_zcl_parsed_hdr_t pcmd_info_cpy;
+  ZB_MEMCPY(&pcmd_info_cpy, pcmd_info, sizeof(zb_zcl_parsed_hdr_t));
+
   if (ZB_ZCL_CHECK_IF_SEND_DEFAULT_RESP(*(pcmd_info), status))
   {
     ZB_ZCL_SEND_DEFAULT_RESP(
       (buffer),
-      ZB_ZCL_PARSED_HDR_SHORT_DATA((pcmd_info)).source.u.short_addr,
+      ZB_ZCL_PARSED_HDR_SHORT_DATA((&pcmd_info_cpy)).source.u.short_addr,
       ZB_APS_ADDR_MODE_16_ENDP_PRESENT,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA((pcmd_info)).src_endpoint,
-      ZB_ZCL_PARSED_HDR_SHORT_DATA((pcmd_info)).dst_endpoint,
-      (pcmd_info)->profile_id,
-      (pcmd_info)->cluster_id,
-      (pcmd_info)->seq_number,
-      (pcmd_info)->cmd_id,
+      ZB_ZCL_PARSED_HDR_SHORT_DATA((&pcmd_info_cpy)).src_endpoint,
+      ZB_ZCL_PARSED_HDR_SHORT_DATA((&pcmd_info_cpy)).dst_endpoint,
+      (&pcmd_info_cpy)->profile_id,
+      (&pcmd_info_cpy)->cluster_id,
+      (&pcmd_info_cpy)->seq_number,
+      (&pcmd_info_cpy)->cmd_id,
       (status));
   }
   else

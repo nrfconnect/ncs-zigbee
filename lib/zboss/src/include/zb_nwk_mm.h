@@ -160,9 +160,9 @@ zb_bool_t zb_mm_is_interface_active(zb_uint8_t iface_id);
 void zb_mm_set_iface_supported_channel_mask(zb_uint8_t iface_id, zb_uint8_t page_index, zb_uint32_t channel_mask);
 
 /**
- * @brief Registers new MAC-split host instance
+ * @brief Registers new MAC-Split host instance
  *
- * @param [out] iface_id - interface id of new MAC-split host instance
+ * @param [out] iface_id - interface id of new MAC-Split host instance
  * @return zb_ret_t - RET_OK for success, error code otherwise
  */
 zb_ret_t zb_mm_macsplit_host_register_and_enable_instance(zb_uint8_t *iface_id);

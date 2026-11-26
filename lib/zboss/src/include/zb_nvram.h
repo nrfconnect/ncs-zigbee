@@ -958,7 +958,7 @@ typedef ZB_PACKED_PRE struct zb_nvram_zgp_sink_tbl_entry_ver_6_0_s
  */
   zb_uint16_t      options;
 
-  zb_uint8_t       match_dev_tbl_idx;
+  zb_uint8_t       unused;
   zb_uint8_t       zgpd_key[ZB_CCM_KEY_SIZE];
   zb_uint8_t       aligned[1];
 }
@@ -1014,11 +1014,11 @@ zb_nvram_dataset_gr_sinkt_versions_t;
 
 typedef enum zb_nvram_dataset_gr_proxyt_versions_e
 {
-  ZB_NVRAM_DATASET_GP_PRPOXYT_DS_VER_1 = 0,
+  ZB_NVRAM_DATASET_GP_PROXYT_DS_VER_1 = 0,
 }
 zb_nvram_dataset_gr_proxyt_versions_t;
 
-#define ZB_NVRAM_DATASET_GP_PRPOXYT_DS_VER ZB_NVRAM_DATASET_GP_PRPOXYT_DS_VER_1
+#define ZB_NVRAM_DATASET_GP_PROXYT_DS_VER ZB_NVRAM_DATASET_GP_PROXYT_DS_VER_1
 
 typedef enum zb_nvram_dataset_gp_cluster_versions_e
 {
@@ -1236,10 +1236,11 @@ ZB_ASSERT_IF_NOT_ALIGNED_TO_4(zb_nvram_page_hdr_dataset_t);
 typedef enum zb_nvram_zcl_reporting_data_ds_versions_e
 {
   ZB_NVRAM_ZCL_REPORTING_DATA_DS_VER_1 = 0,
+  ZB_NVRAM_ZCL_REPORTING_DATA_DS_VER_2 = 1,
 }
 zb_nvram_zcl_reporting_data_ds_versions_t;
 
-#define ZB_NVRAM_ZCL_REPORTING_DATA_DS_VER ZB_NVRAM_ZCL_REPORTING_DATA_DS_VER_1
+#define ZB_NVRAM_ZCL_REPORTING_DATA_DS_VER ZB_NVRAM_ZCL_REPORTING_DATA_DS_VER_2
 
 /**
  * @name NVRAM APS secure data dataset version

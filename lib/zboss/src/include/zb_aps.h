@@ -149,7 +149,7 @@ typedef ZB_PACKED_PRE struct zb_apsde_data_req_s
 
 #ifdef APS_FRAGMENTATION
   zb_uint8_t extended_fc;  /* Extended Frame Control - internal use only */
-  zb_uint8_t block_num;    /* Fragmentation: for the first segment - total payload len */
+  zb_uint8_t block_num;    /* Fragmentation: for the first segment, the total number of fragments */
 #endif
   zb_address_ieee_ref_t dst_addr_ref; /* Dst addr ref will be set in zb_apsde_data_request function
                                            by stack if address is present
@@ -321,14 +321,14 @@ void data_indication(zb_uint8_t param)
 /** @brief Structure for Get Group Membership Command.
   * @see ZCL8 spec, subclause 3.6.2.3.4.
   */
-typedef ZB_PACKED_PRE struct zb_apsme_get_group_membership_req_s
+typedef struct zb_apsme_get_group_membership_req_s
 {
   zb_callback_t  confirm_cb;    /*!< The callback to be called when the operation is completed. */
   zb_ushort_t    n_groups;      /*!< Group addresses amount. */
   zb_uint8_t     endpoint;      /*!< The endpoint which the groups are assigned to. */
   zb_uint8_t     align[1];
   zb_uint16_t    groups[1];     /*!< First element if list with group addresses. */
-} ZB_PACKED_STRUCT zb_apsme_get_group_membership_req_t;
+} zb_apsme_get_group_membership_req_t;
 
 /*
  * 'groups' array member is passed as a function parameter (e.g. zb_aps_group_table_get_membership()), it should be
@@ -690,5 +690,19 @@ void aps_upd_secured_relayed_frm(zb_uint8_t *apsdu, zb_uint8_t tlv_len);
  * @param ieee_addr - IEEE addr
  */
 zb_ret_t zb_aps_add_binding_whitelist_entry(zb_uint8_t ep_id, zb_uint16_t cluster_id, zb_uint8_t cluster_role, zb_ieee_addr_t ieee_addr);
+
+/**
+ * @brief Function which uses `zb_apsde_data_confirm_t` status
+ *        to determine whether buffer has APS hdr included
+ *        at the moment `zb_apsde_data_confirm` called or not.
+ *        Returns valid result until APS header cut during confirm handling.
+ *
+ * @param param     Buffer to check status in.
+ * @return zb_ret_t RET_OK - APS header present.
+ *                  RET_NOT_FOUND - APS header not found.
+ *                  Any other value if can't determine APS hdr presence.
+ */
+zb_ret_t zb_check_aps_has_hdr_by_confirm_status(zb_bufid_t param);
+
 
 #endif /* ZB_APS_H */
