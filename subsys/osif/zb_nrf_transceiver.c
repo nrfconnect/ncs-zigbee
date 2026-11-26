@@ -277,7 +277,7 @@ zb_bool_t zb_trans_transmit(zb_uint8_t wait_type, zb_time_t tx_at,
 				.is_secured = false,
 				.dynamic_data_is_set = false,
 			},
-			.cca = true,
+			.cca = false,
 			.channel = current_channel,
 		};
 		result = nrf_802154_transmit_raw_at(tx_buf, tx_at, &at_metadata);
