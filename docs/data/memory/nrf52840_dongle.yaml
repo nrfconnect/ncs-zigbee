@@ -61,8 +61,8 @@ samples:
     layout: base
     usage:
       nvm:
-        slot0: 409
-      ram_used_kb: 97
+        slot0: 422
+      ram_used_kb: 95
   - label: ':ref:`Zigbee application template <zigbee_template_sample>`'
     not_applicable: true
   - label: ':ref:`Zigbee shell <zigbee_shell_sample>`'
@@ -71,5 +71,5 @@ samples:
     layout: base
     usage:
       nvm:
-        slot0: 469
-      ram_used_kb: 86
+        slot0: 473
+      ram_used_kb: 83
