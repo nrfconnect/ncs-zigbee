@@ -533,6 +533,7 @@ Simulated presses have the following behavior:
 
 * The shell passes simulated presses to the application button handler from the system workqueue, the same way the DK Buttons and LEDs library does for physical button presses.
 * Only one simulated press can be active at a time.
+
 .. _lib_zigbee_application_utilities_options:
 
 Configuration
