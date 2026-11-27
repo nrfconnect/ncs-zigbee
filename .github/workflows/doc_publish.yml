@@ -30,18 +30,32 @@ jobs:
         with:
           workflow: doc_build.yml
           run_id: ${{ github.event.workflow_run.id }}
+          # doc_build uploads docs/publish/*; extract into the same layout for publish steps.
+          path: docs/publish
 
       - name: Unzip html archive
-        working-directory: docs
+        working-directory: docs/publish
         run: |
-          OUTDIR=$(awk 'NR==1 { if ($3 ~ /^(latest|PR-[0-9]+|[0-9]+\.[0-9a-zA-Z\.\-]+)$/) print $3 }' monitor_*.txt)
-          echo "OUTDIR=$OUTDIR" >> "$GITHUB_ENV"
-          unzip ${{ env.DOC_ADDON_NAME }}*.zip -d $OUTDIR
+          set -euo pipefail
+          MONITOR=(monitor_*.txt)
+          if [ ! -f "${MONITOR[0]}" ]; then
+            echo "::error::Missing monitor_*.txt in docs/publish (artifact layout mismatch)" >&2
+            ls -la
+            exit 1
+          fi
+          OUTDIR=$(awk 'NR==1 { if ($3 ~ /^(latest|PR-[0-9]+|[0-9]+\.[0-9a-zA-Z\.\-]+)$/) print $3 }' "${MONITOR[0]}")
+          if [ -z "${OUTDIR}" ]; then
+            echo "::error::Could not parse OUTDIR from ${MONITOR[0]}" >&2
+            cat "${MONITOR[0]}"
+            exit 1
+          fi
+          echo "OUTDIR=${OUTDIR}" >> "$GITHUB_ENV"
+          unzip -q ${{ env.DOC_ADDON_NAME }}*.zip -d "$OUTDIR"
           find "$OUTDIR" -type l -delete
 
       - name: Obtain PR number
         if: ${{ github.event.workflow_run.event == 'pull_request' }}
-        working-directory: docs
+        working-directory: docs/publish
         run: |
           if [ -f pr.txt ]; then
             PR=$(head -n 1 pr.txt | tr -cd '0-9')
@@ -49,7 +63,7 @@ jobs:
           printf 'PR=%s\n' "$PR" >> "$GITHUB_ENV"
 
       - name: Upload to Azure storage
-        working-directory: docs
+        working-directory: docs/publish
         env:
           AZCOPY_CONCURRENCY_VALUE: 1024
           NCS_DOC_SAS_PRS: ${{ secrets.NCS_DOC_SAS_PRS }}
@@ -78,5 +92,5 @@ jobs:
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ env.PR }}
-          body-path: docs/comment.txt
+          body-path: docs/publish/comment.txt
           edit-mode: replace
