@@ -78,7 +78,7 @@ It also has the following trade-offs:
 
    Multiprotocol Zigbee and Bluetooth LE architecture on nRF53 Series devices
 
-For more information, see `Multiprotocol support`_ in the |NCS| documentation and :ref:`zigbee_light_switch_sample_nus`.
+For more information, see :ref:`Multiprotocol support <nrf:ug_multiprotocol_support>` in the |NCS| documentation and :ref:`zigbee_light_switch_sample_nus`.
 
 This platform design is suitable for the following development kits:
 

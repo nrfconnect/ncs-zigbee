@@ -66,7 +66,7 @@ See :ref:`ug_zigbee_configuring_eui64` for information about how to configure th
 Serial communication setup
 ==========================
 
-The communication channel uses Zephyr's `UART API`_.
+The communication channel uses Zephyr's :ref:`UART API <zephyr:uart_api>`.
 
 .. tabs::
 
@@ -142,7 +142,7 @@ Communication through USB
 
 To change the communication channel from the default UART to nRF USB CDC ACM ``cdc_acm_uart0``, use the :file:`prj_usb.conf` configuration file and add the ``-DFILE_SUFFIX=usb`` flag to the build command.
 When using the nRF52840 Dongle, please add the ``-DFILE_SUFFIX=dongle`` flag to the build command instead.
-See `Providing CMake options`_ for instructions on how to add these flags to your build.
+See :ref:`Providing CMake options <nrf:configuring_cmake>` for instructions on how to add these flags to your build.
 For example, when building from the command line, use the following commands:
 
 .. code-block:: console
@@ -182,7 +182,7 @@ To add a second instance for trace logs, complete the following steps:
 #. Create two instances of USB CDC ACM for the application:
 
    a. Create two entries in the DTS overlay file :file:`<board>_usb.overlay` or :file:`<board>_dongle.overlay` for the selected board, one for each USB CDC ACM instance.
-      See `CDC ACM`_ for more information.
+      See :ref:`CDC ACM <zephyr:usb_device_stack>` for more information.
    #. Extend the ``zephyr_udc0`` node in the DTS overlay file to also configure the second USB CDC ACM instance ``"cdc_acm_uart1"``:
 
       .. code-block:: devicetree
@@ -216,7 +216,7 @@ For more configuration options, see :ref:`Zigbee stack logs <zigbee_ug_logging_s
   Bootloader support
   ==================
 
-  The bootloader support in the NCP sample for the ``nrf54l15dk/nrf54l15/cpuapp`` board target is by default disabled, but you can enable `MCUboot`_.
+  The bootloader support in the NCP sample for the ``nrf54l15dk/nrf54l15/cpuapp`` board target is by default disabled, but you can enable :ref:`MCUboot <mcuboot:mcuboot_ncs>`.
 
   MCUboot
   -------
@@ -225,20 +225,20 @@ For more configuration options, see :ref:`Zigbee stack logs <zigbee_ug_logging_s
 
   If you want to use the default UART serial communication channel, set the ``CONFIG_BOOTLOADER_MCUBOOT`` Kconfig option to enable MCUboot.
   To use the same MCUboot configuration as in `Communication through USB`_, you need to provide MCUboot with the Kconfig options included in the :file:`sysbuild/mcuboot_usb.conf` file.
-  See `Image-specific variables`_ in the |NCS| documentations to learn how to set the required options.
+  See :ref:`Image-specific variables <nrf:cmake_options_images>` in the |NCS| documentations to learn how to set the required options.
 
   MCUboot with the USB DFU requires a larger partition.
   To increase the partition, adjust the ``boot_partition`` size in a board-specific devicetree overlay file (for example, :file:`boards/<board_target>_usb.overlay`).
   If your configuration uses MCUboot, provide a matching overlay under :file:`sysbuild/mcuboot/boards/` and set ``zephyr,code-partition`` to ``&boot_partition``.
-  See :ref:`zigbee_ug_static_partition` in the |addon| documentation and `Migrating partition configuration from Partition Manager to devicetree (DTS)`_ in the |NCS| documentation for details.
+  See :ref:`zigbee_ug_static_partition` in the |addon| documentation and :ref:`Migrating partition configuration from Partition Manager to devicetree (DTS) <nrf:migration_partitions>` in the |NCS| documentation for details.
 
-  For instructions on how to set these additional options and configuration at build time, see `Providing CMake options`_ and `Configuring and building`_ in the |NCS| documentation.
+  For instructions on how to set these additional options and configuration at build time, see :ref:`Providing CMake options <nrf:configuring_cmake>` and :ref:`Configuring and building <nrf:configuration_and_build>` in the |NCS| documentation.
 
-  See `Using MCUboot in nRF Connect SDK`_ for information about build system automatically generated files.
+  See :ref:`Using MCUboot in nRF Connect SDK <mcuboot:mcuboot_ncs>` for information about build system automatically generated files.
 
   After every reset, the sample first boots to MCUboot and then, after a couple of seconds, the NCP sample is booted.
   When booted to MCUboot, you can upload the new image with the `dfu-util tool`_.
-  See the Testing section of the `USB DFU (Device Firmware Upgrade)`_ Zephyr sample for the list of required dfu-util commands.
+  See the Testing section of the :zephyr:code-sample:`usb-dfu` Zephyr sample for the list of required dfu-util commands.
 
   .. note::
      Using ``dfu-util`` in this sample flow is intended for development and testing of the USB variant only and is not described as a production firmware update mechanism for end products.
@@ -415,5 +415,5 @@ It uses the ZBOSS stack:
 In addition, it uses the following Zephyr libraries:
 
 * :file:`include/device.h`
-* `Logging`_
-* `UART API`_
+* :ref:`Logging <zephyr:logging_api>`
+* :ref:`UART API <zephyr:uart_api>`

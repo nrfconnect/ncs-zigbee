@@ -6,37 +6,36 @@
      - PCA
      - Board name
      - Board target
-   * - `nRF52840 DK <Developing with nRF52 Series_>`_
+   * - :ref:`nRF52840 DK <nrf:ug_nrf52_group>`
      - PCA10056
-     - `nrf52840dk`_
+     - :doc:`nrf52840dk <zephyr:boards/nordic/nrf52840dk/doc/index>`
      - ``nrf52840dk/nrf52840``
-   * - `nRF52840 Dongle <Developing with nRF52 Series_>`_
+   * - :ref:`nRF52840 Dongle DK <nrf:ug_nrf52_group>`
      - PCA10059
-     - `nrf52840dongle`_
+     - :doc:`nrf52840dongle <zephyr:boards/nordic/nrf52840dongle/doc/index>`
      - ``nrf52840dongle/nrf52840``
-   * - `nRF5340 DK <Developing with nRF53 Series_>`_
+   * - :ref:`nRF5340 DK <nrf:ug_nrf53>`
      - PCA10095
-     - `nrf5340dk`_
+     - :doc:`nrf5340dk <zephyr:boards/nordic/nrf5340dk/doc/index>`
      - | ``nrf5340dk/nrf5340/cpuapp``
-   * - `nRF54L10 emulation on the nRF54L15 DK <Developing with nRF54L Series_>`_
+   * - :ref:`nRF54L10 emulation on the nRF54L15 DK <nrf:ug_nrf54l>`
      - PCA10156
-     - `nrf54l15dk`_
+     - :doc:`nrf54l15dk <zephyr:boards/nordic/nrf54l15dk/doc/index>`
      - ``nrf54l15dk/nrf54l10/cpuapp``
-   * - `nRF54LC10 DK <Developing with nRF54L Series_>`_
+   * - :ref:`nRF54LC10 DK <nrf:ug_nrf54l>`
      - PCA10226
-     - `nrf54lc10dk`_
+     - :doc:`nrf54lc10dk <zephyr:boards/nordic/nrf54lc10dk/doc/index>`
      - ``nrf54lc10dk/nrf54lc10a/cpuapp``
-   * - `nRF54L15 DK <Developing with nRF54L Series_>`_
+   * - :ref:`nRF54L15 DK <nrf:ug_nrf54l>`
      - PCA10156
-     - `nrf54l15dk`_
+     - :doc:`nrf54l15dk <zephyr:boards/nordic/nrf54l15dk/doc/index>`
      - ``nrf54l15dk/nrf54l15/cpuapp``
-   * - `nRF54LM20 DK <Developing with nRF54L Series_>`_
+   * - :ref:`nRF54LM20 DK <nrf:ug_nrf54l>`
      - PCA10184
-     - `nrf54lm20dk`_
+     - :doc:`nrf54lm20dk <zephyr:boards/nordic/nrf54lm20dk/doc/index>`
      - | ``nrf54lm20dk/nrf54lm20a/cpuapp``
        | ``nrf54lm20dk/nrf54lm20b/cpuapp``
-   * - `nRF54LM20 Dongle <Developing with nRF54L Series_>`_
+   * - :ref:`nRF54LM20 Dongle <nrf:ug_nrf54l>`
      - --
-     - nrf54lm20dongle
+     - :doc:`nrf54lm20dongle <zephyr:boards/nordic/nrf54lm20dongle/doc/index>`
      - ``nrf54lm20dongle/nrf54lm20b/cpuapp``
-

@@ -59,7 +59,7 @@ The Zigbee Over The Air Device Firmware Upgrade (:ref:`lib_zigbee_fota`) library
 To enable and configure the library, you must set the ``CONFIG_ZIGBEE_FOTA`` Kconfig option.
 Other :ref:`Zigbee FOTA Kconfig options <lib_zigbee_fota_options>` can be used with default values.
 
-Because the Zigbee OTA DFU performs the upgrade using the `DFU target`_ library, the are several non-Zigbee Kconfig options that must be set to configure the update process:
+Because the Zigbee OTA DFU performs the upgrade using the :ref:`DFU target <nrf:lib_dfu_target>` library, the are several non-Zigbee Kconfig options that must be set to configure the update process:
 
 * ``CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION`` - This option specifies the current image version in the format ``"major.minor.patch"`` or ``"major.minor.patch+build"``.
   Each component must be in the range of 0 to 255.
@@ -88,7 +88,7 @@ Configuring these options and updating the default values (at least updating the
 Configuring MCUboot image compression
 =====================================
 
-You can enable `MCUboot image compression`_ for Zigbee FOTA updates to reduce the size of the image transferred over the Zigbee network.
+You can enable :ref:`MCUboot image compression <nrf:mcuboot_image_compression>` for Zigbee FOTA updates to reduce the size of the image transferred over the Zigbee network.
 When compression is enabled, the generated Zigbee update file contains a compressed MCUboot image, and MCUboot decompresses it while applying the update.
 
 To enable compressed updates, set the following Kconfig options in the application's sysbuild configuration file:
@@ -104,7 +104,7 @@ For ZBOSS NVRAM placement and the devicetree-based flash layout, see :ref:`zigbe
 
 The secondary application slot does not have to be resized to use compressed Zigbee FOTA updates.
 You can reduce the secondary slot to save flash space, but only if your application's compressed update image always fits in the smaller slot.
-For more information about partitioning requirements and limitations, see `MCUboot image compression`_.
+For more information about partitioning requirements and limitations, see :ref:`MCUboot image compression <nrf:mcuboot_image_compression>`.
 
 Enabling Zigbee FOTA in an application
 ======================================
@@ -221,7 +221,7 @@ The Zigbee ZCL scene helper library provides a set of functions that implement t
 
 To enable the Zigbee ZCL scene helper library, set the ``CONFIG_ZIGBEE_SCENES`` Kconfig option.
 
-Because the library uses Zephyr's `Settings`_ subsystem, the application must call the following functions for the library to work correctly:
+Because the library uses Zephyr's :ref:`Settings <zephyr:settings_api>` subsystem, the application must call the following functions for the library to work correctly:
 
 * :c:func:`zcl_scenes_init()`
 * :c:func:`zcl_scenes_cb()`
@@ -243,7 +243,7 @@ The Zigbee shell library implements a set of :ref:`Zigbee shell commands <zigbee
 
 To extend a sample with the Zigbee shell command support, set the following Kconfig options:
 
-* ``CONFIG_ZIGBEE_SHELL`` - This option enables Zigbee shell and Zephyr's `Shell`_ interface.
+* ``CONFIG_ZIGBEE_SHELL`` - This option enables Zigbee shell and Zephyr's :ref:`Shell <zephyr:shell_api>` interface.
 * ``CONFIG_ZIGBEE_SHELL_ENDPOINT`` - This option specifies the endpoint number to be used by the Zigbee shell instance.
   The endpoint must be present at the device and you must not register an endpoint handler for this endpoint.
 * ``CONFIG_ZIGBEE_SHELL_DEBUG_CMD`` - This option enables commands useful for testing and debugging.

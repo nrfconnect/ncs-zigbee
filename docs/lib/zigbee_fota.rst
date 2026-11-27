@@ -8,7 +8,7 @@ Zigbee FOTA
    :depth: 2
 
 The Zigbee firmware over-the-air (Zigbee FOTA) library provides Zigbee endpoint definition, which implements clusters responsible for transferring a firmware file through the Zigbee network.
-The received data is passed as an upgrade candidate through the `DFU multi-image`_ library API to the `DFU target`_.
+The received data is passed as an upgrade candidate through the :ref:`DFU multi-image <nrf:lib_dfu_multi_image>` library API to the :ref:`DFU target <nrf:lib_dfu_target>`.
 
 The library uses the endpoint to:
 
@@ -17,7 +17,7 @@ The library uses the endpoint to:
 * Transfer the new firmware using the ZCL OTA cluster commands.
 * Allow the OTA server to manage the upgrade process using the ZCL OTA control commands.
 
-When used, the Zigbee FOTA library replaces the `FOTA download`_ library in |NCS|.
+When used, the Zigbee FOTA library replaces the :ref:`FOTA download <nrf:lib_fota_download>` library in |NCS|.
 
 .. note::
     The Zigbee FOTA functionality is available for the :ref:`zigbee_light_switch_sample` sample.
@@ -49,10 +49,10 @@ After the OTA Upgrade Client downloads the Zigbee OTA image header, the stack ve
 
 If all values are accepted, the OTA Upgrade Client downloads the first fragment of the firmware image.
 
-Once the download is started, all received data fragments are passed to the `DFU multi-image`_ library.
+Once the download is started, all received data fragments are passed to the :ref:`DFU multi-image <nrf:lib_dfu_multi_image>` library.
 The library takes care of where the upgrade candidate is stored, depending on the image type that is being downloaded.
 If the ``CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME`` Kconfig option is enabled, the client stores the information required to resume an interrupted download after a device reset.
-The library stores the Zigbee OTA session metadata and uses the `DFU multi-image`_ progress state to continue the transfer from the last saved offset after the device rejoins the network.
+The library stores the Zigbee OTA session metadata and uses the :ref:`DFU multi-image <nrf:lib_dfu_multi_image>` progress state to continue the transfer from the last saved offset after the device rejoins the network.
 
 When the download is completed, the download client sends an appropriate event.
 At this point, the received firmware is tagged as an upgrade candidate and the OTA server is queried for an update time.
@@ -105,9 +105,7 @@ The Zigbee FOTA library has the following limitations:
 
 * The endpoint definition in the library includes the endpoint ID, defined with ``CONFIG_ZIGBEE_FOTA_ENDPOINT``.
   When using the Zigbee FOTA library, this endpoint ID cannot be used for other endpoints.
-* The Zigbee FOTA upgrades are currently supported on the nRF52840 DK (PCA10056), nRF5340 DK (PCA10095), nRF54L15 DK (PCA10156), nRF54LC10 DK (PCA10226), and nRF54LM20 DK (PCA10157).
-* On the nRF54LC10 DK, both MCUboot slots are placed in internal RRAM (partitions under :file:`dts/fota_internal/`) because the board has no external SPI NOR flash.
-  Use the same ``zigbee_fota`` snippet as on other supported boards; see :ref:`zigbee_memory` for the layout.
+* The Zigbee FOTA upgrades are currently supported on the nRF52840 DK (PCA10056), nRF5340 DK (PCA10095), nRF54L15 DK (PCA10156), and nRF54LM20 DK (PCA10157).
 * The Zigbee FOTA library does not currently support bootloader upgrades.
 
 Additionally, the following limitations apply on the nRF5340 SoCs:

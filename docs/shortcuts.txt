@@ -17,13 +17,13 @@
 
 .. ### Config shortcuts
 
-.. |config| replace:: See `Configuring and building`_ in the |NCS| documentation for information about how to permanently or temporarily change the configuration.
+.. |config| replace:: See :ref:`Configuring and building <nrf:configuration_and_build>` in the |NCS| documentation for information about how to permanently or temporarily change the configuration.
 
 .. |connect_kit| replace:: Connect the kit to the computer using a USB cable.
    The kit is assigned a COM port (Windows) or ttyACM device (Linux), which is visible in the Device Manager.
 
 .. |connect_terminal| replace:: Connect to the kit with a terminal emulator (for example, nRF Connect Serial Terminal).
-   See `Testing and optimization`_ in the |NCS| documentation for the required settings and steps.
+   See :ref:`Testing and optimization <nrf:test_and_optimize>` in the |NCS| documentation for the required settings and steps.
 
 .. ### Development and evaluation disclaimers
 
@@ -47,8 +47,8 @@
 
 .. ### Other shortcuts
 
-.. |sysbuild_autoenabled_ncs| replace:: When building `repository applications <Repository application_>`_ in the |addon| which is an `SDK repository <Repository types_>`_, building with sysbuild is `enabled by default <Sysbuild enabled by default_>`_.
-   If you work with out-of-tree `freestanding applications <Freestanding application_>`_, you need to manually pass the ``--sysbuild`` parameter to every build command or `configure west to always use it <Configuring sysbuild usage in west_>`_.
+.. |sysbuild_autoenabled_ncs| replace:: When building :ref:`repository applications <nrf:create_application_types_repository>` in the |addon| which is an :ref:`SDK repository <nrf:dm_code_base>`, building with sysbuild is :ref:`enabled by default <nrf:sysbuild_enabled_ncs>`.
+   If you work with out-of-tree :ref:`freestanding applications <nrf:create_application_types_freestanding>`, you need to manually pass the ``--sysbuild`` parameter to every build command or :ref:`configure west to always use it <nrf:sysbuild_enabled_ncs_configuring>`.
 
 .. ### Zigbee & ZBOSS shortcuts
 

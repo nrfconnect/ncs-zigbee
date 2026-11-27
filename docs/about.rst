@@ -14,7 +14,7 @@ The stack comes with the following features:
 * Zigbee Cluster Library, revision 8.
 * Zigbee Green Power Proxy Basic.
 
-See `Software maturity levels`_ in the |NCS| documentation for what experimental support means.
+See :ref:`Software maturity levels <nrf:software_maturity>` in the |NCS| documentation for what experimental support means.
 Experimental support also means that the feature is either not certified or no sample is provided for the given feature (or both).
 
 See the :ref:`zigbee_zboss` page and the `external ZBOSS development guide and API documentation`_ for more information about the ZBOSS library.

@@ -1,3 +1,5 @@
+:orphan:
+
 .. _known_issues:
 
 Known issues
@@ -22,7 +24,7 @@ A known issue can list one or both of the following entries:
   Sometimes, they are discovered later and added over time.
 
 .. version-filter::
-  :default: v1-4-0
+  :default: v2-0-0
   :container: dl/dt
   :tags: [("wontfix", "Won't fix")]
 
