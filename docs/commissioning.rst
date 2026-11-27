@@ -7,8 +7,6 @@ Commissioning
    :local:
    :depth: 2
 
-test update
-
 Commissioning is a process that allows a new Zigbee device to join a Zigbee network.
 The device is configured into the network, so that it can start communicating with other network nodes.
 If there is no network to join, the commissioning procedure ensures that a new network is created.
