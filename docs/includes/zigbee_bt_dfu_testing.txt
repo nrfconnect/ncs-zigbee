@@ -15,7 +15,7 @@ To test DFU over Bluetooth SMP in a Zigbee-only build, complete the following st
          a. Install `nRF Connect Device Manager`_.
          #. Use the :file:`dfu_application.zip` file from the build directory.
 
-         For detailed instructions, see `FOTA updates on nRF54L Series devices`_ (nRF54L15 and nRF54LM20 DKs) or `FOTA updates with nRF5340 DK`_ (nRF5340 DK).
+         For detailed instructions, see :ref:`FOTA updates on nRF54L Series devices <nrf:ug_nrf54l_developing_ble_fota>` (nRF54L15 and nRF54LM20 DKs) or :ref:`FOTA updates with nRF5340 DK <nrf:ug_nrf53_developing_ble_fota>` (nRF5340 DK).
 
       .. group-tab:: PC (mcumgr)
 
@@ -27,10 +27,10 @@ To test DFU over Bluetooth SMP in a Zigbee-only build, complete the following st
             |zigbee mcumgr smp upload|
 
          After uploading, list the images, mark the new slot as pending, and reset the device.
-         For the full procedure (image upload, list, test, and reset), see the `MCUmgr Command-line tool`_ page.
+         For the full procedure (image upload, list, test, and reset), see the :ref:`MCUmgr Command-line tool <nrf:dfu_tools_mcumgr_cli>` page.
 
 After the update completes, MCUboot applies the new image on the next reboot.
 
 .. note::
    Zigbee OTA and SMP DFU are independent transports, and SMP is not part of the Zigbee specification.
-   You can use either `mcumgr`_ or `nRF Connect Device Manager`_ to perform the update over Bluetooth LE.
+   You can use either :ref:`mcumgr <zephyr:mcu_mgr>` or `nRF Connect Device Manager`_ to perform the update over Bluetooth LE.

@@ -8,7 +8,7 @@ Zigbee FOTA
    :depth: 2
 
 The Zigbee firmware over-the-air (Zigbee FOTA) library provides Zigbee endpoint definition, which implements clusters responsible for transferring a firmware file through the Zigbee network.
-The received data is passed as an upgrade candidate through the `DFU multi-image`_ library API to the `DFU target`_.
+The received data is passed as an upgrade candidate through the :ref:`DFU multi-image <nrf:lib_dfu_multi_image>` library API to the :ref:`DFU target <nrf:lib_dfu_target>`.
 
 The library uses the endpoint to:
 
@@ -17,7 +17,7 @@ The library uses the endpoint to:
 * Transfer the new firmware using the ZCL OTA cluster commands.
 * Allow the OTA server to manage the upgrade process using the ZCL OTA control commands.
 
-When used, the Zigbee FOTA library replaces the `FOTA download`_ library in |NCS|.
+When used, the Zigbee FOTA library replaces the :ref:`FOTA download <nrf:lib_fota_download>` library in |NCS|.
 
 .. note::
     The Zigbee FOTA functionality is available for the :ref:`zigbee_light_switch_sample` sample.
@@ -49,10 +49,10 @@ After the OTA Upgrade Client downloads the Zigbee OTA image header, the stack ve
 
 If all values are accepted, the OTA Upgrade Client downloads the first fragment of the firmware image.
 
-Once the download is started, all received data fragments are passed to the `DFU multi-image`_ library.
+Once the download is started, all received data fragments are passed to the :ref:`DFU multi-image <nrf:lib_dfu_multi_image>` library.
 The library takes care of where the upgrade candidate is stored, depending on the image type that is being downloaded.
 If the ``CONFIG_ZIGBEE_FOTA_DOWNLOAD_RESUME`` Kconfig option is enabled, the client stores the information required to resume an interrupted download after a device reset.
-The library stores the Zigbee OTA session metadata and uses the `DFU multi-image`_ progress state to continue the transfer from the last saved offset after the device rejoins the network.
+The library stores the Zigbee OTA session metadata and uses the :ref:`DFU multi-image <nrf:lib_dfu_multi_image>` progress state to continue the transfer from the last saved offset after the device rejoins the network.
 
 When the download is completed, the download client sends an appropriate event.
 At this point, the received firmware is tagged as an upgrade candidate and the OTA server is queried for an update time.

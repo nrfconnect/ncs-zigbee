@@ -17,14 +17,36 @@ version = 'Latest'
 
 # Paths
 
-DOC_BASE = Path(__file__).absolute()
+DOC_BASE = Path(__file__).resolve().parent
+REPO_BASE = DOC_BASE.parent
+
+# -- NCS version for intersphinx ---------------------------------------------
+
+NCS_VERSION_NUMBER = "3.4.2"
+
+try:
+    import west.manifest
+
+    manifest = west.manifest.Manifest.from_file(REPO_BASE / "west.yml")
+    nrf_projects = manifest.get_projects(["nrf"])
+    if nrf_projects:
+        revision = nrf_projects[0].revision
+        if revision.startswith("v"):
+            revision = revision[1:]
+        NCS_VERSION_NUMBER = revision
+except Exception:
+    pass
+
+_NCS_DOCS_BASE = f"https://nrfconnectdocs.nordicsemi.com/ncs/{NCS_VERSION_NUMBER}"
+_NCS_DOCS_STORAGE = f"https://ncsdoc.z6.web.core.windows.net/ncs/{NCS_VERSION_NUMBER}"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-sys.path.insert(0, str("_extensions"))
+sys.path.insert(0, str(DOC_BASE / "_extensions"))
 
 extensions = [
+    'sphinx.ext.intersphinx',
     'breathe',
     'sphinxcontrib.mscgen',
     'sphinx_tabs.tabs',
@@ -35,6 +57,25 @@ extensions = [
     'memory_viz',
     'stack_viz',
 ]
+
+intersphinx_mapping = {
+    "nrf": (
+        f"{_NCS_DOCS_BASE}/nrf/",
+        f"{_NCS_DOCS_STORAGE}/nrf/objects.inv",
+    ),
+    "zephyr": (
+        f"{_NCS_DOCS_BASE}/zephyr/",
+        f"{_NCS_DOCS_STORAGE}/zephyr/objects.inv",
+    ),
+    "mcuboot": (
+        f"{_NCS_DOCS_BASE}/mcuboot/",
+        f"{_NCS_DOCS_STORAGE}/mcuboot/objects.inv",
+    ),
+    "nrfxlib": (
+        f"{_NCS_DOCS_BASE}/nrfxlib/",
+        f"{_NCS_DOCS_STORAGE}/nrfxlib/objects.inv",
+    ),
+}
 
 # The root document.
 root_doc = 'index'

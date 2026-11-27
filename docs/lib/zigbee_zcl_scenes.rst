@@ -9,7 +9,7 @@ Zigbee ZCL scene helper
 
 The Zigbee ZCL scene helper library provides a set of functions that implement the callbacks required by the ZCL scene cluster in the application.
 You can use this library to implement these mandatory callbacks and save the configured scenes in the non-volatile memory.
-For this purpose, it uses Zephyr's `Settings`_ subsystem.
+For this purpose, it uses Zephyr's :ref:`Settings <zephyr:settings_api>` subsystem.
 
 This library is capable of recalling attribute values for the following ZCL clusters:
 
@@ -26,7 +26,7 @@ Configuration
 
 To enable the Zigbee ZCL scene helper library, set the ``CONFIG_ZIGBEE_SCENES`` Kconfig option.
 
-Because the library uses Zephyr's `Settings`_ subsystem, the application must call the following functions for the library to work correctly:
+Because the library uses Zephyr's :ref:`Settings <zephyr:settings_api>` subsystem, the application must call the following functions for the library to work correctly:
 
 * :c:func:`zcl_scenes_init()`
 * :c:func:`zcl_scenes_cb()`

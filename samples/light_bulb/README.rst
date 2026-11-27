@@ -222,7 +222,7 @@ This sample uses the following |NCS| libraries:
 
   * :file:`zb_nrf_platform.h`
 
-* `DK Buttons and LEDs`_
+* :ref:`DK Buttons and LEDs <nrf:dk_buttons_and_leds_readme>`
 
 It uses the ZBOSS stack:
 
@@ -232,5 +232,5 @@ In addition, it uses the following Zephyr libraries:
 
 * :file:`include/zephyr.h`
 * :file:`include/device.h`
-* `Logging`_
-* `Pulse Width Modulation (PWM)`_
+* :ref:`Logging <zephyr:logging_api>`
+* :ref:`Pulse Width Modulation (PWM) <zephyr:pwm_api>`

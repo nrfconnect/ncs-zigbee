@@ -17,7 +17,7 @@ Enabling a device to work with these commands simplifies testing and debugging o
 Configuration
 *************
 
-The Zigbee shell commands are implemented using Zephyr's `Shell`_ interface.
+The Zigbee shell commands are implemented using Zephyr's :ref:`Shell <zephyr:shell_api>` interface.
 By default, Zephyr shell uses the UART backend.
 To change this and other Zephyr's shell settings (for example, the prompt or the maximum amount of accepted command arguments), read the documentation page in Zephyr.
 
@@ -44,7 +44,7 @@ Zigbee shell commands are available for the following backends when testing samp
 * Segger RTT
 
 You can run the Zigbee shell commands after connecting and configuring the backend for testing.
-For more information, see `Testing and optimization`_ in the |NCS| documentation.
+For more information, see :ref:`Testing and optimization <nrf:test_and_optimize>` in the |NCS| documentation.
 
 .. _zigbee_shell_reference:
 
