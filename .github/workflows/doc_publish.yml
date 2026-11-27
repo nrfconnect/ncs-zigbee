@@ -31,6 +31,24 @@ jobs:
           workflow: doc_build.yml
           run_id: ${{ github.event.workflow_run.id }}
 
+      # upload-artifact docs/publish/* lands at workspace root; sparse checkout has no docs/ tree.
+      - name: Stage publish artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p docs/publish
+          shopt -s nullglob
+          if ! compgen -G "docs/publish/monitor_*.txt" > /dev/null; then
+            for f in monitor_*.txt; do mv "$f" docs/publish/; done
+            [ -f pr.txt ] && mv pr.txt docs/publish/
+            [ -f comment.txt ] && mv comment.txt docs/publish/
+            for f in *.zip; do mv "$f" docs/publish/; done
+          fi
+          if ! compgen -G "docs/publish/monitor_*.txt" > /dev/null; then
+            echo "::error::Missing monitor_*.txt after artifact download (layout mismatch)" >&2
+            ls -laR
+            exit 1
+          fi
+
       - name: Unzip html archive
         working-directory: docs/publish
         run: |
