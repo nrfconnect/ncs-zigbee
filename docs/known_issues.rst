@@ -45,6 +45,46 @@ KRKNWK-22663: NCP connectivity firmware is not supported
 
   Restoring NCP connectivity firmware and the host package is planned for a future add-on release (without a confirmed timeline).
 
+.. rst-class:: v2-0-0 v1-4-0
+
+KRKNWK-22667: Green Power proxy crashes when sending a GPDF to a bidirectional Green Power Device
+  On routers and coordinators with Zigbee Green Power enabled (``CONFIG_ZIGBEE_GP_PB``), the device asserts in the nRF 802.15.4 Radio Driver the first time it transmits a GPDF to a Green Power Device.
+  This happens, for example, when the device acts as a TempMaster and answers a GPD Channel Request with a Channel Configuration, or sends a Commissioning Reply to a bidirectional Green Power Device.
+  The add-on transceiver schedules the frame with :c:func:`nrf_802154_transmit_raw_at` without setting the ``channel`` field of the metadata, so the driver attempts to transmit on channel 0.
+  After the assertion, the device stops responding on the network.
+
+  **Workaround:** In the :file:`subsys/osif/zb_nrf_transceiver.c` file, set the transmission channel in the ``ZB_MAC_TX_WAIT_ZGP`` case of the :c:func:`zb_trans_transmit` function:
+
+  .. code-block:: c
+
+     nrf_802154_transmit_at_metadata_t at_metadata = {
+             .frame_props = {
+                     .is_secured = false,
+                     .dynamic_data_is_set = false,
+             },
+             .cca = false,
+             .channel = current_channel,
+     };
+
+  The change is in the add-on sources only, so you do not need to update the precompiled ZBOSS libraries.
+  Rebuild your application to apply it.
+
+.. rst-class:: v1-4-0 v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
+
+NCSIDB-1980: NCP UART link stops responding to the host after a long ZBOSS stall
+  On the :ref:`NCP <zigbee_ncp_sample>` device, if the ZBOSS thread is blocked for longer than the NCP link layer send timeout (700 ms) while a host frame is being sent, the link can enter a permanent TX error and stop talking to the host until reset.
+  NVRAM page migration is a typical cause.
+
+  **Workaround:** Reset the NCP from the host when possible, or deliver each pending UART send-complete on the ZBOSS thread immediately before the link layer poll (at most once per send).
+
+.. rst-class:: v2-0-0 v1-4-0 v1-3-0 v1-2-1
+
+KRKNWK-22790: Trust Center cannot join more than about 20 devices
+  On a coordinator or Trust Center, the APS link key-pair table can fill with duplicate records when a joined device sends APS-secured traffic the TC cannot decrypt.
+  Further joins then fail during TCLK authorization; the table can stay full across reset until NVRAM is erased.
+
+  **Workaround:** Erase ZBOSS NVRAM on the affected coordinator and form the network again.
+
 .. rst-class:: v1-4-0 v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
 
 KRKNWK-22734: Increased power consumption when using precompiled ZBOSS libraries
@@ -86,20 +126,20 @@ KRKNWK-22613: Zigbee FOTA does not work for the light bulb sample
 
   **Workaround:** Cherry-pick and apply commit with the fix from ``main`` (commit hash: ``fda1f10981dc88553078f9f3aa14e3d4189007d2``).
 
-.. rst-class:: v1-4-0
+.. rst-class:: v2-0-0 v1-4-1 v1-4-0
 
 KRKNWK-22334: Zigbee Touchlink commissioning does not work reliably when Zigbee FOTA is enabled
   When Zigbee Firmware-Over-the-Air (FOTA) is enabled, Zigbee Touchlink commissioning does not work reliably.
   This issue is not observed when Zigbee FOTA is disabled.
 
-.. rst-class:: v1-4-0
+.. rst-class:: v2-0-0 v1-4-1 v1-4-0
 
 KRKNWK-22335: Zigbee Touchlink initiator is not always able to pair after single button activation
   In some cases, pressing the dedicated button does not pair the :ref:`zigbee_light_switch_sample`, acting as Touchlink initiator, with the :ref:`zigbee_light_bulb_sample`, acting as Touchlink target.
 
   **Workaround:** If the devices are not paired within 5–7 seconds after pressing the button, short-press the button once again on the light switch.
 
-.. rst-class:: v1-4-0
+.. rst-class:: v2-0-0 v1-4-1 v1-4-0
 
 KRKNWK-22343: Zigbee Touchlink initiator does not work when Zigbee Sleepy End Device behavior is enabled
   Touchlink commissioning uses inter-PAN frames that require the Zigbee End Device to keep its radio receiver active.
@@ -114,7 +154,7 @@ KRKNWK-21267: NCP crashes when migrating from the R22 to R23 firmware
   After migrating the ZBOSS firmware from R22 to R23, the Network Co-Processor (NCP) crashes during the migration of application datasets.
   This issue occurs only when the host application uses application‑specific datasets (:c:macro:`ZB_NVRAM_APP_DATA1` to :c:macro:`ZB_NVRAM_APP_DATA4` types).
 
-.. rst-class:: v1-4-0 v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
+.. rst-class:: v2-0-0 v1-4-1 v1-4-0 v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
 
 KRKNWK-21057: Poll Control cluster values overwritten to defaults on reboot
   After a sleepy end device (SED) reboots, the Poll Control cluster attributes are not restored to the values set before the reboot.
@@ -180,7 +220,7 @@ KRKNWK-21014: Increased power consumption after leaving network
 
     ZB_TRANSCEIVER_SET_RX_ON_OFF(zb_get_rx_on_when_idle());
 
-.. rst-class:: v1-4-0 v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
+.. rst-class:: v1-4-1 v1-4-0 v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
 
 NCSIDB-1336: Zigbee Router device cannot rejoin after missing Network Key update or rotation
   If a Zigbee Router device does not receive Network Key update or rotation messages (for example, while resetting or powered off), it may fall out of sync with the Trust Center and continue using old keys.
@@ -213,7 +253,7 @@ NCSIDB-1336: Zigbee Router device cannot rejoin after missing Network Key update
        break;
      }
 
-.. rst-class:: v1-4-0 v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
+.. rst-class:: wontfix v2-0-0 v1-4-1 v1-4-0 v1-3-0 v1-2-1 v1-2-0 v1-1-0 v1-0-0
 
 KRKNWK-12115: Simultaneous commissioning of many devices can cause the Coordinator device to assert
   The Zigbee Coordinator can assert when multiple devices are being commissioned at the same time.
