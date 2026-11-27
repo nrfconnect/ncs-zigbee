@@ -16,6 +16,8 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 +-------------------+------------------+-----------------------+---------------------+
 | |addon| version   | |NCS| version    | ZBOSS stack version   | NCP host version    |
 +===================+==================+=======================+=====================+
+| 1.4.1             | 3.4.2            | 4.2.7.1               | 3.8.0               |
++-------------------+------------------+-----------------------+---------------------+
 | 1.4.0             | 3.4.0            | 4.2.2.5               | 3.7.0               |
 +-------------------+------------------+-----------------------+---------------------+
 | 1.3.0             | 2.9.2            | 4.2.2.4               | 3.6.0               |
@@ -39,10 +41,19 @@ For a full list of |addon| releases, related |NCS| and ZBOSS stack and NCP host 
 | 0.1.0             |                  |                       | N/A                 | 
 +-------------------+------------------+-----------------------+---------------------+
 
-|addon| vX.Y.Z - TBD
+|addon| v1.4.1 - 26/11/2026
 ***************************
 
-The following release is `supported <Software maturity levels_>`_.
+This release has `supported <Software maturity levels_>`_ maturity status.
+It is the first release based on |NCS| v3.4.2 and ZBOSS v4.2.7.1, both of which are LTS releases.
+This provides a stable base that will receive security and critical fixes in the future.
+
+* Added:
+
+  * Support for the |NCS| v3.4.2.
+  * The new ZBOSS R23 v4.2.7.1.
+    See :ref:`zboss_stack_updates_4271` for the full list of stack fixes and enhancements.
+  * The ZBOSS NCP Host package v3.8.0.
 
 * Updated:
 
