@@ -2,8 +2,8 @@ You can add support for the nRF21540 front-end module to this sample by using on
 
 * Build the sample for one board that contains the nRF21540 FEM, such as :`nrf21540dk/nrf52840 <nrf52840dk_>_`.
 * Manually create a devicetree overlay file that describes how the nRF21540 FEM is connected to the SoC.
-  See `Configuring devicetree`_ for different ways of adding the overlay file.
-* Provide nRF21540 FEM capabilities by using a `shield <Shields_>`_, for example the `nRF21540 EK <Developing with the nRF21540 EK_>`_ shield that is available in the |NCS|.
+  See :ref:`Configuring devicetree <nrf:configuring_devicetree>` for different ways of adding the overlay file.
+* Provide nRF21540 FEM capabilities by using a :ref:`shield <zephyr:shields>`, for example the :ref:`nRF21540 EK <nrf:ug_radio_fem_nrf21540ek>` shield that is available in the |NCS|.
   In this case, build the project for a board connected to the shield you are using with an appropriate variable included in the build command, for example ``-DSHIELD=nrf21540ek``.
   This variable instructs the build system to append the appropriate devicetree overlay file.
 
@@ -24,9 +24,9 @@ You can add support for the nRF21540 front-end module to this sample by using on
 
            west build -b nrf52840dk/nrf52840 -- -DSHIELD=nrf21540ek
 
-  See `Building and programming with nRF21540 EK`_ in the |NCS| documentation for information about how to program when you are using a board with a network core, for example nRF5340 DK.
+  See :ref:`Building and programming with nRF21540 EK <nrf:ug_radio_fem_nrf21540ek_programming>` in the |NCS| documentation for information about how to program when you are using a board with a network core, for example nRF5340 DK.
 
 Each of these options adds the description of the nRF21540 FEM to the devicetree.
-See `Developing with Front-End Modules`_ in the |NCS| documentation for more information about FEM in the |NCS|.
+See :ref:`Developing with Front-End Modules <nrf:ug_radio_fem>` in the |NCS| documentation for more information about FEM in the |NCS|.
 
 To add support for other front-end modules, add the respective devicetree file entries to the board devicetree file or the devicetree overlay file.

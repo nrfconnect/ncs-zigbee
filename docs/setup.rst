@@ -28,13 +28,13 @@ Software requirements
 For libraries and code for |addon|, see the `ncs-zigbee repository <Zigbee R23 add-on_>`_.
 
 To work with the |addon|, you need to install the |NCS|, including all its prerequisites and the |NCS| toolchain.
-Follow the `Installing the nRF Connect SDK`_ instructions, with the following exception:
+Follow the :ref:`Installing the nRF Connect SDK <nrf:install_ncs>` instructions, with the following exception:
 
 .. tabs::
 
    .. group-tab:: |nRFVSC|
 
-      In the `Get the nRF Connect SDK code <Installing the nRF Connect SDK_>`_ section, click :guilabel:`Create a new application`. 
+      In the :ref:`Get the nRF Connect SDK code <nrf:cloning_the_repositories>` section, click :guilabel:`Create a new application`. 
       Select :guilabel:`Browse nRF Connect SDK Add-on Index`, then choose :guilabel:`Zigbee R23`. 
       Select |release| of the |addon|. 
       This step also installs nRF Connect SDK v\ |ncs_version|.
@@ -46,7 +46,7 @@ Follow the `Installing the nRF Connect SDK`_ instructions, with the following ex
 
       **Initialize a new workspace:**
 
-      1. In the `Get the nRF Connect SDK code <Installing the nRF Connect SDK_>`_, run the following command to initialize west with the |addon|, which also initializes the compatible version of the nRF Connect SDK:
+      1. In the :ref:`Get the nRF Connect SDK code <nrf:cloning_the_repositories>`, run the following command to initialize west with the |addon|, which also initializes the compatible version of the nRF Connect SDK:
 
          a. Initialize ``ncs`` for the add-on:
 

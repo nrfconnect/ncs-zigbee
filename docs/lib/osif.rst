@@ -105,7 +105,7 @@ Zigbee async serial
 
 ..
   The Zigbee async serial is the only backend that the ZBOSS OSIF serial supports for handling the NCP communication.
-  This set of functions uses `UART API`_ and can be configured to use UART peripheral.
+  This set of functions uses :ref:`UART API <zephyr:uart_api>` and can be configured to use UART peripheral.
   The data received are internally buffered.
 
   You can also use the Zigbee async serial for logging ZBOSS traces.
@@ -137,7 +137,7 @@ The Zigbee ZBOSS OSIF layer serial device needs to be provided in devicetree as 
 Zigbee serial logger
 ====================
 
-This set of functions uses Zephyr's `UART API`_ and can be configured to use either the UART peripheral.
+This set of functions uses Zephyr's :ref:`UART API <zephyr:uart_api>` and can be configured to use either the UART peripheral.
 Data is buffered internally in ring buffer and printed in the binary format.
 This ring buffer has a size of 4096 bytes by default.
 
@@ -163,7 +163,7 @@ The ZBOSS tracing serial device needs to be provided in Devicetree like this:
 Zigbee logger
 =============
 
-This set of functions uses Zephyr's `Logging`_ API for logging hexdumps of received binary data.
+This set of functions uses Zephyr's :ref:`Logging <zephyr:logging_api>` API for logging hexdumps of received binary data.
 Data is buffered internally in ring buffer.
 
 Zigbee logger configuration options

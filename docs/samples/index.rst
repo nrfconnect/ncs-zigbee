@@ -40,12 +40,12 @@ The following table lists variants and extensions available for each Zigbee samp
         - :ref:`** <zigbee_ug_sed>`
         - :ref:`** <zigbee_ug_sed>`
       * - Multiprotocol Bluetooth LE
-        - `*** <Multiprotocol support_>`_
+        - :ref:`*** <nrf:ug_multiprotocol_support>`
         - ✔
-        - `*** <Multiprotocol support_>`_
+        - :ref:`*** <nrf:ug_multiprotocol_support>`
         -
-        - `*** <Multiprotocol support_>`_
-        - `*** <Multiprotocol support_>`_
+        - :ref:`*** <nrf:ug_multiprotocol_support>`
+        - :ref:`*** <nrf:ug_multiprotocol_support>`
       * - Zigbee FOTA
         - :ref:`** <ug_zigbee_configuring_components_ota>`
         - ✔
@@ -87,12 +87,12 @@ The following table lists variants and extensions available for each Zigbee samp
       - :ref:`** <zigbee_ug_sed>`
       - :ref:`** <zigbee_ug_sed>`
     * - Multiprotocol Bluetooth LE
-      - `*** <Multiprotocol support_>`_
+      - :ref:`*** <nrf:ug_multiprotocol_support>`
       - ✔
-      - `*** <Multiprotocol support_>`_
+      - :ref:`*** <nrf:ug_multiprotocol_support>`
       -
-      - `*** <Multiprotocol support_>`_
-      - `*** <Multiprotocol support_>`_
+      - :ref:`*** <nrf:ug_multiprotocol_support>`
+      - :ref:`*** <nrf:ug_multiprotocol_support>`
     * - Zigbee FOTA
       - :ref:`** <ug_zigbee_configuring_components_ota>`
       - ✔

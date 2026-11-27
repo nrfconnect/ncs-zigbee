@@ -114,56 +114,56 @@ Other NVM columns list the reserved partition size for that region.
 
          .. group-tab:: nRF52833
 
-            Memory requirements for samples running on the `nRF52833 DK <Board support_>`_ (`nrf52833dk`_).
+            Memory requirements for samples running on the :ref:`nRF52833 DK <nrf:app_boards>` (:doc:`nrf52833dk <zephyr:boards/nordic/nrf52833dk/doc/index>`).
 
             .. memory-board::
                :board: nrf52833
 
          .. group-tab:: nRF52840
 
-            Memory requirements for samples running on the `nRF52840 DK <Board support_>`_ (`nrf52840dk`_).
+            Memory requirements for samples running on the :ref:`nRF52840 DK <nrf:app_boards>` (:doc:`nrf52840dk <zephyr:boards/nordic/nrf52840dk/doc/index>`).
 
             .. memory-board::
                :board: nrf52840
 
          .. group-tab:: nRF52840 Dongle
 
-            Memory requirements for samples running on the `nRF52840 Dongle DK <Board support_>`_  (`nrf52840dongle`_).
+            Memory requirements for samples running on the :ref:`nRF52840 Dongle DK <nrf:app_boards>`  (:doc:`nrf52840dongle <zephyr:boards/nordic/nrf52840dongle/doc/index>`).
 
             .. memory-board::
                :board: nrf52840_dongle
 
          .. group-tab:: nRF5340
 
-            Memory requirements for samples running on the `nRF5340 DK <Board support_>`_ (`nrf5340dk`_).
+            Memory requirements for samples running on the :ref:`nRF5340 DK <nrf:app_boards>` (:doc:`nrf5340dk <zephyr:boards/nordic/nrf5340dk/doc/index>`).
 
             .. memory-board::
                :board: nrf5340
 
          .. group-tab:: nRF54L05
 
-            Memory requirements for samples running on the `nRF54L05 emulation on the nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
+            Memory requirements for samples running on the :ref:`nRF54L05 emulation on the nRF54L15 DK <nrf:app_boards>` (:doc:`nrf54l15dk <zephyr:boards/nordic/nrf54l15dk/doc/index>`).
 
             .. memory-board::
                :board: nrf54l05
 
          .. group-tab:: nRF54L10
 
-            Memory requirements for samples running on the `nRF54L10 emulation on the nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
+            Memory requirements for samples running on the :ref:`nRF54L10 emulation on the nRF54L15 DK <nrf:app_boards>` (:doc:`nrf54l15dk <zephyr:boards/nordic/nrf54l15dk/doc/index>`).
 
             .. memory-board::
                :board: nrf54l10
 
          .. group-tab:: nRF54L15
 
-            Memory requirements for samples running on the `nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
+            Memory requirements for samples running on the :ref:`nRF54L15 DK <nrf:app_boards>` (:doc:`nrf54l15dk <zephyr:boards/nordic/nrf54l15dk/doc/index>`).
 
             .. memory-board::
                :board: nrf54l15
 
          .. group-tab:: nRF54LM20
 
-            Memory requirements for samples running on the `nRF54LM20 DK <Board support_>`_ (`nrf54lm20dk`_) with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
+            Memory requirements for samples running on the :ref:`nRF54LM20 DK <nrf:app_boards>` (:doc:`nrf54lm20dk <zephyr:boards/nordic/nrf54lm20dk/doc/index>`) with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
 
             .. memory-board::
                :board: nrf54lm20
@@ -174,56 +174,56 @@ Other NVM columns list the reserved partition size for that region.
 
          .. group-tab:: nRF52833
 
-            The following table lists memory requirements for samples running on the `nRF52833 DK <Board support_>`_ (`nrf52833dk`_).
+            The following table lists memory requirements for samples running on the :ref:`nRF52833 DK <nrf:app_boards>` (:doc:`nrf52833dk <zephyr:boards/nordic/nrf52833dk/doc/index>`).
 
             .. memory-table::
                :board: nrf52833
 
          .. group-tab:: nRF52840
 
-            The following table lists memory requirements for samples running on the `nRF52840 DK <Board support_>`_ (`nrf52840dk`_).
+            The following table lists memory requirements for samples running on the :ref:`nRF52840 DK <nrf:app_boards>` (:doc:`nrf52840dk <zephyr:boards/nordic/nrf52840dk/doc/index>`).
 
             .. memory-table::
                :board: nrf52840
 
          .. group-tab:: nRF52840 Dongle
 
-            The following table lists memory requirements for samples running on the `nRF52840 Dongle DK <Board support_>`_  (`nrf52840dongle`_).
+            The following table lists memory requirements for samples running on the :ref:`nRF52840 Dongle DK <nrf:app_boards>`  (:doc:`nrf52840dongle <zephyr:boards/nordic/nrf52840dongle/doc/index>`).
 
             .. memory-table::
                :board: nrf52840_dongle
 
          .. group-tab:: nRF5340
 
-            The following table lists memory requirements for samples running on the `nRF5340 DK <Board support_>`_ (`nrf5340dk`_).
+            The following table lists memory requirements for samples running on the :ref:`nRF5340 DK <nrf:app_boards>` (:doc:`nrf5340dk <zephyr:boards/nordic/nrf5340dk/doc/index>`).
 
             .. memory-table::
                :board: nrf5340
 
          .. group-tab:: nRF54L05
 
-            The following table lists memory requirements for samples running on the `nRF54L05 emulation on the nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
+            The following table lists memory requirements for samples running on the :ref:`nRF54L05 emulation on the nRF54L15 DK <nrf:app_boards>` (:doc:`nrf54l15dk <zephyr:boards/nordic/nrf54l15dk/doc/index>`).
 
             .. memory-table::
                :board: nrf54l05
 
          .. group-tab:: nRF54L10
 
-            The following table lists memory requirements for samples running on the `nRF54L10 emulation on the nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
+            The following table lists memory requirements for samples running on the :ref:`nRF54L10 emulation on the nRF54L15 DK <nrf:app_boards>` (:doc:`nrf54l15dk <zephyr:boards/nordic/nrf54l15dk/doc/index>`).
 
             .. memory-table::
                :board: nrf54l10
 
          .. group-tab:: nRF54L15
 
-            The following table lists memory requirements for samples running on the `nRF54L15 DK <Board support_>`_ (`nrf54l15dk`_).
+            The following table lists memory requirements for samples running on the :ref:`nRF54L15 DK <nrf:app_boards>` (:doc:`nrf54l15dk <zephyr:boards/nordic/nrf54l15dk/doc/index>`).
 
             .. memory-table::
                :board: nrf54l15
 
          .. group-tab:: nRF54LM20
 
-            The following table lists memory requirements for samples running on the `nRF54LM20 DK <Board support_>`_ (`nrf54lm20dk`_) with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
+            The following table lists memory requirements for samples running on the :ref:`nRF54LM20 DK <nrf:app_boards>` (:doc:`nrf54lm20dk <zephyr:boards/nordic/nrf54lm20dk/doc/index>`) with the ``nrf54lm20dk/nrf54lm20a/cpuapp`` or ``nrf54lm20dk/nrf54lm20b/cpuapp`` board targets.
 
             .. memory-table::
                :board: nrf54lm20
