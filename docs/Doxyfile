@@ -2332,7 +2332,9 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = __syscall= \
                          DOXYGEN \
-                         CONFIG_ZIGBEE_DEBUG_FUNCTIONS
+                         CONFIG_ZIGBEE_DEBUG_FUNCTIONS \
+                         CONFIG_ZIGBEE_APP_IO_SHELL \
+                         CONFIG_PWM
 
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
