@@ -33,3 +33,4 @@ See also the :ref:`lib_zigbee_osif` library in the :ref:`lib_zigbee` section.
 
    configuration
    certification
+   stack_updates
