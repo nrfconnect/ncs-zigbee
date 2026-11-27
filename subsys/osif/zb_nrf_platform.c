@@ -346,6 +346,14 @@ int zigbee_init(void)
 #error Zigbee device role undefined!
 #endif
 
+#if defined(CONFIG_ZIGBEE_CHANNEL_SELECTION_MODE_SINGLE)
+	zb_channel_list_t secondary_channel_list;
+
+	zb_channel_list_init(secondary_channel_list);
+	zb_channel_page_list_set_2_4GHz_mask(secondary_channel_list, 0U);
+	zb_set_bdb_secondary_channel_list(secondary_channel_list);
+#endif
+
 #endif /* CONFIG_ZIGBEE_LIBRARY_NCP_DEV */
 
 #endif /* CONFIG_ZB_TEST_MODE_MAC */

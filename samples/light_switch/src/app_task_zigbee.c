@@ -273,6 +273,7 @@ static void start_identifying(zb_cb_param_t param)
 
 #if defined(CONFIG_ZIGBEE_TOUCHLINK_INITIATOR)
 static bool touchlink_start_pending;
+static bool touchlink_in_progress;
 
 static void light_switch_touchlink_begin(zb_cb_param_t unused);
 
@@ -298,12 +299,19 @@ static void light_switch_touchlink_begin(zb_cb_param_t unused)
 		LOG_WRN("Touchlink commissioning rejected, cancelling active commissioning");
 		zigbee_network_join_commissioning_set_active(false);
 		zb_buf_get_out_delayed(light_switch_touchlink_cancel_then_begin);
+	} else {
+		touchlink_in_progress = true;
 	}
 }
 
 static void light_switch_touchlink_initiator_start_cb(zb_cb_param_t param)
 {
 	ZVUNUSED(param);
+
+	if (touchlink_in_progress || touchlink_start_pending) {
+		LOG_INF("Touchlink commissioning already in progress");
+		return;
+	}
 
 	zigbee_network_rejoin_abort();
 	ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_begin, 0);
@@ -799,17 +807,24 @@ void zboss_signal_handler(zb_cb_param_t param)
 	case ZB_BDB_SIGNAL_STEERING_CANCELLED:
 		if (touchlink_start_pending) {
 			touchlink_start_pending = false;
-			ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_begin, 0);
-			break;
+			if (status == RET_OK) {
+				ZB_SCHEDULE_APP_CALLBACK(light_switch_touchlink_begin, 0);
+				break;
+			}
+			LOG_WRN("Steering cancel failed (status: %d), aborting Touchlink start",
+				status);
 		}
 		ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
 		break;
 
 	case ZB_BDB_SIGNAL_TOUCHLINK:
+		touchlink_in_progress = false;
 		ZB_ERROR_CHECK(zigbee_default_signal_handler(param));
 		if (status == RET_OK) {
 			LOG_INF("Touchlink done: start finding bulb");
 			light_switch_schedule_bulb_find();
+		} else {
+			LOG_INF("Touchlink commissioning failed (status: %d)", status);
 		}
 		break;
 #endif /* CONFIG_ZIGBEE_TOUCHLINK_INITIATOR */

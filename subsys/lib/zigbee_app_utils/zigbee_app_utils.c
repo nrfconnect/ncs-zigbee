@@ -343,6 +343,11 @@ zb_ret_t zigbee_default_signal_handler(zb_cb_param_t param)
 		 *    (see BDB specification section 8.4).
 		 */
 		LOG_INF("Device started for the first time");
+
+		/* A network steering attempt started while the device is not
+		 * on a network, is reported with this signal instead of
+		 * ZB_BDB_SIGNAL_STEERING.
+		 */
 		if (status == RET_OK) {
 			if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
 				LOG_INF("Start network steering");
@@ -354,6 +359,16 @@ zb_ret_t zigbee_default_signal_handler(zb_cb_param_t param)
 				LOG_INF("Start network steering");
 				comm_status = bdb_start_commissioning_tracked(
 					ZB_BDB_NETWORK_STEERING);
+			}
+		} else if (role != ZB_NWK_DEVICE_TYPE_COORDINATOR) {
+			rejoin_attempt_finished();
+			if (status == RET_INTERRUPTED) {
+				LOG_INF("Network steering interrupted");
+			} else {
+				zigbee_network_join_commissioning_set_active(false);
+				LOG_INF("Network steering was not successful (status: %d)",
+					status);
+				start_network_rejoin(true);
 			}
 		} else {
 			LOG_ERR("Failed to initialize Zigbee stack (status: %d)",
@@ -1410,7 +1425,11 @@ void zigbee_touchlink_target_signal_handler(zb_cb_param_t param)
 		}
 	}
 
-	if (sig == ZB_BDB_SIGNAL_STEERING && status != RET_OK && !ZB_JOINED() &&
+	/* On a node that is not on a network, a failed steering attempt is
+	 * reported as ZB_BDB_SIGNAL_DEVICE_FIRST_START.
+	 */
+	if ((sig == ZB_BDB_SIGNAL_STEERING || sig == ZB_BDB_SIGNAL_DEVICE_FIRST_START) &&
+	    status != RET_OK && !ZB_JOINED() &&
 	    zigbee_tl_target_state == ZIGBEE_TL_TARGET_STATE_IDLE) {
 		zb_ret_t zr;
 
