@@ -72,7 +72,7 @@ Multiprotocol Bluetooth LE extension
 ====================================
 
 This optional extension demonstrates dynamic concurrent switching between two protocols, Bluetooth® LE and Zigbee.
-It uses the `Nordic UART Service (NUS)`_ library.
+It uses the :ref:`Nordic UART Service (NUS) <nrf:nus_service_readme>` library.
 
 When this extension is enabled, you can use:
 
@@ -81,12 +81,12 @@ When this extension is enabled, you can use:
 
 Both networks are independent from each other.
 
-To support both protocols at the same time, the Zigbee stack uses the `IEEE 802.15.4`_ radio during the inactive time of the Bluetooth LE radio (using the Timeslot API of the `Multiprotocol Service Layer`_).
+To support both protocols at the same time, the Zigbee stack uses the :ref:`IEEE 802.15.4 <zephyr:ieee802154_interface>` radio during the inactive time of the Bluetooth LE radio (using the Timeslot API of the :ref:`Multiprotocol Service Layer <nrfxlib:mpsl>`).
 Depending on the Bluetooth LE connection interval, the nRF52 development kits can spend up to 99% of the radio time on the Zigbee protocol.
 
 Transmitting and receiving data when using this example does not break connection from any of the used radio protocols, either Bluetooth LE or Zigbee.
 
-For more information about the multiprotocol feature, see `Multiprotocol support`_ in the |NCS| documentation.
+For more information about the multiprotocol feature, see :ref:`Multiprotocol support <nrf:ug_multiprotocol_support>` in the |NCS| documentation.
 
 
 .. _zigbee_light_switch_configuration:
@@ -161,10 +161,10 @@ For example, when building from the command line, use the following command:
 
    west build samples/light_switch -b *board_target* -- -DEXTRA_CONF_FILE='overlay-multiprotocol_ble.conf'
 
-For the board name to use instead of the ``board_target``, see `Programming board names`_.
+For the board name to use instead of the ``board_target``, see :ref:`Programming board names <nrf:programming_board_names>`.
 
-See `Providing CMake options`_ in the |NCS| documentation for instructions on how to add flags to your build.
-For more information about configuration files in the |NCS|, see `Build and configuration system`_ in the |NCS| documentation.
+See :ref:`Providing CMake options <nrf:configuring_cmake>` in the |NCS| documentation for instructions on how to add flags to your build.
+For more information about configuration files in the |NCS|, see :ref:`Build and configuration system <nrf:build_and_configuration_system>` in the |NCS| documentation.
 
 ..
   FEM support
@@ -327,19 +327,19 @@ Multiprotocol Bluetooth LE extension assignments
 
       LED 0:
           Lit and solid when a Bluetooth LE Central is connected to the NUS service.
-          Available when using `Nordic UART Service (NUS)`_ in the multiprotocol configuration.
+          Available when using :ref:`Nordic UART Service (NUS) <nrf:nus_service_readme>` in the multiprotocol configuration.
 
    .. group-tab:: nRF54LM20 Dongle
 
       Red LED 1:
           Lit and solid when a Bluetooth LE Central is connected to the NUS service.
-          Available when using `Nordic UART Service (NUS)`_ in the multiprotocol configuration.
+          Available when using :ref:`Nordic UART Service (NUS) <nrf:nus_service_readme>` in the multiprotocol configuration.
 
    .. group-tab:: nRF52 and nRF53 DKs
 
       LED 1:
           Lit and solid when a Bluetooth LE Central is connected to the NUS service.
-          Available when using `Nordic UART Service (NUS)`_ in the multiprotocol configuration.
+          Available when using :ref:`Nordic UART Service (NUS) <nrf:nus_service_readme>` in the multiprotocol configuration.
 
 UART command assignments:
     The following command assignments are configured and used in nRF Toolbox when :ref:`zigbee_light_switch_testing_ble`:
@@ -534,21 +534,21 @@ Sample output
 -------------
 
 You can observe the sample logging output through a serial port after connecting with a terminal emulator (for example, nRF Connect Serial Terminal).
-See `Testing and optimization`_ in the |NCS| documentation for the required settings and steps.
+See :ref:`Testing and optimization <nrf:test_and_optimize>` in the |NCS| documentation for the required settings and steps.
 
 Dependencies
 ************
 
 This sample uses the following |NCS| libraries:
 
-* `RAM power-down`_
+* :ref:`RAM power-down <nrf:ug_power_optimization_ram>`
 * :ref:`lib_zigbee_error_handler`
 * :ref:`lib_zigbee_application_utilities`
 * Zigbee subsystem:
 
   * :file:`zb_nrf_platform.h`
 
-* `DK Buttons and LEDs`_
+* :ref:`DK Buttons and LEDs <nrf:dk_buttons_and_leds_readme>`
 
 It uses the ZBOSS stack:
 
@@ -558,13 +558,13 @@ In addition, it uses the following Zephyr libraries:
 
 * :file:`include/zephyr.h`
 * :file:`include/device.h`
-* `Logging`_
+* :ref:`Logging <zephyr:logging_api>`
 
 The following dependencies are added by the multiprotocol Bluetooth LE extension:
 
-* `SoftDevice Controller`_
-* `Nordic UART Service (NUS)`_
-* Zephyr's `Bluetooth API`_:
+* :ref:`SoftDevice Controller <nrfxlib:softdevice_controller>`
+* :ref:`Nordic UART Service (NUS) <nrf:nus_service_readme>`
+* Zephyr's :ref:`Bluetooth API <zephyr:bluetooth_api>`:
 
   * ``include/bluetooth/bluetooth.h``
   * ``include/bluetooth/gatt.h``

@@ -31,5 +31,5 @@ In combination with the |NCS|, the |addon| allows for development of low-power c
    lib/index
    tools
    software-maturity
+   compatibility_matrix
    release-notes
-   known_issues

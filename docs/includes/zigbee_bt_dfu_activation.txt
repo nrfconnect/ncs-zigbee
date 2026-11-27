@@ -10,7 +10,7 @@ For example, when building from the command line, use the following command:
 
    west build |sample dir| -b *board_target* -- -DFILE_SUFFIX=fota -DSNIPPET=zigbee_fota
 
-The FOTA variant enables `MCUboot image compression`_.
+The FOTA variant enables :ref:`MCUboot image compression <nrf:mcuboot_image_compression>`.
 The generated Zigbee update file contains a compressed MCUboot image, and MCUboot decompresses it while applying the update.
 This setting reduces the size of the update image.
 However, it requires MCUboot to run in overwrite-only mode, which means the device cannot revert to the previous image after an update is applied.

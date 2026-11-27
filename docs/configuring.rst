@@ -19,7 +19,7 @@ Zigbee requires the following modules:
 * :ref:`zigbee_zboss`, with the :ref:`lib_zigbee_osif` subsystem acting as the linking layer between the ZBOSS stack and the |NCS|.
   The ZBOSS library is enabled by the ``CONFIG_ZIGBEE_ADD_ON`` Kconfig option.
   For more information about the ZBOSS stack, see also the `external ZBOSS development guide and API documentation`_.
-* `IEEE 802.15.4`_ radio driver - This library is automatically enabled when working with Zigbee on Nordic Semiconductor's development kits.
+* :ref:`IEEE 802.15.4 <zephyr:ieee802154_interface>` radio driver - This library is automatically enabled when working with Zigbee on Nordic Semiconductor's development kits.
 
 .. _zigbee_ug_configuration:
 
@@ -38,7 +38,7 @@ After that, you have to define the Zigbee device role for the Zigbee application
 Setting any of these options enables the respective ZBOSS role library.
 This is needed because End Devices use different libraries than Routers and Coordinators.
 
-For instructions about how to set Kconfig options, see `Configuring and building`_ in the |NCS| documentation.
+For instructions about how to set Kconfig options, see :ref:`Configuring and building <nrf:configuration_and_build>` in the |NCS| documentation.
 
 .. _zigbee_ug_sed:
 
@@ -314,7 +314,7 @@ Custom logging per module
 =========================
 
 Logging is handled with the ``CONFIG_LOG`` Kconfig option.
-This option enables logging for both the stack and Zephyr's `Logging`_ API.
+This option enables logging for both the stack and Zephyr's :ref:`Logging <zephyr:logging_api>` API.
 
 .. _zigbee_ug_logging_application_logs:
 
@@ -329,7 +329,7 @@ This level can be changed only by modifying the sample code.
 Stack logs
 ----------
 
-The stack logs are independent from Zephyr's `Logging`_ API.
+The stack logs are independent from Zephyr's :ref:`Logging <zephyr:logging_api>` API.
 To customize them, use the following Kconfig options:
 
 * ``CONFIG_ZBOSS_ERROR_PRINT_TO_LOG`` - Allows the application to log ZBOSS error names; enabled by default.
@@ -343,7 +343,7 @@ To customize them, use the following Kconfig options:
 The stack logs are provided in a binary format.
 You can configure how they are printed with the following Kconfig options:
 
-* ``CONFIG_ZBOSS_TRACE_HEXDUMP_LOGGING`` - Stack logs are printed as hexdump using Zephyr's `Logging`_ API.
+* ``CONFIG_ZBOSS_TRACE_HEXDUMP_LOGGING`` - Stack logs are printed as hexdump using Zephyr's :ref:`Logging <zephyr:logging_api>` API.
   This option is enabled by default.
 * ``CONFIG_ZBOSS_TRACE_BINARY_LOGGING`` - Stack logs are printed in the binary format using one of the following independent serial backends of your choice:
 
@@ -362,7 +362,7 @@ You can configure how they are printed with the following Kconfig options:
   * ``CONFIG_ZBOSS_TRACE_BINARY_NCP_TRANSPORT_LOGGING`` - Stack logs are printed in the binary format using the NCP transport channel.
 
 ..
-  Stack logs are stored in the internal buffer if they are printed using Zephyr's `Logging`_ API or the independent serial backend.
+  Stack logs are stored in the internal buffer if they are printed using Zephyr's :ref:`Logging <zephyr:logging_api>` API or the independent serial backend.
   You can customize the buffer size with the ``CONFIG_ZBOSS_TRACE_LOGGER_BUFFER_SIZE`` Kconfig option.
   The buffer size must be larger than ``256`` and smaller than ``2147483648``
 
@@ -398,7 +398,7 @@ For example, setting ``CONFIG_ZBOSS_TRACE_LOG_LEVEL_INF`` will enable logging of
 Reduced power consumption
 =========================
 
-You can reduce the amount of power used by your device by enabling the `RAM power-down`_ library.
+You can reduce the amount of power used by your device by enabling the :ref:`RAM power-down <nrf:lib_ram_pwrdn>` library.
 This library is also used for `Power saving during sleep`_.
 
 
@@ -408,11 +408,11 @@ Upgrading Zigbee application
 ****************************
 
 When upgrading the Zigbee application, use Zephyr's devicetree-based flash partitioning to ensure that ZBOSS' NVRAM is placed in the same area of flash.
-This is because enabling additional features (for example, Zephyr's `Non-Volatile Storage (NVS)`_) can change the placement of the partition in the flash and the ZBOSS settings can be lost, as the application is not able to find the partition.
+This is because enabling additional features (for example, Zephyr's :ref:`Non-Volatile Storage (NVS) <zephyr:nvs_api>`) can change the placement of the partition in the flash and the ZBOSS settings can be lost, as the application is not able to find the partition.
 
 The Partition Manager is deprecated in the |NCS|.
 New Zigbee designs and migrated applications should define fixed flash partitions in devicetree instead of using :file:`pm_static*.yml` files.
-See `Migrating partition configuration from Partition Manager to devicetree (DTS)`_ in the |NCS| documentation for the general migration workflow.
+See :ref:`Migrating partition configuration from Partition Manager to devicetree (DTS) <nrf:migration_partitions>` in the |NCS| documentation for the general migration workflow.
 
 When Partition Manager is disabled (``SB_CONFIG_PARTITION_MANAGER=n``), the Zigbee add-on requires the following devicetree partition nodes:
 
