@@ -30,8 +30,6 @@ jobs:
         with:
           workflow: doc_build.yml
           run_id: ${{ github.event.workflow_run.id }}
-          # doc_build uploads docs/publish/*; extract into the same layout for publish steps.
-          path: docs/publish
 
       - name: Unzip html archive
         working-directory: docs/publish
